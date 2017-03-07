@@ -13,21 +13,21 @@ describe("Dispatchers", () => {
 
     describe("Basic usage", () => {
       it("creates only one Dispatcher.Touch per element", () => {
-        const svg = TestMethods.generateSVG();
+        const div = TestMethods.generateDiv();
         const component = new Plottable.Component();
-        sinon.stub(component, "rootElement", () => svg);
+        sinon.stub(component, "rootElement", () => div);
 
         const td1 = Plottable.Dispatchers.Touch.getDispatcher(component);
         assert.isNotNull(td1, "created a new Dispatcher on an SVG");
         const td2 = Plottable.Dispatchers.Touch.getDispatcher(component);
-        assert.strictEqual(td1, td2, "returned the existing Dispatcher if called again with same <svg>");
+        assert.strictEqual(td1, td2, "returned the existing Dispatcher if called again with same <div>");
 
-        svg.remove();
+        div.remove();
       });
     });
 
     describe("Callbacks", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let touchDispatcher: Plottable.Dispatchers.Touch;
       let callbackWasCalled: boolean;
 
@@ -51,11 +51,11 @@ describe("Dispatchers", () => {
       };
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
         const component = new Plottable.Component();
-        sinon.stub(component, "rootElement", () => svg);
+        sinon.stub(component, "rootElement", () => div);
         // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
-        svg.append("rect").attr("width", SVG_WIDTH).attr("height", SVG_HEIGHT);
+        div.append("rect").attr("width", SVG_WIDTH).attr("height", SVG_HEIGHT);
         touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(component);
         callbackWasCalled = false;
       });
@@ -64,68 +64,68 @@ describe("Dispatchers", () => {
         assert.strictEqual(touchDispatcher.onTouchStart(callbackWithPositionAssertion), touchDispatcher,
           "setting the touchStart callback returns the dispatcher");
 
-        TestMethods.triggerFakeTouchEvent("touchstart", svg, expectedPoints, ids);
+        TestMethods.triggerFakeTouchEvent("touchstart", div, expectedPoints, ids);
         assert.isTrue(callbackWasCalled, "callback was called on touchstart");
 
         assert.strictEqual(touchDispatcher.offTouchStart(callbackWithPositionAssertion), touchDispatcher,
           "unsetting the touchStart callback returns the dispatcher");
 
         callbackWasCalled = false;
-        TestMethods.triggerFakeTouchEvent("touchstart", svg, expectedPoints, ids);
+        TestMethods.triggerFakeTouchEvent("touchstart", div, expectedPoints, ids);
         assert.isFalse(callbackWasCalled, "callback was disconnected from the dispatcher");
 
-        svg.remove();
+        div.remove();
       });
 
       it("calls the touchMove callback", () => {
         assert.strictEqual(touchDispatcher.onTouchMove(callbackWithPositionAssertion), touchDispatcher,
           "setting the touchMove callback returns the dispatcher");
 
-        TestMethods.triggerFakeTouchEvent("touchmove", svg, expectedPoints, ids);
+        TestMethods.triggerFakeTouchEvent("touchmove", div, expectedPoints, ids);
         assert.isTrue(callbackWasCalled, "callback was called on touchmove");
 
         assert.strictEqual(touchDispatcher.offTouchMove(callbackWithPositionAssertion), touchDispatcher,
           "unsetting the touchMove callback returns the dispatcher");
 
         callbackWasCalled = false;
-        TestMethods.triggerFakeTouchEvent("touchmove", svg, expectedPoints, ids);
+        TestMethods.triggerFakeTouchEvent("touchmove", div, expectedPoints, ids);
         assert.isFalse(callbackWasCalled, "callback was disconnected from the dispatcher");
 
-        svg.remove();
+        div.remove();
       });
 
       it("calls the touchEnd callback", () => {
         assert.strictEqual(touchDispatcher.onTouchEnd(callbackWithPositionAssertion), touchDispatcher,
           "setting the touchEnd callback returns the dispatcher");
 
-        TestMethods.triggerFakeTouchEvent("touchend", svg, expectedPoints, ids);
+        TestMethods.triggerFakeTouchEvent("touchend", div, expectedPoints, ids);
         assert.isTrue(callbackWasCalled, "callback was called on touchend");
 
         assert.strictEqual(touchDispatcher.offTouchEnd(callbackWithPositionAssertion), touchDispatcher,
           "unsetting the touchEnd callback returns the dispatcher");
 
         callbackWasCalled = false;
-        TestMethods.triggerFakeTouchEvent("touchend", svg, expectedPoints, ids);
+        TestMethods.triggerFakeTouchEvent("touchend", div, expectedPoints, ids);
         assert.isFalse(callbackWasCalled, "callback was disconnected from the dispatcher");
 
-        svg.remove();
+        div.remove();
       });
 
       it("calls the touchCancel callback", () => {
         assert.strictEqual(touchDispatcher.onTouchCancel(callbackWithPositionAssertion), touchDispatcher,
           "setting the touchCancel callback returns the dispatcher");
 
-        TestMethods.triggerFakeTouchEvent("touchcancel", svg, expectedPoints, ids);
+        TestMethods.triggerFakeTouchEvent("touchcancel", div, expectedPoints, ids);
         assert.isTrue(callbackWasCalled, "callback was called on touchend");
 
         assert.strictEqual(touchDispatcher.offTouchCancel(callbackWithPositionAssertion), touchDispatcher,
           "unsetting the touchCancel callback returns the dispatcher");
 
         callbackWasCalled = false;
-        TestMethods.triggerFakeTouchEvent("touchcancel", svg, expectedPoints, ids);
+        TestMethods.triggerFakeTouchEvent("touchcancel", div, expectedPoints, ids);
         assert.isFalse(callbackWasCalled, "callback was disconnected from the dispatcher");
 
-        svg.remove();
+        div.remove();
       });
 
       it("can register two callbacks for the same touch dispatcher", () => {
@@ -137,7 +137,7 @@ describe("Dispatchers", () => {
         touchDispatcher.onTouchStart(callback1);
         touchDispatcher.onTouchStart(callback2);
 
-        TestMethods.triggerFakeTouchEvent("touchstart", svg, expectedPoints, ids);
+        TestMethods.triggerFakeTouchEvent("touchstart", div, expectedPoints, ids);
 
         assert.isTrue(callback1WasCalled, "callback 1 was called on touchstart");
         assert.isTrue(callback2WasCalled, "callback 2 was called on touchstart");
@@ -146,11 +146,11 @@ describe("Dispatchers", () => {
 
         callback1WasCalled = false;
         callback2WasCalled = false;
-        TestMethods.triggerFakeTouchEvent("touchstart", svg, expectedPoints, ids);
+        TestMethods.triggerFakeTouchEvent("touchstart", div, expectedPoints, ids);
         assert.isFalse(callback1WasCalled, "callback 1 was disconnected from the dispatcher");
         assert.isTrue(callback2WasCalled, "callback 2 is still connected to the dispatcher");
 
-        svg.remove();
+        div.remove();
       });
 
       it("doesn't call callbacks if not in the DOM", () => {
@@ -158,13 +158,13 @@ describe("Dispatchers", () => {
         const callback = () => customCallbackWasCalled = true;
 
         touchDispatcher.onTouchMove(callback);
-        TestMethods.triggerFakeTouchEvent("touchmove", svg, expectedPoints, ids);
+        TestMethods.triggerFakeTouchEvent("touchmove", div, expectedPoints, ids);
         assert.isTrue(customCallbackWasCalled, "callback was called on touchmove");
 
-        svg.remove();
+        div.remove();
         customCallbackWasCalled = false;
-        TestMethods.triggerFakeTouchEvent("touchmove", svg, expectedPoints, ids);
-        assert.isFalse(customCallbackWasCalled, "callback was not called after <svg> was removed from DOM");
+        TestMethods.triggerFakeTouchEvent("touchmove", div, expectedPoints, ids);
+        assert.isFalse(customCallbackWasCalled, "callback was not called after <div> was removed from DOM");
 
         touchDispatcher.offTouchMove(callback);
       });

@@ -10,19 +10,19 @@ import * as TestMethods from "../testMethods";
 describe("Plots", () => {
   describe("PiePlot", () => {
     describe("Rendering", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let dataset: Plottable.Dataset;
       let data: any[];
       let piePlot: Plottable.Plots.Pie;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG();
+        div = TestMethods.generateDiv();
         data = [{value: 5}, {value: 15}];
         dataset = new Plottable.Dataset(data);
         piePlot = new Plottable.Plots.Pie();
         piePlot.addDataset(dataset);
         piePlot.sectorValue((d) => d.value);
-        piePlot.renderTo(svg);
+        piePlot.renderTo(div);
       });
 
       it("draws a fill path and a stroke path for each slice", () => {
@@ -34,7 +34,7 @@ describe("Plots", () => {
         assert.strictEqual(arcOutlinePaths.size(), data.length, "1 outline path per datum");
         assert.strictEqual(arcFillPaths.style("stroke"), "none", "fill paths have no stroke");
         assert.strictEqual(arcOutlinePaths.style("fill"), "none", "outline paths have no fill");
-        svg.remove();
+        div.remove();
       });
 
       it("draws slices proportional in angle to their value", () => {
@@ -71,7 +71,7 @@ describe("Plots", () => {
         assert.closeTo(lineCommand1.arguments[0], 0, 1, "draws line to origin (x)");
         assert.closeTo(lineCommand1.arguments[1], 0, 1, "draws line to origin (y)");
 
-        svg.remove();
+        div.remove();
       });
 
       it("uses Plottable colors for sectors by default", () => {
@@ -81,7 +81,7 @@ describe("Plots", () => {
         arcPaths.each(function(d, i) {
           assert.deepEqual(d3.color(d3.select(this).attr("fill")), d3.color(plottableColors[i]), `sector with index ${i} has the correct fill color`);
         });
-        svg.remove();
+        div.remove();
       });
 
       it("updates slices when data changes", () => {
@@ -104,7 +104,7 @@ describe("Plots", () => {
         originalPathStrings.forEach((pathString, index) => {
           assert.notStrictEqual(pathString, oneMoreSlicePathStrings[index], "slices were updated when data changed");
         });
-        svg.remove();
+        div.remove();
       });
 
       it("can set innerRadius()", () => {
@@ -125,7 +125,7 @@ describe("Plots", () => {
         assert.closeTo(innerArcCommand0.arguments[5], 0, 1, "inner arc ends at correct position (x)");
         assert.closeTo(innerArcCommand0.arguments[6], -expectedInnerRadius, 1, "inner arc ends at correct position (y)");
 
-        svg.remove();
+        div.remove();
       });
 
       it("can set outerRadius()", () => {
@@ -146,7 +146,7 @@ describe("Plots", () => {
         assert.closeTo(outerArcCommand0.arguments[5], expectedOuterRadius, 1, "outer arc ends at correct position (x)");
         assert.closeTo(outerArcCommand0.arguments[6], 0, 1, "outer arc ends at correct position (y)");
 
-        svg.remove();
+        div.remove();
       });
 
       it("can set startAngle()", () => {
@@ -185,7 +185,7 @@ describe("Plots", () => {
         assert.closeTo(lineCommand1.arguments[0], 0, 1, "draws line to origin (x)");
         assert.closeTo(lineCommand1.arguments[1], 0, 1, "draws line to origin (y)");
 
-        svg.remove();
+        div.remove();
       });
 
       it("can set endAngle()", () => {
@@ -224,7 +224,7 @@ describe("Plots", () => {
         assert.closeTo(lineCommand1.arguments[0], 0, 1, "draws line to origin (x)");
         assert.closeTo(lineCommand1.arguments[1], 0, 1, "draws line to origin (y)");
 
-        svg.remove();
+        div.remove();
       });
 
       it("updates slices when data changes and render correctly w.r.t. scale changes", () => {
@@ -247,17 +247,17 @@ describe("Plots", () => {
           assert.notInclude(pathString, "NaN", "new pathString should not contain NaN");
           assert.notStrictEqual(pathString, originalStringPaths[index], "new pathString should not equal old one");
         });
-        svg.remove();
+        div.remove();
       });
 
     });
 
     describe("Labels", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let piePlot: Plottable.Plots.Pie;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG(500, 500);
+        div = TestMethods.generateDiv(500, 500);
         piePlot = new Plottable.Plots.Pie();
         piePlot.sectorValue((d) => d.value);
         piePlot.labelsEnabled(true);
@@ -271,13 +271,13 @@ describe("Plots", () => {
         ];
         let dataset = new Plottable.Dataset(data);
         piePlot.addDataset(dataset);
-        piePlot.renderTo(svg);
+        piePlot.renderTo(div);
         let labels = piePlot.content().selectAll<Element, any>("text");
         assert.strictEqual(labels.size(), data.length, "one label per slice");
         piePlot.render();
         labels = piePlot.content().selectAll<Element, any>("text");
         assert.strictEqual(labels.size(), data.length, "one label per slice after re-render()ing");
-        svg.remove();
+        div.remove();
       });
 
       it("updates labels when data changes", () => {
@@ -288,7 +288,7 @@ describe("Plots", () => {
         ];
         let dataset = new Plottable.Dataset(data1);
         piePlot.addDataset(dataset);
-        piePlot.renderTo(svg);
+        piePlot.renderTo(div);
         let labels = piePlot.content().selectAll<Element, any>("text");
         assert.strictEqual(labels.size(), data1.length, "one label per datum");
         labels.each(function() {
@@ -306,7 +306,7 @@ describe("Plots", () => {
           let labelText = d3.select(this).text();
           assert.strictEqual(labelText, "2", "label text was updated");
         });
-        svg.remove();
+        div.remove();
       });
 
       it("removes labels when they are disabled after rendering", () => {
@@ -317,13 +317,13 @@ describe("Plots", () => {
         ];
         let dataset = new Plottable.Dataset(data);
         piePlot.addDataset(dataset);
-        piePlot.renderTo(svg);
+        piePlot.renderTo(div);
         let labels = piePlot.content().selectAll<Element, any>("text");
         assert.strictEqual(labels.size(), data.length, "one label per datum");
         piePlot.labelsEnabled(false);
         labels = piePlot.content().selectAll<Element, any>("text");
         assert.strictEqual(labels.size(), 0, "labels were removed");
-        svg.remove();
+        div.remove();
       });
 
       it("hides labels if slices are too small", () => {
@@ -337,7 +337,7 @@ describe("Plots", () => {
         ];
         let dataset = new Plottable.Dataset(data);
         piePlot.addDataset(dataset);
-        piePlot.renderTo(svg);
+        piePlot.renderTo(div);
         let labelGs = piePlot.content().select(".label-area").selectAll<Element, any>(".label-area > g");
         labelGs.each(function(d, i) {
           let visibility = d3.select(this).style("visibility");
@@ -347,7 +347,7 @@ describe("Plots", () => {
             assert.include(["visible", "inherit"], visibility, `label with index ${i} shown when slice is appropriately sized`);
           }
         });
-        svg.remove();
+        div.remove();
       });
 
       it("uses its formatter to format labels", () => {
@@ -358,12 +358,12 @@ describe("Plots", () => {
         let dataset = new Plottable.Dataset(data);
         piePlot.addDataset(dataset);
         piePlot.labelFormatter((n: number) => n + " m");
-        piePlot.renderTo(svg);
-        let texts = svg.selectAll<Element, any>("text").nodes().map((n: any) => d3.select(n).text());
+        piePlot.renderTo(div);
+        let texts = div.selectAll<Element, any>("text").nodes().map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 2, "both labels are drawn");
         assert.strictEqual(texts[0], "5 m", "The formatter was used to format the label for slice index 0");
         assert.strictEqual(texts[1], "15 m", "The formatter was used to format the label for slice index 1");
-        svg.remove();
+        div.remove();
       });
 
       it("hides labels if they don't fit", () => {
@@ -377,9 +377,9 @@ describe("Plots", () => {
         ];
         let dataset = new Plottable.Dataset(data);
         piePlot.addDataset(dataset);
-        piePlot.renderTo(svg);
+        piePlot.renderTo(div);
 
-        let texts = svg.selectAll<Element, any>("text");
+        let texts = div.selectAll<Element, any>("text");
         assert.strictEqual(texts.size(), data.length, "One label is rendered for each piece of data");
 
         texts.each(function(d, i) {
@@ -391,7 +391,7 @@ describe("Plots", () => {
           }
         });
 
-        svg.remove();
+        div.remove();
       });
 
       it("hides labels outside of the render area", () => {
@@ -402,9 +402,9 @@ describe("Plots", () => {
         ];
         let dataset = new Plottable.Dataset(data);
         piePlot.addDataset(dataset).outerRadius(500);
-        piePlot.renderTo(svg);
+        piePlot.renderTo(div);
 
-        let texts = svg.selectAll<Element, any>("text");
+        let texts = div.selectAll<Element, any>("text");
         assert.strictEqual(texts.size(), data.length, "One label is rendered for each piece of data");
 
         texts.each(function(d, i) {
@@ -415,7 +415,7 @@ describe("Plots", () => {
             assert.include(["visible", "inherit"], visibility, `label ${i} shown when in the renderArea`);
           }
         });
-        svg.remove();
+        div.remove();
       });
 
       it("does not show labels for invalid data", () => {
@@ -426,30 +426,30 @@ describe("Plots", () => {
         ];
         let dataset = new Plottable.Dataset(data);
         piePlot.addDataset(dataset);
-        piePlot.renderTo(svg);
+        piePlot.renderTo(div);
 
-        let texts = svg.selectAll<Element, any>("text").nodes().map((n: any) => d3.select(n).text());
+        let texts = div.selectAll<Element, any>("text").nodes().map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 2, "One label is rendered for each valid datum");
         assert.strictEqual(texts[0], "1", "Label for the first valid datum is shown");
         assert.strictEqual(texts[1], "2", "Label for the second valid datum is shown");
-        svg.remove();
+        div.remove();
       });
     });
 
     describe("Selections", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let dataset: Plottable.Dataset;
       let data: any[];
       let piePlot: Plottable.Plots.Pie;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG();
+        div = TestMethods.generateDiv();
         data = [{value: 5}, {value: 15}];
         dataset = new Plottable.Dataset(data);
         piePlot = new Plottable.Plots.Pie();
         piePlot.addDataset(dataset);
         piePlot.sectorValue((d) => d.value);
-        piePlot.renderTo(svg);
+        piePlot.renderTo(div);
       });
 
       it("retrieves all dataset selections when no arguments are specified", () => {
@@ -457,7 +457,7 @@ describe("Plots", () => {
         assert.strictEqual(allSectors.size(), data.length * 2, "all sectors retrieved");
         assert.strictEqual(allSectors.filter(".fill").size(), 2, "each sector has a fill path");
         assert.strictEqual(allSectors.filter(".outline").size(), 2, "each sector has an outline path");
-        svg.remove();
+        div.remove();
       });
 
       it("retrieves correct selections", () => {
@@ -467,31 +467,31 @@ describe("Plots", () => {
         assert.strictEqual(allSectors.filter(".outline").size(), 2, "each sector has an outline path");
         assert.includeMembers(allSectors.data(), data, "dataset data in selection data");
 
-        svg.remove();
+        div.remove();
       });
 
       it("skips invalid Datasets", () => {
         let allSectors = piePlot.selections([new Plottable.Dataset([])]);
         assert.strictEqual(allSectors.size(), 0, "no sectors retrieved");
 
-        svg.remove();
+        div.remove();
       });
     });
 
     describe("Entities", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let dataset: Plottable.Dataset;
       let data = [{value: 5}, {value: 15}];
       let piePlot: Plottable.Plots.Pie;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG();
+        div = TestMethods.generateDiv();
         dataset = new Plottable.Dataset();
         piePlot = new Plottable.Plots.Pie();
         dataset.data(data);
         piePlot.addDataset(dataset);
         piePlot.sectorValue((d) => d.value);
-        piePlot.renderTo(svg);
+        piePlot.renderTo(div);
       });
 
       it("returns both a fill path and a stroke path in each Entity's selection", () => {
@@ -501,7 +501,7 @@ describe("Plots", () => {
           assert.isNotNull(entity.selection, "entity has a fill selection");
           assert.isNotNull(entity.strokeSelection, "entity has a stroke selection");
         });
-        svg.remove();
+        div.remove();
       });
 
       it("retrieves the entity under each given point with entitiesAt()", () => {
@@ -543,7 +543,7 @@ describe("Plots", () => {
         const entities = piePlot.entitiesAt( { x: 0, y: 0 } );
         assert.lengthOf(entities, 0, "no entities returned");
 
-        svg.remove();
+        div.remove();
       });
 
       it("returns nothing for points within innerRadius() or outside of outerRadius() with entitiesAt()", () => {
@@ -572,18 +572,18 @@ describe("Plots", () => {
         };
         let entitiesOutsideOuterRadius = piePlot.entitiesAt(clickOutsideOuterRadius);
         assert.lengthOf(entitiesOutsideOuterRadius, 0, "no entities returned when clicking outside outerRadius()");
-        svg.remove();
+        div.remove();
       });
 
       it("retrieves undefined for entitiesNearest when no entities rendered", () => {
         piePlot.datasets([new Plottable.Dataset([])]);
-        piePlot.renderTo(svg);
+        piePlot.renderTo(div);
         let closest = piePlot.entityNearest({
           x: piePlot.width() / 2,
           y: piePlot.height() / 2,
         });
         assert.strictEqual(closest, undefined, "no datum has been retrieved");
-        svg.remove();
+        div.remove();
       });
     });
 
@@ -591,17 +591,17 @@ describe("Plots", () => {
       it("renders correctly with no Datasets", () => {
         let SVG_WIDTH = 400;
         let SVG_HEIGHT = 400;
-        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        let div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
         let piePlot = new Plottable.Plots.Pie();
         piePlot.sectorValue((d) => d.value);
-        assert.doesNotThrow(() => piePlot.renderTo(svg), Error);
+        assert.doesNotThrow(() => piePlot.renderTo(div), Error);
         assert.strictEqual(piePlot.width(), SVG_WIDTH, "was allocated width");
         assert.strictEqual(piePlot.height(), SVG_HEIGHT, "was allocated height");
-        svg.remove();
+        div.remove();
       });
 
       it("does not render slices for undefined, NaN, strings, or negative numbers", () => {
-        let svg = TestMethods.generateSVG();
+        let div = TestMethods.generateDiv();
 
         let dataWithBadValue = [
           { v: 1 },
@@ -618,7 +618,7 @@ describe("Plots", () => {
         piePlot.addDataset(new Plottable.Dataset(dataWithBadValue));
         piePlot.sectorValue((d) => d.v);
 
-        piePlot.renderTo(svg);
+        piePlot.renderTo(div);
 
         let elementsDrawnSel = piePlot.content().selectAll<Element, any>(".arc.fill");
 
@@ -632,7 +632,7 @@ describe("Plots", () => {
           assert.closeTo(endAngle - startAngle, Math.PI / 2, 0.001, `slice with index ${i} is a quarter of the pie`);
         }
 
-        svg.remove();
+        div.remove();
       });
     });
   });

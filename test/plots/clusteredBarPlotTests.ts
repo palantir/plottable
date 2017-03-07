@@ -14,20 +14,20 @@ describe("Plots", () => {
       const SVG_HEIGHT = 400;
       const isVertical = orientation === Plottable.Plots.Bar.ORIENTATION_VERTICAL;
 
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let categoryScale: Plottable.Scales.Category;
       let linearScale: Plottable.Scales.Linear;
       let clusterBarPlot: Plottable.Plots.ClusteredBar<number | string, number | string>;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
         categoryScale = new Plottable.Scales.Category();
         linearScale = new Plottable.Scales.Linear();
         clusterBarPlot = new Plottable.Plots.ClusteredBar<number | string, number | string>(orientation);
         clusterBarPlot.x((d) => isVertical ? d.category : d.num, isVertical ? categoryScale : linearScale);
         clusterBarPlot.y((d) => isVertical ? d.num : d.category, isVertical ? linearScale : categoryScale);
         clusterBarPlot.baselineValue(0);
-        clusterBarPlot.renderTo(svg);
+        clusterBarPlot.renderTo(div);
       });
 
       it(`renders with correct width, height and position`, () => {
@@ -77,7 +77,7 @@ describe("Plots", () => {
         assert.deepEqual(dataset1.data(), originalData1, "underlying data is not modified for dataset1");
         assert.deepEqual(dataset2.data(), originalData2, "underlying data is not modified for dataset2");
 
-        svg.remove();
+        div.remove();
       });
 
       it("renders correctly with missing values", () => {
@@ -132,7 +132,7 @@ describe("Plots", () => {
 
         assert.operator(TestMethods.numAttr(cBar0, attr), "<", TestMethods.numAttr(cBar1, attr), "C bars clustered in dataset order");
 
-        svg.remove();
+        div.remove();
       });
     });
   });

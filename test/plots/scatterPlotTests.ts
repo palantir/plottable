@@ -14,13 +14,13 @@ describe("Plots", () => {
     describe("Basic Rendering", () => {
       const SVG_WIDTH = 400;
       const SVG_HEIGHT = 400;
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let plot: Plottable.Plots.Scatter<number, number>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Linear();
         plot = new Plottable.Plots.Scatter<number, number>();
@@ -31,12 +31,12 @@ describe("Plots", () => {
       afterEach(function() {
         if (this.currentTest.state === "passed") {
           plot.destroy();
-          svg.remove();
+          div.remove();
         }
       });
 
       it("renders correctly with no data", () => {
-        assert.doesNotThrow(() => plot.renderTo(svg), Error);
+        assert.doesNotThrow(() => plot.renderTo(div), Error);
         assert.strictEqual(plot.width(), SVG_WIDTH, "was allocated width");
         assert.strictEqual(plot.height(), SVG_HEIGHT, "was allocated height");
       });
@@ -64,11 +64,11 @@ describe("Plots", () => {
         plot.animator(Plottable.Plots.Animator.MAIN, new Mocks.NoOpAnimator());
         plot.animated(true);
 
-        plot.renderTo(svg);
+        plot.renderTo(div);
 
         const pathString = plot.content().select("path").attr("d");
         const zeroSizePathString = symbolFactory(0);
-        const normalizingPath = svg.append("path"); // generated and normalized paths don't align on all browsers
+        const normalizingPath = div.append("path"); // generated and normalized paths don't align on all browsers
         const expectedPathString = normalizingPath.attr("d", zeroSizePathString).attr("d");
         assert.strictEqual(pathString, expectedPathString, "path string is initialized with the correct symbol and a size of 0");
       });
@@ -83,7 +83,7 @@ describe("Plots", () => {
         ];
         let dataset = new Plottable.Dataset(data);
         plot.addDataset(dataset);
-        plot.renderTo(svg);
+        plot.renderTo(div);
 
         assert.strictEqual(plot.selections().size(), 5, "all 5 data points are drawn");
 
@@ -138,7 +138,7 @@ describe("Plots", () => {
     });
 
     describe("The Accessors properly access data, index and Dataset", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let plot: Plottable.Plots.Scatter<number, number>;
       let dataset: Plottable.Dataset;
       let data: any[];
@@ -146,7 +146,7 @@ describe("Plots", () => {
       beforeEach(() => {
         const SVG_WIDTH = 400;
         const SVG_HEIGHT = 400;
-        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
         let xScale = new Plottable.Scales.Linear().domain([0, SVG_WIDTH]);
         let yScale = new Plottable.Scales.Linear().domain([0, SVG_HEIGHT]);
         let metadata = { foo: 10, bar: 20 };
@@ -159,7 +159,7 @@ describe("Plots", () => {
       });
 
       it("renders symbols correctly", () => {
-        plot.renderTo(svg);
+        plot.renderTo(div);
         let symbols = plot.selections();
         assert.strictEqual(symbols.size(), data.length, "exactly 2 symbols are rendered");
 
@@ -172,11 +172,11 @@ describe("Plots", () => {
         assert.closeTo(c2Position[0], 11, 0.01, "second symbol cx is correct");
         assert.closeTo(c2Position[1], 380, 0.01, "second symbol cy is correct");
 
-        svg.remove();
+        div.remove();
       });
 
       it("renders symbols correctly after data change", () => {
-        plot.renderTo(svg);
+        plot.renderTo(div);
         let changedData = [{ x: 2, y: 2 }, { x: 4, y: 4 }];
         dataset.data(changedData);
 
@@ -192,11 +192,11 @@ describe("Plots", () => {
         assert.closeTo(c2Position[0], 14, 0.01, "second symbol cx is correct after data change");
         assert.closeTo(c2Position[1], 380, 0.01, "second symbol cy is correct after data change");
 
-        svg.remove();
+        div.remove();
       });
 
       it("renders symbols correctly after metadata change", () => {
-        plot.renderTo(svg);
+        plot.renderTo(div);
         let changedMetadata = { foo: 0, bar: 0 };
         dataset.metadata(changedMetadata);
 
@@ -212,7 +212,7 @@ describe("Plots", () => {
         assert.closeTo(c2Position[0], 1, 0.01, "second symbol cx is correct after metadata change");
         assert.closeTo(c2Position[1], 400, 0.01, "second symbol cy is correct after metadata change");
 
-        svg.remove();
+        div.remove();
       });
 
       it("sets size() correctly", () => {
@@ -227,7 +227,7 @@ describe("Plots", () => {
         assert.strictEqual(plot.size().accessor(data[0], 0, dataset), 0, "first symbol size is calculated correctly");
         assert.strictEqual(plot.size().accessor(data[1], 1, dataset), 2, "second symbol size is calculated correctly");
 
-        svg.remove();
+        div.remove();
       });
 
       it("sets symbol() correctly", () => {
@@ -243,13 +243,13 @@ describe("Plots", () => {
         assert.deepEqual(plot.symbol().accessor(data[0], 0, dataset), squareSymbolFactory, "first symbol SymbolFactory is set correctly");
         assert.deepEqual(plot.symbol().accessor(data[1], 1, dataset), circleSymbolFactory, "second symbol SymbolFactory is set correctly");
 
-        svg.remove();
+        div.remove();
       });
 
     });
 
     describe("Selections", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let plot: Plottable.Plots.Scatter<number, number>;
       let dataset: Plottable.Dataset;
       let dataset2: Plottable.Dataset;
@@ -258,7 +258,7 @@ describe("Plots", () => {
       let data: any[];
       let data2: any[];
       beforeEach(() => {
-        svg = TestMethods.generateSVG();
+        div = TestMethods.generateDiv();
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Linear();
         data = [{ x: 0, y: 0 }, { x: 1, y: 1 }];
@@ -273,18 +273,18 @@ describe("Plots", () => {
       });
 
       it("selects all points in all datasets", () => {
-        plot.renderTo(svg);
+        plot.renderTo(div);
         let allCircles = plot.selections();
         assert.strictEqual(allCircles.size(), 4, "all circles retrieved");
         let selectionData = allCircles.data();
         assert.includeMembers(selectionData, data, "first dataset data in selection data");
         assert.includeMembers(selectionData, data2, "second dataset data in selection data");
 
-        svg.remove();
+        div.remove();
       });
 
       it("selects the closest data point", () => {
-        plot.renderTo(svg);
+        plot.renderTo(div);
         let diff = 10;
         let closest = plot.entityNearest({
           x: xScale.scale(0) + diff,
@@ -293,11 +293,11 @@ describe("Plots", () => {
 
         assert.deepEqual(closest.datum, dataset.data()[0], "correct datum has been retrieved");
 
-        svg.remove();
+        div.remove();
       });
 
       it("ignores off-plot data points when retrieving the nearest Entity", () => {
-        plot.renderTo(svg);
+        plot.renderTo(div);
         yScale.domain([0, 1.9]);
 
         let closest = plot.entityNearest({
@@ -306,24 +306,24 @@ describe("Plots", () => {
         });
         assert.deepEqual(closest.datum, dataset.data()[1], "correct datum has been retrieved");
 
-        svg.remove();
+        div.remove();
       });
 
       it("retrieves undefined from entityNearest when no scatter points are in view", () => {
         yScale.domain([-2, -1]);
         xScale.domain([-2, -1]);
-        plot.renderTo(svg);
+        plot.renderTo(div);
 
         let closest = plot.entityNearest({
           x: plot.width() / 2,
           y: plot.height() / 2,
         });
         assert.strictEqual(closest, undefined, "no datum has been retrieved");
-        svg.remove();
+        div.remove();
       });
 
       it("can retrieve Entities in a certain range", () => {
-        plot.renderTo(svg);
+        plot.renderTo(div);
 
         let entities = plot.entitiesIn({
           min: xScale.scale(1),
@@ -336,11 +336,11 @@ describe("Plots", () => {
         assert.lengthOf(entities, 1, "only one Entity has been retrieved");
         assert.deepEqual(entities[0].datum, { x: 1, y: 1 }, "correct datum has been retrieved");
 
-        svg.remove();
+        div.remove();
       });
 
       it("does not return Entities whose center lies outside the range", () => {
-        plot.renderTo(svg);
+        plot.renderTo(div);
 
         let entities = plot.entitiesIn({
           min: xScale.scale(1.001),
@@ -352,11 +352,11 @@ describe("Plots", () => {
 
         assert.lengthOf(entities, 0, "no Entities retrieved");
 
-        svg.remove();
+        div.remove();
       });
 
       it("can retrieve Entities in a certain bounds", () => {
-        plot.renderTo(svg);
+        plot.renderTo(div);
         let entities = plot.entitiesIn({
           topLeft: {
             x: xScale.scale(1),
@@ -371,11 +371,11 @@ describe("Plots", () => {
         assert.lengthOf(entities, 1, "only one Entity has been retrieved");
         assert.deepEqual(entities[0].datum, { x: 1, y: 1 }, "correct datum has been retrieved");
 
-        svg.remove();
+        div.remove();
       });
 
       it("can retrieve Entities centered at a given Point", () => {
-        plot.renderTo(svg);
+        plot.renderTo(div);
 
         let entities = plot.entitiesAt({
           x: xScale.scale(1),
@@ -384,14 +384,14 @@ describe("Plots", () => {
         assert.lengthOf(entities, 1, "only one Entity has been retrieved");
         assert.deepEqual(entities[0].datum, { x: 1, y: 1 }, "correct datum has been retrieved");
 
-        svg.remove();
+        div.remove();
       });
 
       it("determines whether an Entity contains a given Point by its position and size", () => {
         let initialSize = 10;
         let initialRadius = initialSize / 2;
         plot.size(initialSize);
-        plot.renderTo(svg);
+        plot.renderTo(div);
 
         let entities = plot.entitiesAt({
           x: xScale.scale(1) + initialRadius,
@@ -406,12 +406,12 @@ describe("Plots", () => {
           y: yScale.scale(1) - initialRadius,
         });
         assert.lengthOf(entities, 0, "none of the Entities is retrieved");
-        svg.remove();
+        div.remove();
       });
 
       it("returns all Entities containing a given Point across all Datasets", () => {
         dataset2.data([{ x: 0, y: 1 }, { x: 200, y: 200 }]);
-        plot.renderTo(svg);
+        plot.renderTo(div);
 
         let entities = plot.entitiesAt({
           x: xScale.scale(0.5),
@@ -422,7 +422,7 @@ describe("Plots", () => {
         assert.deepEqual(entities[1].datum, { x: 1, y: 1 }, "correct datum has been retrieved");
         assert.deepEqual(entities[2].datum, { x: 0, y: 1 }, "correct datum has been retrieved");
 
-        svg.remove();
+        div.remove();
       });
     });
   });

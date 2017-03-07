@@ -44,16 +44,16 @@ describe("Interactions", () => {
     [TestMethods.InteractionMode.Mouse, TestMethods.InteractionMode.Touch].forEach((mode) => {
       describe(`Listening to ${MODE_NAME[mode]} events`, () => {
 
-        let svg: SimpleSelection<void>;
+        let div: d3.Selection<HTMLDivElement, any, any, any>;
         let pointerInteraction: Plottable.Interactions.Pointer;
         let eventTarget: SimpleSelection<void>;
         let callback: PointerTestCallback;
 
         beforeEach(() => {
-          svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+          div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
 
           const component = new Plottable.Component();
-          component.renderTo(svg);
+          component.renderTo(div);
           eventTarget = component.background();
 
           pointerInteraction = new Plottable.Interactions.Pointer();
@@ -63,7 +63,7 @@ describe("Interactions", () => {
 
         afterEach(function() {
           if (this.currentTest.state === "passed") {
-            svg.remove();
+            div.remove();
           }
         });
 
@@ -153,7 +153,7 @@ describe("Interactions", () => {
       });
 
       describe(`Interactions under overlay for ${MODE_NAME[mode]} events`, () => {
-        let svg: SimpleSelection<void>;
+        let div: d3.Selection<HTMLDivElement, any, any, any>;
         let pointerInteraction: Plottable.Interactions.Pointer;
         let eventTarget: SimpleSelection<void>;
 
@@ -161,8 +161,8 @@ describe("Interactions", () => {
         let overlay: SimpleSelection<void>;
 
         beforeEach(() => {
-          svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-          overlay = TestMethods.getSVGParent().append("div").styles({
+          div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+          overlay = TestMethods.getElementParent().append("div").styles({
             height: `${SVG_HEIGHT}px`,
             width: `${SVG_WIDTH}px`,
             position: "relative",
@@ -172,7 +172,7 @@ describe("Interactions", () => {
           });
 
           const component = new Plottable.Component();
-          component.renderTo(svg);
+          component.renderTo(div);
           eventTarget = component.background();
 
           pointerInteraction = new Plottable.Interactions.Pointer();
@@ -185,7 +185,7 @@ describe("Interactions", () => {
 
         afterEach(function() {
           if (this.currentTest.state === "passed") {
-            svg.remove();
+            div.remove();
             overlay.remove();
           }
         });

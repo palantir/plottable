@@ -17,11 +17,11 @@ describe("SelectionBoxLayer", () => {
       const halfPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
       const DRAG_BOX_LAYER_EVENTS = ["dragStart", "drag", "dragEnd"];
 
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let dbl: Plottable.Components.DragBoxLayer;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
         dbl = new Plottable.Components.DragBoxLayer();
       });
 
@@ -54,7 +54,7 @@ describe("SelectionBoxLayer", () => {
       }
 
       it("draws box on drag", () => {
-        dbl.renderTo(svg);
+        dbl.renderTo(div);
         assert.isFalse(dbl.boxVisible(), "box is hidden initially");
 
         const target = dbl.background();
@@ -63,11 +63,11 @@ describe("SelectionBoxLayer", () => {
         const bounds = dbl.bounds();
         assert.deepEqual(bounds.topLeft, quarterPoint, "top-left point was set correctly");
         assert.deepEqual(bounds.bottomRight, halfPoint, "bottom-right point was set correctly");
-        svg.remove();
+        div.remove();
       });
 
       it("dismisses on click", () => {
-        dbl.renderTo(svg);
+        dbl.renderTo(div);
 
         const target = dbl.background();
 
@@ -77,13 +77,13 @@ describe("SelectionBoxLayer", () => {
 
         TestMethods.triggerFakeDragSequence(target, halfPoint, halfPoint);
         assert.isFalse(dbl.boxVisible(), "box is hidden on click");
-        svg.remove();
+        div.remove();
       });
 
       it("can get and set the detection radius", () => {
         assert.strictEqual(dbl.detectionRadius(), 3, "there is a default detection radius");
         assert.doesNotThrow(() => dbl.detectionRadius(4), Error, "can set detection radius before anchoring");
-        dbl.renderTo(svg);
+        dbl.renderTo(div);
 
         assert.strictEqual(dbl.detectionRadius(), 4, "detection radius did not change upon rendering");
         assert.strictEqual(dbl.detectionRadius(5), dbl, "setting the detection radius returns the drag box layer");
@@ -91,11 +91,11 @@ describe("SelectionBoxLayer", () => {
 
         // HACKHACK #2661: Cannot assert errors being thrown with description
         (<any> assert).throws(() => dbl.detectionRadius(-1), Error, "detection radius cannot be negative", "fails to set negative radius");
-        svg.remove();
+        div.remove();
       });
 
       it("applies the given detection radius property", () => {
-        dbl.renderTo(svg);
+        dbl.renderTo(div);
 
         const radius = 5;
         dbl.detectionRadius(radius);
@@ -118,17 +118,17 @@ describe("SelectionBoxLayer", () => {
           assert.strictEqual(cornerRadius, radius, "corner radius was set correctly");
         });
 
-        svg.remove();
+        div.remove();
       });
 
       it("does not error on destroy if scales are not added", () => {
         assert.doesNotThrow(() => dbl.destroy(), Error, "can destroy without scales");
-        svg.remove();
+        div.remove();
       });
 
       it("does not call callbacks when dragBoxLayer is destroyed", () => {
         // rendered in a Group so that drag sequence can be simulated on Group background after DragBoxLayer is destroyed
-        const group = new Plottable.Components.Group([dbl]).renderTo(svg);
+        const group = new Plottable.Components.Group([dbl]).renderTo(div);
         const target = group.background();
         let onDragStartCallbackCalled = false;
         let onDragCallbackCalled = false;
@@ -152,13 +152,13 @@ describe("SelectionBoxLayer", () => {
         assert.isFalse(onDragCallbackCalled, "onDrag callback is not called after destroyed");
         assert.isFalse(onDragEndcallbackCalled, "onDragEnd callback is not called after destroyed");
 
-        svg.remove();
+        div.remove();
       });
 
       it("does not call callbacks when dragBoxLayer is detached", () => {
         // rendered in a Group so that drag sequence can be simulated on Group background after DragBoxLayer is detached
         const group = new Plottable.Components.Group([dbl]);
-        group.renderTo(svg);
+        group.renderTo(div);
         const target = group.background();
         let onDragStartCallbackCalled = false;
         let onDragCallbackCalled = false;
@@ -189,12 +189,12 @@ describe("SelectionBoxLayer", () => {
         assert.isTrue(onDragEndcallbackCalled, "onDragEnd callback is called when re-anchor()");
 
         dbl.destroy();
-        svg.remove();
+        div.remove();
       });
 
       DRAG_BOX_LAYER_EVENTS.forEach(function(event: string) {
         it(`calls the ${event} callback`, () => {
-          dbl.renderTo(svg);
+          dbl.renderTo(div);
 
           let receivedBounds: Plottable.Bounds;
           let callbackCalled = false;
@@ -217,11 +217,11 @@ describe("SelectionBoxLayer", () => {
           callbackCalled = false;
           TestMethods.triggerFakeDragSequence(target, quarterPoint, halfPoint);
           assert.isFalse(callbackCalled, "the callback was detached from the dragBoxLayer and not called");
-          svg.remove();
+          div.remove();
         });
 
         it("can register two onDragStart callbacks on the same component", () => {
-          dbl.renderTo(svg);
+          dbl.renderTo(div);
 
           let callbackDragStart1Called = false;
           let callbackDragStart2Called = false;
@@ -245,12 +245,12 @@ describe("SelectionBoxLayer", () => {
           TestMethods.triggerFakeDragSequence(target, quarterPoint, halfPoint);
           assert.isFalse(callbackDragStart1Called, "the callback 1 for drag start was disconnected");
           assert.isTrue(callbackDragStart2Called, "the callback 2 for drag start is still connected");
-          svg.remove();
+          div.remove();
         });
       });
 
       it("calls all the drag interaction callbacks when needed", () => {
-        dbl.renderTo(svg);
+        dbl.renderTo(div);
 
         let callbackDragStartCalled = false;
         let callbackDragCalled = false;
@@ -282,7 +282,7 @@ describe("SelectionBoxLayer", () => {
         assert.isFalse(callbackDragStartCalled, "the callback for drag start was disconnected");
         assert.isFalse(callbackDragCalled, "the callback for drag was disconnected");
         assert.isTrue(callbackDragEndCalled, "the callback for drag end is still connected");
-        svg.remove();
+        div.remove();
       });
     });
 
@@ -290,11 +290,11 @@ describe("SelectionBoxLayer", () => {
       const SVG_WIDTH = 400;
       const SVG_HEIGHT = 400;
 
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let dbl: Plottable.Components.DragBoxLayer;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
         dbl = new Plottable.Components.DragBoxLayer();
       });
 
@@ -305,12 +305,12 @@ describe("SelectionBoxLayer", () => {
 
         assert.strictEqual(dbl.enabled(true), dbl, "the setter returns the drag box layer");
         assert.isTrue(dbl.enabled(), "drag box layer can be re-enabled");
-        svg.remove();
+        div.remove();
       });
 
       it("does not draw box when disabled", () => {
         dbl.enabled(false);
-        dbl.renderTo(svg);
+        dbl.renderTo(div);
         assert.isFalse(dbl.boxVisible(), "box is hidden initially");
 
         const startPoint = {
@@ -328,7 +328,7 @@ describe("SelectionBoxLayer", () => {
         dbl.enabled(true);
         TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
         assert.isTrue(dbl.boxVisible(), "box is shown when enabled");
-        svg.remove();
+        div.remove();
       });
     });
 
@@ -337,7 +337,7 @@ describe("SelectionBoxLayer", () => {
       const SVG_HEIGHT = 400;
       const midPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
 
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let dbl: Plottable.Components.DragBoxLayer;
       let target: SimpleSelection<void>;
       let initialBounds: Plottable.Bounds;
@@ -355,9 +355,9 @@ describe("SelectionBoxLayer", () => {
       }
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
         dbl = new Plottable.Components.DragBoxLayer();
-        dbl.renderTo(svg);
+        dbl.renderTo(div);
 
         target = dbl.background();
         resetBox();
@@ -369,7 +369,7 @@ describe("SelectionBoxLayer", () => {
         assert.isTrue(dbl.resizable(), "successfully set to true");
         assert.strictEqual(dbl.resizable(false), dbl, "the setter returns the drag box layer");
         assert.isFalse(dbl.resizable(), "successfully set back to false");
-        svg.remove();
+        div.remove();
       });
 
       it("correctly sets pointer-events for resizable DragBoxLayer", () => {
@@ -388,7 +388,7 @@ describe("SelectionBoxLayer", () => {
           const computedStyle = window.getComputedStyle(<Element> corner.node());
           assert.strictEqual(computedStyle.pointerEvents.toLowerCase(), "visiblefill", "pointer-events set correctly on corners");
         });
-        svg.remove();
+        div.remove();
       });
 
       it("can resize from top edge", () => {
@@ -412,7 +412,7 @@ describe("SelectionBoxLayer", () => {
                                );
         bounds = dbl.bounds();
         assert.strictEqual(bounds.bottomRight.y, newY, "can drag through to other side");
-        svg.remove();
+        div.remove();
       });
 
       it("can resize from bottom edge", () => {
@@ -436,7 +436,7 @@ describe("SelectionBoxLayer", () => {
                                );
         bounds = dbl.bounds();
         assert.strictEqual(bounds.topLeft.y, newY, "can drag through to other side");
-        svg.remove();
+        div.remove();
       });
 
       it("can resize from left edge", () => {
@@ -460,7 +460,7 @@ describe("SelectionBoxLayer", () => {
                                );
         bounds = dbl.bounds();
         assert.strictEqual(bounds.bottomRight.x, newX, "can drag through to other side");
-        svg.remove();
+        div.remove();
       });
 
       it("can resize from right edge", () => {
@@ -484,7 +484,7 @@ describe("SelectionBoxLayer", () => {
                                );
         bounds = dbl.bounds();
         assert.strictEqual(bounds.topLeft.x, newX, "can drag through to other side");
-        svg.remove();
+        div.remove();
       });
 
       it("resizes if grabbed within detectionRadius", () => {
@@ -511,7 +511,7 @@ describe("SelectionBoxLayer", () => {
         assert.strictEqual(bounds.topLeft.y, startYOutside, "new box was started at the drag start position");
         assert.strictEqual(bounds.bottomRight.x, midPoint.x, "new box was started at the drag start position");
         assert.strictEqual(bounds.bottomRight.y, SVG_HEIGHT, "new box was started at the drag start position");
-        svg.remove();
+        div.remove();
       });
 
       it("doesn't dismiss on no-op resize", () => {
@@ -522,7 +522,7 @@ describe("SelectionBoxLayer", () => {
                                );
         assert.isTrue(dbl.boxVisible(), "box was not dismissed");
         assert.deepEqual(dbl.bounds(), initialBounds, "bounds did not change");
-        svg.remove();
+        div.remove();
       });
 
       it("can't resize if hidden", () => {
@@ -537,7 +537,7 @@ describe("SelectionBoxLayer", () => {
         assert.strictEqual(bounds.topLeft.y, initialBounds.bottomRight.y, "new box was started at the drag start position");
         assert.strictEqual(bounds.bottomRight.x, midPoint.x, "new box was ended at the drag end position");
         assert.strictEqual(bounds.bottomRight.y, SVG_HEIGHT, "new box was ended at the drag end position");
-        svg.remove();
+        div.remove();
       });
 
       it("has resizable CSS classes only when it is enabled and resizable", () => {
@@ -553,7 +553,7 @@ describe("SelectionBoxLayer", () => {
         dbl.enabled(true);
         assert.isFalse(dbl.hasClass(xResizableClass), "does not carry \"x-resizable\" class if enabled, but not resizable");
         assert.isFalse(dbl.hasClass(yResizableClass), "does not carry \"y-resizable\" class if enabled, but not resizable");
-        svg.remove();
+        div.remove();
       });
     });
 
@@ -563,15 +563,15 @@ describe("SelectionBoxLayer", () => {
       const midPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
       const dragDistance = 10;
 
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let dbl: Plottable.Components.DragBoxLayer;
       let target: SimpleSelection<void>;
       let initialBounds: Plottable.Bounds;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
         dbl = new Plottable.Components.DragBoxLayer();
-        dbl.renderTo(svg);
+        dbl.renderTo(div);
 
         target = dbl.background();
         dbl.bounds({
@@ -588,7 +588,7 @@ describe("SelectionBoxLayer", () => {
         assert.isTrue(dbl.movable(), "can set to true");
         assert.strictEqual(dbl.movable(false), dbl, "setter returns DragBoxLayer");
         assert.isFalse(dbl.movable(), "can set back to false");
-        svg.remove();
+        div.remove();
       });
 
       it("can move left", () => {
@@ -602,7 +602,7 @@ describe("SelectionBoxLayer", () => {
         assert.strictEqual(bounds.bottomRight.x, initialBounds.bottomRight.x - dragDistance, "right edge moved");
         assert.strictEqual(bounds.topLeft.y, initialBounds.topLeft.y, "top edge did not move");
         assert.strictEqual(bounds.bottomRight.y, initialBounds.bottomRight.y, "bottom edge did not move");
-        svg.remove();
+        div.remove();
       });
 
       it("can move right", () => {
@@ -616,7 +616,7 @@ describe("SelectionBoxLayer", () => {
         assert.strictEqual(bounds.bottomRight.x, initialBounds.bottomRight.x + dragDistance, "right edge moved");
         assert.strictEqual(bounds.topLeft.y, initialBounds.topLeft.y, "top edge did not move");
         assert.strictEqual(bounds.bottomRight.y, initialBounds.bottomRight.y, "bottom edge did not move");
-        svg.remove();
+        div.remove();
       });
 
       it("can move up", () => {
@@ -630,7 +630,7 @@ describe("SelectionBoxLayer", () => {
         assert.strictEqual(bounds.bottomRight.x, initialBounds.bottomRight.x, "right edge did not move");
         assert.strictEqual(bounds.topLeft.y, initialBounds.topLeft.y - dragDistance, "top edge moved");
         assert.strictEqual(bounds.bottomRight.y, initialBounds.bottomRight.y - dragDistance, "bottom edge moved");
-        svg.remove();
+        div.remove();
       });
 
       it("can move down", () => {
@@ -644,7 +644,7 @@ describe("SelectionBoxLayer", () => {
         assert.strictEqual(bounds.bottomRight.x, initialBounds.bottomRight.x, "right edge did not move");
         assert.strictEqual(bounds.topLeft.y, initialBounds.topLeft.y + dragDistance, "top edge moved");
         assert.strictEqual(bounds.bottomRight.y, initialBounds.bottomRight.y + dragDistance, "bottom edge moved");
-        svg.remove();
+        div.remove();
       });
 
       it("does not move if grabbed within detectionRadius while resizable", () => {
@@ -659,7 +659,7 @@ describe("SelectionBoxLayer", () => {
         assert.strictEqual(bounds.bottomRight.y, initialBounds.bottomRight.y, "bottom edge was not moved");
         assert.strictEqual(bounds.topLeft.x, initialBounds.topLeft.x, "left edge was not moved");
         assert.strictEqual(bounds.bottomRight.x, SVG_WIDTH, "right edge was repositioned");
-        svg.remove();
+        div.remove();
       });
 
       it("doesn't dismiss on no-op move", () => {
@@ -670,7 +670,7 @@ describe("SelectionBoxLayer", () => {
         );
         assert.isTrue(dbl.boxVisible(), "box remains visible");
         assert.deepEqual(dbl.bounds(), initialBounds, "bounds did not change");
-        svg.remove();
+        div.remove();
       });
 
       it("dismisses on click outside of box", () => {
@@ -678,7 +678,7 @@ describe("SelectionBoxLayer", () => {
         const origin = { x: 0, y: 0 };
         TestMethods.triggerFakeDragSequence(target, origin, origin);
         assert.isFalse(dbl.boxVisible(), "box is no longer visible");
-        svg.remove();
+        div.remove();
       });
 
       it("starts new box if hidden instead of moving", () => {
@@ -693,7 +693,7 @@ describe("SelectionBoxLayer", () => {
         assert.strictEqual(bounds.topLeft.y, midPoint.y, "new box was started at the drag start position (y)");
         assert.strictEqual(bounds.bottomRight.x, midPoint.x, "new box was ended at the drag end position (x)");
         assert.strictEqual(bounds.bottomRight.y, midPoint.y + dragDistance, "new box was ended at the drag end position (y)");
-        svg.remove();
+        div.remove();
       });
 
       it("has movable CSS classes only when enabled and movable", () => {
@@ -706,7 +706,7 @@ describe("SelectionBoxLayer", () => {
         dbl.movable(false);
         dbl.enabled(true);
         assert.isFalse(dbl.hasClass(movableClass), "does not carry \"movable\" class if enabled, but not movable");
-        svg.remove();
+        div.remove();
       });
     });
   });

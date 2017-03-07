@@ -59,9 +59,9 @@ describe("Axes", () => {
           it(`draws tick labels ${labelPosition} of the corresponding mark if specified for orientation ${orientation}`, () => {
             const scale = new Plottable.Scales.Linear();
             const axis = new Plottable.Axes.Numeric(scale, orientation);
-            const svg = TestMethods.generateSVG();
+            const div = TestMethods.generateDiv();
             axis.tickLabelPosition(labelPosition);
-            axis.renderTo(svg);
+            axis.renderTo(div);
 
             const tickLabels = axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}`);
             const tickMarks = axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_MARK_CLASS}`);
@@ -71,21 +71,21 @@ describe("Axes", () => {
             tickLabels.each(function(d, i) {
               TestMethods.assertBBoxNonIntersection(d3.select(this), d3.select(tickMarks.nodes()[i]));
             });
-            svg.remove();
+            div.remove();
           });
         });
       });
 
       orientations.forEach((orientation) => {
         it(`does not overlap tick labels in a constrained space for orientation ${orientation}`, () => {
-          const svg = TestMethods.generateSVG();
+          const div = TestMethods.generateDiv();
           const constrainedWidth = 50;
           const constrainedHeight = 50;
-          svg.attr("width", constrainedWidth);
-          svg.attr("height", constrainedHeight);
+          div.attr("width", constrainedWidth);
+          div.attr("height", constrainedHeight);
           const scale = new Plottable.Scales.Linear();
           const axis = new Plottable.Axes.Numeric(scale, orientation);
-          axis.renderTo(svg);
+          axis.renderTo(div);
 
           const visibconstickLabels = applyVisibleFilter(axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
 
@@ -98,18 +98,18 @@ describe("Axes", () => {
             });
           });
 
-          svg.remove();
+          div.remove();
         });
       });
 
       orientations.forEach((orientation) => {
         it(`separates tick labels with the same spacing for orientation ${orientation}`, () => {
-          const svg = TestMethods.generateSVG();
+          const div = TestMethods.generateDiv();
           const scale = new Plottable.Scales.Linear();
           scale.domain([-2500000, 2500000]);
 
           const axis = new Plottable.Axes.Numeric(scale, orientation);
-          axis.renderTo(svg);
+          axis.renderTo(div);
 
           const visibconstickLabels = applyVisibleFilter(axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
 
@@ -125,23 +125,23 @@ describe("Axes", () => {
               interval, window.Pixel_CloseTo_Requirement, `tick label pair ${i} is spaced the same as the first pair`);
           });
 
-          svg.remove();
+          div.remove();
         });
       });
 
       orientations.forEach((orientation) => {
         it(`renders numbers in order with a reversed domain for orientation ${orientation}`, () => {
-          const svg = TestMethods.generateSVG();
+          const div = TestMethods.generateDiv();
           const scale = new Plottable.Scales.Linear();
           scale.domain([3, 0]);
 
           const axis = new Plottable.Axes.Numeric(scale, orientation);
-          axis.renderTo(svg);
+          axis.renderTo(div);
 
           const tickLabels = applyVisibleFilter(axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
           assert.operator(tickLabels.size(), ">", 1, "tick labels are shown");
 
-          svg.remove();
+          div.remove();
         });
       });
 
@@ -150,24 +150,24 @@ describe("Axes", () => {
           const scale = new Plottable.Scales.Linear().domain([400000000, 500000000]);
           const axis = new Plottable.Axes.Numeric(scale, orientation);
 
-          const svg = TestMethods.generateSVG();
-          axis.renderTo(svg);
+          const div = TestMethods.generateDiv();
+          axis.renderTo(div);
 
           const tickLabelContainerClass = "tick-label-container";
           const labelContainer = axis.content().select(`.${tickLabelContainerClass}`);
           axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}`).each(function() {
             TestMethods.assertBBoxInclusion(labelContainer, d3.select(this));
           });
-          svg.remove();
+          div.remove();
         });
       });
 
       orientations.forEach((orientation) => {
         it(`draws ticks labels centered with the corresponding tick mark for orientation ${orientation}`, () => {
-          const svg = TestMethods.generateSVG();
+          const div = TestMethods.generateDiv();
           const scale = new Plottable.Scales.Linear();
           const axis = new Plottable.Axes.Numeric(scale, orientation);
-          axis.renderTo(svg);
+          axis.renderTo(div);
 
           const tickLabels = axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}`);
           assert.operator(tickLabels.size(), ">=", 2, "at least two tick labels were drawn");
@@ -186,18 +186,18 @@ describe("Axes", () => {
             assert.closeTo(labelCenter, markCenter, 1.5, `tick label ${i} is centered on mark`);
           });
 
-          svg.remove();
+          div.remove();
         });
       });
 
       it("does not overlap tick marks with tick labels", () => {
-        const svg = TestMethods.generateSVG();
+        const div = TestMethods.generateDiv();
 
         const scale = new Plottable.Scales.Linear();
         scale.domain([175, 185]);
         const axis = new Plottable.Axes.Numeric(scale, "left")
                                       .innerTickLength(50);
-        axis.renderTo(svg);
+        axis.renderTo(div);
 
         const tickLabels = applyVisibleFilter(axis.content().selectAll<Element, any>("." + Plottable.Axis.TICK_LABEL_CLASS));
 
@@ -211,20 +211,20 @@ describe("Axes", () => {
                 `tickMark ${i} and tickLabel ${i2} should not overlap`);
           });
         });
-        svg.remove();
+        div.remove();
       });
     });
 
     describe("formatting the labels", () => {
       it("formats to the specified formatter", () => {
-        const svg = TestMethods.generateSVG();
+        const div = TestMethods.generateDiv();
         const scale = new Plottable.Scales.Linear();
 
         const formatter = Plottable.Formatters.fixed(2);
 
         const axis = new Plottable.Axes.Numeric(scale, "left");
         axis.formatter(formatter);
-        axis.renderTo(svg);
+        axis.renderTo(div);
 
         const tickLabels = axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}`);
         tickLabels.each(function(d, i) {
@@ -232,20 +232,20 @@ describe("Axes", () => {
           assert.strictEqual(labelText, formatter(d), `formatter used to format tick label ${i}`);
         });
 
-        svg.remove();
+        div.remove();
       });
     });
 
     describe("allocating space", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG();
+        div = TestMethods.generateDiv();
       });
 
       afterEach(function() {
         if (this.currentTest.state === "passed") {
-          svg.remove();
+          div.remove();
         }
       });
 
@@ -255,10 +255,10 @@ describe("Axes", () => {
           scale.domain([5, -5]);
 
           const axis = new Plottable.Axes.Numeric(scale, orientation);
-          axis.renderTo(svg);
+          axis.renderTo(div);
 
           const visibconstickLabels = applyVisibleFilter(axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
-          const boundingBox = svg.select(".axis").select<Element>(".bounding-box").node().getBoundingClientRect();
+          const boundingBox = div.select(".axis").select<Element>(".bounding-box").node().getBoundingClientRect();
           visibconstickLabels.each(function(d, i) {
             const visibconstickLabelRect = this.getBoundingClientRect();
             assertBoxInside(visibconstickLabelRect, boundingBox, 0.5, `tick label ${i} is inside the bounding box`);
@@ -272,10 +272,10 @@ describe("Axes", () => {
           scale.domain([50000000000, -50000000000]);
 
           const axis = new Plottable.Axes.Numeric(scale, verticalOrientation);
-          axis.renderTo(svg);
+          axis.renderTo(div);
 
           const visibconstickLabels = applyVisibleFilter(axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
-          const boundingBox = svg.select(".axis").select<Element>(".bounding-box").node().getBoundingClientRect();
+          const boundingBox = div.select(".axis").select<Element>(".bounding-box").node().getBoundingClientRect();
           visibconstickLabels.each(function(d, i) {
             const visibconstickLabelRect = this.getBoundingClientRect();
             assertBoxInside(visibconstickLabelRect, boundingBox, 0, `long tick label ${i} is inside the bounding box`);
@@ -285,8 +285,8 @@ describe("Axes", () => {
     });
 
     describe("drawing tick marks", () => {
-      it("does not draw ticks marks outside of the svg", () => {
-        const svg = TestMethods.generateSVG();
+      it("does not draw ticks marks outside of the div", () => {
+        const div = TestMethods.generateDiv();
         const scale = new Plottable.Scales.Linear();
         const domainMin = 0;
         const domainMax = 3;
@@ -295,7 +295,7 @@ describe("Axes", () => {
           return Plottable.Utils.Math.range(domainMin, domainMax + 4);
         });
         const axis = new Plottable.Axes.Numeric(scale, "bottom");
-        axis.renderTo(svg);
+        axis.renderTo(div);
         const tickMarks = axis.content().selectAll<Element, any>(".tick-mark");
         tickMarks.each(function(d, i) {
           const tickMark = d3.select(this);
@@ -303,13 +303,13 @@ describe("Axes", () => {
           assert.operator(tickMarkPosition, ">=", 0, `tick mark ${i} drawn right of left edge`);
           assert.operator(tickMarkPosition, "<=", axis.width(), `tick mark ${i} drawn left of right edge`);
         });
-        svg.remove();
+        div.remove();
       });
     });
 
     describe("using width approximation", () => {
       it("reasonably approximates tick label sizes with approximate measuring", () => {
-        const svg = TestMethods.generateSVG();
+        const div = TestMethods.generateDiv();
 
         const testDomains = [
           [-1, 1],
@@ -325,7 +325,7 @@ describe("Axes", () => {
           const axis = new Plottable.Axes.Numeric(scale, "left");
 
           axis.usesTextWidthApproximation(true);
-          axis.renderTo(svg);
+          axis.renderTo(div);
           const widthApprox = axis.width();
 
           axis.usesTextWidthApproximation(false);
@@ -339,7 +339,7 @@ describe("Axes", () => {
           axis.destroy();
         });
 
-        svg.remove();
+        div.remove();
       });
     });
   });

@@ -10,14 +10,14 @@ import * as TestMethods from "../testMethods";
 describe("Plots", () => {
   describe("SegmentPlot", () => {
     describe("rendering", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let plot: Plottable.Plots.Segment<number, number>;
 
       beforeEach(() => {
         plot = new Plottable.Plots.Segment<number, number>();
-        svg = TestMethods.generateSVG();
+        div = TestMethods.generateDiv();
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Linear();
         const data = [
@@ -33,7 +33,7 @@ describe("Plots", () => {
       it("renders a line properly", () => {
         plot.x2((d) => d.x2);
         plot.y2((d) => d.y2);
-        plot.renderTo(svg);
+        plot.renderTo(div);
 
         const lines = plot.content().selectAll<Element, any>("line");
         assert.strictEqual(lines.size(), plot.datasets()[0].data().length, "line for each datum");
@@ -48,12 +48,12 @@ describe("Plots", () => {
           assert.closeTo(TestMethods.numAttr(line, "y2"), yScale.scale(d.y2),
             window.Pixel_CloseTo_Requirement, `y2 for line ${i}`);
         });
-        svg.remove();
+        div.remove();
       });
 
       it("renders vertical lines when x2 is not set", () => {
         plot.y2((d) => d.y2);
-        plot.renderTo(svg);
+        plot.renderTo(div);
 
         const lines = plot.content().selectAll<Element, any>("line");
         assert.strictEqual(lines.size(), plot.datasets()[0].data().length, "line for each datum");
@@ -61,12 +61,12 @@ describe("Plots", () => {
           const line = d3.select(this);
           assert.strictEqual(TestMethods.numAttr(line, "x1"), TestMethods.numAttr(line, "x2"), `same x for line ${i}`);
         });
-        svg.remove();
+        div.remove();
       });
 
       it("renders horizontal lines when y2 is not set", () => {
         plot.x2((d) => d.x2);
-        plot.renderTo(svg);
+        plot.renderTo(div);
 
         const lines = plot.content().selectAll<Element, any>("line");
         assert.strictEqual(lines.size(), plot.datasets()[0].data().length, "line for each datum");
@@ -74,18 +74,18 @@ describe("Plots", () => {
           const line = d3.select(this);
           assert.strictEqual(TestMethods.numAttr(line, "y1"), TestMethods.numAttr(line, "y2"), `same y for line ${i}`);
         });
-        svg.remove();
+        div.remove();
       });
     });
 
     describe("autoranging", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let plot: Plottable.Plots.Segment<number, number>;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG();
+        div = TestMethods.generateDiv();
         plot = new Plottable.Plots.Segment<number, number>();
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Linear();
@@ -105,7 +105,7 @@ describe("Plots", () => {
         plot.addDataset(new Plottable.Dataset(staggeredData));
         plot.autorangeMode("x");
 
-        plot.renderTo(svg);
+        plot.renderTo(div);
 
         assert.deepEqual(xScale.domain(), [0, 2], "x domain includes both visible segments");
 
@@ -114,7 +114,7 @@ describe("Plots", () => {
 
         yScale.domain([0.5, 1.5]);
         assert.deepEqual(xScale.domain(), [1, 2], "x domain includes only the visible segment (second)");
-        svg.remove();
+        div.remove();
       });
 
       it("adjusts the yScale domain with respect to the xScale domain when autorangeMode is set to y", () => {
@@ -129,7 +129,7 @@ describe("Plots", () => {
         plot.addDataset(new Plottable.Dataset(staggeredData));
         plot.autorangeMode("y");
 
-        plot.renderTo(svg);
+        plot.renderTo(div);
 
         assert.deepEqual(yScale.domain(), [0, 2], "y domain includes both visible segments");
 
@@ -138,18 +138,18 @@ describe("Plots", () => {
 
         xScale.domain([0.5, 1.5]);
         assert.deepEqual(yScale.domain(), [1, 2], "y domain includes only the visible segment (second)");
-        svg.remove();
+        div.remove();
       });
     });
 
     describe("retrieving the entities in a specified area", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let plot: Plottable.Plots.Segment<number, number>;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG();
+        div = TestMethods.generateDiv();
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Linear();
         plot = new Plottable.Plots.Segment<number, number>()
@@ -161,7 +161,7 @@ describe("Plots", () => {
           { x: 4, x2: 5, y: 2, y2: 4 },
           { x: 2, x2: 4, y: 1, y2: 1 },
         ];
-        plot.addDataset(new Plottable.Dataset(data)).renderTo(svg);
+        plot.addDataset(new Plottable.Dataset(data)).renderTo(div);
       });
 
       it("retrieves the entities that intersect with the bounding box", () => {
@@ -172,7 +172,7 @@ describe("Plots", () => {
         assert.lengthOf(entities, 2, "retrieved 2 entities intersect with the box");
         assert.strictEqual(entities[0].index, 0, "the entity of index 0 is retrieved");
         assert.strictEqual(entities[1].index, 1, "the entity of index 1 is retrieved");
-        svg.remove();
+        div.remove();
       });
 
       it("retrieves the entities that intersect with given ranges", () => {
@@ -183,7 +183,7 @@ describe("Plots", () => {
         assert.lengthOf(entities, 2, "retrieved 2 entities intersect with the ranges");
         assert.strictEqual(entities[0].index, 1, "the entity of index 1 is retrieved");
         assert.strictEqual(entities[1].index, 2, "the entity of index 2 is retrieved");
-        svg.remove();
+        div.remove();
       });
 
       it("retrieves the entity if exactly one of its endpoints is in the ranges", () => {
@@ -202,7 +202,7 @@ describe("Plots", () => {
         // horizontal segment
         checkEntitiesInRange(3, 1.5, 2.5, 1.5, 0.5);
         checkEntitiesInRange(3, 3.5, 4.5, 1.5, 0.5);
-        svg.remove();
+        div.remove();
       });
 
       it("retrieves the entity if both of its endpoints are in the ranges", () => {
@@ -217,7 +217,7 @@ describe("Plots", () => {
 
         // horizontal segment
         checkEntitiesInRange(3, 1.5, 4.5, 1.5, 0.5);
-        svg.remove();
+        div.remove();
       });
 
       it("retrieves the entity if it intersects with the ranges with no endpoints inside", () => {
@@ -232,7 +232,7 @@ describe("Plots", () => {
 
         // horizontal segment
         checkEntitiesInRange(3, 2.5, 3.5, 1.5, 0.5);
-        svg.remove();
+        div.remove();
       });
 
       it("returns empty array when no entities intersect with the ranges", () => {
@@ -241,18 +241,18 @@ describe("Plots", () => {
           { min: yScale.scale(2.5), max: yScale.scale(1.5) }
         );
         assert.lengthOf(entities, 0, "no entities intersects with the ranges");
-        svg.remove();
+        div.remove();
       });
 
       it("retrieves undefined from entityNearest when no entities are rendered", () => {
         plot.datasets([new Plottable.Dataset([])]);
-        plot.renderTo(svg);
+        plot.renderTo(div);
         let closest = plot.entityNearest({
           x: plot.width() / 2,
           y: plot.height() / 2,
         });
         assert.strictEqual(closest, undefined, "no datum has been retrieved");
-        svg.remove();
+        div.remove();
       });
 
       function checkEntitiesInRange(index: number, x1: number, x2: number, y1: number, y2: number) {

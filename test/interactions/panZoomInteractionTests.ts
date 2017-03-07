@@ -90,7 +90,7 @@ describe("Interactions", () => {
     });
 
     describe("Panning", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 500;
 
@@ -106,10 +106,10 @@ describe("Interactions", () => {
         yScale = new Plottable.Scales.Linear();
         yScale.domain([0, SVG_HEIGHT / 2]).range([0, SVG_HEIGHT]);
 
-        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
 
         let component = new Plottable.Component();
-        component.renderTo(svg);
+        component.renderTo(div);
 
         panZoomInteraction = new Plottable.Interactions.PanZoom();
         panZoomInteraction.addXScale(xScale);
@@ -129,7 +129,7 @@ describe("Interactions", () => {
         TestMethods.triggerFakeMouseEvent("mouseend", eventTarget, endPoint.x, endPoint.y);
         assert.deepEqual(xScale.domain(), expectedXDomain, "xScale pans to the correct domain via drag (mouse)");
         assert.deepEqual(yScale.domain(), expectedYDomain, "yScale pans to the correct domain via drag (mouse)");
-        svg.remove();
+        div.remove();
       });
 
       it("translates the scale correctly on dragging to outside of the component (mouse)", () => {
@@ -142,7 +142,7 @@ describe("Interactions", () => {
         TestMethods.triggerFakeMouseEvent("mouseend", eventTarget, endPoint.x, endPoint.y);
         assert.deepEqual(xScale.domain(), expectedXDomain, "xScale pans to the correct domain via drag (mouse)");
         assert.deepEqual(yScale.domain(), expectedYDomain, "yScale pans to the correct domain via drag (mouse)");
-        svg.remove();
+        div.remove();
       });
 
       it("translates multiple scales correctly on dragging (mouse)", () => {
@@ -158,7 +158,7 @@ describe("Interactions", () => {
         TestMethods.triggerFakeMouseEvent("mouseend", eventTarget, endPoint.x, endPoint.y);
         assert.deepEqual(xScale.domain(), expectedXDomain, "xScale pans to the correct domain via drag (mouse)");
         assert.deepEqual(xScale2.domain(), expectedXDomain2, "xScale2 pans to the correct domain via drag (mouse)");
-        svg.remove();
+        div.remove();
       });
 
       it("translates the scale correctly on dragging (touch)", () => {
@@ -171,7 +171,7 @@ describe("Interactions", () => {
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint]);
         assert.deepEqual(xScale.domain(), expectedXDomain, "xScale pans to the correct domain via drag (touch)");
         assert.deepEqual(yScale.domain(), expectedYDomain, "yScale pans to the correct domain via drag (touch)");
-        svg.remove();
+        div.remove();
       });
 
       it("translates the scale correctly on dragging to outside of the component (touch)", () => {
@@ -184,7 +184,7 @@ describe("Interactions", () => {
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint]);
         assert.deepEqual(xScale.domain(), expectedXDomain, "xScale pans to the correct domain via drag (touch)");
         assert.deepEqual(yScale.domain(), expectedYDomain, "yScale pans to the correct domain via drag (touch)");
-        svg.remove();
+        div.remove();
       });
 
       it("translates multiple scales correctly on dragging (touch)", () => {
@@ -200,7 +200,7 @@ describe("Interactions", () => {
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint]);
         assert.deepEqual(xScale.domain(), expectedXDomain, "xScale pans to the correct domain via drag (touch)");
         assert.deepEqual(xScale2.domain(), expectedXDomain2, "xScale2 pans to the correct domain via drag (touch)");
-        svg.remove();
+        div.remove();
       });
 
       function domainAfterPan(startPoint: Plottable.Point, endPoint: Plottable.Point,
@@ -214,7 +214,7 @@ describe("Interactions", () => {
     });
 
     describe("Zooming", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 500;
 
@@ -231,10 +231,10 @@ describe("Interactions", () => {
         yScale = new Plottable.Scales.Linear();
         yScale.domain([0, SVG_HEIGHT / 2]).range([0, SVG_HEIGHT]);
 
-        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
 
         component = new Plottable.Component();
-        component.renderTo(svg);
+        component.renderTo(div);
 
         panZoomInteraction = new Plottable.Interactions.PanZoom();
         panZoomInteraction.addXScale(xScale);
@@ -248,7 +248,7 @@ describe("Interactions", () => {
         // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
         // https://github.com/ariya/phantomjs/issues/11289
         if (window.PHANTOMJS) {
-          svg.remove();
+          div.remove();
           return;
         }
 
@@ -257,18 +257,18 @@ describe("Interactions", () => {
         let expectedXDomain = domainAfterWheel(deltaY, scrollPoint, xScale, true);
         let expectedYDomain = domainAfterWheel(deltaY, scrollPoint, yScale, true);
 
-        TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
+        TestMethods.triggerFakeWheelEvent("wheel", div, scrollPoint.x, scrollPoint.y, deltaY);
 
         assert.deepEqual(xScale.domain(), expectedXDomain, "xScale zooms to the correct domain via scroll");
         assert.deepEqual(yScale.domain(), expectedYDomain, "yScale zooms to the correct domain via scroll");
-        svg.remove();
+        div.remove();
       });
 
       it("magnifies multiple scales correctly (mousewheel)", () => {
         // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
         // https://github.com/ariya/phantomjs/issues/11289
         if (window.PHANTOMJS) {
-          svg.remove();
+          div.remove();
           return;
         }
         let xScale2 = new Plottable.Scales.Linear();
@@ -280,11 +280,11 @@ describe("Interactions", () => {
         let expectedXDomain = domainAfterWheel(deltaY, scrollPoint, xScale, true);
         let expectedXDomain2 = domainAfterWheel(deltaY, scrollPoint, xScale2, true);
 
-        TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY );
+        TestMethods.triggerFakeWheelEvent("wheel", div, scrollPoint.x, scrollPoint.y, deltaY );
 
         assert.deepEqual(xScale.domain(), expectedXDomain, "xScale zooms to the correct domain via scroll");
         assert.deepEqual(xScale2.domain(), expectedXDomain2, "xScale2 zooms to the correct domain via scroll");
-        svg.remove();
+        div.remove();
       });
 
       it("magnifies the scale correctly (pinching)", () => {
@@ -299,7 +299,7 @@ describe("Interactions", () => {
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1] );
         assert.deepEqual(xScale.domain(), expectedXDomain, "xScale transforms to the correct domain via pinch");
         assert.deepEqual(yScale.domain(), expectedYDomain, "yScale transforms to the correct domain via pinch");
-        svg.remove();
+        div.remove();
       });
 
       it("magnifies multiple scales correctly (pinching)", () => {
@@ -317,7 +317,7 @@ describe("Interactions", () => {
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1] );
         assert.deepEqual(xScale.domain(), expectedXDomain, "xScale transforms to the correct domain via pinch");
         assert.deepEqual(xScale2.domain(), expectedXDomain2, "xScale2 transforms to the correct domain via pinch");
-        svg.remove();
+        div.remove();
       });
 
       it("can pinch inside one component and not affect another component", () => {
@@ -332,7 +332,7 @@ describe("Interactions", () => {
         panZoomInteraction2.attachTo(component2);
 
         let table = new Plottable.Components.Table([[component, component2]]);
-        table.renderTo(svg);
+        table.renderTo(div);
 
         let startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 2 };
         let startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
@@ -344,7 +344,7 @@ describe("Interactions", () => {
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1] );
         assert.deepEqual(xScale.domain(), expectedXDomain, "xScale inside target component transforms via pinch");
         assert.deepEqual(xScale2.domain(), initialDomain, "xScale outside of target component does not transform via pinch");
-        svg.remove();
+        div.remove();
       });
 
       function domainAfterPinch(startPoint: Plottable.Point, startPoint2: Plottable.Point,
@@ -371,7 +371,7 @@ describe("Interactions", () => {
     });
 
     describe("Setting minDomainExtent", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 500;
 
@@ -384,10 +384,10 @@ describe("Interactions", () => {
         xScale = new Plottable.Scales.Linear();
         xScale.domain([0, SVG_WIDTH / 2]);
 
-        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
 
         let component = new Plottable.Component();
-        component.renderTo(svg);
+        component.renderTo(div);
 
         panZoomInteraction = new Plottable.Interactions.PanZoom();
         panZoomInteraction.addXScale(xScale);
@@ -404,14 +404,14 @@ describe("Interactions", () => {
         assert.strictEqual(panZoomInteraction.minDomainExtent(xScale), minimumDomainExtent,
           "returns the correct minDomainExtent");
 
-        svg.remove();
+        div.remove();
       });
 
       it("rejects negative extents", () => {
         // HACKHACK #2661: Cannot assert errors being thrown with description
         (<any> assert).throws(() => panZoomInteraction.minDomainExtent(xScale, -1), Error, "extent must be non-negative",
           "Correctly rejects -1");
-        svg.remove();
+        div.remove();
       });
 
       it("can't set minDomainExtent() be larger than maxDomainExtent() for the same Scale", () => {
@@ -423,30 +423,30 @@ describe("Interactions", () => {
         (<any> assert).throws(() => panZoomInteraction.minDomainExtent(xScale, tooBigMinimumDomainExtent), Error,
           "minDomainExtent must be smaller than maxDomainExtent for the same Scale",
           "cannot have minDomainExtent larger than maxDomainExtent");
-        svg.remove();
+        div.remove();
       });
 
       it("cannot go beyond the specified domainExtent (mousewheel)", () => {
         // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
         // https://github.com/ariya/phantomjs/issues/11289
         if (window.PHANTOMJS) {
-          svg.remove();
+          div.remove();
           return;
         }
 
         let minimumDomainExtent = SVG_WIDTH / 4;
         let scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
         let deltaY = -3000;
-        TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
+        TestMethods.triggerFakeWheelEvent("wheel", div, scrollPoint.x, scrollPoint.y, deltaY);
         let domainExtent = Math.abs(xScale.domain()[1] - xScale.domain()[0]);
         assert.operator(domainExtent, "<", minimumDomainExtent, "there is no zoom limit before setting minimun extent via scroll");
 
         panZoomInteraction.minDomainExtent(xScale, minimumDomainExtent);
         xScale.domain([0, SVG_WIDTH / 2]);
-        TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
+        TestMethods.triggerFakeWheelEvent("wheel", div, scrollPoint.x, scrollPoint.y, deltaY);
         domainExtent = Math.abs(xScale.domain()[1] - xScale.domain()[0]);
         assert.strictEqual(domainExtent, minimumDomainExtent, "xScale zooms to the correct domain via scroll");
-        svg.remove();
+        div.remove();
       });
 
       it("cannot go beyond the specified domainExtent (pinching)", () => {
@@ -473,12 +473,12 @@ describe("Interactions", () => {
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1]);
         domainExtent = Math.abs(xScale.domain()[1] - xScale.domain()[0]);
         assert.strictEqual(domainExtent, minimumDomainExtent, "xScale zooms to the correct domain via pinch");
-        svg.remove();
+        div.remove();
       });
     });
 
     describe("Setting maxDomainExtent", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 500;
 
@@ -491,10 +491,10 @@ describe("Interactions", () => {
         xScale = new Plottable.Scales.Linear();
         xScale.domain([0, SVG_WIDTH / 2]);
 
-        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
 
         let component = new Plottable.Component();
-        component.renderTo(svg);
+        component.renderTo(div);
 
         panZoomInteraction = new Plottable.Interactions.PanZoom();
         panZoomInteraction.addXScale(xScale);
@@ -511,7 +511,7 @@ describe("Interactions", () => {
         assert.strictEqual(panZoomInteraction.maxDomainExtent(xScale), maximumDomainExtent,
           "returns the correct maxDomainExtent");
 
-        svg.remove();
+        div.remove();
       });
 
       it("rejects non-positive extents", () => {
@@ -521,7 +521,7 @@ describe("Interactions", () => {
         // HACKHACK #2661: Cannot assert errors being thrown with description
         (<any> assert).throws(() => panZoomInteraction.maxDomainExtent(xScale, 0), Error, "extent must be positive",
           "Correctly rejects 0");
-        svg.remove();
+        div.remove();
       });
 
       it("can't set maxDomainExtent() to be smaller than minDomainExtent() for the same Scale", () => {
@@ -533,31 +533,31 @@ describe("Interactions", () => {
           "maxDomainExtent must be larger than minDomainExtent for the same Scale",
           "cannot have maxDomainExtent smaller than minDomainExtent");
 
-        svg.remove();
+        div.remove();
       });
 
       it("cannot go beyond the specified domainExtent (mousewheel)", () => {
         // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
         // https://github.com/ariya/phantomjs/issues/11289
         if (window.PHANTOMJS) {
-          svg.remove();
+          div.remove();
           return;
         }
 
         let maximumDomainExtent = SVG_WIDTH;
         let scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
         let deltaY = 3000;
-        TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
+        TestMethods.triggerFakeWheelEvent("wheel", div, scrollPoint.x, scrollPoint.y, deltaY);
         let domainExtent = Math.abs(xScale.domain()[1] - xScale.domain()[0]);
         assert.operator(domainExtent, ">", maximumDomainExtent, "there is no zoom limit before setting maximun extent via scroll");
 
         xScale.domain([0, SVG_WIDTH / 2]);
         panZoomInteraction.maxDomainExtent(xScale, maximumDomainExtent);
 
-        TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
+        TestMethods.triggerFakeWheelEvent("wheel", div, scrollPoint.x, scrollPoint.y, deltaY);
         domainExtent = Math.abs(xScale.domain()[1] - xScale.domain()[0]);
         assert.strictEqual(domainExtent, maximumDomainExtent, "xScale zooms to the correct domain via scroll");
-        svg.remove();
+        div.remove();
       });
 
       it("cannot go beyond the specified domainExtent (pinching)", () => {
@@ -584,12 +584,12 @@ describe("Interactions", () => {
 
         domainExtent = Math.abs(xScale.domain()[1] - xScale.domain()[0]);
         assert.strictEqual(domainExtent, maximumDomainExtent, "xScale zooms to the correct domain via pinch");
-        svg.remove();
+        div.remove();
       });
     });
 
     describe("Setting minDomainValue", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 500;
       let eventTarget: SimpleSelection<void>;
@@ -600,10 +600,10 @@ describe("Interactions", () => {
         xScale = new Plottable.Scales.Linear();
         xScale.domain([0, SVG_WIDTH / 2]).range([0, SVG_WIDTH]);
 
-        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
 
         let component = new Plottable.Component();
-        component.renderTo(svg);
+        component.renderTo(div);
 
         panZoomInteraction = new Plottable.Interactions.PanZoom();
         panZoomInteraction.addXScale(xScale);
@@ -613,7 +613,7 @@ describe("Interactions", () => {
       });
 
       afterEach(() => {
-        svg.remove();
+        div.remove();
       });
 
       it("can set minDomainValue", () => {
@@ -635,13 +635,13 @@ describe("Interactions", () => {
         // simulate massive scroll zoom out
         let scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
         let deltaY = 3000;
-        TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
+        TestMethods.triggerFakeWheelEvent("wheel", div, scrollPoint.x, scrollPoint.y, deltaY);
         assert.operator(xScale.domain()[0], "<", domainValue, "no initial limit");
 
         // add limit
         panZoomInteraction.minDomainValue(xScale, domainValue);
 
-        TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
+        TestMethods.triggerFakeWheelEvent("wheel", div, scrollPoint.x, scrollPoint.y, deltaY);
         assert.strictEqual(xScale.domain()[0], domainValue, "limit works");
       });
 
@@ -673,7 +673,7 @@ describe("Interactions", () => {
     });
 
     describe("Setting maxDomainValue", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 500;
       let eventTarget: SimpleSelection<void>;
@@ -684,10 +684,10 @@ describe("Interactions", () => {
         xScale = new Plottable.Scales.Linear();
         xScale.domain([0, SVG_WIDTH / 2]).range([0, SVG_WIDTH]);
 
-        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
 
         let component = new Plottable.Component();
-        component.renderTo(svg);
+        component.renderTo(div);
 
         panZoomInteraction = new Plottable.Interactions.PanZoom();
         panZoomInteraction.addXScale(xScale);
@@ -697,7 +697,7 @@ describe("Interactions", () => {
       });
 
       afterEach(() => {
-        svg.remove();
+        div.remove();
       });
 
       it("can set maxDomainValue", () => {
@@ -719,13 +719,13 @@ describe("Interactions", () => {
         // simulate massive scroll zoom out
         let scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
         let deltaY = 3000;
-        TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
+        TestMethods.triggerFakeWheelEvent("wheel", div, scrollPoint.x, scrollPoint.y, deltaY);
         assert.operator(xScale.domain()[1], ">", domainValue, "no initial limit");
 
         // add limit
         panZoomInteraction.maxDomainValue(xScale, domainValue);
 
-        TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
+        TestMethods.triggerFakeWheelEvent("wheel", div, scrollPoint.x, scrollPoint.y, deltaY);
         assert.strictEqual(xScale.domain()[1], domainValue, "limit works");
       });
 
@@ -761,7 +761,7 @@ describe("Interactions", () => {
     });
 
     describe("Setting both minDomainValue and maxDomainValue", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 500;
       let eventTarget: SimpleSelection<void>;
@@ -772,10 +772,10 @@ describe("Interactions", () => {
         xScale = new Plottable.Scales.Linear();
         xScale.domain([0, SVG_WIDTH / 2]).range([0, SVG_WIDTH]);
 
-        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
 
         let component = new Plottable.Component();
-        component.renderTo(svg);
+        component.renderTo(div);
 
         panZoomInteraction = new Plottable.Interactions.PanZoom();
         panZoomInteraction.addXScale(xScale);
@@ -785,7 +785,7 @@ describe("Interactions", () => {
       });
 
       afterEach(() => {
-        svg.remove();
+        div.remove();
       });
 
       it("cannot go beyond the specified maxDomainValue (mousewheel)", () => {
@@ -801,7 +801,7 @@ describe("Interactions", () => {
         // simulate massive scroll zoom out
         let scrollPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 4 };
         let deltaY = 3000;
-        TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
+        TestMethods.triggerFakeWheelEvent("wheel", div, scrollPoint.x, scrollPoint.y, deltaY);
         assert.operator(xScale.domain()[0], "<", domainMinValue, "no initial min limit");
         assert.operator(xScale.domain()[1], ">", domainMaxValue, "no initial max limit");
 
@@ -809,7 +809,7 @@ describe("Interactions", () => {
         xScale.domain([domainMinValue, domainMaxValue]);
         panZoomInteraction.setMinMaxDomainValuesTo(xScale);
 
-        TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
+        TestMethods.triggerFakeWheelEvent("wheel", div, scrollPoint.x, scrollPoint.y, deltaY);
         assert.strictEqual(xScale.domain()[0], domainMinValue, "min limit works");
         assert.strictEqual(xScale.domain()[1], domainMaxValue, "max limit works");
       });
@@ -850,7 +850,7 @@ describe("Interactions", () => {
     });
 
     describe("Registering and deregistering Pan and Zoom event callbacks", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 500;
 
@@ -880,10 +880,10 @@ describe("Interactions", () => {
         xScale = new Plottable.Scales.Linear();
         xScale.domain([0, SVG_WIDTH / 2]);
 
-        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
 
         let component = new Plottable.Component();
-        component.renderTo(svg);
+        component.renderTo(div);
 
         panZoomInteraction = new Plottable.Interactions.PanZoom();
         panZoomInteraction.addXScale(xScale);
@@ -912,7 +912,7 @@ describe("Interactions", () => {
         TestMethods.triggerFakeMouseEvent("mouseup", eventTarget, endPoint.x, endPoint.y);
         assert.isTrue(callback.called, "Interaction correctly triggers the callback (mouse)");
 
-        svg.remove();
+        div.remove();
       });
 
       it("registers callback using onZoomEnd", () => {
@@ -941,13 +941,13 @@ describe("Interactions", () => {
         // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
         // https://github.com/ariya/phantomjs/issues/11289
         if (window.PHANTOMJS) {
-          svg.remove();
+          div.remove();
           return;
         }
 
-        TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
+        TestMethods.triggerFakeWheelEvent("wheel", div, scrollPoint.x, scrollPoint.y, deltaY);
         assert.isTrue(callback.called, "Interaction correctly triggers the callback (mouse)");
-        svg.remove();
+        div.remove();
       });
 
       it("deregisters callback using offPanEnd", () => {
@@ -964,7 +964,7 @@ describe("Interactions", () => {
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint]);
         assert.isFalse(callback.called, "callback should be disconnected from the Interaction");
 
-        svg.remove();
+        div.remove();
       });
 
       it("deregisters callback using offZoomEnd", () => {
@@ -982,7 +982,7 @@ describe("Interactions", () => {
 
         assert.isFalse(callback.called, "callback should be disconnected from the Interaction");
 
-        svg.remove();
+        div.remove();
       });
 
       it("can register multiple onPanEnd callbacks", () => {
@@ -999,7 +999,7 @@ describe("Interactions", () => {
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint]);
         assert.isTrue(callback1.called, "Interaction should trigger the first callback");
         assert.isTrue(callback1.called, "Interaction should trigger the second callback");
-        svg.remove();
+        div.remove();
       });
 
       it("can register multiple onZoomEnd callbacks", () => {
@@ -1018,7 +1018,7 @@ describe("Interactions", () => {
 
         assert.isTrue(callback1.called, "Interaction should trigger the first callback");
         assert.isTrue(callback1.called, "Interaction should trigger the second callback");
-        svg.remove();
+        div.remove();
       });
 
       it("can deregister a onPanEnd callback without affecting the other ones", () => {
@@ -1036,7 +1036,7 @@ describe("Interactions", () => {
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint]);
         assert.isFalse(callback1.called, "Callback1 should be disconnected from the Interaction");
         assert.isTrue(callback2.called, "Callback2 should still exist on the Interaction");
-        svg.remove();
+        div.remove();
       });
 
       it("can deregister a onZoomEnd callback without affecting the other ones", () => {
@@ -1056,7 +1056,7 @@ describe("Interactions", () => {
 
         assert.isFalse(callback1.called, "Callback1 should be disconnected from the Interaction");
         assert.isTrue(callback2.called, "Callback2 should still exist on the Interaction");
-        svg.remove();
+        div.remove();
       });
     });
   });

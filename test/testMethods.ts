@@ -5,17 +5,17 @@ import * as d3 from "d3";
 import * as Plottable from "../src";
 import { getTranslateValues } from "../src/utils/domUtils";
 
-export function generateDIV(width = 400, height = 400): d3.Selection<HTMLDivElement, void | {}, any, any> {
-  let parent = getSVGParent();
+export function generateDiv(width = 400, height = 400): d3.Selection<HTMLDivElement, void | {}, any, any> {
+  let parent = getElementParent();
   return parent.append<HTMLDivElement>("div").style("width", `${width}px`).style("height", `${height}px`).attr("class", "div");
 }
 
 export function generateSVG(width = 400, height = 400): d3.Selection<SVGSVGElement, void | {}, any, any> {
-  let parent = getSVGParent();
+  let parent = getElementParent();
   return parent.append<SVGSVGElement>("svg").attr("width", width).attr("height", height).attr("class", "svg");
 }
 
-export function getSVGParent(): SimpleSelection<void> {
+export function getElementParent(): SimpleSelection<void> {
   let mocha = d3.select("#mocha-report");
   if (mocha.node() != null) {
     let suites = mocha.selectAll<Element, any>(".suite");
@@ -29,7 +29,7 @@ export function getSVGParent(): SimpleSelection<void> {
 export function isInDOM(component: Plottable.Component) {
   let contentNode = <Element> component.content().node();
   return contentNode != null && Plottable.Utils.DOM.contains(document.body, contentNode);
-};
+}
 
 export function verifySpaceRequest(sr: Plottable.SpaceRequest, expectedMinWidth: number, expectedMinHeight: number, message: string) {
   assert.strictEqual(sr.minWidth, expectedMinWidth, message + " (space request: minWidth)");

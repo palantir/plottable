@@ -29,7 +29,7 @@ describe("Interactions", () => {
       y: -SVG_HEIGHT / 2,
     };
 
-    let svg: SimpleSelection<void>;
+    let div: d3.Selection<HTMLDivElement, any, any, any>;
     let component: Plottable.Component;
     let dragInteraction: Plottable.Interactions.Drag;
 
@@ -71,9 +71,9 @@ describe("Interactions", () => {
     }
 
     beforeEach(() => {
-      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
       component = new Plottable.Component();
-      component.renderTo(svg);
+      component.renderTo(div);
 
       dragInteraction = new Plottable.Interactions.Drag();
       dragInteraction.attachTo(component);
@@ -81,7 +81,7 @@ describe("Interactions", () => {
 
     afterEach(function() {
       if (this.currentTest.state === "passed") {
-        svg.remove();
+        div.remove();
       }
     });
 

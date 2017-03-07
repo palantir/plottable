@@ -64,7 +64,10 @@ export function requestAnimationFramePolyfill(callback: () => void) {
  * @param {Element} element The element to query
  * @returns {number} The width of the element.
  */
-export function elementWidth(element: Element) {
+export function elementWidth(elementOrSelection: Element | d3.Selection<Element, any, any, any>) {
+  const element = elementOrSelection instanceof d3.selection
+    ? (elementOrSelection as d3.Selection<HTMLElement, any, any, any>).node()
+    : (elementOrSelection as Element);
   let style = window.getComputedStyle(element);
   return _parseStyleValue(style, "width")
     + _parseStyleValue(style, "padding-left")
@@ -80,7 +83,10 @@ export function elementWidth(element: Element) {
  * @param {Element} element The element to query
  * @returns {number} The height of the element
  */
-export function elementHeight(element: Element) {
+export function elementHeight(elementOrSelection: Element | d3.Selection<Element, any, any, any>) {
+  const element = elementOrSelection instanceof d3.selection
+    ? (elementOrSelection as d3.Selection<HTMLElement, any, any, any>).node()
+    : (elementOrSelection as Element);
   let style = window.getComputedStyle(element);
   return _parseStyleValue(style, "height")
     + _parseStyleValue(style, "padding-top")

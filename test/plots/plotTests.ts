@@ -16,16 +16,16 @@ describe("Plots", () => {
 
     describe("managing entities", () => {
       let plot: Plottable.Plot;
-      let svg: any;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
 
       beforeEach(() => {
         plot = new Plottable.Plot();
-        svg = TestMethods.generateSVG();
-        plot.renderTo(svg);
+        div = TestMethods.generateDiv();
+        plot.renderTo(div);
       });
 
       afterEach(() => {
-        svg.remove();
+        div.remove();
       });
 
       it("first call to entities builds a new store", () => {
@@ -82,16 +82,16 @@ describe("Plots", () => {
 
     describe("entityNearest", () => {
       let plot: Plottable.Plot;
-      let svg: any;
+      let div: any;
 
       beforeEach(() => {
         plot = new Plottable.Plot();
-        svg = TestMethods.generateSVG();
-        plot.renderTo(svg);
+        div = TestMethods.generateDiv();
+        plot.renderTo(div);
       });
 
       afterEach(() => {
-        svg.remove();
+        div.remove();
       });
 
       it("builds entityStore if entity store is undefined", () => {
@@ -136,12 +136,12 @@ describe("Plots", () => {
         const datasets = Plottable.Utils.Math.range(0, datasetCount).map(() => new Plottable.Dataset());
         plot.datasets(datasets);
 
-        const svg = TestMethods.generateSVG();
-        plot.anchor(svg);
+        const div = TestMethods.generateDiv();
+        plot.anchor(div);
 
         assert.strictEqual(plot.content().select(".render-area").selectAll<Element, any>("g").size(), datasetCount, "g for each dataset");
 
-        svg.remove();
+        div.remove();
       });
 
       it("updates the scales extents when the datasets get updated", () => {
@@ -155,8 +155,8 @@ describe("Plots", () => {
 
         const oldDomain = scale.domain();
 
-        const svg = TestMethods.generateSVG();
-        plot.anchor(svg);
+        const div = TestMethods.generateDiv();
+        plot.anchor(div);
 
         assert.operator(scale.domainMin(), "<=", Math.min.apply(null, data), "domainMin extended to at least minimum");
         assert.operator(scale.domainMax(), ">=", Math.max.apply(null, data), "domainMax extended to at least maximum");
@@ -172,7 +172,7 @@ describe("Plots", () => {
         assert.operator(scale.domainMin(), "<=", Math.min.apply(null, data.concat(data2)), "domainMin includes new dataset");
         assert.operator(scale.domainMax(), ">=", Math.max.apply(null, data.concat(data2)), "domainMax includes new dataset");
 
-        svg.remove();
+        div.remove();
       });
 
       it("updates the scale extents in dataset order", () => {
@@ -186,11 +186,11 @@ describe("Plots", () => {
         plot.addDataset(dataset);
         plot.attr("key", (d) => d, categoryScale);
 
-        let svg = TestMethods.generateSVG();
-        plot.anchor(svg);
+        let div = TestMethods.generateDiv();
+        plot.anchor(div);
 
         assert.deepEqual(categoryScale.domain(), data2.concat(data), "extent in the right order");
-        svg.remove();
+        div.remove();
       });
     });
 
@@ -237,12 +237,12 @@ describe("Plots", () => {
 
       const oldDomain = scale.domain();
 
-      const svg = TestMethods.generateSVG();
-      plot.anchor(svg);
+      const div = TestMethods.generateDiv();
+      plot.anchor(div);
 
       plot.destroy();
       assert.deepEqual(scale.domain(), oldDomain, "destroying the plot removes its extents from the scale");
-      svg.remove();
+      div.remove();
     });
 
     it("disconnects the data extents from the scales when detached", () => {
@@ -256,29 +256,29 @@ describe("Plots", () => {
 
       const oldDomain = scale.domain();
 
-      const svg = TestMethods.generateSVG();
-      plot.anchor(svg);
+      const div = TestMethods.generateDiv();
+      plot.anchor(div);
 
       plot.detach();
       assert.deepEqual(scale.domain(), oldDomain, "detaching the plot removes its extents from the scale");
-      svg.remove();
+      div.remove();
     });
 
     describe("clipPath", () => {
       it("uses the correct clipPath", () => {
-        const svg = TestMethods.generateSVG();
+        const div = TestMethods.generateDiv();
         const plot = new Plottable.Plot();
-        plot.renderTo(svg);
+        plot.renderTo(div);
         TestMethods.verifyClipPath(plot);
-        svg.remove();
+        div.remove();
       });
 
       // not supported on IE9 (http://caniuse.com/#feat=history)
       if (window.history != null && window.history.replaceState != null) {
         it("updates the clipPath reference when rendered", () => {
-          const svg = TestMethods.generateSVG();
+          const div = TestMethods.generateDiv();
           const plot = new Plottable.Plot();
-          plot.renderTo(svg);
+          plot.renderTo(div);
 
           const originalState = window.history.state;
           const originalTitle = document.title;
@@ -295,7 +295,7 @@ describe("Plots", () => {
           const normalizeClipPath = (s: string) => s.replace(/"/g, "");
           assert.strictEqual(normalizeClipPath((<any> plot)._element.attr("clip-path")), expectedClipPathURL,
             "the clipPath reference was updated");
-          svg.remove();
+          div.remove();
         });
       }
     });
@@ -360,9 +360,9 @@ describe("Plots", () => {
         const scale = new Plottable.Scales.Category();
         plot.attr("foo", indexCheckAccessor, scale);
 
-        const svg = TestMethods.generateSVG();
-        plot.anchor(svg);
-        svg.remove();
+        const div = TestMethods.generateDiv();
+        plot.anchor(div);
+        div.remove();
       });
 
       it("can apply a scale to the returned values", () => {
@@ -411,13 +411,13 @@ describe("Plots", () => {
 
         plot.attr("foo", (d) => d, scale);
 
-        const svg = TestMethods.generateSVG();
-        plot.anchor(svg);
+        const div = TestMethods.generateDiv();
+        plot.anchor(div);
 
         assert.operator(scale.domainMin(), "<=", Math.min.apply(null, data), "domainMin extended to at least minimum");
         assert.operator(scale.domainMax(), ">=", Math.max.apply(null, data), "domainMax extended to at least maximum");
 
-        svg.remove();
+        div.remove();
       });
     });
   });

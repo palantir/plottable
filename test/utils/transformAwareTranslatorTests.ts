@@ -9,7 +9,7 @@ import * as TestMethods from "../testMethods";
 
 describe("Translator", () => {
 it("getTranslator() creates only one Translator per html root", () => {
-    let div = TestMethods.generateDIV();
+    let div = TestMethods.generateDiv();
     const component = new Plottable.Component();
     sinon.stub(component, "rootElement", () => div);
 
@@ -22,7 +22,7 @@ it("getTranslator() creates only one Translator per html root", () => {
   });
 
   it("converts points to html-space correctly", () => {
-    let div = TestMethods.generateDIV();
+    let div = TestMethods.generateDiv();
     div.style("position", "relative");
     const component = new Plottable.Component();
     sinon.stub(component, "rootElement", () => div);
@@ -49,16 +49,16 @@ it("getTranslator() creates only one Translator per html root", () => {
   });
 
   it("getTranslator() creates only one Translator per <svg>", () => {
-    let svg = TestMethods.generateSVG();
+    let div = TestMethods.generateDiv();
     const component = new Plottable.Component();
-    sinon.stub(component, "rootElement", () => svg);
+    sinon.stub(component, "rootElement", () => div);
 
     let t1 = Plottable.Utils.getTranslator(component);
     assert.isNotNull(t1, "created a new Translator on a <svg>");
     let t2 = Plottable.Utils.getTranslator(component);
     assert.strictEqual(t1, t2, "returned the existing Translator if called again with same <svg>");
 
-    svg.remove();
+    div.remove();
   });
 
   it("converts points to <svg>-space correctly", () => {

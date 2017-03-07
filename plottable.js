@@ -15243,6 +15243,7 @@ function luminance(color) {
  * @license MIT
  */
 
+var d3 = __webpack_require__(1);
 var nativeMath = window.Math;
 /**
  * Returns whether the child is in fact a child of the parent
@@ -15299,7 +15300,10 @@ exports.requestAnimationFramePolyfill = requestAnimationFramePolyfill;
  * @param {Element} element The element to query
  * @returns {number} The width of the element.
  */
-function elementWidth(element) {
+function elementWidth(elementOrSelection) {
+    var element = elementOrSelection instanceof d3.selection
+        ? elementOrSelection.node()
+        : elementOrSelection;
     var style = window.getComputedStyle(element);
     return _parseStyleValue(style, "width")
         + _parseStyleValue(style, "padding-left")
@@ -15315,7 +15319,10 @@ exports.elementWidth = elementWidth;
  * @param {Element} element The element to query
  * @returns {number} The height of the element
  */
-function elementHeight(element) {
+function elementHeight(elementOrSelection) {
+    var element = elementOrSelection instanceof d3.selection
+        ? elementOrSelection.node()
+        : elementOrSelection;
     var style = window.getComputedStyle(element);
     return _parseStyleValue(style, "height")
         + _parseStyleValue(style, "padding-top")

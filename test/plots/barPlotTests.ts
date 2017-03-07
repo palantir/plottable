@@ -33,8 +33,14 @@ describe("Plots", () => {
       const isVertical = orientation === Plottable.Plots.Bar.ORIENTATION_VERTICAL;
       const basePositionAttr = isVertical ? "x" : "y";
       const baseSizeAttr = isVertical ? "width" : "height";
+      const getDivBaseSizeDimension = (div: d3.Selection<HTMLDivElement, any, any, any>) => {
+        return isVertical ? Plottable.Utils.DOM.elementWidth(div) : Plottable.Utils.DOM.elementHeight(div);
+      };
       const valuePositionAttr = isVertical ? "y" : "x";
       const valueSizeAttr = isVertical ? "height" : "width";
+      const getValueBaseSizeDimension = (div: d3.Selection<HTMLDivElement, any, any, any>) => {
+        return isVertical ? Plottable.Utils.DOM.elementHeight(div) : Plottable.Utils.DOM.elementWidth(div);
+      };
 
       describe(`rendering when ${orientation}`, () => {
         const data = [
@@ -43,14 +49,14 @@ describe("Plots", () => {
           { base: "C", value: -1 },
         ];
 
-        let svg: SimpleSelection<void>;
+        let div: d3.Selection<HTMLDivElement, any, any, any>;
         let barPlot: Plottable.Plots.Bar<string | number, number | string>;
         let baseScale: Plottable.Scales.Category;
         let valueScale: Plottable.Scales.Linear;
         let dataset: Plottable.Dataset;
 
         beforeEach(() => {
-          svg = TestMethods.generateSVG();
+          div = TestMethods.generateDiv();
           barPlot = new Plottable.Plots.Bar<string | number, number | string>(orientation);
           baseScale = new Plottable.Scales.Category();
           valueScale = new Plottable.Scales.Linear();
@@ -67,7 +73,7 @@ describe("Plots", () => {
         afterEach(function() {
           if (this.currentTest.state === "passed") {
             barPlot.destroy();
-            svg.remove();
+            div.remove();
           }
         });
 
@@ -80,7 +86,7 @@ describe("Plots", () => {
             `baseline ${valuePositionAttr}2 is correct`);
           assert.strictEqual(TestMethods.numAttr(baseline, `${basePositionAttr}1`), 0,
             `baseline ${basePositionAttr}1 is correct`);
-          assert.strictEqual(TestMethods.numAttr(baseline, `${basePositionAttr}2`), TestMethods.numAttr(svg, baseSizeAttr),
+          assert.strictEqual(TestMethods.numAttr(baseline, `${basePositionAttr}2`), getDivBaseSizeDimension(div),
             `baseline ${basePositionAttr}2 is correct`);
 
           const bars = barPlot.content().selectAll<Element, any>("rect");
@@ -108,21 +114,21 @@ describe("Plots", () => {
         }
 
         it("renders with no data", () => {
-          assert.doesNotThrow(() => barPlot.renderTo(svg), Error);
-          assert.strictEqual(barPlot.width(), TestMethods.numAttr(svg, "width"), "was allocated width");
-          assert.strictEqual(barPlot.height(), TestMethods.numAttr(svg, "height"), "was allocated height");
+          assert.doesNotThrow(() => barPlot.renderTo(div), Error);
+          assert.strictEqual(barPlot.width(), Plottable.Utils.DOM.elementWidth(div), "was allocated width");
+          assert.strictEqual(barPlot.height(), Plottable.Utils.DOM.elementHeight(div), "was allocated height");
         });
 
         it("draws bars and baseline in correct positions", () => {
           barPlot.addDataset(dataset);
-          barPlot.renderTo(svg);
+          barPlot.renderTo(div);
 
           assertCorrectRendering();
         });
 
         it("rerenders correctly when the baseline value is changed", () => {
           barPlot.addDataset(dataset);
-          barPlot.renderTo(svg);
+          barPlot.renderTo(div);
 
           barPlot.baselineValue(1);
           assertCorrectRendering();
@@ -134,7 +140,7 @@ describe("Plots", () => {
           baseScale.domain(firstTwoBaseValues);
           barPlot.addDataset(dataset);
           barPlot.autorangeMode(valuePositionAttr);
-          barPlot.renderTo(svg);
+          barPlot.renderTo(div);
 
           const valueScaleDomain = valueScale.domain();
           const expectedValueDomainMin = Math.min(data[0].value, data[1].value);
@@ -146,14 +152,14 @@ describe("Plots", () => {
         it("doesn't show values from outside the base scale's domain", () => {
           baseScale.domain(["-A"]);
           barPlot.addDataset(dataset);
-          barPlot.renderTo(svg);
+          barPlot.renderTo(div);
 
           assert.strictEqual(barPlot.content().selectAll<Element, any>("rect").size(), 0, "draws no bars when the domain contains no data points");
         });
       });
 
       describe(`autodomaining when ${orientation}`, () => {
-        let svg: SimpleSelection<void>;
+        let div: d3.Selection<HTMLDivElement, any, any, any>;
         let baseScale: Plottable.Scales.Linear;
         let valueScale: Plottable.Scales.Linear;
         let barPlot: Plottable.Plots.Bar<number, number>;
@@ -162,7 +168,7 @@ describe("Plots", () => {
         const valueAccessor = (d: any) => d.value;
 
         beforeEach(() => {
-          svg = TestMethods.generateSVG();
+          div = TestMethods.generateDiv();
           barPlot = new Plottable.Plots.Bar<number, number>(orientation);
           baseScale = new Plottable.Scales.Linear();
           valueScale = new Plottable.Scales.Linear();
@@ -178,7 +184,7 @@ describe("Plots", () => {
         afterEach(function() {
           if (this.currentTest.state === "passed") {
             barPlot.destroy();
-            svg.remove();
+            div.remove();
           }
         });
 
@@ -187,7 +193,7 @@ describe("Plots", () => {
             { base: baseScale.domain()[1] + 10, value: 5 },
           ];
           barPlot.addDataset(new Plottable.Dataset(singlePointData));
-          barPlot.renderTo(svg);
+          barPlot.renderTo(div);
           const baseScaleDomain = baseScale.domain();
           assert.operator(baseScaleDomain[0], "<=", singlePointData[0].base, "lower end of base domain is less than the value");
           assert.operator(baseScaleDomain[1], ">=", singlePointData[0].base, "upper end of base domain is greater than the value");
@@ -199,7 +205,7 @@ describe("Plots", () => {
             { base: 1, value: 2 },
           ];
           barPlot.addDataset(new Plottable.Dataset(data));
-          barPlot.renderTo(svg);
+          barPlot.renderTo(div);
 
           const baseDomainAfterRendering = baseScale.domain();
           baseScale.autoDomain();
@@ -212,14 +218,14 @@ describe("Plots", () => {
         const scaleTypes = ["Linear", "ModifiedLog", "Time"];
         scaleTypes.forEach((scaleType) => {
           describe(`using a ${scaleType} base Scale`, () => {
-            let svg: SimpleSelection<void>;
+            let div: d3.Selection<HTMLDivElement, any, any, any>;
             let barPlot: Plottable.Plots.Bar<number | Date, number | Date>;
             let baseScale: Plottable.QuantitativeScale<number | Date>;
             let valueScale: Plottable.Scales.Linear;
             let dataset: Plottable.Dataset;
 
             beforeEach(() => {
-              svg = TestMethods.generateSVG();
+              div = TestMethods.generateDiv();
               barPlot = new Plottable.Plots.Bar<number | Date, number | Date>(orientation);
 
               switch (scaleType) {
@@ -248,13 +254,13 @@ describe("Plots", () => {
               }
               dataset = new Plottable.Dataset();
               barPlot.addDataset(dataset);
-              barPlot.renderTo(svg);
+              barPlot.renderTo(div);
             });
 
             afterEach(function() {
               if (this.currentTest.state === "passed") {
                 barPlot.destroy();
-                svg.remove();
+                div.remove();
               }
             });
 
@@ -288,15 +294,15 @@ describe("Plots", () => {
 
               const bars = barPlot.content().selectAll<Element, any>("rect");
               assert.strictEqual(bars.size(), data.length, "one bar was drawn per datum");
-              const svgSize = TestMethods.numAttr(svg, baseSizeAttr);
+              const divSize = getDivBaseSizeDimension(div);
               bars.each(function() {
                 const bar = d3.select(this);
                 const barPosition = TestMethods.numAttr(bar, basePositionAttr);
                 const barSize = TestMethods.numAttr(bar, baseSizeAttr);
                 assert.operator(barPosition, ">=", 0, `bar is within visible area (${basePositionAttr})`);
-                assert.operator(barPosition, "<=", svgSize, `bar is within visible area (${basePositionAttr})`);
+                assert.operator(barPosition, "<=", divSize, `bar is within visible area (${basePositionAttr})`);
                 assert.operator(barPosition + barSize, ">=", 0, `bar is within visible area (${baseSizeAttr})`);
-                assert.operator(barPosition + barSize, "<=", svgSize, `bar is within visible area (${baseSizeAttr})`);
+                assert.operator(barPosition + barSize, "<=", divSize, `bar is within visible area (${baseSizeAttr})`);
               });
             });
 
@@ -316,9 +322,9 @@ describe("Plots", () => {
 
               const bar = barPlot.content().select("rect");
               const barSize = TestMethods.numAttr(bar, baseSizeAttr);
-              const svgSize = TestMethods.numAttr(svg, baseSizeAttr);
-              assert.operator(barSize, ">=", svgSize / 4, "bar is larger than 1/4 of the available space");
-              assert.operator(barSize, "<=", svgSize / 2, "bar is smaller than 1/2 of the available space");
+              const divSize = getDivBaseSizeDimension(div);
+              assert.operator(barSize, ">=", divSize / 4, "bar is larger than 1/4 of the available space");
+              assert.operator(barSize, "<=", divSize / 2, "bar is smaller than 1/2 of the available space");
             });
 
             it("computes a sensible width when given repeated base value", () => {
@@ -330,12 +336,12 @@ describe("Plots", () => {
 
               const bars = barPlot.content().selectAll<Element, any>("rect");
               assert.strictEqual(bars.size(), repeatedBaseData.length, "one bar was drawn per datum");
-              const svgSize = TestMethods.numAttr(svg, baseSizeAttr);
+              const divSize = getDivBaseSizeDimension(div);
               bars.each(function() {
                 const bar = d3.select(this);
                 const barSize = TestMethods.numAttr(bar, baseSizeAttr);
-                assert.operator(barSize, ">=", svgSize / 4, "bar is larger than 1/4 of the available space");
-                assert.operator(barSize, "<=", svgSize / 2, "bar is smaller than 1/2 of the available space");
+                assert.operator(barSize, ">=", divSize / 4, "bar is larger than 1/4 of the available space");
+                assert.operator(barSize, "<=", divSize / 2, "bar is smaller than 1/2 of the available space");
               });
             });
 
@@ -372,14 +378,14 @@ describe("Plots", () => {
         ];
         const DEFAULT_DOMAIN = [-5, 5];
 
-        let svg: SimpleSelection<void>;
+        let div: d3.Selection<HTMLDivElement, any, any, any>;
         let baseScale: Plottable.Scales.Linear;
         let valueScale: Plottable.Scales.Linear;
         let barPlot: Plottable.Plots.Bar<number, number>;
         let dataset: Plottable.Dataset;
 
         beforeEach(() => {
-          svg = TestMethods.generateSVG();
+          div = TestMethods.generateDiv();
           barPlot = new Plottable.Plots.Bar<number, number>(orientation);
           baseScale = new Plottable.Scales.Linear();
           baseScale.domain(DEFAULT_DOMAIN);
@@ -394,13 +400,13 @@ describe("Plots", () => {
           }
           dataset = new Plottable.Dataset(data);
           barPlot.addDataset(dataset);
-          barPlot.renderTo(svg);
+          barPlot.renderTo(div);
         });
 
         afterEach(function() {
           if (this.currentTest.state === "passed") {
             barPlot.destroy();
-            svg.remove();
+            div.remove();
           }
         });
 
@@ -429,7 +435,7 @@ describe("Plots", () => {
         });
 
         it("hides the labels if bars are too thin to show them", () => {
-          svg.attr(baseSizeAttr, TestMethods.numAttr(svg, baseSizeAttr) / 10);
+          div.attr(baseSizeAttr, getDivBaseSizeDimension(div) / 10);
           barPlot.redraw();
           barPlot.labelsEnabled(true);
 
@@ -501,7 +507,7 @@ describe("Plots", () => {
             assert.strictEqual(d3.select(textsAfterRendering.nodes()[i]).style("visibility"), "hidden",
               `label for bar with index ${i} is hidden`);
           });
-          svg.remove();
+          div.remove();
         });
 
         it("hides labels cut off by upper end of base scale", () => {
@@ -539,7 +545,7 @@ describe("Plots", () => {
               assert.strictEqual(d3.select(textNode).style("visibility"), "hidden", `label for bar with index ${i} is hidden`);
             }
           });
-          svg.remove();
+          div.remove();
         });
 
         it("hides or shifts labels cut off by upper end of value scale", () => {
@@ -596,14 +602,14 @@ describe("Plots", () => {
         ];
         const DEFAULT_DOMAIN = [-2, 2];
 
-        let svg: SimpleSelection<void>;
+        let div: d3.Selection<HTMLDivElement, any, any, any>;
         let barPlot: Plottable.Plots.Bar<number, number>;
         let baseScale: Plottable.Scales.Linear;
         let valueScale: Plottable.Scales.Linear;
         let dataset: Plottable.Dataset;
 
         beforeEach(() => {
-          svg = TestMethods.generateSVG();
+          div = TestMethods.generateDiv();
           barPlot = new Plottable.Plots.Bar<number, number>(orientation);
           baseScale = new Plottable.Scales.Linear();
           baseScale.domain(DEFAULT_DOMAIN);
@@ -618,13 +624,13 @@ describe("Plots", () => {
           }
           dataset = new Plottable.Dataset(data);
           barPlot.addDataset(dataset);
-          barPlot.renderTo(svg);
+          barPlot.renderTo(div);
         });
 
         afterEach(function() {
           if (this.currentTest.state === "passed") {
             barPlot.destroy();
-            svg.remove();
+            div.remove();
           }
         });
 

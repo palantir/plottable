@@ -28,6 +28,7 @@ before(() => {
 });
 
 after(() => {
+  // TODO modify this "svg" selector to correctly select TestMethods.generateDiv!!!!
   assert.strictEqual(d3.selectAll<Element, any>("svg").size(), 0, "all svgs have been removed");
   assert.strictEqual(d3.selectAll<Element, any>("style").size(), 0, "all style nodes have been removed");
 });

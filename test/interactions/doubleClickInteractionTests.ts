@@ -10,26 +10,26 @@ import * as TestMethods from "../testMethods";
 describe("Interactions", () => {
   describe("DoubleClick Interaction", () => {
     let clickedPoint: Plottable.Point;
-    let svg: SimpleSelection<void>;
+    let div: d3.Selection<HTMLDivElement, any, any, any>;
     let doubleClickInteraction: Plottable.Interactions.DoubleClick;
     let component: Plottable.Component;
 
     beforeEach(() => {
-      const svgWidth = 400;
-      const svgHeight = 400;
-      svg = TestMethods.generateSVG(svgWidth, svgHeight);
+      const divWidth = 400;
+      const divHeight = 400;
+      div = TestMethods.generateDiv(divWidth, divHeight);
       component = new Plottable.Component();
-      component.renderTo(svg);
+      component.renderTo(div);
 
       doubleClickInteraction = new Plottable.Interactions.DoubleClick();
       doubleClickInteraction.attachTo(component);
 
-      clickedPoint = {x: svgWidth / 2, y: svgHeight / 2};
+      clickedPoint = {x: divWidth / 2, y: divHeight / 2};
     });
 
     afterEach(function() {
       if (this.currentTest.state === "passed") {
-        svg.remove();
+        div.remove();
       }
     });
 

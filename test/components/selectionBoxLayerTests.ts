@@ -12,19 +12,19 @@ describe("SelectionBoxLayer", () => {
     const SVG_WIDTH = 500;
     const SVG_HEIGHT = 500;
     const SELECTION_BOX_CLASSNAME = ".selection-box";
-    let svg: SimpleSelection<void>;
+    let div: d3.Selection<HTMLDivElement, any, any, any>;
     let sbl: Plottable.Components.SelectionBoxLayer;
 
     beforeEach(() => {
-      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
       sbl = new Plottable.Components.SelectionBoxLayer();
     });
 
     it("can set the boxVisible property", () => {
       assert.strictEqual(sbl.boxVisible(), false, "The box is not visible by default");
 
-      sbl.renderTo(svg);
-      assert.strictEqual(sbl.boxVisible(), false, "The box is not visible by default after rendering to svg");
+      sbl.renderTo(div);
+      assert.strictEqual(sbl.boxVisible(), false, "The box is not visible by default after rendering to div");
 
       assert.strictEqual(sbl.boxVisible(true), sbl, "Setting the boxVisible attribute returns the selection box layer");
       assert.strictEqual(sbl.boxVisible(), true, "Setting the boxVisible to true attribute works");
@@ -32,45 +32,45 @@ describe("SelectionBoxLayer", () => {
       assert.strictEqual(sbl.boxVisible(), false, "Setting the boxVisible attribute to false works");
 
       sbl.destroy();
-      svg.remove();
+      div.remove();
     });
 
     it("renders the box in accordance to boxVisible property", () => {
-      sbl.renderTo(svg);
+      sbl.renderTo(div);
 
-      let selectionBox = svg.select(SELECTION_BOX_CLASSNAME);
+      let selectionBox = div.select(SELECTION_BOX_CLASSNAME);
       assert.isTrue(selectionBox.empty(), "initilizes without box in DOM");
 
       sbl.boxVisible(true);
-      selectionBox = svg.select(SELECTION_BOX_CLASSNAME);
+      selectionBox = div.select(SELECTION_BOX_CLASSNAME);
       assert.isFalse(selectionBox.empty(), "box is inserted in DOM when showing");
 
       sbl.boxVisible(false);
-      selectionBox = svg.select(SELECTION_BOX_CLASSNAME);
+      selectionBox = div.select(SELECTION_BOX_CLASSNAME);
       assert.isTrue(selectionBox.empty(), "box is removed from DOM when not showing");
 
       sbl.destroy();
-      svg.remove();
+      div.remove();
     });
 
     it("generates the correct clipPath", () => {
-      sbl.renderTo(svg);
+      sbl.renderTo(div);
 
       TestMethods.verifyClipPath(sbl);
       const clipRect = (<any> sbl)._boxContainer.select(".clip-rect");
       assert.strictEqual(TestMethods.numAttr(clipRect, "width"), SVG_WIDTH, "the clipRect has an appropriate width");
       assert.strictEqual(TestMethods.numAttr(clipRect, "height"), SVG_HEIGHT, "the clipRect has an appropriate height");
-      svg.remove();
+      div.remove();
     });
 
     it("updates the clipPath reference when rendered", () => {
       // HACKHACK: History and history API not supported on IE9 (http://caniuse.com/#feat=history)
       if (window.history == null ||  window.history.replaceState == null) {
-        svg.remove();
+        div.remove();
         return;
       }
 
-      sbl.renderTo(svg);
+      sbl.renderTo(div);
 
       const originalState = window.history.state;
       const originalTitle = document.title;
@@ -87,7 +87,7 @@ describe("SelectionBoxLayer", () => {
       const normalizeClipPath = (s: string) => s.replace(/"/g, "");
       assert.strictEqual(normalizeClipPath((<any> sbl)._element.attr("clip-path")), expectedClipPathURL,
         "the clipPath reference was updated");
-      svg.remove();
+      div.remove();
     });
 
     it("can set the bounds property", () => {
@@ -111,7 +111,7 @@ describe("SelectionBoxLayer", () => {
       }), Error, "can set bounds before anchoring");
 
       sbl.boxVisible(true);
-      sbl.renderTo(svg);
+      sbl.renderTo(div);
 
       assertCorrectRendering(topLeft, bottomRight, "rendered correctly");
       let queriedBounds = sbl.bounds();
@@ -128,10 +128,10 @@ describe("SelectionBoxLayer", () => {
       assert.deepEqual(queriedBounds.bottomRight, bottomRight, "returns correct bottom-right position");
 
       sbl.destroy();
-      svg.remove();
+      div.remove();
 
       function assertCorrectRendering(expectedTL: Plottable.Point, expectedBR: Plottable.Point, msg: string) {
-        const selectionBox = svg.select(SELECTION_BOX_CLASSNAME);
+        const selectionBox = div.select(SELECTION_BOX_CLASSNAME);
         const bbox = Plottable.Utils.DOM.elementBBox(selectionBox);
         assert.strictEqual(bbox.x, expectedTL.x, msg + " (x-origin)");
         assert.strictEqual(bbox.x, expectedTL.y, msg + " (y-origin)");
@@ -155,12 +155,12 @@ describe("SelectionBoxLayer", () => {
       });
 
       sbl.boxVisible(true);
-      sbl.anchor(svg);
+      sbl.anchor(div);
       // HACKHACK #2614: chai-assert.d.ts has the wrong signature
       (<any> assert).throws(() => sbl.renderImmediately(), "bounds have not been properly set", "cannot set invalid bounds");
 
       sbl.destroy();
-      svg.remove();
+      div.remove();
     });
 
     it("uses the pixel values sides if they were set last", () => {
@@ -189,7 +189,7 @@ describe("SelectionBoxLayer", () => {
       assert.deepEqual(queriedBounds.bottomRight, bottomRight, "returns correct bottom-right position");
 
       sbl.destroy();
-      svg.remove();
+      div.remove();
     });
 
     it("has an effective size of 0, but will occupy all offered space", () => {
@@ -199,7 +199,7 @@ describe("SelectionBoxLayer", () => {
       assert.isTrue(sbl.fixedHeight(), "fixed height");
 
       sbl.destroy();
-      svg.remove();
+      div.remove();
     });
   });
 
@@ -207,12 +207,12 @@ describe("SelectionBoxLayer", () => {
     const SVG_WIDTH = 500;
     const SVG_HEIGHT = 500;
     const SELECTION_AREA_CLASSNAME = ".selection-area";
-    let svg: SimpleSelection<void>;
+    let div: d3.Selection<HTMLDivElement, any, any, any>;
     let sbl: Plottable.Components.SelectionBoxLayer;
     let xScale: Plottable.Scales.Linear;
 
     beforeEach(() => {
-      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
       sbl = new Plottable.Components.SelectionBoxLayer();
       xScale = new Plottable.Scales.Linear();
       xScale.domain([0, 2000]);
@@ -223,21 +223,21 @@ describe("SelectionBoxLayer", () => {
       assert.isUndefined(sbl.xScale(), "no xScale is specified by default");
       assert.strictEqual(sbl.xScale(xScale), sbl, "setting the xScale returns the selection box layer");
       assert.strictEqual(sbl.xScale(), xScale, "The getter returns the correct scale");
-      sbl.renderTo(svg);
+      sbl.renderTo(div);
 
       sbl.xExtent([0, 1000]);
 
       sbl.boxVisible(true);
-      let selectionBox = svg.select(SELECTION_AREA_CLASSNAME);
+      let selectionBox = div.select(SELECTION_AREA_CLASSNAME);
       assert.strictEqual(selectionBox.attr("x"), "0", "box starts at left edge");
 
       xScale.domain([-1000, 1000]);
 
-      selectionBox = svg.select(SELECTION_AREA_CLASSNAME);
+      selectionBox = div.select(SELECTION_AREA_CLASSNAME);
       assert.strictEqual(selectionBox.attr("x"), "250", "domain change moves box");
 
       sbl.destroy();
-      svg.remove();
+      div.remove();
     });
 
     it("can set the data values of the left and right sides directly", () => {
@@ -251,7 +251,7 @@ describe("SelectionBoxLayer", () => {
       assert.deepEqual(sbl.xExtent(), xExtent, "xExtent set");
       assert.strictEqual(sbl.bounds().topLeft.x, xScale.scale(xExtent[0]), "left pixel position adjusts accordingly");
       assert.strictEqual(sbl.bounds().bottomRight.x, xScale.scale(xExtent[1]), "right pixel position adjusts accordingly");
-      sbl.renderTo(svg);
+      sbl.renderTo(div);
 
       const box = sbl.content().select(SELECTION_AREA_CLASSNAME);
 
@@ -261,7 +261,7 @@ describe("SelectionBoxLayer", () => {
         window.Pixel_CloseTo_Requirement, "box width attribute extends for width of x extent");
 
       sbl.destroy();
-      svg.remove();
+      div.remove();
     });
 
     it("uses the data values for the left and right sides if they were set last", () => {
@@ -287,7 +287,7 @@ describe("SelectionBoxLayer", () => {
       assert.strictEqual(sbl.bounds().bottomRight.x, xScale.scale(xExtent[1]), "right pixel position adjusts accordingly");
 
       sbl.destroy();
-      svg.remove();
+      div.remove();
     });
 
     it("updates left and right edge pixel positions if in VALUE mode and xScale is switched", () => {
@@ -311,7 +311,7 @@ describe("SelectionBoxLayer", () => {
       assert.strictEqual(sbl.bounds().bottomRight.x, xScale2.scale(xExtent[1]), "right pixel position adjusts accordingly");
 
       sbl.destroy();
-      svg.remove();
+      div.remove();
     });
 
     it("updates left and right edge pixel positions if in VALUE mode and xScale updates", () => {
@@ -332,7 +332,7 @@ describe("SelectionBoxLayer", () => {
       assert.strictEqual(sbl.bounds().bottomRight.x, xScale.scale(xExtent[1]), "right pixel position adjusts accordingly");
 
       sbl.destroy();
-      svg.remove();
+      div.remove();
     });
   });
 
@@ -340,12 +340,12 @@ describe("SelectionBoxLayer", () => {
     const SVG_WIDTH = 500;
     const SVG_HEIGHT = 500;
     const SELECTION_AREA_CLASSNAME = ".selection-area";
-    let svg: SimpleSelection<void>;
+    let div: d3.Selection<HTMLDivElement, any, any, any>;
     let sbl: Plottable.Components.SelectionBoxLayer;
     let yScale: Plottable.Scales.Linear;
 
     beforeEach(() => {
-      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
       sbl = new Plottable.Components.SelectionBoxLayer();
       yScale = new Plottable.Scales.Linear();
       yScale.domain([0, 2000]);
@@ -357,21 +357,21 @@ describe("SelectionBoxLayer", () => {
       assert.strictEqual(sbl.yScale(yScale), sbl, "setting the yScale returns the selection box layer");
       assert.strictEqual(sbl.yScale(), yScale, "The getter returns the correct scale");
 
-      sbl.renderTo(svg);
+      sbl.renderTo(div);
 
       sbl.yExtent([0, 1000]);
 
       sbl.boxVisible(true);
-      let selectionBox = svg.select(SELECTION_AREA_CLASSNAME);
+      let selectionBox = div.select(SELECTION_AREA_CLASSNAME);
       assert.strictEqual(selectionBox.attr("y"), "0", "box starts at top edge");
 
       yScale.domain([-1000, 1000]);
 
-      selectionBox = svg.select(SELECTION_AREA_CLASSNAME);
+      selectionBox = div.select(SELECTION_AREA_CLASSNAME);
       assert.strictEqual(selectionBox.attr("y"), "250", "domain change moves box");
 
       sbl.destroy();
-      svg.remove();
+      div.remove();
     });
 
     it("can set the data values of the top and bottom sides directly", () => {
@@ -385,7 +385,7 @@ describe("SelectionBoxLayer", () => {
       assert.deepEqual(sbl.yExtent(), yExtent, "yExtent set");
       assert.strictEqual(sbl.bounds().topLeft.y, yScale.scale(yExtent[0]), "top pixel position adjusts accordingly");
       assert.strictEqual(sbl.bounds().bottomRight.y, yScale.scale(yExtent[1]), "bottom pixel position adjusts accordingly");
-      sbl.renderTo(svg);
+      sbl.renderTo(div);
 
       const box = sbl.content().select(SELECTION_AREA_CLASSNAME);
 
@@ -395,7 +395,7 @@ describe("SelectionBoxLayer", () => {
         window.Pixel_CloseTo_Requirement, "box height attribute extends for width of y extent");
 
       sbl.destroy();
-      svg.remove();
+      div.remove();
     });
 
     it("uses the data values for the top and bottom sides if they were set last", () => {
@@ -421,7 +421,7 @@ describe("SelectionBoxLayer", () => {
       assert.strictEqual(sbl.bounds().bottomRight.y, yScale.scale(yExtent[1]), "bottom pixel position adjusts accordingly");
 
       sbl.destroy();
-      svg.remove();
+      div.remove();
     });
 
     it("updates top and bottom edge pixel positions if in VALUE mode and yScale is switched", () => {
@@ -445,7 +445,7 @@ describe("SelectionBoxLayer", () => {
       assert.strictEqual(sbl.bounds().bottomRight.y, yScale2.scale(yExtent[1]), "bottom pixel position adjusts accordingly");
 
       sbl.destroy();
-      svg.remove();
+      div.remove();
     });
 
     it("updates top and bottom edge pixel positions if in VALUE mode and yScale updates", () => {
@@ -466,7 +466,7 @@ describe("SelectionBoxLayer", () => {
       assert.strictEqual(sbl.bounds().bottomRight.y, yScale.scale(yExtent[1]), "bottom pixel position adjusts accordingly");
 
       sbl.destroy();
-      svg.remove();
+      div.remove();
     });
   });
 });

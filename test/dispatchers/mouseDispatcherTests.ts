@@ -12,24 +12,22 @@ describe("Dispatchers", () => {
   describe("Mouse Dispatcher", () => {
 
     describe("Basic usage", () => {
-      let svg: SimpleSelection<void>;
-      let svgNode: SVGElement;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let component: Plottable.Component;
 
       beforeEach(() => {
         component = new Plottable.Component();
-        svg = TestMethods.generateSVG();
-        sinon.stub(component, "rootElement", () => svg);
-        svgNode = <SVGElement>svg.node();
+        div = TestMethods.generateDiv();
+        sinon.stub(component, "rootElement", () => div);
       });
 
-      it("creates only one Dispatcher.Mouse per <svg> using getDispatcher() ", () => {
+      it("creates only one Dispatcher.Mouse per <div> using getDispatcher() ", () => {
         let dispatcher1 = Plottable.Dispatchers.Mouse.getDispatcher(component);
         assert.isNotNull(dispatcher1, "created a new Dispatcher on an SVG");
         let dispatcher2 = Plottable.Dispatchers.Mouse.getDispatcher(component);
-        assert.strictEqual(dispatcher1, dispatcher2, "returned the existing Dispatcher if called again with same <svg>");
+        assert.strictEqual(dispatcher1, dispatcher2, "returned the existing Dispatcher if called again with same <div>");
 
-        svg.remove();
+        div.remove();
       });
 
       it("returns non-null value for default lastMousePosition()", () => {
@@ -39,7 +37,7 @@ describe("Dispatchers", () => {
         assert.isNotNull(point.x, "x value is set");
         assert.isNotNull(point.y, "y value is set");
 
-        svg.remove();
+        div.remove();
       });
     });
 
@@ -52,7 +50,7 @@ describe("Dispatchers", () => {
       };
 
       let component: Plottable.Component;
-      let svg: d3.Selection<SVGSVGElement, any, any, any>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let mouseDispatcher: Plottable.Dispatchers.Mouse;
 
       beforeEach(() => {
@@ -60,10 +58,10 @@ describe("Dispatchers", () => {
         let SVG_HEIGHT = 400;
 
         component = new Plottable.Component();
-        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
         // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
-        svg.append("rect").attr("width", SVG_WIDTH).attr("height", SVG_HEIGHT);
-        sinon.stub(component, "rootElement", () => svg);
+        div.append("rect").attr("width", SVG_WIDTH).attr("height", SVG_HEIGHT);
+        sinon.stub(component, "rootElement", () => div);
 
         mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(component);
       });
@@ -80,17 +78,17 @@ describe("Dispatchers", () => {
         assert.strictEqual(mouseDispatcher.onMouseDown(callback), mouseDispatcher,
           "setting the mouseDown callback returns the dispatcher");
 
-        TestMethods.triggerFakeMouseEvent("mousedown", svg, targetX, targetY);
+        TestMethods.triggerFakeMouseEvent("mousedown", div, targetX, targetY);
         assert.isTrue(callbackWasCalled, "callback was called on mouseDown");
 
         assert.strictEqual(mouseDispatcher.offMouseDown(callback), mouseDispatcher,
           "unsetting the mouseDown callback returns the dispatcher");
 
         callbackWasCalled = false;
-        TestMethods.triggerFakeMouseEvent("mousedown", svg, targetX, targetY);
+        TestMethods.triggerFakeMouseEvent("mousedown", div, targetX, targetY);
         assert.isFalse(callbackWasCalled, "callback was disconnected from the dispatcher");
 
-        svg.remove();
+        div.remove();
       });
 
       it("calls the mouseUp callback", () => {
@@ -105,24 +103,24 @@ describe("Dispatchers", () => {
         assert.strictEqual(mouseDispatcher.onMouseUp(callback), mouseDispatcher,
           "setting the mouseUp callback returns the dispatcher");
 
-        TestMethods.triggerFakeMouseEvent("mouseup", svg, targetX, targetY);
+        TestMethods.triggerFakeMouseEvent("mouseup", div, targetX, targetY);
         assert.isTrue(callbackWasCalled, "callback was called on mouseUp");
 
         assert.strictEqual(mouseDispatcher.offMouseUp(callback), mouseDispatcher,
           "unsetting the mouseUp callback returns the dispatcher");
 
         callbackWasCalled = false;
-        TestMethods.triggerFakeMouseEvent("mouseup", svg, targetX, targetY);
+        TestMethods.triggerFakeMouseEvent("mouseup", div, targetX, targetY);
         assert.isFalse(callbackWasCalled, "callback was disconnected from the dispatcher");
 
-        svg.remove();
+        div.remove();
       });
 
       it("calls the wheel callback", () => {
         // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
         // https://github.com/ariya/phantomjs/issues/11289
         if (window.PHANTOMJS) {
-          svg.remove();
+          div.remove();
           return;
         }
 
@@ -140,17 +138,17 @@ describe("Dispatchers", () => {
         assert.strictEqual(mouseDispatcher.onWheel(callback), mouseDispatcher,
           "setting the wheel callback returns the dispatcher");
 
-        TestMethods.triggerFakeWheelEvent("wheel", svg, targetX, targetY, targetDeltaY);
+        TestMethods.triggerFakeWheelEvent("wheel", div, targetX, targetY, targetDeltaY);
         assert.isTrue(callbackWasCalled, "callback was called on wheel");
 
         assert.strictEqual(mouseDispatcher.offWheel(callback), mouseDispatcher,
           "unsetting the wheel callback returns the dispatcher");
 
         callbackWasCalled = false;
-        TestMethods.triggerFakeWheelEvent("wheel", svg, targetX, targetY, targetDeltaY);
+        TestMethods.triggerFakeWheelEvent("wheel", div, targetX, targetY, targetDeltaY);
         assert.isFalse(callbackWasCalled, "callback was disconnected from the dispatcher");
 
-        svg.remove();
+        div.remove();
       });
 
       it("calls the dblClick callback", () => {
@@ -165,17 +163,17 @@ describe("Dispatchers", () => {
         assert.strictEqual(mouseDispatcher.onDblClick(callback), mouseDispatcher,
           "setting the dblClick callback returns the dispatcher");
 
-        TestMethods.triggerFakeMouseEvent("dblclick", svg, targetX, targetY);
+        TestMethods.triggerFakeMouseEvent("dblclick", div, targetX, targetY);
         assert.isTrue(callbackWasCalled, "callback was called on dblClick");
 
         assert.strictEqual(mouseDispatcher.offDblClick(callback), mouseDispatcher,
           "unsetting the dblClick callback returns the dispatcher");
 
         callbackWasCalled = false;
-        TestMethods.triggerFakeMouseEvent("dblclick", svg, targetX, targetY);
+        TestMethods.triggerFakeMouseEvent("dblclick", div, targetX, targetY);
         assert.isFalse(callbackWasCalled, "callback was disconnected from the dispatcher");
 
-        svg.remove();
+        div.remove();
       });
 
       it("calls mouseMove callback on mouseover, mousemove, and mouseout", () => {
@@ -189,26 +187,26 @@ describe("Dispatchers", () => {
 
         mouseDispatcher.onMouseMove(callback);
 
-        TestMethods.triggerFakeMouseEvent("mouseover", svg, targetX, targetY);
+        TestMethods.triggerFakeMouseEvent("mouseover", div, targetX, targetY);
         assert.isTrue(callbackWasCalled, "callback was called on mouseover");
         callbackWasCalled = false;
-        TestMethods.triggerFakeMouseEvent("mousemove", svg, targetX, targetY);
+        TestMethods.triggerFakeMouseEvent("mousemove", div, targetX, targetY);
         assert.isTrue(callbackWasCalled, "callback was called on mousemove");
         callbackWasCalled = false;
-        TestMethods.triggerFakeMouseEvent("mouseout", svg, targetX, targetY);
+        TestMethods.triggerFakeMouseEvent("mouseout", div, targetX, targetY);
         assert.isTrue(callbackWasCalled, "callback was called on mouseout");
 
         mouseDispatcher.offMouseMove(callback);
 
         callbackWasCalled = false;
-        TestMethods.triggerFakeMouseEvent("mouseover", svg, targetX, targetY);
+        TestMethods.triggerFakeMouseEvent("mouseover", div, targetX, targetY);
         assert.isFalse(callbackWasCalled, "disconnected dispatcher callback not called on mouseover");
-        TestMethods.triggerFakeMouseEvent("mousemove", svg, targetX, targetY);
+        TestMethods.triggerFakeMouseEvent("mousemove", div, targetX, targetY);
         assert.isFalse(callbackWasCalled, "disconnected dispatcher callback not called on mousemove");
-        TestMethods.triggerFakeMouseEvent("mouseout", svg, targetX, targetY);
+        TestMethods.triggerFakeMouseEvent("mouseout", div, targetX, targetY);
         assert.isFalse(callbackWasCalled, "disconnected dispatcher callback not called on mouseout");
 
-        svg.remove();
+        div.remove();
       });
 
       it("can register two callbacks for the same mouse dispatcher", () => {
@@ -219,19 +217,19 @@ describe("Dispatchers", () => {
 
         mouseDispatcher.onMouseMove(cb1);
         mouseDispatcher.onMouseMove(cb2);
-        TestMethods.triggerFakeMouseEvent("mousemove", svg, targetX, targetY);
+        TestMethods.triggerFakeMouseEvent("mousemove", div, targetX, targetY);
         assert.isTrue(cb1Called, "callback 1 was called on mousemove");
         assert.isTrue(cb2Called, "callback 2 was called on mousemove");
 
         cb1Called = false;
         cb2Called = false;
         mouseDispatcher.offMouseMove(cb1);
-        TestMethods.triggerFakeMouseEvent("mousemove", svg, targetX, targetY);
+        TestMethods.triggerFakeMouseEvent("mousemove", div, targetX, targetY);
         assert.isFalse(cb1Called, "callback was not called after blanking");
         assert.isTrue(cb2Called, "callback 2 was still called");
 
         mouseDispatcher.offMouseMove(cb2);
-        svg.remove();
+        div.remove();
       });
 
       it("doesn't call callbacks if not in the DOM", () => {
@@ -239,13 +237,13 @@ describe("Dispatchers", () => {
         let callback = () => callbackWasCalled = true;
 
         mouseDispatcher.onMouseMove(callback);
-        TestMethods.triggerFakeMouseEvent("mousemove", svg, targetX, targetY);
+        TestMethods.triggerFakeMouseEvent("mousemove", div, targetX, targetY);
         assert.isTrue(callbackWasCalled, "callback was called on mousemove");
 
-        svg.remove();
+        div.remove();
         callbackWasCalled = false;
-        TestMethods.triggerFakeMouseEvent("mousemove", svg, targetX, targetY);
-        assert.isFalse(callbackWasCalled, "callback was not called after <svg> was removed from DOM");
+        TestMethods.triggerFakeMouseEvent("mousemove", div, targetX, targetY);
+        assert.isFalse(callbackWasCalled, "callback was not called after <div> was removed from DOM");
 
         mouseDispatcher.offMouseMove(callback);
       });
@@ -255,10 +253,10 @@ describe("Dispatchers", () => {
         let callback = () => callbackWasCalled = true;
 
         mouseDispatcher.onMouseDown(callback);
-        TestMethods.triggerFakeMouseEvent("mousedown", svg, targetX, targetY);
+        TestMethods.triggerFakeMouseEvent("mousedown", div, targetX, targetY);
         assert.isTrue(callbackWasCalled, "callback was called on mousedown");
 
-        let element = <HTMLElement> <any> svg.node();
+        let element = <HTMLElement> <any> div.node();
         // Getting the absolute coordinates of the SVG in order to place the overlay at the right location
         let topLeftCorner = { x: 0, y: 0 };
         while (element != null) {
@@ -267,7 +265,7 @@ describe("Dispatchers", () => {
           element = <HTMLElement> (element.offsetParent || element.parentNode);
         }
 
-        let overlay = TestMethods.getSVGParent().append("div").styles({
+        let overlay = TestMethods.getElementParent().append("div").styles({
           height: "400px",
           width: "400px",
           topLeftCorner: "absolute",
@@ -280,7 +278,7 @@ describe("Dispatchers", () => {
         assert.isFalse(callbackWasCalled, "callback was not called on mousedown on overlay");
 
         mouseDispatcher.offMouseDown(callback);
-        svg.remove();
+        div.remove();
         overlay.remove();
       });
     });

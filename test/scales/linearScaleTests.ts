@@ -374,7 +374,7 @@ describe("Scales", () => {
     describe("Plot interaction", () => {
       function createMockDrawer(dataset: Plottable.Dataset) {
         let drawer = new Plottable.Drawer(dataset);
-        (<any> drawer)._svgElementName = "mock";
+        (<any> drawer)._divElementName = "mock";
         return drawer;
       }
 
@@ -390,35 +390,35 @@ describe("Scales", () => {
       });
 
       it("receives updates from the plot and autodomains accordingly", () => {
-        let svg = TestMethods.generateSVG();
+        let div = TestMethods.generateDiv();
         let plot = new Plottable.Plot();
 
         (<any> plot)._createDrawer = (_dataset: Plottable.Dataset) => createMockDrawer(_dataset);
         plot.addDataset(dataset);
         plot.attr("x", (d) => d.x, scale);
-        plot.renderTo(svg);
+        plot.renderTo(div);
 
         assert.deepEqual(scale.domain(), [0, 5], "scale domain was autodomained correctly");
 
         dataset.data([{x: 100}]);
         assert.deepEqual(scale.domain(), [99, 101], "scale domain was updated properly");
 
-        svg.remove();
+        div.remove();
       });
 
       it("uses reference counting to keep track of the plots it coordinates", () => {
-        let svg1 = TestMethods.generateSVG();
-        let svg2 = TestMethods.generateSVG();
+        let div1 = TestMethods.generateDiv();
+        let div2 = TestMethods.generateDiv();
 
         let plot1 = new Plottable.Plot();
         (<any> plot1)._createDrawer = (_dataset: Plottable.Dataset) => createMockDrawer(_dataset);
         plot1.addDataset(dataset).attr("x", (d) => d.x, scale);
-        plot1.renderTo(svg1);
+        plot1.renderTo(div1);
 
         let plot2 = new Plottable.Plot();
         (<any> plot2)._createDrawer = (_dataset: Plottable.Dataset) => createMockDrawer(_dataset);
         plot2.addDataset(dataset).attr("x", (d) => d.x, scale);
-        plot2.renderTo(svg2);
+        plot2.renderTo(div2);
 
         assert.deepEqual(scale.domain(), [0, 5], "correct domain is initially set for the scale");
 
@@ -434,12 +434,12 @@ describe("Scales", () => {
         dataset.data([{x: 99}, {x: 100}]);
         assert.deepEqual(scale.domain(), [0, 1], "scale shows default values when all perspectives removed");
 
-        svg1.remove();
-        svg2.remove();
+        div1.remove();
+        div2.remove();
       });
 
       it("adjusts to plot detaching, reattaching or destruction", () => {
-        let svg = TestMethods.generateSVG();
+        let div = TestMethods.generateDiv();
         let dataset1 = new Plottable.Dataset([
           {x: 0, y: 0},
           {x: 1, y: 1},
@@ -465,7 +465,7 @@ describe("Scales", () => {
         plot2.y((d) => d.y, yScale);
 
         let group = new Plottable.Components.Group([plot1, plot2]);
-        group.renderTo(svg);
+        group.renderTo(div);
 
         assert.deepEqual(xScale.domain(), [0, 2]);
         plot1.detach();
@@ -475,7 +475,7 @@ describe("Scales", () => {
         plot1.destroy();
         assert.deepEqual(xScale.domain(), [1, 2], "domain update on destroying plot 1");
 
-        svg.remove();
+        div.remove();
       });
     });
   });

@@ -238,7 +238,7 @@ describe("Plots", () => {
   });
 
   describe("auto scale domain on numeric", () => {
-    let svg: SimpleSelection<void>;
+    let div: d3.Selection<HTMLDivElement, any, any, any>;
     let SVG_WIDTH = 600;
     let SVG_HEIGHT = 400;
     let yScale: Plottable.Scales.Linear;
@@ -247,7 +247,7 @@ describe("Plots", () => {
     let dataset2: Plottable.Dataset;
 
     beforeEach(() => {
-      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
       xScale = new Plottable.Scales.Linear();
       xScale.domain([1, 2]);
       yScale = new Plottable.Scales.Linear();
@@ -272,9 +272,9 @@ describe("Plots", () => {
       plot.x((d: any) => d.x, xScale)
           .y((d: any) => d.y, yScale)
           .autorangeMode("y");
-      plot.renderTo(svg);
+      plot.renderTo(div);
       assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
-      svg.remove();
+      div.remove();
     });
 
     it("auto scales correctly on stacked bar", () => {
@@ -284,14 +284,14 @@ describe("Plots", () => {
       plot.x((d: any) => d.x, xScale)
           .y((d: any) => d.y, yScale)
           .autorangeMode("y");
-      plot.renderTo(svg);
+      plot.renderTo(div);
       assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
-      svg.remove();
+      div.remove();
     });
   });
 
   describe("auto scale domain on Category", () => {
-    let svg: SimpleSelection<void>;
+    let div: d3.Selection<HTMLDivElement, any, any, any>;
     let SVG_WIDTH = 600;
     let SVG_HEIGHT = 400;
     let yScale: Plottable.Scales.Linear;
@@ -300,7 +300,7 @@ describe("Plots", () => {
     let dataset2: Plottable.Dataset;
 
     beforeEach(() => {
-      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
       xScale = new Plottable.Scales.Category().domain(["a", "b"]);
       yScale = new Plottable.Scales.Linear();
 
@@ -324,9 +324,9 @@ describe("Plots", () => {
       plot.x((d: any) => d.x, xScale)
           .y((d: any) => d.y, yScale)
           .autorangeMode("y");
-      plot.renderTo(svg);
+      plot.renderTo(div);
       assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
-      svg.remove();
+      div.remove();
     });
 
     it("auto scales correctly on stacked area", () => {
@@ -336,20 +336,20 @@ describe("Plots", () => {
       plot.x((d: any) => d.x, xScale)
           .y((d: any) => d.y, yScale)
           .autorangeMode("y");
-      plot.renderTo(svg);
+      plot.renderTo(div);
       assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
-      svg.remove();
+      div.remove();
     });
   });
 
   describe("scale extent updates", () => {
-    let svg: SimpleSelection<void>;
+    let div: d3.Selection<HTMLDivElement, any, any, any>;
     let xScale: Plottable.Scales.Category;
     let yScale: Plottable.Scales.Linear;
     let stackedBarPlot: Plottable.Plots.StackedBar<string, number>;
 
     beforeEach(() => {
-      svg = TestMethods.generateSVG(600, 400);
+      div = TestMethods.generateDiv(600, 400);
 
       xScale = new Plottable.Scales.Category();
       yScale = new Plottable.Scales.Linear();
@@ -358,11 +358,11 @@ describe("Plots", () => {
       stackedBarPlot.x((d) => d.key, xScale);
       stackedBarPlot.y((d) => d.value, yScale);
 
-      stackedBarPlot.renderTo(svg);
+      stackedBarPlot.renderTo(div);
     });
 
     afterEach(() => {
-      svg.remove();
+      div.remove();
     });
 
     it("extents are updated as datasets are updated", () => {

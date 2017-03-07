@@ -18,12 +18,12 @@ describe("InterpolatedColorLegend", () => {
     const SVG_HEIGHT = 400;
     const SVG_WIDTH = 400;
 
-    let svg: SimpleSelection<void>;
+    let div: d3.Selection<HTMLDivElement, any, any, any>;
     let colorScale: Plottable.Scales.InterpolatedColor;
     let legend: Plottable.Components.InterpolatedColorLegend;
 
     beforeEach(() => {
-      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
       colorScale = new Plottable.Scales.InterpolatedColor();
       legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     });
@@ -61,7 +61,7 @@ describe("InterpolatedColorLegend", () => {
     }
 
     it("renders correctly when horizontal", () => {
-      legend.renderTo(svg);
+      legend.renderTo(div);
 
       assertBasicRendering();
 
@@ -75,12 +75,12 @@ describe("InterpolatedColorLegend", () => {
       assert.operator(lowerLabelBCR.right, "<=", swatchContainerBCR.left, "first label to left of swatches");
       assert.operator(swatchContainerBCR.right, "<=", upperLabelBCR.left, "second label to right of swatches");
 
-      svg.remove();
+      div.remove();
     });
 
     it("renders correctly when oriented right", () => {
       legend.orientation("right");
-      legend.renderTo(svg);
+      legend.renderTo(div);
 
       assertBasicRendering();
 
@@ -95,12 +95,12 @@ describe("InterpolatedColorLegend", () => {
       assert.operator(swatchContainerBCR.right, "<=", upperLabelBCR.left, "second label to right of swatches");
       assert.operator(upperLabelBCR.bottom, "<=", lowerLabelBCR.top, "lower label is drawn below upper label");
 
-      svg.remove();
+      div.remove();
     });
 
     it("renders correctly when oriented left", () => {
       legend.orientation("left");
-      legend.renderTo(svg);
+      legend.renderTo(div);
 
       assertBasicRendering();
 
@@ -115,11 +115,11 @@ describe("InterpolatedColorLegend", () => {
       assert.operator(upperLabelBCR.left, "<=", swatchContainerBCR.left, "second label to left of swatches");
       assert.operator(upperLabelBCR.bottom, "<=", lowerLabelBCR.top, "lower label is drawn below upper label");
 
-      svg.remove();
+      div.remove();
     });
 
     it("does not crash when font-size is 0px", () => {
-      legend.renderTo(svg);
+      legend.renderTo(div);
       const style = legend.content().append("style");
       style.attr("type", "text/css");
       style.text(".plottable .interpolated-color-legend text { font-size: 0px; }" +
@@ -129,17 +129,17 @@ describe("InterpolatedColorLegend", () => {
       assert.doesNotThrow(() => legend.expands(true), Error, "it does not throw error when text height is 0");
       assert.strictEqual(textHeight, 0, "text height is set to 0");
       style.remove();
-      svg.remove();
+      div.remove();
     });
 
     it("re-renders when scale domain updates", () => {
       legend.orientation("horizontal");
-      legend.renderTo(svg);
+      legend.renderTo(div);
 
       colorScale.domain([0, 85]);
       assertBasicRendering();
 
-      svg.remove();
+      div.remove();
     });
 
     it("checks input of orientation", () => {
@@ -149,11 +149,11 @@ describe("InterpolatedColorLegend", () => {
 
       // HACKHACK #2661: Cannot assert errors being thrown with description
       (<any> assert).throws(() => legend.orientation("blargh"), Error, "not a valid orientation", "error on invalid orientation");
-      svg.remove();
+      div.remove();
     });
 
     it("triggers layout computation on orientation change", () => {
-      legend.renderTo(svg);
+      legend.renderTo(div);
 
       const widthBefore = legend.width();
       const heightBefore = legend.height();
@@ -161,7 +161,7 @@ describe("InterpolatedColorLegend", () => {
       legend.orientation("right");
       assert.notEqual(legend.width(), widthBefore, "proportions changed (width)");
       assert.notEqual(legend.height(), heightBefore, "proportions changed (height)");
-      svg.remove();
+      div.remove();
     });
 
     ORIENTATIONS.forEach((orientation: string) => {
@@ -173,17 +173,17 @@ describe("InterpolatedColorLegend", () => {
           } else {
             value = constrain === "width" ? 45 : 100;
           }
-          svg.attr(constrain, value);
+          div.attr(constrain, value);
           legend.orientation(orientation);
-          legend.renderTo(svg);
+          legend.renderTo(div);
           assertBasicRendering();
-          svg.remove();
+          div.remove();
         });
       });
     });
 
     it("has the same number of swatches as its height when vertical", () => {
-      legend.renderTo(svg);
+      legend.renderTo(div);
       legend.orientation("left").expands(false);
       const numSwatches = legend.content().selectAll<Element, any>(SWATCH_SELECTOR).size();
       const swatchContainer = legend.content().select(SWATCH_CONTAINER_SELECTOR);
@@ -193,11 +193,11 @@ describe("InterpolatedColorLegend", () => {
       const swatchContainerExpandedHeight = (<Element> swatchContainer.node()).getBoundingClientRect().height;
       assert.closeTo(numSwatches, swatchContainerHeight, 1, "non-expanded left legend has one swatch per pixel");
       assert.closeTo(newNumSwatches, swatchContainerExpandedHeight, 1, "expanded left legend has one swatch per pixel");
-      svg.remove();
+      div.remove();
     });
 
     it("has the same number of swatches as its width when horizontal", () => {
-      legend.renderTo(svg);
+      legend.renderTo(div);
       legend.orientation("horizontal").expands(false);
       const numSwatches = legend.content().selectAll<Element, any>(SWATCH_SELECTOR).size();
       const swatchContainer = legend.content().select(SWATCH_CONTAINER_SELECTOR);
@@ -207,7 +207,7 @@ describe("InterpolatedColorLegend", () => {
       const swatchContainerExpandedWidth = (<Element> swatchContainer.node()).getBoundingClientRect().width;
       assert.closeTo(numSwatches, swatchContainerWidth, 1, "non-expanded left legend has one swatch per pixel");
       assert.closeTo(newNumSwatches, swatchContainerExpandedWidth, 1, "expanded left legend has one swatch per pixel");
-      svg.remove();
+      div.remove();
     });
   });
 
@@ -215,18 +215,18 @@ describe("InterpolatedColorLegend", () => {
     const SVG_HEIGHT = 400;
     const SVG_WIDTH = 400;
 
-    let svg: SimpleSelection<void>;
+    let div: d3.Selection<HTMLDivElement, any, any, any>;
     let colorScale: Plottable.Scales.InterpolatedColor;
     let legend: Plottable.Components.InterpolatedColorLegend;
 
     beforeEach(() => {
-      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
       colorScale = new Plottable.Scales.InterpolatedColor();
       legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     });
 
     it("fixes height if expand is set to false or orientation is horizontal", () => {
-      legend.renderTo(svg);
+      legend.renderTo(div);
 
       assert.isTrue(legend.fixedHeight(), "height is fixed on default");
 
@@ -242,11 +242,11 @@ describe("InterpolatedColorLegend", () => {
       legend.expands(false);
       assert.isTrue(legend.fixedHeight(), "height is fixed when expand is set to false");
 
-      svg.remove();
+      div.remove();
     });
 
     it("fixes width if expand is set to false or orientation is vertically", () => {
-      legend.renderTo(svg);
+      legend.renderTo(div);
 
       assert.isTrue(legend.fixedWidth(), "width is fixed on default");
 
@@ -263,26 +263,26 @@ describe("InterpolatedColorLegend", () => {
       legend.orientation("horizontal");
       assert.isTrue(legend.fixedWidth(), "width is fixed when expand is set to false");
 
-      svg.remove();
+      div.remove();
     });
 
     it("spams the entire height if oriented vertically and expand is set to true", () => {
       legend.orientation("left");
       legend.expands(true);
-      legend.renderTo(svg);
-      assert.strictEqual(legend.height(), SVG_HEIGHT, "legend height is the same as svg height");
-      svg.remove();
+      legend.renderTo(div);
+      assert.strictEqual(legend.height(), SVG_HEIGHT, "legend height is the same as div height");
+      div.remove();
     });
 
     it("spams the entire width if oriented horizontally and expand is set to true", () => {
       legend.expands(true);
-      legend.renderTo(svg);
-      assert.strictEqual(legend.width(), SVG_WIDTH, "legend width is the same as svg width");
-      svg.remove();
+      legend.renderTo(div);
+      assert.strictEqual(legend.width(), SVG_WIDTH, "legend width is the same as div width");
+      div.remove();
     });
 
     it("has more swatches than default when expand is true", () => {
-      legend.renderTo(svg);
+      legend.renderTo(div);
       ORIENTATIONS.forEach((orientation) => {
         legend.orientation(orientation).expands(false);
         const numSwatches = legend.content().selectAll<Element, any>(SWATCH_SELECTOR).size();
@@ -290,7 +290,7 @@ describe("InterpolatedColorLegend", () => {
         const newNumSwatches = legend.content().selectAll<Element, any>(SWATCH_SELECTOR).size();
         assert.operator(newNumSwatches, ">", numSwatches, `there are more swatches when expanded (orientation: ${orientation})`);
       });
-      svg.remove();
+      div.remove();
     });
 
   });
@@ -299,18 +299,18 @@ describe("InterpolatedColorLegend", () => {
     const SVG_HEIGHT = 400;
     const SVG_WIDTH = 400;
 
-    let svg: SimpleSelection<void>;
+    let div: d3.Selection<HTMLDivElement, any, any, any>;
     let colorScale: Plottable.Scales.InterpolatedColor;
     let legend: Plottable.Components.InterpolatedColorLegend;
 
     beforeEach(() => {
-      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
       colorScale = new Plottable.Scales.InterpolatedColor();
       legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     });
 
     it("does not have padding on ends of vertical legends", () => {
-      legend.renderTo(svg);
+      legend.renderTo(div);
       const orientations = ["left", "right"];
       orientations.forEach((orientation) => {
         legend.orientation(orientation).expands(true);
@@ -318,12 +318,12 @@ describe("InterpolatedColorLegend", () => {
         assert.closeTo(height, SVG_HEIGHT, window.Pixel_CloseTo_Requirement,
           "actual height is SVG_HEIGHT with orientation: " + orientation);
       });
-      svg.remove();
+      div.remove();
     });
 
     it("pads left-oriented legends correctly", () => {
       legend.orientation("left");
-      legend.renderTo(svg);
+      legend.renderTo(div);
       let swatchBoundingRect = (<Element> legend.content().select(SWATCH_CONTAINER_SELECTOR).node()).getBoundingClientRect();
       let legendBoundingRect = (<Element> legend.background().select(BACKGROUND_SELECTOR).node()).getBoundingClientRect();
       let swatchWidth = swatchBoundingRect.width;
@@ -341,12 +341,12 @@ describe("InterpolatedColorLegend", () => {
       padding = legendEdge - swatchEdge;
       assert.closeTo(swatchWidth, padding, window.Pixel_CloseTo_Requirement,
         "padding is approximately equal to swatch width when expanded");
-      svg.remove();
+      div.remove();
     });
 
     it("pads right-oriented legends correctly", () => {
       legend.orientation("right");
-      legend.renderTo(svg);
+      legend.renderTo(div);
       let swatchBoundingRect = (<Element> legend.content().select(SWATCH_CONTAINER_SELECTOR).node()).getBoundingClientRect();
       let legendBoundingRect = (<Element> legend.background().select(BACKGROUND_SELECTOR).node()).getBoundingClientRect();
       let swatchWidth = swatchBoundingRect.width;
@@ -366,12 +366,12 @@ describe("InterpolatedColorLegend", () => {
       // HACKHACK #2122: two measurement errors in IE combine, and total error = 2
       assert.closeTo(swatchWidth, padding, 2,
         "padding is approximately equal to swatch width when expanded");
-      svg.remove();
+      div.remove();
     });
 
     it("pads horizontal legends correctly", () => {
       legend.orientation("horizontal");
-      legend.renderTo(svg);
+      legend.renderTo(div);
       let swatchBoundingRect = (<Element> legend.content().select(SWATCH_CONTAINER_SELECTOR).node()).getBoundingClientRect();
       let legendBoundingRect = (<Element> legend.background().select(BACKGROUND_SELECTOR).node()).getBoundingClientRect();
       let swatchHeight = swatchBoundingRect.height;
@@ -389,29 +389,29 @@ describe("InterpolatedColorLegend", () => {
       padding = legendEdge - swatchEdge;
       assert.closeTo(swatchHeight, padding, window.Pixel_CloseTo_Requirement,
         "padding is approximately equal to swatch height when expanded");
-      svg.remove();
+      div.remove();
     });
   });
 
   describe("Constrained situations", () => {
-    let svg: SimpleSelection<void>;
+    let div: d3.Selection<HTMLDivElement, any, any, any>;
     let colorScale: Plottable.Scales.InterpolatedColor;
     let legend: Plottable.Components.InterpolatedColorLegend;
 
     beforeEach(() => {
-      svg = TestMethods.generateSVG();
+      div = TestMethods.generateDiv();
       colorScale = new Plottable.Scales.InterpolatedColor();
       legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     });
 
     it("degrades padding when height is constrained in horizontal orientation", () => {
       legend.orientation("horizontal");
-      legend.renderTo(svg);
+      legend.renderTo(div);
       let swatchBoundingRect = (<Element> legend.content().select(SWATCH_CONTAINER_SELECTOR).node()).getBoundingClientRect();
       const unconstrainedSwatchHeight = swatchBoundingRect.height;
       const textHeight = unconstrainedSwatchHeight;
       const constrainedHeight = textHeight;
-      svg.attr("height", constrainedHeight);
+      div.attr("height", constrainedHeight);
       legend.redraw();
       const legendBoundingRect = (<Element> legend.background().select(BACKGROUND_SELECTOR).node()).getBoundingClientRect();
       swatchBoundingRect = (<Element> legend.content().select(SWATCH_CONTAINER_SELECTOR).node()).getBoundingClientRect();
@@ -419,61 +419,61 @@ describe("InterpolatedColorLegend", () => {
       const bottomPadding = legendBoundingRect.bottom - swatchBoundingRect.bottom;
       assert.operator(topPadding, "<", textHeight, "top padding degrades to be smaller than textHeight");
       assert.operator(bottomPadding, "<", textHeight, "bottom padding degrades to be smaller than textHeight");
-      svg.remove();
+      div.remove();
     });
 
     it("degrades padding when width is constrained in left orientation", () => {
       legend.orientation("left");
-      legend.renderTo(svg);
+      legend.renderTo(div);
       let swatchBoundingRect = (<Element> legend.content().select(SWATCH_CONTAINER_SELECTOR).node()).getBoundingClientRect();
       const unconstrainedSwatchWidth = swatchBoundingRect.width;
       const textHeight = unconstrainedSwatchWidth;
       const constrainedWidth = textHeight * 2;
-      svg.attr("width", constrainedWidth);
+      div.attr("width", constrainedWidth);
       legend.redraw();
       const legendBoundingRect = (<Element> legend.background().select(BACKGROUND_SELECTOR).node()).getBoundingClientRect();
       swatchBoundingRect = (<Element> legend.content().select(SWATCH_CONTAINER_SELECTOR).node()).getBoundingClientRect();
       const leftPadding = legendBoundingRect.right - swatchBoundingRect.right;
       assert.operator(leftPadding, "<", textHeight, "right-side padding degrades to be smaller than textHeight");
-      svg.remove();
+      div.remove();
     });
 
     it("degrades padding when width is constrained in right orientation", () => {
       legend.orientation("right");
-      legend.renderTo(svg);
+      legend.renderTo(div);
       let swatchBoundingRect = (<Element> legend.content().select(SWATCH_CONTAINER_SELECTOR).node()).getBoundingClientRect();
       const unconstrainedSwatchWidth = swatchBoundingRect.width;
       const textHeight = unconstrainedSwatchWidth;
       const constrainedWidth = textHeight * 2;
-      svg.attr("width", constrainedWidth);
+      div.attr("width", constrainedWidth);
       legend.redraw();
       const legendBoundingRect = (<Element> legend.background().select(BACKGROUND_SELECTOR).node()).getBoundingClientRect();
       swatchBoundingRect = (<Element> legend.content().select(SWATCH_CONTAINER_SELECTOR).node()).getBoundingClientRect();
       const leftPadding = swatchBoundingRect.left - legendBoundingRect.left;
       assert.operator(leftPadding, "<", textHeight, "left-side padding degrades to be smaller than textHeight");
-      svg.remove();
+      div.remove();
     });
 
     it("degrades gracefully when width is very constrained", () => {
       legend.orientation("horizontal");
-      legend.renderTo(svg);
+      legend.renderTo(div);
       const constrainedWidth = 30;
-      svg.attr("width", constrainedWidth);
+      div.attr("width", constrainedWidth);
       assert.doesNotThrow(() => legend.redraw(), Error, "rendering in a small space should not error");
       const numSwatches = legend.content().selectAll<Element, any>(SWATCH_SELECTOR).size();
       assert.strictEqual(0, numSwatches, "no swatches are drawn");
-      svg.remove();
+      div.remove();
     });
 
   });
 
   describe("Title Element", () => {
-    let svg: SimpleSelection<void>;
+    let div: d3.Selection<HTMLDivElement, any, any, any>;
     let colorScale: Plottable.Scales.InterpolatedColor;
     let legend: Plottable.Components.InterpolatedColorLegend;
 
     beforeEach(() => {
-      svg = TestMethods.generateSVG();
+      div = TestMethods.generateDiv();
       colorScale = new Plottable.Scales.InterpolatedColor();
       legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     });
@@ -481,7 +481,7 @@ describe("InterpolatedColorLegend", () => {
     it("adds formatted title element to each swatch", () => {
       const formatter = Plottable.Formatters.percentage(2);
       legend.formatter(formatter);
-      legend.renderTo(svg);
+      legend.renderTo(div);
 
       const entries = legend.content().selectAll<Element, any>("rect.swatch");
       assert.operator(entries.size(), ">=", 11, "there is at least 11 swatches");
@@ -489,20 +489,20 @@ describe("InterpolatedColorLegend", () => {
         const swatch = d3.select(this);
         assert.strictEqual(swatch.select("title").text(), formatter(d));
       });
-      svg.remove();
+      div.remove();
     });
 
     it("does not create title elements if configuration is set to false", () => {
       var originalSetting = Plottable.Configs.ADD_TITLE_ELEMENTS;
       Plottable.Configs.ADD_TITLE_ELEMENTS = false;
-      legend.renderTo(svg);
+      legend.renderTo(div);
       Plottable.Configs.ADD_TITLE_ELEMENTS = originalSetting;
 
       const entries = legend.content().selectAll<Element, any>("rect.swatch");
       assert.operator(entries.size(), ">=", 11, "there is at least 11 swatches");
       const titles = entries.selectAll<Element, any>("title");
       assert.strictEqual(titles.size(), 0, "no titles should be rendered");
-      svg.remove();
+      div.remove();
     });
   });
 });

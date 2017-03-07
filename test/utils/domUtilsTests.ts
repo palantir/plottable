@@ -43,7 +43,7 @@ describe("Utils.DOM", () => {
 
   describe("elementWidth(), elementHeight()", () => {
     it("can get a plain element's size", () => {
-      let parent = TestMethods.getSVGParent();
+      let parent = TestMethods.getElementParent();
       parent.style("width", "300px");
       parent.style("height", "200px");
       let parentElem = <Element> parent.node();
@@ -66,7 +66,7 @@ describe("Utils.DOM", () => {
     });
 
     it("can accept multiple units and convert to pixels", () => {
-      let parent = TestMethods.getSVGParent();
+      let parent = TestMethods.getElementParent();
       let parentElem = <Element> parent.node();
       let child = parent.append("div");
       let childElem = <Element> child.node();
