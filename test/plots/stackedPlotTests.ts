@@ -239,15 +239,15 @@ describe("Plots", () => {
 
   describe("auto scale domain on numeric", () => {
     let div: d3.Selection<HTMLDivElement, any, any, any>;
-    let SVG_WIDTH = 600;
-    let SVG_HEIGHT = 400;
+    let DIV_WIDTH = 600;
+    let DIV_HEIGHT = 400;
     let yScale: Plottable.Scales.Linear;
     let xScale: Plottable.Scales.Linear;
     let dataset1: Plottable.Dataset;
     let dataset2: Plottable.Dataset;
 
     beforeEach(() => {
-      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
       xScale = new Plottable.Scales.Linear();
       xScale.domain([1, 2]);
       yScale = new Plottable.Scales.Linear();
@@ -292,15 +292,15 @@ describe("Plots", () => {
 
   describe("auto scale domain on Category", () => {
     let div: d3.Selection<HTMLDivElement, any, any, any>;
-    let SVG_WIDTH = 600;
-    let SVG_HEIGHT = 400;
+    let DIV_WIDTH = 600;
+    let DIV_HEIGHT = 400;
     let yScale: Plottable.Scales.Linear;
     let xScale: Plottable.Scales.Category;
     let dataset1: Plottable.Dataset;
     let dataset2: Plottable.Dataset;
 
     beforeEach(() => {
-      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
       xScale = new Plottable.Scales.Category().domain(["a", "b"]);
       yScale = new Plottable.Scales.Linear();
 

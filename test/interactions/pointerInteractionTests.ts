@@ -9,11 +9,11 @@ import * as TestMethods from "../testMethods";
 
 describe("Interactions", () => {
   describe("Pointer Interaction", () => {
-    const SVG_WIDTH = 400;
-    const SVG_HEIGHT = 400;
-    const HALF_POINT = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
-    const QUARTER_POINT = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
-    const OUTSIDE_POINT = { x: SVG_WIDTH * 2, y: SVG_HEIGHT * 2 };
+    const DIV_WIDTH = 400;
+    const DIV_HEIGHT = 400;
+    const HALF_POINT = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
+    const QUARTER_POINT = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
+    const OUTSIDE_POINT = { x: DIV_WIDTH * 2, y: DIV_HEIGHT * 2 };
     const MODE_NAME = ["mouse", "touch"];
 
     type PointerTestCallback = {
@@ -50,7 +50,7 @@ describe("Interactions", () => {
         let callback: PointerTestCallback;
 
         beforeEach(() => {
-          div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+          div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
 
           const component = new Plottable.Component();
           component.renderTo(div);
@@ -113,13 +113,13 @@ describe("Interactions", () => {
           triggerPointerEvent(OUTSIDE_POINT, mode, eventTarget);
           assert.isFalse(callback.called, `not called when moving outside of the Component (${MODE_NAME[mode]})`);
 
-          TestMethods.triggerFakeMouseEvent(`mousemove`, eventTarget, SVG_WIDTH / 2, SVG_HEIGHT / 2);
+          TestMethods.triggerFakeMouseEvent(`mousemove`, eventTarget, DIV_WIDTH / 2, DIV_HEIGHT / 2);
           triggerPointerEvent(OUTSIDE_POINT, mode, eventTarget);
           assert.isTrue(callback.called, `callback called on exiting Component (${MODE_NAME[mode]})`);
           assert.deepEqual(callback.lastPoint, OUTSIDE_POINT, `was passed correct point (${MODE_NAME[mode]})`);
 
           callback.reset();
-          triggerPointerEvent({ x: 3 * SVG_WIDTH, y: 3 * SVG_HEIGHT }, mode, eventTarget);
+          triggerPointerEvent({ x: 3 * DIV_WIDTH, y: 3 * DIV_HEIGHT }, mode, eventTarget);
           assert.isFalse(callback.called, `callback not called again if already outside of Component (${MODE_NAME[mode]})`);
 
           pointerInteraction.offPointerExit(callback);
@@ -161,13 +161,13 @@ describe("Interactions", () => {
         let overlay: SimpleSelection<void>;
 
         beforeEach(() => {
-          div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+          div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
           overlay = TestMethods.getElementParent().append("div").styles({
-            height: `${SVG_HEIGHT}px`,
-            width: `${SVG_WIDTH}px`,
+            height: `${DIV_HEIGHT}px`,
+            width: `${DIV_WIDTH}px`,
             position: "relative",
-            top: `-${SVG_HEIGHT / 2}px`,
-            left: `${SVG_WIDTH / 2}px`,
+            top: `-${DIV_HEIGHT / 2}px`,
+            left: `${DIV_WIDTH / 2}px`,
             background: "black",
           });
 

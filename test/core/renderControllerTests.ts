@@ -7,8 +7,8 @@ import * as Plottable from "../../src";
 import * as TestMethods from "../testMethods";
 
 describe("RenderController", () => {
-  let SVG_WIDTH = 400;
-  let SVG_HEIGHT = 300;
+  let DIV_WIDTH = 400;
+  let DIV_HEIGHT = 300;
 
   describe("configuring the render policy", () => {
     after(() => {
@@ -31,7 +31,7 @@ describe("RenderController", () => {
   });
 
   it("can queue a component to render", () => {
-    let div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+    let div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
     let component = new Plottable.Component();
     let renderedClass = "rendered";
     component.renderImmediately = () => {
@@ -46,7 +46,7 @@ describe("RenderController", () => {
   });
 
   it("can queue a component to undergo layout computation and render", () => {
-    let div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+    let div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
     let component = new Plottable.Component();
     let renderedClass = "rendered";
     component.renderImmediately = () => {
@@ -57,8 +57,8 @@ describe("RenderController", () => {
     Plottable.RenderController.registerToComputeLayoutAndRender(component);
     assert.isFalse(component.content().select(`.${renderedClass}`).empty(), "component has rendered");
     assert.deepEqual(component.origin(), {x: 0, y: 0}, "origin set");
-    assert.strictEqual(component.width(), SVG_WIDTH, "width set");
-    assert.strictEqual(component.height(), SVG_HEIGHT, "height set");
+    assert.strictEqual(component.width(), DIV_WIDTH, "width set");
+    assert.strictEqual(component.height(), DIV_HEIGHT, "height set");
     component.destroy();
     div.remove();
   });

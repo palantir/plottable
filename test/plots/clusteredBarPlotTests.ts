@@ -10,8 +10,8 @@ import * as TestMethods from "../testMethods";
 describe("Plots", () => {
   [Plottable.Plots.Bar.ORIENTATION_VERTICAL, Plottable.Plots.Bar.ORIENTATION_HORIZONTAL].forEach((orientation: string) => {
     describe(`Clustered Bar Plot in ${orientation} orientation`, () => {
-      const SVG_WIDTH = 400;
-      const SVG_HEIGHT = 400;
+      const DIV_WIDTH = 400;
+      const DIV_HEIGHT = 400;
       const isVertical = orientation === Plottable.Plots.Bar.ORIENTATION_VERTICAL;
 
       let div: d3.Selection<HTMLDivElement, any, any, any>;
@@ -20,7 +20,7 @@ describe("Plots", () => {
       let clusterBarPlot: Plottable.Plots.ClusteredBar<number | string, number | string>;
 
       beforeEach(() => {
-        div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+        div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
         categoryScale = new Plottable.Scales.Category();
         linearScale = new Plottable.Scales.Linear();
         clusterBarPlot = new Plottable.Plots.ClusteredBar<number | string, number | string>(orientation);
@@ -64,7 +64,7 @@ describe("Plots", () => {
             const position = isVertical ? "x" : "y";
 
             assert.closeTo(TestMethods.numAttr(bar, secondaryAttr), rangeBand, 2, `${secondaryAttr} is correct for bar ${index}`);
-            assert.closeTo(TestMethods.numAttr(bar, mainAttr), (isVertical ? SVG_HEIGHT : SVG_WIDTH) / maxValue * datum.num,
+            assert.closeTo(TestMethods.numAttr(bar, mainAttr), (isVertical ? DIV_HEIGHT : DIV_WIDTH) / maxValue * datum.num,
               window.Pixel_CloseTo_Requirement, `${mainAttr} is correct for bar ${index}`);
 
             // check that clustering is correct

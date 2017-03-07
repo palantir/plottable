@@ -10,8 +10,8 @@ import * as Mocks from "../mocks";
 import * as TestMethods from "../testMethods";
 
 describe("Component", () => {
-  let SVG_WIDTH = 400;
-  let SVG_HEIGHT = 300;
+  let DIV_WIDTH = 400;
+  let DIV_HEIGHT = 300;
 
   describe("anchoring", () => {
 
@@ -20,7 +20,7 @@ describe("Component", () => {
 
     beforeEach(() => {
       c = new Plottable.Component();
-      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
     });
 
     it("adds itself as a child element of the input selection", () => {
@@ -76,7 +76,7 @@ describe("Component", () => {
     it("can switch which element it is anchored to", () => {
       c.anchor(div);
 
-      let div2 = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+      let div2 = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
       c.anchor(div2);
       assert.notStrictEqual(<SVGElement> c.rootElement().node(),
         div.node(), "component DOM elements are not children of div element");
@@ -89,7 +89,7 @@ describe("Component", () => {
 
     it("removes DOM elements in previous div when anchoring to a different div", () => {
       c.anchor(div);
-      let div2 = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+      let div2 = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
       c.anchor(div2);
       assert.isTrue(div.select("svg").empty(), "previous div element should not have any group child nodes");
       assert.isFalse(div2.select("svg").empty(), "new div element should have group child nodes");
@@ -139,7 +139,7 @@ describe("Component", () => {
       c.onAnchor(callback);
       c.anchor(div);
 
-      let div2 = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+      let div2 = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
       callbackCalled = false;
       c.anchor(div2);
       assert.isTrue(callbackCalled, "callback was called on anchoring to a new <div>");
@@ -172,7 +172,7 @@ describe("Component", () => {
 
     beforeEach(() => {
       c = new Plottable.Component();
-      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
     });
 
     it("can remove its own DOM elements", () => {
@@ -255,7 +255,7 @@ describe("Component", () => {
 
     beforeEach(() => {
       c = new Plottable.Component();
-      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
     });
 
     it("can set its parent to a container that contains this component", () => {
@@ -287,7 +287,7 @@ describe("Component", () => {
 
     beforeEach(() => {
       c = new Plottable.Component();
-      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
     });
 
     it("can add css classes", () => {
@@ -326,7 +326,7 @@ describe("Component", () => {
 
     beforeEach(() => {
       c = new Plottable.Component();
-      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
     });
 
     it("defaults to take up all space", () => {
@@ -335,8 +335,8 @@ describe("Component", () => {
 
       c.anchor(div);
       c.computeLayout();
-      assert.strictEqual(c.width() , SVG_WIDTH, "takes all available width");
-      assert.strictEqual(c.height(), SVG_HEIGHT, "takes all available height");
+      assert.strictEqual(c.width() , DIV_WIDTH, "takes all available width");
+      assert.strictEqual(c.height(), DIV_HEIGHT, "takes all available height");
       let origin = c.origin();
       assert.strictEqual(origin.x, 0 , "x origin defaults to leftmost");
       assert.strictEqual(origin.y, 0 , "y origin defaults to topmost");
@@ -359,13 +359,13 @@ describe("Component", () => {
     it("recomputes the layout if the environment changes", () => {
       c.anchor(div);
       c.computeLayout();
-      assert.strictEqual(c.width() , SVG_WIDTH, "takes all available width");
-      assert.strictEqual(c.height(), SVG_HEIGHT, "takes all available height");
+      assert.strictEqual(c.width() , DIV_WIDTH, "takes all available width");
+      assert.strictEqual(c.height(), DIV_HEIGHT, "takes all available height");
 
-      div.style("width", 2 * SVG_WIDTH + "px").style("height", 2 * SVG_HEIGHT + "px");
+      div.style("width", 2 * DIV_WIDTH + "px").style("height", 2 * DIV_HEIGHT + "px");
       c.computeLayout();
-      assert.strictEqual(c.width() , 2 * SVG_WIDTH, "updated to take new available width");
-      assert.strictEqual(c.height(), 2 * SVG_HEIGHT, "updated to take new available height");
+      assert.strictEqual(c.width() , 2 * DIV_WIDTH, "updated to take new available width");
+      assert.strictEqual(c.height(), 2 * DIV_HEIGHT, "updated to take new available height");
 
       c.destroy();
       div.remove();
@@ -442,7 +442,7 @@ describe("Component", () => {
 
     it("allows for recomputing the layout and rendering", () => {
       c.renderTo(div);
-      c.computeLayout({x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4}, SVG_WIDTH / 4, SVG_HEIGHT / 4);
+      c.computeLayout({x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4}, DIV_WIDTH / 4, DIV_HEIGHT / 4);
       c.redraw();
       let origin = c.origin();
       assert.deepEqual(origin, {x: 0, y: 0}, "origin reset");
@@ -482,7 +482,7 @@ describe("Component", () => {
 
     beforeEach(() => {
       c = new Mocks.FixedSizeComponent(fixedWidth, fixedHeight);
-      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
       c.anchor(div);
     });
 
@@ -505,8 +505,8 @@ describe("Component", () => {
     });
 
     it("does not translate if more space was requested than offered", () => {
-      let requestedWidth = SVG_WIDTH * 2;
-      let requestedHeight = SVG_HEIGHT * 2;
+      let requestedWidth = DIV_WIDTH * 2;
+      let requestedHeight = DIV_HEIGHT * 2;
       c.destroy();
       c = new Mocks.FixedSizeComponent(requestedWidth, requestedHeight);
       let t = new Plottable.Components.Table([[c]]);
@@ -526,7 +526,7 @@ describe("Component", () => {
 
     beforeEach(() => {
       c = new Plottable.Component();
-      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
     });
 
     it("defaults to a top and left alignment", () => {
@@ -569,7 +569,7 @@ describe("Component", () => {
 
     beforeEach(() => {
       c = new Mocks.FixedSizeComponent(fixedWidth, fixedHeight);
-      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
       c.anchor(div);
     });
 
@@ -583,13 +583,13 @@ describe("Component", () => {
       c.xAlignment(Plottable.Components.Alignment.CENTER)
         .yAlignment(Plottable.Components.Alignment.CENTER);
       c.computeLayout();
-      expectedOrigin = {x: SVG_WIDTH / 2 - fixedWidth / 2, y: SVG_HEIGHT / 2 - fixedHeight / 2};
+      expectedOrigin = {x: DIV_WIDTH / 2 - fixedWidth / 2, y: DIV_HEIGHT / 2 - fixedHeight / 2};
       assert.deepEqual(c.origin(), expectedOrigin, "center component aligns correctly");
 
       c.xAlignment(Plottable.Components.Alignment.RIGHT)
         .yAlignment(Plottable.Components.Alignment.BOTTOM);
       c.computeLayout();
-      expectedOrigin = {x: SVG_WIDTH - fixedWidth, y: SVG_HEIGHT - fixedHeight};
+      expectedOrigin = {x: DIV_WIDTH - fixedWidth, y: DIV_HEIGHT - fixedHeight};
       assert.deepEqual(c.origin(), expectedOrigin, "bottom-right component aligns correctly");
       c.destroy();
       div.remove();
@@ -603,7 +603,7 @@ describe("Component", () => {
 
     beforeEach(() => {
       c = new Plottable.Component();
-      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
     });
 
     it("does not request any space when offered a width and a height", () => {
@@ -623,7 +623,7 @@ describe("Component", () => {
 
     beforeEach(() => {
       c = new Plottable.Component();
-      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
     });
 
     it("cannot reanchor if destroyed", () => {
@@ -654,7 +654,7 @@ describe("Component", () => {
 
     beforeEach(() => {
       c = new Plottable.Component();
-      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
     });
 
     it("performs all of the same operations as renderImmediately()", () => {
@@ -708,7 +708,7 @@ describe("Component", () => {
     beforeEach(() => {
       renderFlag = false;
       c = new Plottable.Component();
-      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
       c.renderImmediately = () => {
         renderFlag = true;
         return this;
@@ -722,8 +722,8 @@ describe("Component", () => {
     it("renders to a DOM node involves anchoring, layout computing, and actual rendering", () => {
       assert.strictEqual(c.renderTo(div), c, "returns calling object");
       assert.isTrue(div.classed("plottable"), "anchored to div");
-      assert.strictEqual(c.width(), SVG_WIDTH, "component takes up div width");
-      assert.strictEqual(c.height(), SVG_HEIGHT, "component takes up div height");
+      assert.strictEqual(c.width(), DIV_WIDTH, "component takes up div width");
+      assert.strictEqual(c.height(), DIV_HEIGHT, "component takes up div height");
       assert.isTrue(renderFlag, "component has rendered");
       c.destroy();
       div.remove();
@@ -794,11 +794,11 @@ describe("Component", () => {
 
     it("detaches the component if rendering to a new div", () => {
       let divHeight2 = 50;
-      let div2 = TestMethods.generateDiv(SVG_WIDTH, divHeight2);
+      let div2 = TestMethods.generateDiv(DIV_WIDTH, divHeight2);
 
       c.renderTo(div);
       assert.isTrue((<Node> div.node()).hasChildNodes(), "anchored onto div");
-      assert.strictEqual(c.height(), SVG_HEIGHT, "occupies entire space of div");
+      assert.strictEqual(c.height(), DIV_HEIGHT, "occupies entire space of div");
 
       c.renderTo(div2);
 
@@ -819,7 +819,7 @@ describe("Component", () => {
 
     beforeEach(() => {
       c = new Plottable.Component();
-      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
     });
 
     it("returns origin without a parent", () => {
@@ -832,8 +832,8 @@ describe("Component", () => {
       let parent = new Plottable.Components.Group([c]);
       parent.anchor(div);
       c.anchor(div);
-      parent.computeLayout({x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4}, SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      c.computeLayout({x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4}, SVG_WIDTH / 4, SVG_HEIGHT / 4);
+      parent.computeLayout({x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4}, DIV_WIDTH / 2, DIV_HEIGHT / 2);
+      c.computeLayout({x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4}, DIV_WIDTH / 4, DIV_HEIGHT / 4);
       let originToRoot = {
         x: parent.origin().x + c.origin().x,
         y: parent.origin().y + c.origin().y,
@@ -851,7 +851,7 @@ describe("Component", () => {
 
     beforeEach(() => {
       c = new Plottable.Component();
-      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
       c.anchor(div);
       c.computeLayout();
     });
@@ -859,7 +859,7 @@ describe("Component", () => {
     it("calculates the bounds relative to the origin", () => {
       assert.deepEqual(c.bounds(), {
         topLeft: c.origin(),
-        bottomRight: { x: SVG_WIDTH, y: SVG_HEIGHT }
+        bottomRight: { x: DIV_WIDTH, y: DIV_HEIGHT }
       });
       c.destroy();
       div.remove();
@@ -876,7 +876,7 @@ describe("Component", () => {
       // HACKHACK #2777: Can't use a Mocks Compnoent here because they descend from a different Plottable,
       // which has the wrong RenderPolicy in coverage.html
       (<any> clippedComponent)._clipPathEnabled = true;
-      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
     });
 
     it("generates a clipPath element if it is enabled", () => {

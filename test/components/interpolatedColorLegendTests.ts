@@ -15,15 +15,15 @@ describe("InterpolatedColorLegend", () => {
   const ORIENTATIONS = ["horizontal", "left", "right"];
 
   describe("Basic Usage", () => {
-    const SVG_HEIGHT = 400;
-    const SVG_WIDTH = 400;
+    const DIV_HEIGHT = 400;
+    const DIV_WIDTH = 400;
 
     let div: d3.Selection<HTMLDivElement, any, any, any>;
     let colorScale: Plottable.Scales.InterpolatedColor;
     let legend: Plottable.Components.InterpolatedColorLegend;
 
     beforeEach(() => {
-      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
       colorScale = new Plottable.Scales.InterpolatedColor();
       legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     });
@@ -212,15 +212,15 @@ describe("InterpolatedColorLegend", () => {
   });
 
   describe("Expanding", () => {
-    const SVG_HEIGHT = 400;
-    const SVG_WIDTH = 400;
+    const DIV_HEIGHT = 400;
+    const DIV_WIDTH = 400;
 
     let div: d3.Selection<HTMLDivElement, any, any, any>;
     let colorScale: Plottable.Scales.InterpolatedColor;
     let legend: Plottable.Components.InterpolatedColorLegend;
 
     beforeEach(() => {
-      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
       colorScale = new Plottable.Scales.InterpolatedColor();
       legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     });
@@ -270,14 +270,14 @@ describe("InterpolatedColorLegend", () => {
       legend.orientation("left");
       legend.expands(true);
       legend.renderTo(div);
-      assert.strictEqual(legend.height(), SVG_HEIGHT, "legend height is the same as div height");
+      assert.strictEqual(legend.height(), DIV_HEIGHT, "legend height is the same as div height");
       div.remove();
     });
 
     it("spams the entire width if oriented horizontally and expand is set to true", () => {
       legend.expands(true);
       legend.renderTo(div);
-      assert.strictEqual(legend.width(), SVG_WIDTH, "legend width is the same as div width");
+      assert.strictEqual(legend.width(), DIV_WIDTH, "legend width is the same as div width");
       div.remove();
     });
 
@@ -296,15 +296,15 @@ describe("InterpolatedColorLegend", () => {
   });
 
   describe("Padding", () => {
-    const SVG_HEIGHT = 400;
-    const SVG_WIDTH = 400;
+    const DIV_HEIGHT = 400;
+    const DIV_WIDTH = 400;
 
     let div: d3.Selection<HTMLDivElement, any, any, any>;
     let colorScale: Plottable.Scales.InterpolatedColor;
     let legend: Plottable.Components.InterpolatedColorLegend;
 
     beforeEach(() => {
-      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
       colorScale = new Plottable.Scales.InterpolatedColor();
       legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     });
@@ -315,8 +315,8 @@ describe("InterpolatedColorLegend", () => {
       orientations.forEach((orientation) => {
         legend.orientation(orientation).expands(true);
         const height = (<Element> legend.content().select(SWATCH_CONTAINER_SELECTOR).node()).getBoundingClientRect().height;
-        assert.closeTo(height, SVG_HEIGHT, window.Pixel_CloseTo_Requirement,
-          "actual height is SVG_HEIGHT with orientation: " + orientation);
+        assert.closeTo(height, DIV_HEIGHT, window.Pixel_CloseTo_Requirement,
+          "actual height is DIV_HEIGHT with orientation: " + orientation);
       });
       div.remove();
     });

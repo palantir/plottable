@@ -173,35 +173,35 @@ describe("GuideLineLayer", () => {
 
   ["vertical", "horizontal"].forEach((orientation: string) => {
     describe(`Rendering ${orientation} guide line`, () => {
-      const SVG_WIDTH = orientation === "vertical" ? 400 : 300;
-      const SVG_HEIGHT = orientation === "vertical" ? 300 : 400;
+      const DIV_WIDTH = orientation === "vertical" ? 400 : 300;
+      const DIV_HEIGHT = orientation === "vertical" ? 300 : 400;
       const GUIDE_LINE_CLASS = ".guide-line";
 
       let div: d3.Selection<HTMLDivElement, any, any, any>;
 
       beforeEach(() => {
-        div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+        div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
       });
 
       function getExpectedAttr(value: number) {
         return {
           x1: orientation === "vertical" ? value : 0,
-          x2: orientation === "vertical" ? value : SVG_WIDTH,
+          x2: orientation === "vertical" ? value : DIV_WIDTH,
           y1: orientation === "vertical" ? 0 : value,
-          y2: orientation === "vertical" ? SVG_HEIGHT : value,
+          y2: orientation === "vertical" ? DIV_HEIGHT : value,
         };
       }
       it("requests no space, but will occupy all offered space", () => {
         const gll = new Plottable.Components.GuideLineLayer<void>(orientation);
-        const request = gll.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
+        const request = gll.requestedSpace(DIV_WIDTH, DIV_HEIGHT);
         TestMethods.verifySpaceRequest(request, 0, 0, "does not request any space");
         assert.isTrue(gll.fixedWidth(), "fixed width");
         assert.isTrue(gll.fixedHeight(), "fixed height");
 
         gll.anchor(div);
-        gll.computeLayout({x: 0, y: 0}, SVG_WIDTH, SVG_HEIGHT);
-        assert.strictEqual(gll.width(), SVG_WIDTH, "accepted all offered width");
-        assert.strictEqual(gll.height(), SVG_HEIGHT, "accepted all offered height");
+        gll.computeLayout({x: 0, y: 0}, DIV_WIDTH, DIV_HEIGHT);
+        assert.strictEqual(gll.width(), DIV_WIDTH, "accepted all offered width");
+        assert.strictEqual(gll.height(), DIV_HEIGHT, "accepted all offered height");
         div.remove();
       });
 
@@ -210,13 +210,13 @@ describe("GuideLineLayer", () => {
         gll.renderTo(div);
         TestMethods.verifyClipPath(gll);
         const clipRect = (<any> gll)._boxContainer.select(".clip-rect");
-        assert.strictEqual(TestMethods.numAttr(clipRect, "width"), SVG_WIDTH, "the clipRect has an appropriate width");
-        assert.strictEqual(TestMethods.numAttr(clipRect, "height"), SVG_HEIGHT, "the clipRect has an appropriate height");
+        assert.strictEqual(TestMethods.numAttr(clipRect, "width"), DIV_WIDTH, "the clipRect has an appropriate width");
+        assert.strictEqual(TestMethods.numAttr(clipRect, "height"), DIV_HEIGHT, "the clipRect has an appropriate height");
         div.remove();
       });
 
       it("renders correctly given a pixel position", () => {
-        const range = (orientation === "vertical" ? SVG_WIDTH : SVG_HEIGHT);
+        const range = (orientation === "vertical" ? DIV_WIDTH : DIV_HEIGHT);
         const expectedPosition1 = range / 2;
         const gll = new Plottable.Components.GuideLineLayer<number>(orientation);
         gll.pixelPosition(expectedPosition1);
@@ -291,7 +291,7 @@ describe("GuideLineLayer", () => {
       it(`sets the scale's range based on the allocated ${orientation === "vertical" ? "width" : "height"}`, () => {
         const gll = new Plottable.Components.GuideLineLayer<number>(orientation);
         const scale1 = new Plottable.Scales.Linear();
-        const expectedRange = orientation === "vertical" ? [0, SVG_WIDTH] : [SVG_HEIGHT, 0];
+        const expectedRange = orientation === "vertical" ? [0, DIV_WIDTH] : [DIV_HEIGHT, 0];
         gll.scale(scale1);
         gll.renderTo(div);
         assert.deepEqual(gll.scale().range(), expectedRange, "range was set based on the allocated space");

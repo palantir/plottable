@@ -78,34 +78,34 @@ describe("GuideLineLayer", () => {
 
     ["vertical", "horizontal"].forEach((orientation: string) => {
       describe(`Dragging orientation for ${orientation} DragLineLayer`, () => {
-        const SVG_WIDTH = orientation === "vertical" ? 400 : 300;
-        const SVG_HEIGHT = orientation === "vertical" ? 300 : 400;
+        const DIV_WIDTH = orientation === "vertical" ? 400 : 300;
+        const DIV_HEIGHT = orientation === "vertical" ? 300 : 400;
         const DRAG_EDGE_CSSCLASS = ".drag-edge";
         const GUIDE_LINE_CSSCLASS = ".guide-line";
 
         const quarterPoint = {
-          x: SVG_WIDTH / 4,
-          y: SVG_HEIGHT / 4,
+          x: DIV_WIDTH / 4,
+          y: DIV_HEIGHT / 4,
         };
         const halfPoint = {
-          x: SVG_WIDTH / 2,
-          y: SVG_HEIGHT / 2,
+          x: DIV_WIDTH / 2,
+          y: DIV_HEIGHT / 2,
         };
 
         let dll: Plottable.Components.DragLineLayer<number>;
         let div: d3.Selection<HTMLDivElement, any, any, any>;
 
         beforeEach(() => {
-          div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+          div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
           dll = new Plottable.Components.DragLineLayer<number>(orientation);
         });
 
         function getExpectedAttr(value: number) {
           return {
             x1: orientation === "vertical" ? value : 0,
-            x2: orientation === "vertical" ? value : SVG_WIDTH,
+            x2: orientation === "vertical" ? value : DIV_WIDTH,
             y1: orientation === "vertical" ? 0 : value,
-            y2: orientation === "vertical" ? SVG_HEIGHT : value,
+            y2: orientation === "vertical" ? DIV_HEIGHT : value,
           };
         };
 
@@ -247,9 +247,9 @@ describe("GuideLineLayer", () => {
     });
 
     describe("Interactions", () => {
-      const SVG_WIDTH = 400;
-      const SVG_HEIGHT = 300;
-      const startPosition = SVG_WIDTH / 2;
+      const DIV_WIDTH = 400;
+      const DIV_HEIGHT = 300;
+      const startPosition = DIV_WIDTH / 2;
 
       let dll: Plottable.Components.DragLineLayer<void>;
       let callbackCalled = false;
@@ -264,7 +264,7 @@ describe("GuideLineLayer", () => {
           pixelPositionOnCalling = dll.pixelPosition();
           callbackCalled = true;
         };
-        div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+        div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
         dll.pixelPosition(startPosition);
         dll.renderTo(div);
       });
@@ -273,20 +273,20 @@ describe("GuideLineLayer", () => {
         assert.strictEqual(dll.onDragStart(callback), dll, "onDragStart() returns the calling DragLineLayer");
         dll.renderTo(div);
 
-        TestMethods.triggerFakeMouseEvent("mousedown", dll.background(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+        TestMethods.triggerFakeMouseEvent("mousedown", dll.background(), DIV_WIDTH / 2, DIV_HEIGHT / 2);
         assert.isTrue(callbackCalled, "callback was called on drag start");
-        assert.strictEqual(pixelPositionOnCalling, SVG_WIDTH / 2, "DragLineLayer's state was updated before calling callbacks");
-        TestMethods.triggerFakeMouseEvent("mouseup", dll.background(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+        assert.strictEqual(pixelPositionOnCalling, DIV_WIDTH / 2, "DragLineLayer's state was updated before calling callbacks");
+        TestMethods.triggerFakeMouseEvent("mouseup", dll.background(), DIV_WIDTH / 2, DIV_HEIGHT / 2);
 
         callbackCalled = false;
-        TestMethods.triggerFakeMouseEvent("mousedown", dll.background(), 0, SVG_HEIGHT / 2);
+        TestMethods.triggerFakeMouseEvent("mousedown", dll.background(), 0, DIV_HEIGHT / 2);
         assert.isFalse(callbackCalled, "callback not called if line was not grabbed");
-        TestMethods.triggerFakeMouseEvent("mouseup", dll.background(), 0, SVG_HEIGHT / 2);
+        TestMethods.triggerFakeMouseEvent("mouseup", dll.background(), 0, DIV_HEIGHT / 2);
 
         assert.strictEqual(dll.offDragStart(callback), dll, "offDragStart() returns the calling DragLineLayer");
-        TestMethods.triggerFakeMouseEvent("mousedown", dll.background(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+        TestMethods.triggerFakeMouseEvent("mousedown", dll.background(), DIV_WIDTH / 2, DIV_HEIGHT / 2);
         assert.isFalse(callbackCalled, "callback was deregistered successfully");
-        TestMethods.triggerFakeMouseEvent("mouseup", dll.background(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+        TestMethods.triggerFakeMouseEvent("mouseup", dll.background(), DIV_WIDTH / 2, DIV_HEIGHT / 2);
 
         div.remove();
       });
@@ -294,41 +294,41 @@ describe("GuideLineLayer", () => {
       it("calls callback onDrag", () => {
         assert.strictEqual(dll.onDrag(callback), dll, "onDrag() returns the calling DragLineLayer");
         let midX = startPosition * 3 / 8;
-        let endX = SVG_WIDTH / 4;
-        TestMethods.triggerFakeMouseEvent("mousedown", dll.background(), startPosition, SVG_HEIGHT / 2);
-        TestMethods.triggerFakeMouseEvent("mousemove", dll.background(), midX, SVG_HEIGHT / 2);
+        let endX = DIV_WIDTH / 4;
+        TestMethods.triggerFakeMouseEvent("mousedown", dll.background(), startPosition, DIV_HEIGHT / 2);
+        TestMethods.triggerFakeMouseEvent("mousemove", dll.background(), midX, DIV_HEIGHT / 2);
         assert.isTrue(callbackCalled, "callback was called on drag");
         assert.strictEqual(pixelPositionOnCalling, midX, "DragLineLayer's state was updated before calling callbacks");
 
         callbackCalled = false;
-        TestMethods.triggerFakeMouseEvent("mousemove", dll.background(), endX, SVG_HEIGHT / 2);
+        TestMethods.triggerFakeMouseEvent("mousemove", dll.background(), endX, DIV_HEIGHT / 2);
         assert.isTrue(callbackCalled, "callback was called again on continued dragging");
         assert.strictEqual(pixelPositionOnCalling, endX, "DragLineLayer's state was updated again");
-        TestMethods.triggerFakeMouseEvent("mouseup", dll.background(), endX, SVG_HEIGHT / 2);
+        TestMethods.triggerFakeMouseEvent("mouseup", dll.background(), endX, DIV_HEIGHT / 2);
 
         callbackCalled = false;
         dll.pixelPosition(startPosition);
-        TestMethods.triggerFakeMouseEvent("mousedown", dll.background(), 0, SVG_HEIGHT / 2);
-        TestMethods.triggerFakeMouseEvent("mousemove", dll.background(), endX, SVG_HEIGHT / 2);
+        TestMethods.triggerFakeMouseEvent("mousedown", dll.background(), 0, DIV_HEIGHT / 2);
+        TestMethods.triggerFakeMouseEvent("mousemove", dll.background(), endX, DIV_HEIGHT / 2);
         assert.isFalse(callbackCalled, "callback not called if line was not grabbed");
-        TestMethods.triggerFakeMouseEvent("mouseup", dll.background(), endX, SVG_HEIGHT / 2);
+        TestMethods.triggerFakeMouseEvent("mouseup", dll.background(), endX, DIV_HEIGHT / 2);
 
         assert.strictEqual(dll.offDrag(callback), dll, "offDrag() returns the calling DragLineLayer");
-        TestMethods.triggerFakeMouseEvent("mousedown", dll.background(), startPosition, SVG_HEIGHT / 2);
-        TestMethods.triggerFakeMouseEvent("mousemove", dll.background(), endX, SVG_HEIGHT / 2);
+        TestMethods.triggerFakeMouseEvent("mousedown", dll.background(), startPosition, DIV_HEIGHT / 2);
+        TestMethods.triggerFakeMouseEvent("mousemove", dll.background(), endX, DIV_HEIGHT / 2);
         assert.isFalse(callbackCalled, "callback was deregistered successfully");
-        TestMethods.triggerFakeMouseEvent("mouseup", dll.background(), endX, SVG_HEIGHT / 2);
+        TestMethods.triggerFakeMouseEvent("mouseup", dll.background(), endX, DIV_HEIGHT / 2);
 
         div.remove();
       });
 
       it("calls callback onDragEnd", () => {
         assert.strictEqual(dll.onDragEnd(callback), dll, "onDragEnd() returns the calling DragLineLayer");
-        let endPosition = SVG_WIDTH / 4;
+        let endPosition = DIV_WIDTH / 4;
         TestMethods.triggerFakeDragSequence(
           dll.background(),
-          { x: startPosition, y: SVG_HEIGHT / 2 },
-          { x: endPosition, y: SVG_HEIGHT / 2 }
+          { x: startPosition, y: DIV_HEIGHT / 2 },
+          { x: endPosition, y: DIV_HEIGHT / 2 }
         );
         assert.isTrue(callbackCalled, "callback was called on drag end");
         assert.strictEqual(pixelPositionOnCalling, endPosition, "DragLineLayer's state was updated before calling callbacks");
@@ -337,16 +337,16 @@ describe("GuideLineLayer", () => {
         dll.pixelPosition(startPosition);
         TestMethods.triggerFakeDragSequence(
           dll.background(),
-          { x: 0, y: SVG_HEIGHT / 2 },
-          { x: endPosition, y: SVG_HEIGHT / 2 }
+          { x: 0, y: DIV_HEIGHT / 2 },
+          { x: endPosition, y: DIV_HEIGHT / 2 }
         );
         assert.isFalse(callbackCalled, "callback not called if line was not grabbed");
 
         assert.strictEqual(dll.offDragEnd(callback), dll, "offDragEnd() returns the calling DragLineLayer");
         TestMethods.triggerFakeDragSequence(
           dll.background(),
-          { x: startPosition, y: SVG_HEIGHT / 2 },
-          { x: endPosition, y: SVG_HEIGHT / 2 }
+          { x: startPosition, y: DIV_HEIGHT / 2 },
+          { x: endPosition, y: DIV_HEIGHT / 2 }
         );
         assert.isFalse(callbackCalled, "callback was deregistered successfully");
 

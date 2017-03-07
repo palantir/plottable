@@ -589,14 +589,14 @@ describe("Plots", () => {
 
     describe("Fail safe tests", () => {
       it("renders correctly with no Datasets", () => {
-        let SVG_WIDTH = 400;
-        let SVG_HEIGHT = 400;
-        let div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+        let DIV_WIDTH = 400;
+        let DIV_HEIGHT = 400;
+        let div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
         let piePlot = new Plottable.Plots.Pie();
         piePlot.sectorValue((d) => d.value);
         assert.doesNotThrow(() => piePlot.renderTo(div), Error);
-        assert.strictEqual(piePlot.width(), SVG_WIDTH, "was allocated width");
-        assert.strictEqual(piePlot.height(), SVG_HEIGHT, "was allocated height");
+        assert.strictEqual(piePlot.width(), DIV_WIDTH, "was allocated width");
+        assert.strictEqual(piePlot.height(), DIV_HEIGHT, "was allocated height");
         div.remove();
       });
 

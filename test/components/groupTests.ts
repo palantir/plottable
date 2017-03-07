@@ -183,23 +183,23 @@ describe("Group", () => {
   });
 
   describe("Layout", () => {
-    let SVG_WIDTH = 400;
-    let SVG_HEIGHT = 400;
+    let DIV_WIDTH = 400;
+    let DIV_HEIGHT = 400;
     let div: d3.Selection<HTMLDivElement, any, any, any>;
 
     beforeEach(() => {
-      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
     });
 
     it("requests no space when empty, but occupies all offered space", () => {
       let group = new Plottable.Components.Group([]);
 
-      let request = group.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
+      let request = group.requestedSpace(DIV_WIDTH, DIV_HEIGHT);
       TestMethods.verifySpaceRequest(request, 0, 0, "empty Group doesn't request any space");
 
       group.renderTo(div);
-      assert.strictEqual(group.width(), SVG_WIDTH, "occupies all offered width");
-      assert.strictEqual(group.height(), SVG_HEIGHT, "occupies all offered height");
+      assert.strictEqual(group.width(), DIV_WIDTH, "occupies all offered width");
+      assert.strictEqual(group.height(), DIV_HEIGHT, "occupies all offered height");
       div.remove();
     });
 
@@ -208,40 +208,40 @@ describe("Group", () => {
       let c2 = new Plottable.Component();
       let group = new Plottable.Components.Group([c1, c2]);
 
-      let groupRequest = group.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
-      let c1Request = c1.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
+      let groupRequest = group.requestedSpace(DIV_WIDTH, DIV_HEIGHT);
+      let c1Request = c1.requestedSpace(DIV_WIDTH, DIV_HEIGHT);
       assert.deepEqual(groupRequest, c1Request, "request reflects request of sub-component");
       assert.isFalse(group.fixedWidth(), "width is not fixed if subcomponents are not fixed width");
       assert.isFalse(group.fixedHeight(), "height is not fixed if subcomponents are not fixed height");
 
       group.renderTo(div);
-      assert.strictEqual(group.width(), SVG_WIDTH, "occupies all offered width");
-      assert.strictEqual(group.height(), SVG_HEIGHT, "occupies all offered height");
+      assert.strictEqual(group.width(), DIV_WIDTH, "occupies all offered width");
+      assert.strictEqual(group.height(), DIV_HEIGHT, "occupies all offered height");
       div.remove();
     });
 
     it("requests space correctly when it contains fixed-size Components", () => {
-      let tallComponent = new Mocks.FixedSizeComponent(SVG_WIDTH / 4, SVG_WIDTH / 2);
-      let wideComponent = new Mocks.FixedSizeComponent(SVG_WIDTH / 2, SVG_WIDTH / 4);
+      let tallComponent = new Mocks.FixedSizeComponent(DIV_WIDTH / 4, DIV_WIDTH / 2);
+      let wideComponent = new Mocks.FixedSizeComponent(DIV_WIDTH / 2, DIV_WIDTH / 4);
 
       let group = new Plottable.Components.Group([tallComponent, wideComponent]);
 
-      let request = group.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
-      assert.strictEqual(request.minWidth, SVG_WIDTH / 2, "requested enough space for widest Component");
-      assert.strictEqual(request.minHeight, SVG_HEIGHT / 2, "requested enough space for tallest Component");
+      let request = group.requestedSpace(DIV_WIDTH, DIV_HEIGHT);
+      assert.strictEqual(request.minWidth, DIV_WIDTH / 2, "requested enough space for widest Component");
+      assert.strictEqual(request.minHeight, DIV_HEIGHT / 2, "requested enough space for tallest Component");
 
-      let constrainedRequest = group.requestedSpace(SVG_WIDTH / 10, SVG_HEIGHT / 10);
-      assert.strictEqual(constrainedRequest.minWidth, SVG_WIDTH / 2, "requested enough space for widest Component");
-      assert.strictEqual(constrainedRequest.minHeight, SVG_HEIGHT / 2, "requested enough space for tallest Component");
+      let constrainedRequest = group.requestedSpace(DIV_WIDTH / 10, DIV_HEIGHT / 10);
+      assert.strictEqual(constrainedRequest.minWidth, DIV_WIDTH / 2, "requested enough space for widest Component");
+      assert.strictEqual(constrainedRequest.minHeight, DIV_HEIGHT / 2, "requested enough space for tallest Component");
 
       group.renderTo(div);
-      assert.strictEqual(group.width(), SVG_WIDTH, "occupies all offered width");
-      assert.strictEqual(group.height(), SVG_HEIGHT, "occupies all offered height");
+      assert.strictEqual(group.width(), DIV_WIDTH, "occupies all offered width");
+      assert.strictEqual(group.height(), DIV_HEIGHT, "occupies all offered height");
       div.remove();
     });
 
     it("allocates space to its Components correctly", () => {
-      let FIXED_COMPONENT_SIZE = SVG_WIDTH / 4;
+      let FIXED_COMPONENT_SIZE = DIV_WIDTH / 4;
       let fixedComponent = new Mocks.FixedSizeComponent(FIXED_COMPONENT_SIZE, FIXED_COMPONENT_SIZE);
       fixedComponent.xAlignment("right").yAlignment("bottom");
       let unfixedComponent = new Plottable.Component();
@@ -252,13 +252,13 @@ describe("Group", () => {
       assert.strictEqual(fixedComponent.width(), FIXED_COMPONENT_SIZE, "fixed-size Component has correct width");
       assert.strictEqual(fixedComponent.height(), FIXED_COMPONENT_SIZE, "fixed-size Component has correct height");
       let expectedFixedOrigin = {
-        x: SVG_WIDTH - FIXED_COMPONENT_SIZE,
-        y: SVG_HEIGHT - FIXED_COMPONENT_SIZE,
+        x: DIV_WIDTH - FIXED_COMPONENT_SIZE,
+        y: DIV_HEIGHT - FIXED_COMPONENT_SIZE,
       };
       TestMethods.assertPointsClose(expectedFixedOrigin, fixedComponent.origin(), 1, "fixed-size Component has correct origin");
 
-      assert.strictEqual(unfixedComponent.width(), SVG_WIDTH, "non-fixed-size Component has correct width");
-      assert.strictEqual(unfixedComponent.height(), SVG_HEIGHT, "non-fixed-size Component has correct height");
+      assert.strictEqual(unfixedComponent.width(), DIV_WIDTH, "non-fixed-size Component has correct width");
+      assert.strictEqual(unfixedComponent.height(), DIV_HEIGHT, "non-fixed-size Component has correct height");
       let expectedUnfixedOrigin = {
         x: 0,
         y: 0,

@@ -31,8 +31,8 @@ describe("Dispatchers", () => {
       let touchDispatcher: Plottable.Dispatchers.Touch;
       let callbackWasCalled: boolean;
 
-      const SVG_WIDTH = 400;
-      const SVG_HEIGHT = 400;
+      const DIV_WIDTH = 400;
+      const DIV_HEIGHT = 400;
       const targetXs = [17, 18, 12, 23, 44];
       const targetYs = [77, 78, 52, 43, 14];
       const ids = targetXs.map((targetX, i) => i);
@@ -51,11 +51,11 @@ describe("Dispatchers", () => {
       };
 
       beforeEach(() => {
-        div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+        div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
         const component = new Plottable.Component();
         sinon.stub(component, "rootElement", () => div);
         // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
-        div.append("rect").attr("width", SVG_WIDTH).attr("height", SVG_HEIGHT);
+        div.append("rect").attr("width", DIV_WIDTH).attr("height", DIV_HEIGHT);
         touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(component);
         callbackWasCalled = false;
       });

@@ -9,24 +9,24 @@ import * as TestMethods from "../testMethods";
 
 describe("Interactions", () => {
   describe("Drag Interaction", () => {
-    const SVG_WIDTH = 400;
-    const SVG_HEIGHT = 400;
+    const DIV_WIDTH = 400;
+    const DIV_HEIGHT = 400;
 
     const startPoint = {
-      x: SVG_WIDTH / 4,
-      y: SVG_HEIGHT / 4,
+      x: DIV_WIDTH / 4,
+      y: DIV_HEIGHT / 4,
     };
     const endPoint = {
-      x: SVG_WIDTH / 2,
-      y: SVG_HEIGHT / 2,
+      x: DIV_WIDTH / 2,
+      y: DIV_HEIGHT / 2,
     };
     const positiveOutsidePoint = {
-      x: SVG_WIDTH * 1.5,
-      y: SVG_HEIGHT * 1.5,
+      x: DIV_WIDTH * 1.5,
+      y: DIV_HEIGHT * 1.5,
     };
     const negativeOutsidePoint = {
-      x: -SVG_WIDTH / 2,
-      y: -SVG_HEIGHT / 2,
+      x: -DIV_WIDTH / 2,
+      y: -DIV_HEIGHT / 2,
     };
 
     let div: d3.Selection<HTMLDivElement, any, any, any>;
@@ -71,7 +71,7 @@ describe("Interactions", () => {
     }
 
     beforeEach(() => {
-      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
       component = new Plottable.Component();
       component.renderTo(div);
 
@@ -342,7 +342,7 @@ describe("Interactions", () => {
         });
 
         describe(`invoking callbacks with ${TestMethods.InteractionMode[mode]} events when constrained`, () => {
-          const constrainedPos = { x: SVG_WIDTH, y: SVG_HEIGHT };
+          const constrainedPos = { x: DIV_WIDTH, y: DIV_HEIGHT };
           const constrainedNeg = { x: 0, y: 0 };
 
           let callback: DragTestCallback;

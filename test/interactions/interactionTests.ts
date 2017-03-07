@@ -8,11 +8,11 @@ import * as TestMethods from "../testMethods";
 
 describe("Interactions", () => {
   describe("Interaction", () => {
-    let SVG_WIDTH = 400;
-    let SVG_HEIGHT = 400;
+    let DIV_WIDTH = 400;
+    let DIV_HEIGHT = 400;
 
     it("attaching/detaching a component modifies the state of the interaction", () => {
-      let div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+      let div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
       let component = new Plottable.Component();
       let interaction = new Plottable.Interaction();
       component.renderTo(div);
@@ -29,7 +29,7 @@ describe("Interactions", () => {
     });
 
     it("can attach interaction to component", () => {
-      let div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+      let div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
       let component = new Plottable.Component();
       component.renderTo(div);
 
@@ -41,15 +41,15 @@ describe("Interactions", () => {
 
       clickInteraction.attachTo(component);
 
-      TestMethods.triggerFakeMouseEvent("mousedown", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      TestMethods.triggerFakeMouseEvent("mouseup", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      TestMethods.triggerFakeMouseEvent("mousedown", component.content(), DIV_WIDTH / 2, DIV_HEIGHT / 2);
+      TestMethods.triggerFakeMouseEvent("mouseup", component.content(), DIV_WIDTH / 2, DIV_HEIGHT / 2);
       assert.isTrue(callbackCalled, "callback called on clicking Component (mouse)");
 
       div.remove();
     });
 
     it("can detach interaction from component", () => {
-      let div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+      let div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
       let component = new Plottable.Component();
       component.renderTo(div);
 
@@ -61,22 +61,22 @@ describe("Interactions", () => {
 
       clickInteraction.attachTo(component);
 
-      TestMethods.triggerFakeMouseEvent("mousedown", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      TestMethods.triggerFakeMouseEvent("mouseup", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      TestMethods.triggerFakeMouseEvent("mousedown", component.content(), DIV_WIDTH / 2, DIV_HEIGHT / 2);
+      TestMethods.triggerFakeMouseEvent("mouseup", component.content(), DIV_WIDTH / 2, DIV_HEIGHT / 2);
       assert.isTrue(callbackCalled, "callback called on clicking Component (mouse)");
 
       callbackCalled = false;
       clickInteraction.detachFrom(component);
 
-      TestMethods.triggerFakeMouseEvent("mousedown", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      TestMethods.triggerFakeMouseEvent("mouseup", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      TestMethods.triggerFakeMouseEvent("mousedown", component.content(), DIV_WIDTH / 2, DIV_HEIGHT / 2);
+      TestMethods.triggerFakeMouseEvent("mouseup", component.content(), DIV_WIDTH / 2, DIV_HEIGHT / 2);
       assert.isFalse(callbackCalled, "callback was removed from component and should not be called");
 
       div.remove();
     });
 
     it("calling detachFrom() on a detached Interaction has no effect", () => {
-      let div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+      let div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
       let component = new Plottable.Component();
 
       let clickInteraction = new Plottable.Interactions.Click();
@@ -104,8 +104,8 @@ describe("Interactions", () => {
     });
 
     it("can move interaction from one component to another", () => {
-      let div1 = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
-      let div2 = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+      let div1 = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
+      let div2 = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
       let component1 = new Plottable.Component();
       let component2 = new Plottable.Component();
 
@@ -121,38 +121,38 @@ describe("Interactions", () => {
       clickInteraction.attachTo(component1);
 
       callbackCalled = false;
-      TestMethods.triggerFakeMouseEvent("mousedown", component1.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      TestMethods.triggerFakeMouseEvent("mouseup", component1.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      TestMethods.triggerFakeMouseEvent("mousedown", component1.content(), DIV_WIDTH / 2, DIV_HEIGHT / 2);
+      TestMethods.triggerFakeMouseEvent("mouseup", component1.content(), DIV_WIDTH / 2, DIV_HEIGHT / 2);
       assert.isTrue(callbackCalled, "Round 1 callback called for component 1");
 
       callbackCalled = false;
-      TestMethods.triggerFakeMouseEvent("mousedown", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      TestMethods.triggerFakeMouseEvent("mouseup", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      TestMethods.triggerFakeMouseEvent("mousedown", component2.content(), DIV_WIDTH / 2, DIV_HEIGHT / 2);
+      TestMethods.triggerFakeMouseEvent("mouseup", component2.content(), DIV_WIDTH / 2, DIV_HEIGHT / 2);
       assert.isFalse(callbackCalled, "Round 1 callback not called for component 2");
 
       clickInteraction.detachFrom(component1);
       clickInteraction.attachTo(component2);
 
       callbackCalled = false;
-      TestMethods.triggerFakeMouseEvent("mousedown", component1.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      TestMethods.triggerFakeMouseEvent("mouseup", component1.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      TestMethods.triggerFakeMouseEvent("mousedown", component1.content(), DIV_WIDTH / 2, DIV_HEIGHT / 2);
+      TestMethods.triggerFakeMouseEvent("mouseup", component1.content(), DIV_WIDTH / 2, DIV_HEIGHT / 2);
       assert.isFalse(callbackCalled, "Round 2 (after longhand attaching) callback not called for component 1");
 
       callbackCalled = false;
-      TestMethods.triggerFakeMouseEvent("mousedown", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      TestMethods.triggerFakeMouseEvent("mouseup", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      TestMethods.triggerFakeMouseEvent("mousedown", component2.content(), DIV_WIDTH / 2, DIV_HEIGHT / 2);
+      TestMethods.triggerFakeMouseEvent("mouseup", component2.content(), DIV_WIDTH / 2, DIV_HEIGHT / 2);
       assert.isTrue(callbackCalled, "Round 2 (after longhand attaching) callback called for component 2");
 
       clickInteraction.attachTo(component1);
 
       callbackCalled = false;
-      TestMethods.triggerFakeMouseEvent("mousedown", component1.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      TestMethods.triggerFakeMouseEvent("mouseup", component1.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      TestMethods.triggerFakeMouseEvent("mousedown", component1.content(), DIV_WIDTH / 2, DIV_HEIGHT / 2);
+      TestMethods.triggerFakeMouseEvent("mouseup", component1.content(), DIV_WIDTH / 2, DIV_HEIGHT / 2);
       assert.isTrue(callbackCalled, "Round 3 (after shorthand attaching) callback called for component 1");
 
       callbackCalled = false;
-      TestMethods.triggerFakeMouseEvent("mousedown", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      TestMethods.triggerFakeMouseEvent("mouseup", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      TestMethods.triggerFakeMouseEvent("mousedown", component2.content(), DIV_WIDTH / 2, DIV_HEIGHT / 2);
+      TestMethods.triggerFakeMouseEvent("mouseup", component2.content(), DIV_WIDTH / 2, DIV_HEIGHT / 2);
       assert.isFalse(callbackCalled, "Round 3 (after shorthand attaching) callback not called for component 2");
 
       div1.remove();
@@ -170,7 +170,7 @@ describe("Interactions", () => {
       });
 
       it("no longer responds when disabled", () => {
-        let div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+        let div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
         let component = new Plottable.Component();
         component.renderTo(div);
 
@@ -181,21 +181,21 @@ describe("Interactions", () => {
         clickInteraction.attachTo(component);
 
         clickInteraction.enabled(false);
-        TestMethods.triggerFakeMouseEvent("mousedown", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-        TestMethods.triggerFakeMouseEvent("mouseup", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+        TestMethods.triggerFakeMouseEvent("mousedown", component.content(), DIV_WIDTH / 2, DIV_HEIGHT / 2);
+        TestMethods.triggerFakeMouseEvent("mouseup", component.content(), DIV_WIDTH / 2, DIV_HEIGHT / 2);
         assert.isFalse(callbackCalled, "callback is not called when Interaction is disabled");
 
         clickInteraction.enabled(true);
-        TestMethods.triggerFakeMouseEvent("mousedown", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-        TestMethods.triggerFakeMouseEvent("mouseup", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+        TestMethods.triggerFakeMouseEvent("mousedown", component.content(), DIV_WIDTH / 2, DIV_HEIGHT / 2);
+        TestMethods.triggerFakeMouseEvent("mouseup", component.content(), DIV_WIDTH / 2, DIV_HEIGHT / 2);
         assert.isTrue(callbackCalled, "callback is called when Interaction is re-enabled");
 
         div.remove();
       });
 
       it("can be attached to new Component while disabled", () => {
-        let div1 = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
-        let div2 = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+        let div1 = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
+        let div2 = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
         let component1 = new Plottable.Component();
         let component2 = new Plottable.Component();
         component1.renderTo(div1);
@@ -209,13 +209,13 @@ describe("Interactions", () => {
 
         clickInteraction.enabled(false);
         clickInteraction.attachTo(component2);
-        TestMethods.triggerFakeMouseEvent("mousedown", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-        TestMethods.triggerFakeMouseEvent("mouseup", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+        TestMethods.triggerFakeMouseEvent("mousedown", component2.content(), DIV_WIDTH / 2, DIV_HEIGHT / 2);
+        TestMethods.triggerFakeMouseEvent("mouseup", component2.content(), DIV_WIDTH / 2, DIV_HEIGHT / 2);
         assert.isFalse(callbackCalled, "stays disabled even if attachTo() is called again");
 
         clickInteraction.enabled(true);
-        TestMethods.triggerFakeMouseEvent("mousedown", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-        TestMethods.triggerFakeMouseEvent("mouseup", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+        TestMethods.triggerFakeMouseEvent("mousedown", component2.content(), DIV_WIDTH / 2, DIV_HEIGHT / 2);
+        TestMethods.triggerFakeMouseEvent("mouseup", component2.content(), DIV_WIDTH / 2, DIV_HEIGHT / 2);
         assert.isTrue(callbackCalled, "re-enabled");
 
         div1.remove();

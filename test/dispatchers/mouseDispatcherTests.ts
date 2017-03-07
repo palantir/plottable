@@ -54,13 +54,11 @@ describe("Dispatchers", () => {
       let mouseDispatcher: Plottable.Dispatchers.Mouse;
 
       beforeEach(() => {
-        let SVG_WIDTH = 400;
-        let SVG_HEIGHT = 400;
+        let DIV_WIDTH = 400;
+        let DIV_HEIGHT = 400;
 
         component = new Plottable.Component();
-        div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
-        // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
-        div.append("rect").attr("width", SVG_WIDTH).attr("height", SVG_HEIGHT);
+        div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
         sinon.stub(component, "rootElement", () => div);
 
         mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(component);

@@ -11,17 +11,17 @@ describe("SelectionBoxLayer", () => {
   describe("DragBoxLayer", () => {
 
     describe("Basics usage", () => {
-      const SVG_WIDTH = 400;
-      const SVG_HEIGHT = 400;
-      const quarterPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
-      const halfPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+      const DIV_WIDTH = 400;
+      const DIV_HEIGHT = 400;
+      const quarterPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
+      const halfPoint = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
       const DRAG_BOX_LAYER_EVENTS = ["dragStart", "drag", "dragEnd"];
 
       let div: d3.Selection<HTMLDivElement, any, any, any>;
       let dbl: Plottable.Components.DragBoxLayer;
 
       beforeEach(() => {
-        div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+        div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
         dbl = new Plottable.Components.DragBoxLayer();
       });
 
@@ -287,14 +287,14 @@ describe("SelectionBoxLayer", () => {
     });
 
     describe("Enabling and disabling", () => {
-      const SVG_WIDTH = 400;
-      const SVG_HEIGHT = 400;
+      const DIV_WIDTH = 400;
+      const DIV_HEIGHT = 400;
 
       let div: d3.Selection<HTMLDivElement, any, any, any>;
       let dbl: Plottable.Components.DragBoxLayer;
 
       beforeEach(() => {
-        div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+        div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
         dbl = new Plottable.Components.DragBoxLayer();
       });
 
@@ -314,12 +314,12 @@ describe("SelectionBoxLayer", () => {
         assert.isFalse(dbl.boxVisible(), "box is hidden initially");
 
         const startPoint = {
-          x: SVG_WIDTH / 4,
-          y: SVG_HEIGHT / 4,
+          x: DIV_WIDTH / 4,
+          y: DIV_HEIGHT / 4,
         };
         const endPoint = {
-          x: SVG_WIDTH / 2,
-          y: SVG_HEIGHT / 2,
+          x: DIV_WIDTH / 2,
+          y: DIV_HEIGHT / 2,
         };
 
         const target = dbl.background();
@@ -333,9 +333,9 @@ describe("SelectionBoxLayer", () => {
     });
 
     describe("Resizing", () => {
-      const SVG_WIDTH = 400;
-      const SVG_HEIGHT = 400;
-      const midPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+      const DIV_WIDTH = 400;
+      const DIV_HEIGHT = 400;
+      const midPoint = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
 
       let div: d3.Selection<HTMLDivElement, any, any, any>;
       let dbl: Plottable.Components.DragBoxLayer;
@@ -348,14 +348,14 @@ describe("SelectionBoxLayer", () => {
           bottomRight: { x: 0, y: 0 },
         });
         TestMethods.triggerFakeDragSequence(target,
-                                { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4},
-                                { x: SVG_WIDTH * 3 / 4, y: SVG_HEIGHT * 3 / 4}
+                                { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4},
+                                { x: DIV_WIDTH * 3 / 4, y: DIV_HEIGHT * 3 / 4}
                                );
         initialBounds = dbl.bounds();
       }
 
       beforeEach(() => {
-        div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+        div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
         dbl = new Plottable.Components.DragBoxLayer();
         dbl.renderTo(div);
 
@@ -405,7 +405,7 @@ describe("SelectionBoxLayer", () => {
         assert.strictEqual(bounds.bottomRight.x, initialBounds.bottomRight.x, "right edge was not moved");
 
         resetBox();
-        newY = SVG_HEIGHT;
+        newY = DIV_HEIGHT;
         TestMethods.triggerFakeDragSequence(target,
                                 { x: midPoint.x, y: initialBounds.topLeft.y },
                                 { x: midPoint.x, y: newY }
@@ -417,7 +417,7 @@ describe("SelectionBoxLayer", () => {
 
       it("can resize from bottom edge", () => {
         dbl.resizable(true);
-        let newY = SVG_HEIGHT;
+        let newY = DIV_HEIGHT;
         TestMethods.triggerFakeDragSequence(target,
                                 { x: midPoint.x, y: initialBounds.bottomRight.y },
                                 { x: midPoint.x, y: newY }
@@ -453,7 +453,7 @@ describe("SelectionBoxLayer", () => {
         assert.strictEqual(bounds.bottomRight.x, initialBounds.bottomRight.x, "right edge was not moved");
 
         resetBox();
-        newX = SVG_WIDTH;
+        newX = DIV_WIDTH;
         TestMethods.triggerFakeDragSequence(target,
                                 { x: initialBounds.topLeft.x, y: midPoint.y },
                                 { x: newX, y: midPoint.y }
@@ -465,7 +465,7 @@ describe("SelectionBoxLayer", () => {
 
       it("can resize from right edge", () => {
         dbl.resizable(true);
-        let newX = SVG_WIDTH;
+        let newX = DIV_WIDTH;
         TestMethods.triggerFakeDragSequence(target,
                                 { x: initialBounds.bottomRight.x, y: midPoint.y },
                                 { x: newX, y: midPoint.y }
@@ -492,11 +492,11 @@ describe("SelectionBoxLayer", () => {
         const detectionRadius = dbl.detectionRadius();
         TestMethods.triggerFakeDragSequence(target,
                                 { x: midPoint.x, y: initialBounds.bottomRight.y + detectionRadius - 1 },
-                                { x: midPoint.x, y: SVG_HEIGHT }
+                                { x: midPoint.x, y: DIV_HEIGHT }
                                );
         let bounds = dbl.bounds();
         assert.strictEqual(bounds.topLeft.y, initialBounds.topLeft.y, "top edge was not moved");
-        assert.strictEqual(bounds.bottomRight.y, SVG_HEIGHT, "bottom edge was repositioned");
+        assert.strictEqual(bounds.bottomRight.y, DIV_HEIGHT, "bottom edge was repositioned");
         assert.strictEqual(bounds.topLeft.x, initialBounds.topLeft.x, "left edge was not moved");
         assert.strictEqual(bounds.bottomRight.x, initialBounds.bottomRight.x, "right edge was not moved");
 
@@ -504,13 +504,13 @@ describe("SelectionBoxLayer", () => {
         const startYOutside = initialBounds.bottomRight.y + detectionRadius + 1;
         TestMethods.triggerFakeDragSequence(target,
                                 { x: midPoint.x, y: startYOutside },
-                                { x: midPoint.x, y: SVG_HEIGHT }
+                                { x: midPoint.x, y: DIV_HEIGHT }
                                );
         bounds = dbl.bounds();
         assert.strictEqual(bounds.topLeft.x, midPoint.x, "new box was started at the drag start position");
         assert.strictEqual(bounds.topLeft.y, startYOutside, "new box was started at the drag start position");
         assert.strictEqual(bounds.bottomRight.x, midPoint.x, "new box was started at the drag start position");
-        assert.strictEqual(bounds.bottomRight.y, SVG_HEIGHT, "new box was started at the drag start position");
+        assert.strictEqual(bounds.bottomRight.y, DIV_HEIGHT, "new box was started at the drag start position");
         div.remove();
       });
 
@@ -530,13 +530,13 @@ describe("SelectionBoxLayer", () => {
         dbl.boxVisible(false);
         TestMethods.triggerFakeDragSequence(target,
                                 { x: midPoint.x, y: initialBounds.bottomRight.y },
-                                { x: midPoint.x, y: SVG_HEIGHT }
+                                { x: midPoint.x, y: DIV_HEIGHT }
                                );
         const bounds = dbl.bounds();
         assert.strictEqual(bounds.topLeft.x, midPoint.x, "new box was started at the drag start position");
         assert.strictEqual(bounds.topLeft.y, initialBounds.bottomRight.y, "new box was started at the drag start position");
         assert.strictEqual(bounds.bottomRight.x, midPoint.x, "new box was ended at the drag end position");
-        assert.strictEqual(bounds.bottomRight.y, SVG_HEIGHT, "new box was ended at the drag end position");
+        assert.strictEqual(bounds.bottomRight.y, DIV_HEIGHT, "new box was ended at the drag end position");
         div.remove();
       });
 
@@ -558,9 +558,9 @@ describe("SelectionBoxLayer", () => {
     });
 
     describe("Moving", () => {
-      const SVG_WIDTH = 400;
-      const SVG_HEIGHT = 400;
-      const midPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+      const DIV_WIDTH = 400;
+      const DIV_HEIGHT = 400;
+      const midPoint = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
       const dragDistance = 10;
 
       let div: d3.Selection<HTMLDivElement, any, any, any>;
@@ -569,14 +569,14 @@ describe("SelectionBoxLayer", () => {
       let initialBounds: Plottable.Bounds;
 
       beforeEach(() => {
-        div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+        div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
         dbl = new Plottable.Components.DragBoxLayer();
         dbl.renderTo(div);
 
         target = dbl.background();
         dbl.bounds({
-          topLeft: { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4},
-          bottomRight: { x: SVG_WIDTH * 3 / 4, y: SVG_HEIGHT * 3 / 4},
+          topLeft: { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4},
+          bottomRight: { x: DIV_WIDTH * 3 / 4, y: DIV_HEIGHT * 3 / 4},
         });
         dbl.boxVisible(true);
         initialBounds = dbl.bounds();
@@ -652,13 +652,13 @@ describe("SelectionBoxLayer", () => {
         dbl.resizable(true);
         TestMethods.triggerFakeDragSequence(target,
           { x: initialBounds.bottomRight.x, y: midPoint.y },
-          { x: SVG_WIDTH, y: midPoint.y }
+          { x: DIV_WIDTH, y: midPoint.y }
         );
         const bounds = dbl.bounds();
         assert.strictEqual(bounds.topLeft.y, initialBounds.topLeft.y, "top edge was not moved");
         assert.strictEqual(bounds.bottomRight.y, initialBounds.bottomRight.y, "bottom edge was not moved");
         assert.strictEqual(bounds.topLeft.x, initialBounds.topLeft.x, "left edge was not moved");
-        assert.strictEqual(bounds.bottomRight.x, SVG_WIDTH, "right edge was repositioned");
+        assert.strictEqual(bounds.bottomRight.x, DIV_WIDTH, "right edge was repositioned");
         div.remove();
       });
 

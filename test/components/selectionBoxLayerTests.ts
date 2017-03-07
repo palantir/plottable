@@ -9,14 +9,14 @@ import * as TestMethods from "../testMethods";
 
 describe("SelectionBoxLayer", () => {
   describe("Basic Usage", () => {
-    const SVG_WIDTH = 500;
-    const SVG_HEIGHT = 500;
+    const DIV_WIDTH = 500;
+    const DIV_HEIGHT = 500;
     const SELECTION_BOX_CLASSNAME = ".selection-box";
     let div: d3.Selection<HTMLDivElement, any, any, any>;
     let sbl: Plottable.Components.SelectionBoxLayer;
 
     beforeEach(() => {
-      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
       sbl = new Plottable.Components.SelectionBoxLayer();
     });
 
@@ -58,8 +58,8 @@ describe("SelectionBoxLayer", () => {
 
       TestMethods.verifyClipPath(sbl);
       const clipRect = (<any> sbl)._boxContainer.select(".clip-rect");
-      assert.strictEqual(TestMethods.numAttr(clipRect, "width"), SVG_WIDTH, "the clipRect has an appropriate width");
-      assert.strictEqual(TestMethods.numAttr(clipRect, "height"), SVG_HEIGHT, "the clipRect has an appropriate height");
+      assert.strictEqual(TestMethods.numAttr(clipRect, "width"), DIV_WIDTH, "the clipRect has an appropriate width");
+      assert.strictEqual(TestMethods.numAttr(clipRect, "height"), DIV_HEIGHT, "the clipRect has an appropriate height");
       div.remove();
     });
 
@@ -204,19 +204,19 @@ describe("SelectionBoxLayer", () => {
   });
 
   describe("X scale binding", () => {
-    const SVG_WIDTH = 500;
-    const SVG_HEIGHT = 500;
+    const DIV_WIDTH = 500;
+    const DIV_HEIGHT = 500;
     const SELECTION_AREA_CLASSNAME = ".selection-area";
     let div: d3.Selection<HTMLDivElement, any, any, any>;
     let sbl: Plottable.Components.SelectionBoxLayer;
     let xScale: Plottable.Scales.Linear;
 
     beforeEach(() => {
-      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
       sbl = new Plottable.Components.SelectionBoxLayer();
       xScale = new Plottable.Scales.Linear();
       xScale.domain([0, 2000]);
-      xScale.range([0, SVG_HEIGHT]);
+      xScale.range([0, DIV_HEIGHT]);
     });
 
     it("can set the xScale property", () => {
@@ -302,7 +302,7 @@ describe("SelectionBoxLayer", () => {
 
       const xScale2 = new Plottable.Scales.ModifiedLog();
       xScale2.domain([0, 1000]);
-      xScale2.range([0, SVG_HEIGHT]);
+      xScale2.range([0, DIV_HEIGHT]);
 
       sbl.xScale(xScale2);
       assert.notStrictEqual(sbl.bounds().topLeft.x, leftPosition, "left pixel position changed");
@@ -337,19 +337,19 @@ describe("SelectionBoxLayer", () => {
   });
 
   describe("Y scale binding", () => {
-    const SVG_WIDTH = 500;
-    const SVG_HEIGHT = 500;
+    const DIV_WIDTH = 500;
+    const DIV_HEIGHT = 500;
     const SELECTION_AREA_CLASSNAME = ".selection-area";
     let div: d3.Selection<HTMLDivElement, any, any, any>;
     let sbl: Plottable.Components.SelectionBoxLayer;
     let yScale: Plottable.Scales.Linear;
 
     beforeEach(() => {
-      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
       sbl = new Plottable.Components.SelectionBoxLayer();
       yScale = new Plottable.Scales.Linear();
       yScale.domain([0, 2000]);
-      yScale.range([0, SVG_HEIGHT]);
+      yScale.range([0, DIV_HEIGHT]);
     });
 
     it("can set the yScale property", () => {
@@ -436,7 +436,7 @@ describe("SelectionBoxLayer", () => {
 
       const yScale2 = new Plottable.Scales.ModifiedLog();
       yScale2.domain([0, 1000]);
-      yScale2.range([0, SVG_HEIGHT]);
+      yScale2.range([0, DIV_HEIGHT]);
 
       sbl.yScale(yScale2);
       assert.notStrictEqual(sbl.bounds().topLeft.y, topPosition, "top pixel position changed");

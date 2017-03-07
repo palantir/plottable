@@ -9,15 +9,15 @@ import * as TestMethods from "../testMethods";
 
 describe("Interactions", () => {
   describe("Click Interaction", () => {
-    const SVG_WIDTH = 400;
-    const SVG_HEIGHT = 400;
+    const DIV_WIDTH = 400;
+    const DIV_HEIGHT = 400;
 
     let div: d3.Selection<HTMLDivElement, any, any, any>;
     let component: Plottable.Component;
     let clickInteraction: Plottable.Interactions.Click;
 
     beforeEach(() => {
-      div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
       component = new Plottable.Component();
       component.renderTo(div);
 
@@ -118,9 +118,9 @@ describe("Interactions", () => {
     [TestMethods.InteractionMode.Mouse, TestMethods.InteractionMode.Touch].forEach((mode) => {
       describe(`invoking callbacks with ${TestMethods.InteractionMode[mode]} events`, () => {
         let callback: ClickTestCallback;
-        const quarterPoint = {x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4};
-        const halfPoint = {x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2};
-        const outsidePoint = {x: SVG_WIDTH * 2, y: SVG_HEIGHT * 2};
+        const quarterPoint = {x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4};
+        const halfPoint = {x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2};
+        const outsidePoint = {x: DIV_WIDTH * 2, y: DIV_HEIGHT * 2};
 
         beforeEach(() => {
           callback = makeClickCallback();
@@ -153,18 +153,18 @@ describe("Interactions", () => {
           TestMethods.triggerFakeInteractionEvent(mode,
                                                   TestMethods.InteractionType.Start,
                                                   component.content(),
-                                                  SVG_WIDTH / 2,
-                                                  SVG_HEIGHT / 2);
+                                                  DIV_WIDTH / 2,
+                                                  DIV_HEIGHT / 2);
           TestMethods.triggerFakeInteractionEvent(mode,
                                                   TestMethods.InteractionType.Move,
                                                   component.content(),
-                                                  SVG_WIDTH * 2,
-                                                  SVG_HEIGHT * 2);
+                                                  DIV_WIDTH * 2,
+                                                  DIV_HEIGHT * 2);
           TestMethods.triggerFakeInteractionEvent(mode,
                                                   TestMethods.InteractionType.End,
                                                   component.content(),
-                                                  SVG_WIDTH / 2,
-                                                  SVG_HEIGHT / 2);
+                                                  DIV_WIDTH / 2,
+                                                  DIV_HEIGHT / 2);
           assert.isTrue(callback.called,
                         "callback still called if the pointer is moved out then back inside the Component before releasing");
         });

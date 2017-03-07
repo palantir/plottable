@@ -61,25 +61,25 @@ describe("Labels", () => {
       });
 
       it("positions centered text in the middle of horizontal space", () => {
-        const SVG_WIDTH = Plottable.Utils.DOM.elementWidth(div);
+        const DIV_WIDTH = Plottable.Utils.DOM.elementWidth(div);
         const label = new Plottable.Components.Label("X").renderTo(div);
         const textTranslate = getTranslateValues(label.content().select("g"));
         const eleLeft = parseFloat(label.element().style("left"));
         const textWidth = Plottable.Utils.DOM.elementBBox(label.content().select("text")).width;
         const midPoint = eleLeft + textTranslate[0] + textWidth / 2;
-        assert.closeTo(midPoint, SVG_WIDTH / 2, window.Pixel_CloseTo_Requirement, "label is centered");
+        assert.closeTo(midPoint, DIV_WIDTH / 2, window.Pixel_CloseTo_Requirement, "label is centered");
         div.remove();
       });
 
       it("truncates text that is too long to be render", () => {
-        const SVG_WIDTH = Plottable.Utils.DOM.elementWidth(div);
+        const DIV_WIDTH = Plottable.Utils.DOM.elementWidth(div);
         const label = new Plottable.Components.Label("THIS LABEL IS SO LONG WHOEVER WROTE IT WAS PROBABLY DERANGED");
         label.renderTo(div);
         const content = label.content();
         const text = content.select("text");
         const bbox = Plottable.Utils.DOM.elementBBox(text);
         assert.strictEqual(bbox.height, label.height(), "text height === label.minimumHeight()");
-        assert.operator(bbox.width, "<=", SVG_WIDTH, "the text is not wider than the SVG width");
+        assert.operator(bbox.width, "<=", DIV_WIDTH, "the text is not wider than the SVG width");
         div.remove();
       });
 

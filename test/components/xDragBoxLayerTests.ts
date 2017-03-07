@@ -10,27 +10,27 @@ import * as TestMethods from "../testMethods";
 describe("SelectionBoxLayer", () => {
   describe("XDragBoxLayer", () => {
     describe("Basic Usage", () => {
-      const SVG_WIDTH = 400;
-      const SVG_HEIGHT = 300;
+      const DIV_WIDTH = 400;
+      const DIV_HEIGHT = 300;
 
       const quarterTopLeftPoint = {
-        x: SVG_WIDTH / 4,
-        y: SVG_HEIGHT / 4,
+        x: DIV_WIDTH / 4,
+        y: DIV_HEIGHT / 4,
       };
       const middlePoint = {
-        x: SVG_WIDTH / 2,
-        y: SVG_HEIGHT / 2,
+        x: DIV_WIDTH / 2,
+        y: DIV_HEIGHT / 2,
       };
       const quarterBottomRightPoint = {
-        x: SVG_WIDTH * 3 / 4,
-        y: SVG_HEIGHT * 3 / 4,
+        x: DIV_WIDTH * 3 / 4,
+        y: DIV_HEIGHT * 3 / 4,
       };
 
       let div: d3.Selection<HTMLDivElement, any, any, any>;
       let dbl: Plottable.Components.XDragBoxLayer;
 
       beforeEach(() => {
-        div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+        div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
         dbl = new Plottable.Components.XDragBoxLayer();
       });
 
@@ -46,7 +46,7 @@ describe("SelectionBoxLayer", () => {
         const actualBounds = dbl.bounds();
         assert.strictEqual(actualBounds.topLeft.y, 0, "box starts at top");
         assert.strictEqual(actualBounds.topLeft.x, quarterTopLeftPoint.x, "left edge set correctly");
-        assert.strictEqual(actualBounds.bottomRight.y, SVG_HEIGHT, "box ends at bottom");
+        assert.strictEqual(actualBounds.bottomRight.y, DIV_HEIGHT, "box ends at bottom");
         assert.strictEqual(actualBounds.bottomRight.x, middlePoint.x, "right edge set correctly");
 
         div.remove();
@@ -63,7 +63,7 @@ describe("SelectionBoxLayer", () => {
         const actualBounds = dbl.bounds();
         assert.strictEqual(actualBounds.bottomRight.x, quarterBottomRightPoint.x, "resized in x");
         assert.strictEqual(actualBounds.topLeft.y, 0, "box still starts at top");
-        assert.strictEqual(actualBounds.bottomRight.y, SVG_HEIGHT, "box still ends at bottom");
+        assert.strictEqual(actualBounds.bottomRight.y, DIV_HEIGHT, "box still ends at bottom");
         div.remove();
       });
 
@@ -78,8 +78,8 @@ describe("SelectionBoxLayer", () => {
         });
 
         const boundsBefore = dbl.bounds();
-        const newHeight = 2 * SVG_HEIGHT;
-        assert.strictEqual(dbl.height(), SVG_HEIGHT, "box has same height as SVG");
+        const newHeight = 2 * DIV_HEIGHT;
+        assert.strictEqual(dbl.height(), DIV_HEIGHT, "box has same height as SVG");
 
         div.style("height", newHeight + "px");
         dbl.redraw();
@@ -89,7 +89,7 @@ describe("SelectionBoxLayer", () => {
         assert.strictEqual(boundsAfter.topLeft.x, boundsBefore.topLeft.x, "box keeps same left edge");
         assert.strictEqual(boundsAfter.topLeft.y, 0, "box still starts at top");
         assert.strictEqual(boundsAfter.bottomRight.x, boundsBefore.bottomRight.x, "box keeps same right edge");
-        assert.strictEqual(boundsAfter.bottomRight.y, SVG_HEIGHT * 2, "box still ends at bottom");
+        assert.strictEqual(boundsAfter.bottomRight.y, DIV_HEIGHT * 2, "box still ends at bottom");
         div.remove();
       });
 
@@ -123,15 +123,15 @@ describe("SelectionBoxLayer", () => {
 
         const dragDistance = 10;
         TestMethods.triggerFakeDragSequence(dbl.background(),
-          { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 },
-          { x: SVG_WIDTH / 2 + dragDistance, y: SVG_HEIGHT / 2 + dragDistance }
+          { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 },
+          { x: DIV_WIDTH / 2 + dragDistance, y: DIV_HEIGHT / 2 + dragDistance }
         );
 
         const boundsAfter = dbl.bounds();
         assert.strictEqual(boundsAfter.topLeft.x, boundsBefore.topLeft.x + dragDistance, "left edge moved");
         assert.strictEqual(boundsAfter.topLeft.y, 0, "box still starts at top");
         assert.strictEqual(boundsAfter.bottomRight.x, boundsBefore.bottomRight.x + dragDistance, "right edge moved");
-        assert.strictEqual(boundsAfter.bottomRight.y, SVG_HEIGHT, "box still ends at bottom");
+        assert.strictEqual(boundsAfter.bottomRight.y, DIV_HEIGHT, "box still ends at bottom");
 
         div.remove();
       });

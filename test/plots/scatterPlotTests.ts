@@ -12,15 +12,15 @@ import { getTranslateValues } from "../../src/utils/domUtils";
 describe("Plots", () => {
   describe("ScatterPlot", () => {
     describe("Basic Rendering", () => {
-      const SVG_WIDTH = 400;
-      const SVG_HEIGHT = 400;
+      const DIV_WIDTH = 400;
+      const DIV_HEIGHT = 400;
       let div: d3.Selection<HTMLDivElement, any, any, any>;
       let plot: Plottable.Plots.Scatter<number, number>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
 
       beforeEach(() => {
-        div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
+        div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Linear();
         plot = new Plottable.Plots.Scatter<number, number>();
@@ -37,8 +37,8 @@ describe("Plots", () => {
 
       it("renders correctly with no data", () => {
         assert.doesNotThrow(() => plot.renderTo(div), Error);
-        assert.strictEqual(plot.width(), SVG_WIDTH, "was allocated width");
-        assert.strictEqual(plot.height(), SVG_HEIGHT, "was allocated height");
+        assert.strictEqual(plot.width(), DIV_WIDTH, "was allocated width");
+        assert.strictEqual(plot.height(), DIV_HEIGHT, "was allocated height");
       });
 
       it("is initialized correctly", () => {
@@ -144,11 +144,11 @@ describe("Plots", () => {
       let data: any[];
 
       beforeEach(() => {
-        const SVG_WIDTH = 400;
-        const SVG_HEIGHT = 400;
-        div = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
-        let xScale = new Plottable.Scales.Linear().domain([0, SVG_WIDTH]);
-        let yScale = new Plottable.Scales.Linear().domain([0, SVG_HEIGHT]);
+        const DIV_WIDTH = 400;
+        const DIV_HEIGHT = 400;
+        div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
+        let xScale = new Plottable.Scales.Linear().domain([0, DIV_WIDTH]);
+        let yScale = new Plottable.Scales.Linear().domain([0, DIV_HEIGHT]);
         let metadata = { foo: 10, bar: 20 };
         data = [{ x: 0, y: 0 }, { x: 1, y: 1 }];
         dataset = new Plottable.Dataset(data, metadata);
