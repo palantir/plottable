@@ -52,8 +52,7 @@
    * set the SVG width/height attributes to 100%.
    *
    * Post 3.0 the root element is always a normal div and the only way to set the dimensions is
-   * to use CSS. To replicate the "100%-by-default" behavior, we apply width/height 100% to this
-   * selector.
+   * to use CSS. To replicate the "100%-by-default" behavior, we apply width/height 100%.
    */
   width: 100%;
   height: 100%;
@@ -67,18 +66,25 @@
   position: absolute;
 }
 
-.plottable .component > .background-container,
-.plottable .component > .content,
-.plottable .component > .foreground-container,
-.plottable .component > .box-container {
+.plottable .background-container,
+.plottable .content,
+.plottable .foreground-container,
+.plottable .box-container {
   position: absolute;
   width: 100%;
   height: 100%;
 }
 
+/**
+ * Don't allow svg elements above the content to steal events
+ */
+.plottable .foreground-container,
+.plottable .box-container {
+  pointer-events: none;
+}
+
 .plottable .background-fill {
   fill: none;
-  pointer-events: none;
 }
 
 .plottable .bounding-box {
