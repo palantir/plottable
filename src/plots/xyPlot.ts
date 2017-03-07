@@ -387,18 +387,6 @@ export class XYPlot<X, Y> extends Plot {
       yBinding.accessor != null;
   }
 
-  /**
-   * _invertPixelPoint converts a point in pixel coordinates to a point in data coordinates
-   * @param {Point} point Representation of the point in pixel coordinates
-   * @return {Point} Returns the point represented in data coordinates
-   */
-  protected _invertPixelPoint(point: Point): Point {
-    const xScale = this.x();
-    const yScale = this.y();
-
-    return { x: xScale.scale.invertedTransformation(point.x), y: yScale.scale.invertedTransformation(point.y) };
-  }
-
   protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point {
     let xProjector = Plot._scaledAccessor(this.x());
     let yProjector = Plot._scaledAccessor(this.y());

@@ -2447,16 +2447,6 @@ var XYPlot = (function (_super) {
             yBinding != null &&
             yBinding.accessor != null;
     };
-    /**
-     * _invertPixelPoint converts a point in pixel coordinates to a point in data coordinates
-     * @param {Point} point Representation of the point in pixel coordinates
-     * @return {Point} Returns the point represented in data coordinates
-     */
-    XYPlot.prototype._invertPixelPoint = function (point) {
-        var xScale = this.x();
-        var yScale = this.y();
-        return { x: xScale.scale.invertedTransformation(point.x), y: yScale.scale.invertedTransformation(point.y) };
-    };
     XYPlot.prototype._pixelPoint = function (datum, index, dataset) {
         var xProjector = plot_1.Plot._scaledAccessor(this.x());
         var yProjector = plot_1.Plot._scaledAccessor(this.y());
@@ -13568,22 +13558,6 @@ var Scatter = (function (_super) {
             var size = sizeProjector(datum, index, dataset);
             return x - size / 2 <= p.x && p.x <= x + size / 2 && y - size / 2 <= p.y && p.y <= y + size / 2;
         });
-    };
-    /**
-     * _invertedPixelSize returns the size of the object in data space
-     * @param {Point} [point] The size of the object in pixel space. X corresponds to
-     * the width of the object, and Y corresponds to the height of the object
-     * @return {Point} Returns the size of the object in data space. X corresponds to
-     * the width of the object in data space, and Y corresponds to the height of the
-     * object in data space.
-     */
-    Scatter.prototype._invertedPixelSize = function (point) {
-        var invertedOrigin = this._invertPixelPoint(this.origin());
-        var invertedSize = this._invertPixelPoint({ x: point.x, y: point.y });
-        return {
-            x: Math.abs(invertedSize.x - invertedOrigin.x),
-            y: Math.abs(invertedSize.y - invertedOrigin.y)
-        };
     };
     Scatter._SIZE_KEY = "size";
     Scatter._SYMBOL_KEY = "symbol";

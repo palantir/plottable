@@ -222,22 +222,4 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
       return x - size / 2 <= p.x && p.x <= x + size / 2 && y - size / 2 <= p.y && p.y <= y + size / 2;
     });
   }
-
-  /**
-   * _invertedPixelSize returns the size of the object in data space
-   * @param {Point} [point] The size of the object in pixel space. X corresponds to
-   * the width of the object, and Y corresponds to the height of the object
-   * @return {Point} Returns the size of the object in data space. X corresponds to
-   * the width of the object in data space, and Y corresponds to the height of the
-   * object in data space.
-   */
-  private _invertedPixelSize(point: Point) {
-    const invertedOrigin = this._invertPixelPoint(this.origin());
-    const invertedSize = this._invertPixelPoint({ x: point.x, y: point.y });
-
-    return {
-      x: Math.abs(invertedSize.x - invertedOrigin.x),
-      y: Math.abs(invertedSize.y - invertedOrigin.y)
-    };
-  }
 }
