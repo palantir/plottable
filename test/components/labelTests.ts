@@ -64,9 +64,9 @@ describe("Labels", () => {
         const SVG_WIDTH = Plottable.Utils.DOM.elementWidth(div);
         const label = new Plottable.Components.Label("X").renderTo(div);
         const textTranslate = getTranslateValues(label.content().select("g"));
-        const eleTranslate = getTranslateValues((<any> label)._element);
+        const eleLeft = parseFloat(label.element().style("left"));
         const textWidth = Plottable.Utils.DOM.elementBBox(label.content().select("text")).width;
-        const midPoint = eleTranslate[0] + textTranslate[0] + textWidth / 2;
+        const midPoint = eleLeft + textTranslate[0] + textWidth / 2;
         assert.closeTo(midPoint, SVG_WIDTH / 2, window.Pixel_CloseTo_Requirement, "label is centered");
         div.remove();
       });
