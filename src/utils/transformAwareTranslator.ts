@@ -19,10 +19,6 @@ export function getTranslator(component: Component): Translator {
     const measurer = <SVGElement> <any>document.createElementNS(root.namespaceURI, "svg");
 
     measurer.setAttribute("class", "measurer");
-    measurer.setAttribute("style", "opacity: 0; visibility: hidden;");
-    measurer.setAttribute("width", "1");
-    measurer.setAttribute("height", "1");
-
     measurer.setAttribute("style", "opacity: 0; visibility: hidden; position: absolute; width: 1px; height: 1px;");
 
     root.appendChild(measurer);

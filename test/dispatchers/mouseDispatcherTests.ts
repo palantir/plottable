@@ -18,7 +18,7 @@ describe("Dispatchers", () => {
       beforeEach(() => {
         component = new Plottable.Component();
         div = TestMethods.generateDiv();
-        sinon.stub(component, "rootElement", () => div);
+        component.anchor(div);
       });
 
       it("creates only one Dispatcher.Mouse per <div> using getDispatcher() ", () => {
@@ -59,7 +59,7 @@ describe("Dispatchers", () => {
 
         component = new Plottable.Component();
         div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
-        sinon.stub(component, "rootElement", () => div);
+        component.anchor(div);
 
         mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(component);
       });
