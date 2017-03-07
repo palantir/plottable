@@ -22,7 +22,7 @@ import { coerceExternalD3 } from "../utils/coerceD3";
  * "Drawing" in Plottable really means "making the DOM elements and their attributes correctly reflect
  * the data being passed in".
  */
-export abstract class Drawer {
+export class Drawer {
   private _renderArea: SimpleSelection<void>;
   protected _svgElementName: string;
   protected _className: string;
@@ -167,39 +167,6 @@ export abstract class Drawer {
 
     return this;
   }
-
-  public drawToCanvas(data: any[], drawSteps: Drawers.DrawStep[], context: CanvasRenderingContext2D) {
-    let appliedDrawSteps: Drawers.AppliedDrawStep[] = drawSteps.map((dr: Drawers.DrawStep) => {
-      let attrToAppliedProjector = this._appliedProjectors(dr.attrToProjector);
-      return {
-        attrToAppliedProjector: attrToAppliedProjector,
-        animator: dr.animator,
-      };
-    });
-
-    // // in SVG world:
-    // const update = d3.selectAll("rect").data([ {x: 3, y: 9}, {x: 5, y: 12}]);
-    // // iterate through every data point and set the attrs
-    // update.attrs({ x: (d) => d.x, y: (d) => d.y, fill: ..., stroke: ... });
-    //
-    // // in Canvas world:
-    // data.forEach((point, index) => {
-    //   context.beginPath();
-    //   context.fillStyle = attrsToProjectors["fill"](point, index)
-    //   context.strokeStyle = attrsToProjectors["stroke"](point, index)
-    //   context.rect(attrsToProjectors["x"](point, index))
-    // });
-
-    let delay = 0;
-    appliedDrawSteps.forEach((drawStep, i) => {
-      Utils.Window.setTimeout(() => this._canvasDraw(data, drawStep, context), delay);
-      delay += drawStep.animator.totalTime(data.length);
-    });
-
-    return this;
-  }
-
-  protected abstract _canvasDraw(data: any[], step: Drawers.AppliedDrawStep, context: CanvasRenderingContext2D): void;
 
   public selection(): SimpleSelection<any> {
     this.maybeRefreshCache();
