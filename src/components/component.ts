@@ -27,7 +27,7 @@ export class Component {
    * Holds all the DOM associated with this component. A direct child of the element we're
    * anchored to.
    */
-  private _element: SimpleSelection<void>;
+  private _element: d3.Selection<HTMLElement, any, any, any>;
   /**
    * Container for the visual content that this Component displays. Subclasses should attach
    * elements onto the _content. Located in between the background and the foreground.
@@ -98,7 +98,7 @@ export class Component {
   /**
    * If we're the root Component (top-level), this is the HTMLElement we've anchored to (user-supplied).
    */
-  private _rootElement: SimpleSelection<void>;
+  private _rootElement: d3.Selection<HTMLElement, any, any, any>;
   /**
    * width of the Component as computed in computeLayout. Used to size the hitbox, bounding box, etc
    */
@@ -129,7 +129,7 @@ export class Component {
    * @param {d3.Selection} selection.
    * @returns {Component} The calling Component.
    */
-  public anchor(selection: SimpleSelection<void>) {
+  public anchor(selection: d3.Selection<HTMLElement, any, any, any>) {
     selection = coerceExternalD3(selection);
     if (this._destroyed) {
       throw new Error("Can't reuse destroy()-ed Components!");
@@ -241,7 +241,7 @@ export class Component {
       } else if (this._rootElement != null) {
         // we are the top-level Component, retrieve height/width from rootElement
         origin = { x: 0, y: 0 };
-        const elem = this._rootElement.node() as Element;
+        const elem = this._rootElement.node();
         availableWidth = Utils.DOM.elementWidth(elem);
         availableHeight = Utils.DOM.elementHeight(elem);
       } else {
@@ -355,7 +355,7 @@ export class Component {
    * @param {String|d3.Selection} element The element, a selector string for the element, or a d3.Selection for the element.
    * @returns {Component} The calling Component.
    */
-  public renderTo(element: string | HTMLElement | SimpleSelection<void>): this {
+  public renderTo(element: string | HTMLElement | d3.Selection<HTMLElement, any, any, any>): this {
     this.detach();
     if (element != null) {
       let selection: d3.Selection<HTMLElement, any, any, any>;
@@ -364,7 +364,7 @@ export class Component {
       } else if (element instanceof Element) {
         selection = d3.select<HTMLElement, any>(element);
       } else {
-        selection = <d3.Selection<HTMLElement, any, any, any>> coerceExternalD3(element);
+        selection = coerceExternalD3(element);
       }
       if (!selection.node() || selection.node().nodeName == null) {
         throw new Error("Plottable requires a valid Element to renderTo");
@@ -712,7 +712,7 @@ export class Component {
   /**
    * Returns the HTML Element at the root of this component's DOM tree.
    */
-  public element(): SimpleSelection<void> {
+  public element(): d3.Selection<HTMLElement, any, any, any> {
     return this._element;
   }
 
