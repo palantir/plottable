@@ -52,7 +52,7 @@ export class Plot extends Component {
    */
   constructor() {
     super();
-    this._clipPathEnabled = true;
+    this._overflowHidden = true;
     this.addClass("plot");
     this._datasetToDrawer = new Utils.Map<Dataset, Drawer>();
     this._attrBindings = d3.map<Plots.AccessorScaleBinding<any, any>>();

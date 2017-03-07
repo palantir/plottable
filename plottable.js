@@ -155,7 +155,7 @@ var Plot = (function (_super) {
         this._dataChanged = false;
         this._animate = false;
         this._animators = {};
-        this._clipPathEnabled = true;
+        this._overflowHidden = true;
         this.addClass("plot");
         this._datasetToDrawer = new Utils.Map();
         this._attrBindings = d3.map();
@@ -705,11 +705,9 @@ var coerceD3_1 = __webpack_require__(11);
 var Component = (function () {
     function Component() {
         /**
-         * The clip path will prevent content from overflowing its Component space.
-         *
-         * TODO decide if this is still needed in an HTML world
+         * Subclasses should set this to true in their constructor to prevent content from overflowing.
          */
-        this._clipPathEnabled = false;
+        this._overflowHidden = false;
         this._origin = { x: 0, y: 0 };
         this._xAlignment = "left";
         this._yAlignment = "top";
@@ -717,9 +715,8 @@ var Component = (function () {
         this._isAnchored = false;
         /**
          * List of "boxes"; SVGComponent has a "box" API that lets subclasses add boxes
-         * with "addBox". Three boxes are added:
+         * with "addBox". Two boxes are added:
          *
-         * .clip-rect - the clipPath rect, (basically overflow: hidden)
          * .background-fill - for the background container (unclear what it's use is)
          * .bounding-box - this._boundingBox
          *
@@ -813,8 +810,11 @@ var Component = (function () {
         this._content = this._element.append("svg").classed("content", true);
         this._foregroundContainer = this._element.append("svg").classed("foreground-container", true);
         this._boxContainer = this._element.append("svg").classed("box-container", true);
-        if (this._clipPathEnabled) {
-            this._generateClipPath();
+        if (this._overflowHidden) {
+            this._content.classed("component-overflow-hidden", true);
+        }
+        else {
+            this._content.classed("component-overflow-visible", true);
         }
         this._boundingBox = this._addBox("bounding-box");
         this._isSetup = true;
@@ -918,9 +918,6 @@ var Component = (function () {
      * Component, Table, and Group; render them immediately with .renderTo() instead.
      */
     Component.prototype.renderImmediately = function () {
-        if (this._clipPathEnabled) {
-            this._updateClipPath();
-        }
         return this;
     };
     /**
@@ -1024,20 +1021,6 @@ var Component = (function () {
             box.attr("width", this.width()).attr("height", this.height());
         }
         return box;
-    };
-    Component.prototype._generateClipPath = function () {
-        // The clip path will prevent content from overflowing its Component space.
-        this._clipPathID = Utils.DOM.generateUniqueClipPathId();
-        var clipPathParent = this._boxContainer.append("clipPath").attr("id", this._clipPathID);
-        this._addBox("clip-rect", clipPathParent);
-        this._updateClipPath();
-    };
-    Component.prototype._updateClipPath = function () {
-        // HACKHACK: IE <= 9 does not respect the HTML base element in SVG.
-        // They don't need the current URL in the clip path reference.
-        var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
-        prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
-        this._element.attr("clip-path", "url(\"" + prefix + "#" + this._clipPathID + "\")");
     };
     /**
      * Checks if the Component has a given CSS class.
@@ -5899,7 +5882,7 @@ var GuideLineLayer = (function (_super) {
             throw new Error(orientation + " is not a valid orientation for GuideLineLayer");
         }
         this._orientation = orientation;
-        this._clipPathEnabled = true;
+        this._overflowHidden = true;
         this.addClass("guide-line-layer");
         if (this._isVertical()) {
             this.addClass("vertical");
@@ -6061,7 +6044,7 @@ var SelectionBoxLayer = (function (_super) {
         this._adjustBoundsCallback = function () {
             _this.render();
         };
-        this._clipPathEnabled = true;
+        this._overflowHidden = true;
         this._xExtent = [undefined, undefined];
         this._yExtent = [undefined, undefined];
     }
@@ -15430,14 +15413,6 @@ function clientRectInside(innerClientRect, outerClientRect) {
         nativeMath.floor(innerClientRect.bottom) <= nativeMath.ceil(outerClientRect.bottom));
 }
 exports.clientRectInside = clientRectInside;
-var _latestClipPathId = 0;
-/**
- * Generates a ClipPath ID that is unique for this instance of Plottable
- */
-function generateUniqueClipPathId() {
-    return "plottableClipPath" + ++_latestClipPathId;
-}
-exports.generateUniqueClipPathId = generateUniqueClipPathId;
 /**
  * Returns true if the supplied coordinates or Ranges intersect or are contained by bbox.
  *

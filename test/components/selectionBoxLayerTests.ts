@@ -53,40 +53,9 @@ describe("SelectionBoxLayer", () => {
       div.remove();
     });
 
-    it("generates the correct clipPath", () => {
+    it("turns _overflowHidden on", () => {
       sbl.renderTo(div);
-
-      TestMethods.verifyClipPath(sbl);
-      const clipRect = (<any> sbl)._boxContainer.select(".clip-rect");
-      assert.strictEqual(TestMethods.numAttr(clipRect, "width"), DIV_WIDTH, "the clipRect has an appropriate width");
-      assert.strictEqual(TestMethods.numAttr(clipRect, "height"), DIV_HEIGHT, "the clipRect has an appropriate height");
-      div.remove();
-    });
-
-    it("updates the clipPath reference when rendered", () => {
-      // HACKHACK: History and history API not supported on IE9 (http://caniuse.com/#feat=history)
-      if (window.history == null ||  window.history.replaceState == null) {
-        div.remove();
-        return;
-      }
-
-      sbl.renderTo(div);
-
-      const originalState = window.history.state;
-      const originalTitle = document.title;
-      const originalLocation = document.location.href;
-      window.history.replaceState(null, null, "clipPathTest");
-      sbl.render();
-
-      const clipPathId = (<any> sbl)._boxContainer.node().firstChild.id;
-      const expectedPrefix = (/MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href).replace(/#.*/g, "");
-      const expectedClipPathURL = "url(" + expectedPrefix + "#" + clipPathId + ")";
-
-      window.history.replaceState(originalState, originalTitle, originalLocation);
-
-      const normalizeClipPath = (s: string) => s.replace(/"/g, "");
-      assert.strictEqual(normalizeClipPath((<any> sbl)._element.attr("clip-path")), expectedClipPathURL,
-        "the clipPath reference was updated");
+      assert.isTrue((<any> sbl)._overflowHidden, "overflowHidden is enabled");
       div.remove();
     });
 

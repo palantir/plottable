@@ -193,14 +193,6 @@ export function clientRectInside(innerClientRect: ClientRect, outerClientRect: C
   );
 }
 
-let _latestClipPathId = 0;
-/**
- * Generates a ClipPath ID that is unique for this instance of Plottable
- */
-export function generateUniqueClipPathId() {
-  return "plottableClipPath" + ++_latestClipPathId;
-}
-
 /**
  * Returns true if the supplied coordinates or Ranges intersect or are contained by bbox.
  *

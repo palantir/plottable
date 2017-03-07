@@ -46,11 +46,9 @@ export class Component {
    */
   private _foregroundContainer: SimpleSelection<void>;
   /**
-   * The clip path will prevent content from overflowing its Component space.
-   *
-   * TODO decide if this is still needed in an HTML world
+   * Subclasses should set this to true in their constructor to prevent content from overflowing.
    */
-  protected _clipPathEnabled = false;
+  protected _overflowHidden = false;
   private _resizeHandler: IResizeHandler;
   private _origin: Point = { x: 0, y: 0 };
 
@@ -76,9 +74,8 @@ export class Component {
 
   /**
    * List of "boxes"; SVGComponent has a "box" API that lets subclasses add boxes
-   * with "addBox". Three boxes are added:
+   * with "addBox". Two boxes are added:
    *
-   * .clip-rect - the clipPath rect, (basically overflow: hidden)
    * .background-fill - for the background container (unclear what it's use is)
    * .bounding-box - this._boundingBox
    *
@@ -112,10 +109,6 @@ export class Component {
    * If .destroy() has been called on this Component.
    */
   private _destroyed = false;
-  /**
-   * internal clip path id of the clipPath, if it's being used
-   */
-  private _clipPathID: string;
   private _onAnchorCallbacks = new Utils.CallbackSet<ComponentCallback>();
   private _onDetachCallbacks = new Utils.CallbackSet<ComponentCallback>();
 
@@ -201,8 +194,10 @@ export class Component {
     this._foregroundContainer = this._element.append("svg").classed("foreground-container", true);
     this._boxContainer = this._element.append("svg").classed("box-container", true);
 
-    if (this._clipPathEnabled) {
-      this._generateClipPath();
+    if (this._overflowHidden) {
+      this._content.classed("component-overflow-hidden", true);
+    } else {
+      this._content.classed("component-overflow-visible", true);
     }
 
     this._boundingBox = this._addBox("bounding-box");
@@ -316,9 +311,6 @@ export class Component {
    * Component, Table, and Group; render them immediately with .renderTo() instead.
    */
   public renderImmediately() {
-    if (this._clipPathEnabled) {
-      this._updateClipPath();
-    }
     return this;
   }
 
@@ -450,22 +442,6 @@ export class Component {
       box.attr("width", this.width()).attr("height", this.height());
     }
     return box;
-  }
-
-  private _generateClipPath() {
-    // The clip path will prevent content from overflowing its Component space.
-    this._clipPathID = Utils.DOM.generateUniqueClipPathId();
-    let clipPathParent = this._boxContainer.append("clipPath").attr("id", this._clipPathID);
-    this._addBox("clip-rect", clipPathParent);
-    this._updateClipPath();
-  }
-
-  private _updateClipPath() {
-    // HACKHACK: IE <= 9 does not respect the HTML base element in SVG.
-    // They don't need the current URL in the clip path reference.
-    let prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
-    prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
-    this._element.attr("clip-path", "url(\"" + prefix + "#" + this._clipPathID + "\")");
   }
 
   /**

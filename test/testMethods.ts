@@ -363,17 +363,6 @@ function tokenizePathString(pathString: string) {
   return numbers;
 }
 
-export function verifyClipPath(c: Plottable.Component) {
-  let clipPathId = (<any>c)._boxContainer.node().firstChild.id;
-  let expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
-  expectedPrefix = expectedPrefix.replace(/#.*/g, "");
-  let expectedClipPathURL = "url(" + expectedPrefix + "#" + clipPathId + ")";
-  // IE 9 has clipPath like 'url("#clipPath")', must accomodate
-  let normalizeClipPath = (s: string) => s.replace(/"/g, "");
-  assert.isTrue(normalizeClipPath((<any> c)._element.attr("clip-path")) === expectedClipPathURL,
-    "the element has clip-path url attached");
-}
-
 export type RGB = {
   red: number,
   green: number,

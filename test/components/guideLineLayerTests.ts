@@ -205,13 +205,9 @@ describe("GuideLineLayer", () => {
         div.remove();
       });
 
-      it("generates the correct clipPath", () => {
+      it("turns _overflowHidden on", () => {
         const gll = new Plottable.Components.GuideLineLayer<void>(orientation);
-        gll.renderTo(div);
-        TestMethods.verifyClipPath(gll);
-        const clipRect = (<any> gll)._boxContainer.select(".clip-rect");
-        assert.strictEqual(TestMethods.numAttr(clipRect, "width"), DIV_WIDTH, "the clipRect has an appropriate width");
-        assert.strictEqual(TestMethods.numAttr(clipRect, "height"), DIV_HEIGHT, "the clipRect has an appropriate height");
+        assert.isTrue((<any> gll)._overflowHidden, "overflowHidden is enabled");
         div.remove();
       });
 

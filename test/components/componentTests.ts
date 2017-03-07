@@ -60,7 +60,7 @@ describe("Component", () => {
       div.remove();
     });
 
-    it("classes the input with 'plottable' if it is an div", () => {
+    it("classes the input with 'plottable' if it is a div", () => {
       c.anchor(div);
       assert.isTrue(div.classed("plottable"), "<div> was given \"plottable\" CSS class");
       c.destroy();
@@ -162,6 +162,25 @@ describe("Component", () => {
       assert.strictEqual(c.offAnchor(callback), c, "setter returns calling object");
       c.anchor(div);
       assert.isFalse(callbackCalled, "removed callback is not called");
+
+      c.destroy();
+      div.remove();
+    });
+
+    it("overflow: visible by default", () => {
+      c.anchor(div);
+      const styles = window.getComputedStyle(<Element> c.content().node());
+      assert.strictEqual(styles.getPropertyValue("overflow"), "visible", "content has overflow: visible")
+
+      c.destroy();
+      div.remove();
+    });
+
+    it("sets overflow: hidden when _overflowHidden is set" ,() => {
+      (<any> c)._overflowHidden = true;
+      c.anchor(div);
+      const styles = window.getComputedStyle(<Element> c.content().node());
+      assert.strictEqual(styles.getPropertyValue("overflow"), "hidden", "content has overflow: hidden");
 
       c.destroy();
       div.remove();
@@ -865,61 +884,6 @@ describe("Component", () => {
         bottomRight: { x: DIV_WIDTH, y: DIV_HEIGHT }
       });
       c.destroy();
-      div.remove();
-    });
-  });
-
-  describe("restricting rendering through clipPath", () => {
-
-    let clippedComponent: Plottable.Component;
-    let div: d3.Selection<HTMLDivElement, any, any, any>;
-
-    beforeEach(() => {
-      clippedComponent = new Plottable.Component();
-      // HACKHACK #2777: Can't use a Mocks Compnoent here because they descend from a different Plottable,
-      // which has the wrong RenderPolicy in coverage.html
-      (<any> clippedComponent)._clipPathEnabled = true;
-      div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
-    });
-
-    it("generates a clipPath element if it is enabled", () => {
-      clippedComponent.anchor(div);
-      let componentElement = div.select(".component");
-      assert.isNotNull(componentElement.attr("clip-path"), "clip-path attribute set");
-      clippedComponent.destroy();
-      div.remove();
-    });
-
-    it("uses the correct clipPath", () => {
-      clippedComponent.renderTo(div);
-      TestMethods.verifyClipPath(clippedComponent);
-      div.remove();
-    });
-
-    it("updates the clipPath reference when render()-ed", () => {
-      if (window.history == null ||  window.history.replaceState == null) { // not supported on IE9 (http://caniuse.com/#feat=history)
-        div.remove();
-        return;
-      }
-
-      clippedComponent.renderTo(div);
-
-      let originalState = window.history.state;
-      let originalTitle = document.title;
-      let originalLocation = document.location.href;
-      window.history.replaceState(null, null, "clipPathTest");
-      clippedComponent.render();
-
-      let clipPathId = (<any> clippedComponent)._boxContainer.node().firstChild.id;
-      let expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
-      expectedPrefix = expectedPrefix.replace(/#.*/g, "");
-      let expectedClipPathURL = "url(" + expectedPrefix + "#" + clipPathId + ")";
-
-      window.history.replaceState(originalState, originalTitle, originalLocation);
-
-      let normalizeClipPath = (s: string) => s.replace(/"/g, "");
-      assert.strictEqual(normalizeClipPath((<any> clippedComponent)._element.attr("clip-path")), expectedClipPathURL,
-        "the clipPath reference was updated");
       div.remove();
     });
   });

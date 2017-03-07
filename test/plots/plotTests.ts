@@ -14,6 +14,11 @@ describe("Plots", () => {
       assert.isTrue(plot.hasClass("plot"), "plot class added by default");
     });
 
+    it("turns _overflowHidden on", () => {
+      const plot = new Plottable.Plot();
+      assert.isTrue((<any> plot)._overflowHidden, "overflowHidden is enabled");
+    });
+
     describe("managing entities", () => {
       let plot: Plottable.Plot;
       let div: d3.Selection<HTMLDivElement, any, any, any>;
@@ -262,42 +267,6 @@ describe("Plots", () => {
       plot.detach();
       assert.deepEqual(scale.domain(), oldDomain, "detaching the plot removes its extents from the scale");
       div.remove();
-    });
-
-    describe("clipPath", () => {
-      it("uses the correct clipPath", () => {
-        const div = TestMethods.generateDiv();
-        const plot = new Plottable.Plot();
-        plot.renderTo(div);
-        TestMethods.verifyClipPath(plot);
-        div.remove();
-      });
-
-      // not supported on IE9 (http://caniuse.com/#feat=history)
-      if (window.history != null && window.history.replaceState != null) {
-        it("updates the clipPath reference when rendered", () => {
-          const div = TestMethods.generateDiv();
-          const plot = new Plottable.Plot();
-          plot.renderTo(div);
-
-          const originalState = window.history.state;
-          const originalTitle = document.title;
-          const originalLocation = document.location.href;
-          window.history.replaceState(null, null, "clipPathTest");
-          plot.render();
-
-          const clipPathId = (<any> plot)._boxContainer.node().firstChild.id;
-          const expectedPrefix = (/MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href).replace(/#.*/g, "");
-          const expectedClipPathURL = "url(" + expectedPrefix + "#" + clipPathId + ")";
-
-          window.history.replaceState(originalState, originalTitle, originalLocation);
-
-          const normalizeClipPath = (s: string) => s.replace(/"/g, "");
-          assert.strictEqual(normalizeClipPath((<any> plot)._element.attr("clip-path")), expectedClipPathURL,
-            "the clipPath reference was updated");
-          div.remove();
-        });
-      }
     });
 
     describe("setting attributes with attr()", () => {

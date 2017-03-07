@@ -93,6 +93,14 @@
   visibility: hidden;
 }
 
+.plottable .component-overflow-hidden {
+  overflow: hidden;
+}
+
+.plottable .component-overflow-visible {
+  overflow: visible;
+}
+
 .plottable .label text {
   font-family: "Helvetica Neue", sans-serif;
   fill: #32313F;
