@@ -55,8 +55,7 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
         lightweightPlotEntity.index,
         lightweightPlotEntity.dataset);
 
-      // convert diameter into data space to be on the same scale as the scatter point position
-      lightweightPlotEntity.diameter = this._invertedPixelSize({ x: diameter, y: diameter });
+      lightweightPlotEntity.diameter = { x: diameter, y: diameter };
       return lightweightPlotEntity;
     });
   }
