@@ -8,7 +8,7 @@ import * as d3 from "d3";
 import * as Animators from "../animators";
 import { Animator } from "../animators/animator";
 import { Component } from "../components/component";
-import { Accessor, Point, AttributeToProjector, Bounds, SimpleSelection, Projector } from "../core/interfaces";
+import { Accessor, Point, AttributeToProjector, Bounds, SimpleSelection } from "../core/interfaces";
 import { Dataset, DatasetCallback } from "../core/dataset";
 import * as Drawers from "../drawers";
 import { Drawer } from "../drawers/drawer";
