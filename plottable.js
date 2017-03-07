@@ -713,8 +713,7 @@ var RenderController = __webpack_require__(25);
 var Utils = __webpack_require__(0);
 var coerceD3_1 = __webpack_require__(11);
 /**
- * The root class for all Plottable elements. Components are the core logical units
- * that build Plottable visualizations.
+ * Components are the core logical units that build Plottable visualizations.
  *
  * This class deals with Component lifecycle (anchoring, getting a size, and rendering
  * infrastructure), as well as building the framework of DOM elements for all Components.
@@ -722,11 +721,12 @@ var coerceD3_1 = __webpack_require__(11);
 var Component = (function () {
     function Component() {
         /**
-         * guidelineLayer, plot, selectionBoxLayer set this.
          * The clip path will prevent content from overflowing its Component space.
+         *
+         * TODO decide if this is still needed in an HTML world
          */
         this._clipPathEnabled = false;
-        this._origin = { x: 0, y: 0 }; // Origin of the coordinate space for the Component.
+        this._origin = { x: 0, y: 0 };
         this._xAlignment = "left";
         this._yAlignment = "top";
         this._isSetup = false;
@@ -744,6 +744,8 @@ var Component = (function () {
          * I think this API is to make an idea of a "100% width/height" box that could be
          * useful in a variety of situations. But enumerating the three usages of it, it
          * doesn't look like it's being used very much.
+         *
+         * TODO possily remove in HTML world
          */
         this._boxes = [];
         this._cssClasses = new Utils.Set();
@@ -767,8 +769,8 @@ var Component = (function () {
             throw new Error("Can't reuse destroy()-ed Components!");
         }
         if (this.parent() == null) {
-            // svg node gets the "plottable" CSS class
             this._rootElement = selection;
+            // rootElement gets the "plottable" CSS class
             this._rootElement.classed("plottable", true);
         }
         if (this._element != null) {
@@ -830,7 +832,6 @@ var Component = (function () {
         if (this._clipPathEnabled) {
             this._generateClipPath();
         }
-        ;
         this._boundingBox = this._addBox("bounding-box");
         this._isSetup = true;
     };

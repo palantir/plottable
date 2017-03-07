@@ -17,8 +17,7 @@ export type ComponentCallback = (component: Component) => void;
 export type IResizeHandler = (size: { height: number, width: number }) => void;
 
 /**
- * The root class for all Plottable elements. Components are the core logical units
- * that build Plottable visualizations.
+ * Components are the core logical units that build Plottable visualizations.
  *
  * This class deals with Component lifecycle (anchoring, getting a size, and rendering
  * infrastructure), as well as building the framework of DOM elements for all Components.
@@ -31,35 +30,29 @@ export class Component {
   private _element: d3.Selection<HTMLElement, any, any, any>;
   /**
    * Container for the visual content that this Component displays. Subclasses should attach
-   * elements onto the _content. In between the background and the foreground.
+   * elements onto the _content. Located in between the background and the foreground.
    */
   private _content: SimpleSelection<void>;
   /**
    * Used by axes to hide cut off axis labels.
-   * css says "for collision testing", don't know what that means
    */
   protected _boundingBox: SimpleSelection<void>;
   /**
-   * Only referenced in interaction tests as the interaction target
-   *
-   * Also holds the .background-fill. Unclear what .background-fill
-   * does; it has fill: none and pointer-events: none
-   *
-   * I think the idea is to allow extension from 3rd party users to place
-   * more objects above/below the "content"
+   * Place more objects just behind this Component's Content by appending them to the _backgroundContainer.
    */
   private _backgroundContainer: SimpleSelection<void>;
   /**
-   * Only referenced in a few tests; not used anywhere.
+   * Place more objects just in front of this Component's Content by appending them to the _foregroundContainer.
    */
   private _foregroundContainer: SimpleSelection<void>;
   /**
-   * guidelineLayer, plot, selectionBoxLayer set this.
    * The clip path will prevent content from overflowing its Component space.
+   *
+   * TODO decide if this is still needed in an HTML world
    */
   protected _clipPathEnabled = false;
   private _resizeHandler: IResizeHandler;
-  private _origin: Point = { x: 0, y: 0 }; // Origin of the coordinate space for the Component.
+  private _origin: Point = { x: 0, y: 0 };
 
   /**
    * The ComponentContainer that holds this Component in its children, or null, if this
@@ -94,6 +87,8 @@ export class Component {
    * I think this API is to make an idea of a "100% width/height" box that could be
    * useful in a variety of situations. But enumerating the three usages of it, it
    * doesn't look like it's being used very much.
+   *
+   * TODO possily remove in HTML world
    */
   private _boxes: SimpleSelection<void>[] = [];
   /**
@@ -104,7 +99,13 @@ export class Component {
    * If we're the root Component (top-level), this is the HTMLElement we've anchored to (user-supplied).
    */
   private _rootElement: d3.Selection<HTMLElement, any, any, any>;
-  private _width: number; // Width and height of the Component. Used to size the hitbox, bounding box, etc
+  /**
+   * width of the Component as computed in computeLayout. Used to size the hitbox, bounding box, etc
+   */
+  private _width: number;
+  /**
+   * height of the Component as computed in computeLayout. Used to size the hitbox, bounding box, etc
+   */
   private _height: number;
   private _cssClasses = new Utils.Set<string>();
   /**
@@ -135,8 +136,8 @@ export class Component {
     }
 
     if (this.parent() == null) {
-      // svg node gets the "plottable" CSS class
       this._rootElement = selection;
+      // rootElement gets the "plottable" CSS class
       this._rootElement.classed("plottable", true);
     }
 
@@ -203,7 +204,6 @@ export class Component {
     if (this._clipPathEnabled) {
       this._generateClipPath();
     }
-    ;
 
     this._boundingBox = this._addBox("bounding-box");
 

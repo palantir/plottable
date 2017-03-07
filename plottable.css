@@ -39,17 +39,27 @@
   background-color: #06cccc; /* ROBINS_EGG_BLUE */
 }
 
+/**
+ * User-supplied renderTo element.
+ */
 .plottable {
-  display: block; /* SVGs must be block elements for width/height calculations to work in Firefox. */
+  display: block; /* must be block elements for width/height calculations to work in Firefox. */
   pointer-events: visibleFill;
   position: relative;
 }
 
+/**
+ * The _element that roots each Component's DOM.
+ */
 .plottable .component {
+  /* Allow components to be positioned with explicit left/top/width/height styles */
   position: absolute;
 }
 
-.plottable .component > svg {
+.plottable .component > .background-container,
+.plottable .component > .content,
+.plottable .component > .foreground-container,
+.plottable .component > .box-container {
   position: absolute;
   width: 100%;
   height: 100%;
