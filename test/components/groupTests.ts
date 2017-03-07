@@ -62,7 +62,7 @@ describe("Group", () => {
       componentGroup.remove(c2);
       assert.deepEqual(componentGroup.components(), [c1, c3],
         "removing a Component not in the Group does not remove Components from the Group");
-      assert.strictEqual((<SVGElement> c2.content().node()).ownerSVGElement, div.node(), "The Component not in the Group stayed put");
+      assert.strictEqual(c2.element().node().parentNode, div.node(), "The Component not in the Group is still anchored");
 
       div.remove();
     });

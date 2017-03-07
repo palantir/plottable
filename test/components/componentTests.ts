@@ -429,7 +429,7 @@ describe("Component", () => {
       assert.strictEqual(c.height(), height, "height set");
 
       let componentElement = div.select(".component");
-      let translate = TestMethods.getTranslate(componentElement);
+      let translate = [parseFloat(componentElement.style("left")), parseFloat(componentElement.style("top"))];
       assert.deepEqual(translate, [origin.x, origin.y], "the element translated appropriately");
       let backgroundFillBox = div.select(".background-fill");
       assert.closeTo(TestMethods.numAttr(backgroundFillBox, "width"),
@@ -447,7 +447,7 @@ describe("Component", () => {
       let origin = c.origin();
       assert.deepEqual(origin, {x: 0, y: 0}, "origin reset");
       let componentElement = div.select(".component");
-      let translate = TestMethods.getTranslate(componentElement);
+      let translate = [parseFloat(componentElement.style("left")), parseFloat(componentElement.style("top"))];
       assert.deepEqual(translate, [origin.x, origin.y], "DOM element rendered at new origin");
       c.destroy();
       div.remove();
@@ -513,7 +513,8 @@ describe("Component", () => {
       t.renderTo(div);
 
       let componentElement = div.select(".component");
-      assert.deepEqual(TestMethods.getTranslate(componentElement), [0, 0], "the element was not translated");
+      let translate = [parseFloat(componentElement.style("left")), parseFloat(componentElement.style("top"))];
+      assert.deepEqual(translate, [0, 0], "the element was not translated");
       div.remove();
     });
   });
