@@ -159,8 +159,8 @@ describe("TimeAxis", () => {
       assert.strictEqual(firstTick.attr("x1"), "0", "first tick mark at beginning of axis");
       assert.strictEqual(firstTick.attr("x2"), "0", "first tick mark at beginning of axis");
       let lastTick = axis.content().select(`.${Plottable.Axis.TICK_MARK_CLASS}:last-child`);
-      assert.strictEqual(lastTick.attr("x1"), div.attr("width"), "last end tick mark at end of axis");
-      assert.strictEqual(lastTick.attr("x2"), div.attr("width"), "last end tick mark at end of axis");
+      assert.strictEqual(lastTick.attr("x1")+"px", div.style("width"), "last end tick mark at end of axis");
+      assert.strictEqual(lastTick.attr("x2")+"px", div.style("width"), "last end tick mark at end of axis");
       div.remove();
     });
 
@@ -317,7 +317,7 @@ describe("TimeAxis", () => {
     it("draws all of tiers within the component space", () => {
       let div = TestMethods.generateDiv();
       let constrainedHeight = 50;
-      div.attr("height", constrainedHeight);
+      div.style("height", constrainedHeight+"px");
       let scale = new Plottable.Scales.Time();
       let axis = new Plottable.Axes.Time(scale, "bottom");
 

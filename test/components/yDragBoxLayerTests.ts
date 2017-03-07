@@ -80,7 +80,7 @@ describe("SelectionBoxLayer", () => {
 
         const boundsBefore = dbl.bounds();
         const newWidth = 2 * SVG_WIDTH;
-        div.attr("width", newWidth);
+        div.style("width", newWidth + "px");
         dbl.redraw();
         assert.strictEqual(dbl.width(), newWidth, "component changed width to the new SVG width");
 

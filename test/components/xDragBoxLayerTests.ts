@@ -81,7 +81,7 @@ describe("SelectionBoxLayer", () => {
         const newHeight = 2 * SVG_HEIGHT;
         assert.strictEqual(dbl.height(), SVG_HEIGHT, "box has same height as SVG");
 
-        div.attr("height", newHeight);
+        div.style("height", newHeight + "px");
         dbl.redraw();
         assert.strictEqual(dbl.height(), newHeight, "box changes height to the new SVG height");
 

@@ -79,7 +79,7 @@ describe("Legend", () => {
 
     it("does not overflow horizontally with long label", () => {
       color.domain(["foooboooloonoogoorooboopoo"]);
-      div.attr("width", 100);
+      div.style("width", "100px");
       legend.renderTo(div);
       let text = legend.content().select("text").text();
       assert.notEqual(text, "foooboooloonoogoorooboopoo", "the text was truncated");

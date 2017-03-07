@@ -487,7 +487,7 @@ describe("Plots", () => {
 
       it("hides labels when rectangles do not offer enough width", () => {
         let constrainedWidth = 150;
-        div.attr("width", constrainedWidth);
+        div.style("width", constrainedWidth + "px");
         plot.renderTo(div);
         plot.labelsEnabled(true);
         plot.label(() => "a really really really long string");
@@ -498,7 +498,7 @@ describe("Plots", () => {
 
       it("hides labels when rectangles do not offer enough height", () => {
         const constrainedHeight = 30;
-        div.attr("height", constrainedHeight);
+        div.style("height", constrainedHeight + "px");
         plot.renderTo(div);
         plot.labelsEnabled(true);
         plot.label((d: any) => d.val);

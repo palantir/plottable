@@ -435,7 +435,7 @@ describe("Plots", () => {
         });
 
         it("hides the labels if bars are too thin to show them", () => {
-          div.attr(baseSizeAttr, getDivBaseSizeDimension(div) / 10);
+          div.style(baseSizeAttr, getDivBaseSizeDimension(div) / 10 + "px");
           barPlot.redraw();
           barPlot.labelsEnabled(true);
 

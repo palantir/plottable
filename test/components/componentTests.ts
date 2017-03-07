@@ -362,7 +362,7 @@ describe("Component", () => {
       assert.strictEqual(c.width() , SVG_WIDTH, "takes all available width");
       assert.strictEqual(c.height(), SVG_HEIGHT, "takes all available height");
 
-      div.attr("width", 2 * SVG_WIDTH).attr("height", 2 * SVG_HEIGHT);
+      div.style("width", 2 * SVG_WIDTH + "px").style("height", 2 * SVG_HEIGHT + "px");
       c.computeLayout();
       assert.strictEqual(c.width() , 2 * SVG_WIDTH, "updated to take new available width");
       assert.strictEqual(c.height(), 2 * SVG_HEIGHT, "updated to take new available height");
@@ -380,7 +380,6 @@ describe("Component", () => {
       parent.style("height", `${parentHeight}px`);
 
       // Remove width/height attributes and style with CSS
-      div.attr("width", null).attr("height", null);
       c.anchor(div);
       c.computeLayout();
       assert.strictEqual(c.width(), parentWidth, "defaults to width of parent");

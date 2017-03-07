@@ -173,7 +173,7 @@ describe("InterpolatedColorLegend", () => {
           } else {
             value = constrain === "width" ? 45 : 100;
           }
-          div.attr(constrain, value);
+          div.style(constrain, value+"px");
           legend.orientation(orientation);
           legend.renderTo(div);
           assertBasicRendering();
@@ -411,7 +411,7 @@ describe("InterpolatedColorLegend", () => {
       const unconstrainedSwatchHeight = swatchBoundingRect.height;
       const textHeight = unconstrainedSwatchHeight;
       const constrainedHeight = textHeight;
-      div.attr("height", constrainedHeight);
+      div.style("height", constrainedHeight + "px");
       legend.redraw();
       const legendBoundingRect = (<Element> legend.background().select(BACKGROUND_SELECTOR).node()).getBoundingClientRect();
       swatchBoundingRect = (<Element> legend.content().select(SWATCH_CONTAINER_SELECTOR).node()).getBoundingClientRect();
@@ -429,7 +429,7 @@ describe("InterpolatedColorLegend", () => {
       const unconstrainedSwatchWidth = swatchBoundingRect.width;
       const textHeight = unconstrainedSwatchWidth;
       const constrainedWidth = textHeight * 2;
-      div.attr("width", constrainedWidth);
+      div.style("width", constrainedWidth + "px");
       legend.redraw();
       const legendBoundingRect = (<Element> legend.background().select(BACKGROUND_SELECTOR).node()).getBoundingClientRect();
       swatchBoundingRect = (<Element> legend.content().select(SWATCH_CONTAINER_SELECTOR).node()).getBoundingClientRect();
@@ -445,7 +445,7 @@ describe("InterpolatedColorLegend", () => {
       const unconstrainedSwatchWidth = swatchBoundingRect.width;
       const textHeight = unconstrainedSwatchWidth;
       const constrainedWidth = textHeight * 2;
-      div.attr("width", constrainedWidth);
+      div.style("width", constrainedWidth + "px");
       legend.redraw();
       const legendBoundingRect = (<Element> legend.background().select(BACKGROUND_SELECTOR).node()).getBoundingClientRect();
       swatchBoundingRect = (<Element> legend.content().select(SWATCH_CONTAINER_SELECTOR).node()).getBoundingClientRect();
@@ -458,7 +458,7 @@ describe("InterpolatedColorLegend", () => {
       legend.orientation("horizontal");
       legend.renderTo(div);
       const constrainedWidth = 30;
-      div.attr("width", constrainedWidth);
+      div.style("width", constrainedWidth + "px");
       assert.doesNotThrow(() => legend.redraw(), Error, "rendering in a small space should not error");
       const numSwatches = legend.content().selectAll<Element, any>(SWATCH_SELECTOR).size();
       assert.strictEqual(0, numSwatches, "no swatches are drawn");

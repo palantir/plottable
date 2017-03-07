@@ -81,8 +81,8 @@ describe("Axes", () => {
           const div = TestMethods.generateDiv();
           const constrainedWidth = 50;
           const constrainedHeight = 50;
-          div.attr("width", constrainedWidth);
-          div.attr("height", constrainedHeight);
+          div.style("width", constrainedWidth+"px");
+          div.style("height", constrainedHeight+"px");
           const scale = new Plottable.Scales.Linear();
           const axis = new Plottable.Axes.Numeric(scale, orientation);
           axis.renderTo(div);

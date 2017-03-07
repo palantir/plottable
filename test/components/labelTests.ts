@@ -84,7 +84,7 @@ describe("Labels", () => {
       });
 
       it("truncates text to empty string if space given is too small", () => {
-        div.attr("width", 5);
+        div.style("width", "5px");
         const label = new Plottable.Components.Label("Yeah, not gonna fit...");
         label.renderTo(div);
         const text =  label.content().select("text");
