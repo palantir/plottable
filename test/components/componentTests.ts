@@ -48,11 +48,14 @@ describe("Component", () => {
       div.remove();
     });
 
-    it("sets the background-fill's pointer-event to none", () => {
+    it("sets the foreground-container and box-container pointer-events to none", () => {
       c.anchor(div);
-      let backgroundFill = c.background().select(".background-fill").node();
-      let pointerEvent = window.getComputedStyle(<Element>backgroundFill).pointerEvents;
-      assert.strictEqual(pointerEvent, "none", "background-fill's pointer-event is set to none");
+      const foreground = c.foreground().node();
+      const boxContainer = c.element().select(".box-container").node();
+      let pointerEventForeground = window.getComputedStyle(<Element>foreground).pointerEvents;
+      let pointerEventBox = window.getComputedStyle(<Element>boxContainer).pointerEvents;
+      assert.strictEqual(pointerEventForeground, "none", "foreground-container's pointer-event is set to none");
+      assert.strictEqual(pointerEventBox, "none", "box-container's pointer-event is set to none");
       c.destroy();
       div.remove();
     });
