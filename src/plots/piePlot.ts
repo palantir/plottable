@@ -4,7 +4,7 @@
  */
 
 import * as d3 from "d3";
-import * as SVGTypewriter from "svg-typewriter";
+import * as Typesetter from "typesettable";
 
 import * as Animators from "../animators";
 import { Accessor, Point, AttributeToProjector, SimpleSelection } from "../core/interfaces";
@@ -579,12 +579,14 @@ export class Pie extends Plot {
   }
 
   private _drawLabels() {
-    let attrToProjector = this._generateAttrToProjector();
-    let labelArea = this._renderArea.append("g").classed("label-area", true);
-    let measurer = new SVGTypewriter.CacheMeasurer(labelArea);
-    let writer = new SVGTypewriter.Writer(measurer);
-    let dataset = this.datasets()[0];
-    let data = this._getDataToDraw().get(dataset);
+    const attrToProjector = this._generateAttrToProjector();
+    const labelArea = this._renderArea.append("g").classed("label-area", true);
+
+    const context = new Typesetter.SvgContext(labelArea.node() as SVGElement);
+    const measurer = new Typesetter.CacheMeasurer(context);
+    const writer = new Typesetter.Writer(measurer, context);
+    const dataset = this.datasets()[0];
+    const data = this._getDataToDraw().get(dataset);
     data.forEach((datum, datumIndex) => {
       let value = this.sectorValue().accessor(datum, datumIndex, dataset);
       if (!Utils.Math.isValidNumber(value)) {
@@ -631,11 +633,9 @@ export class Pie extends Plot {
       g.style("visibility", showLabel ? "inherit" : "hidden");
 
       writer.write(value, measurement.width, measurement.height, {
-        selection: g,
         xAlign: "center",
         yAlign: "center",
-        textRotation: 0,
-      });
+      }, g.node());
     });
   }
 }

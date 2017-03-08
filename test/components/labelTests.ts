@@ -2,7 +2,7 @@ import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
-import * as SVGTypewriter from "svg-typewriter";
+import * as Typesetter from "typesettable";
 
 import * as Plottable from "../../src";
 
@@ -213,7 +213,8 @@ describe("Labels", () => {
       it("puts space around the label", () => {
         label.renderTo(svg);
 
-        const measurer = new SVGTypewriter.CacheMeasurer(svg);
+        const context = new Typesetter.SvgContext(svg.node() as Element);
+        const measurer = new Typesetter.CacheMeasurer(context);
         const measure = measurer.measure("testing label");
         assert.operator(label.width(), ">", measure.width, "padding increases size of the component");
         assert.operator(label.width(), "<=", measure.width + 2 * PADDING, "width at most incorporates full padding amount");
