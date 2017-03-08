@@ -78,7 +78,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 126);
+/******/ 	return __webpack_require__(__webpack_require__.s = 125);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -94,23 +94,23 @@ return /******/ (function(modules) { // webpackBootstrap
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-var Array = __webpack_require__(93);
+var Array = __webpack_require__(92);
 exports.Array = Array;
-var Color = __webpack_require__(96);
+var Color = __webpack_require__(95);
 exports.Color = Color;
 var DOM = __webpack_require__(40);
 exports.DOM = DOM;
 var Math = __webpack_require__(28);
 exports.Math = Math;
-var Stacking = __webpack_require__(99);
+var Stacking = __webpack_require__(98);
 exports.Stacking = Stacking;
-var Window = __webpack_require__(100);
+var Window = __webpack_require__(99);
 exports.Window = Window;
+__export(__webpack_require__(93));
 __export(__webpack_require__(94));
-__export(__webpack_require__(95));
 __export(__webpack_require__(11));
+__export(__webpack_require__(96));
 __export(__webpack_require__(97));
-__export(__webpack_require__(98));
 __export(__webpack_require__(41));
 
 
@@ -641,14 +641,14 @@ exports.Plot = Plot;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-var TickGenerators = __webpack_require__(91);
+var TickGenerators = __webpack_require__(90);
 exports.TickGenerators = TickGenerators;
 __export(__webpack_require__(39));
+__export(__webpack_require__(86));
 __export(__webpack_require__(87));
 __export(__webpack_require__(88));
 __export(__webpack_require__(89));
-__export(__webpack_require__(90));
-__export(__webpack_require__(92));
+__export(__webpack_require__(91));
 // ---------------------------------------------------------
 var categoryScale_2 = __webpack_require__(39);
 var quantitativeScale_1 = __webpack_require__(10);
@@ -679,11 +679,11 @@ exports.isTransformable = isTransformable;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(112));
-__export(__webpack_require__(116));
+__export(__webpack_require__(111));
+__export(__webpack_require__(115));
 __export(__webpack_require__(12));
-__export(__webpack_require__(122));
-__export(__webpack_require__(124));
+__export(__webpack_require__(121));
+__export(__webpack_require__(123));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
@@ -1706,7 +1706,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var Interactions = __webpack_require__(15);
+var Interactions = __webpack_require__(14);
 var Utils = __webpack_require__(0);
 var scale_1 = __webpack_require__(18);
 var QuantitativeScale = (function (_super) {
@@ -2010,11 +2010,11 @@ exports.coerceExternalD3 = coerceExternalD3;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+__export(__webpack_require__(116));
 __export(__webpack_require__(117));
 __export(__webpack_require__(118));
 __export(__webpack_require__(119));
 __export(__webpack_require__(120));
-__export(__webpack_require__(121));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
@@ -2037,6 +2037,26 @@ __export(__webpack_require__(66));
 
 /***/ }),
 /* 14 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+__export(__webpack_require__(74));
+__export(__webpack_require__(75));
+__export(__webpack_require__(32));
+__export(__webpack_require__(76));
+__export(__webpack_require__(77));
+
+
+/***/ }),
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2135,27 +2155,6 @@ var Interaction = (function () {
     return Interaction;
 }());
 exports.Interaction = Interaction;
-
-
-/***/ }),
-/* 15 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
-
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
-__export(__webpack_require__(74));
-__export(__webpack_require__(75));
-__export(__webpack_require__(76));
-__export(__webpack_require__(32));
-__export(__webpack_require__(77));
-__export(__webpack_require__(78));
 
 
 /***/ }),
@@ -2489,15 +2488,15 @@ function __export(m) {
 __export(__webpack_require__(36));
 __export(__webpack_require__(22));
 __export(__webpack_require__(37));
-__export(__webpack_require__(79));
+__export(__webpack_require__(78));
 __export(__webpack_require__(38));
+__export(__webpack_require__(79));
 __export(__webpack_require__(80));
 __export(__webpack_require__(81));
 __export(__webpack_require__(82));
 __export(__webpack_require__(83));
 __export(__webpack_require__(84));
 __export(__webpack_require__(85));
-__export(__webpack_require__(86));
 
 
 /***/ }),
@@ -4875,7 +4874,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Interactions = __webpack_require__(15);
+var Interactions = __webpack_require__(14);
 var Utils = __webpack_require__(0);
 var _1 = __webpack_require__(30);
 var selectionBoxLayer_1 = __webpack_require__(35);
@@ -5564,7 +5563,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Dispatchers = __webpack_require__(13);
 var Utils = __webpack_require__(0);
-var interaction_1 = __webpack_require__(14);
+var interaction_1 = __webpack_require__(15);
 var Key = (function (_super) {
     __extends(Key, _super);
     function Key() {
@@ -6871,7 +6870,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var Interactions = __webpack_require__(15);
+var Interactions = __webpack_require__(14);
 var Utils = __webpack_require__(0);
 var scale_1 = __webpack_require__(18);
 var TRANSFORMATION_SPACE = [0, 1];
@@ -8030,7 +8029,7 @@ d3Transition.transition.prototype.styles = transition_styles;
  * @license MIT
  */
 
-var d3Ease = __webpack_require__(101);
+var d3Ease = __webpack_require__(100);
 var coerceD3_1 = __webpack_require__(11);
 var EASE_NAME_MAPPING = {
     "linear": d3Ease.easeLinear,
@@ -8908,7 +8907,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var guideLineLayer_1 = __webpack_require__(34);
-var Interactions = __webpack_require__(15);
+var Interactions = __webpack_require__(14);
 var Utils = __webpack_require__(0);
 var DragLineLayer = (function (_super) {
     __extends(DragLineLayer, _super);
@@ -11424,16 +11423,23 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Dispatchers = __webpack_require__(13);
 var Utils = __webpack_require__(0);
-var interaction_1 = __webpack_require__(14);
+var interaction_1 = __webpack_require__(15);
 var Click = (function (_super) {
     __extends(Click, _super);
     function Click() {
         var _this = this;
         _super.apply(this, arguments);
         this._clickedDown = false;
+        this._doubleClicking = false;
         this._onClickCallbacks = new Utils.CallbackSet();
+        this._onDoubleClickCallbacks = new Utils.CallbackSet();
+        /**
+         * Note: we bind to mousedown, mouseup, touchstart and touchend because browsers
+         * have a 300ms delay between touchstart and click to allow for scrolling cancelling etc.
+         */
         this._mouseDownCallback = function (p, event) { return _this._handleClickDown(p, event); };
         this._mouseUpCallback = function (p, event) { return _this._handleClickUp(p, event); };
+        this._dblClickCallback = function (p, event) { return _this._handleDblClick(p, event); };
         this._touchStartCallback = function (ids, idToPoint, event) { return _this._handleClickDown(idToPoint[ids[0]], event); };
         this._touchEndCallback = function (ids, idToPoint, event) { return _this._handleClickUp(idToPoint[ids[0]], event); };
         this._touchCancelCallback = function (ids, idToPoint) { return _this._clickedDown = false; };
@@ -11443,6 +11449,7 @@ var Click = (function (_super) {
         this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(component.content().node());
         this._mouseDispatcher.onMouseDown(this._mouseDownCallback);
         this._mouseDispatcher.onMouseUp(this._mouseUpCallback);
+        this._mouseDispatcher.onDblClick(this._dblClickCallback);
         this._touchDispatcher = Dispatchers.Touch.getDispatcher(component.content().node());
         this._touchDispatcher.onTouchStart(this._touchStartCallback);
         this._touchDispatcher.onTouchEnd(this._touchEndCallback);
@@ -11452,24 +11459,41 @@ var Click = (function (_super) {
         _super.prototype._unanchor.call(this);
         this._mouseDispatcher.offMouseDown(this._mouseDownCallback);
         this._mouseDispatcher.offMouseUp(this._mouseUpCallback);
+        this._mouseDispatcher.offDblClick(this._dblClickCallback);
         this._mouseDispatcher = null;
         this._touchDispatcher.offTouchStart(this._touchStartCallback);
         this._touchDispatcher.offTouchEnd(this._touchEndCallback);
         this._touchDispatcher.offTouchCancel(this._touchCancelCallback);
         this._touchDispatcher = null;
     };
-    Click.prototype._handleClickDown = function (p, e) {
-        var translatedPoint = this._translateToComponentSpace(p);
-        if (this._isInsideComponent(translatedPoint)) {
+    Click.prototype._handleClickDown = function (p, event) {
+        var translatedP = this._translateToComponentSpace(p);
+        if (this._isInsideComponent(translatedP)) {
             this._clickedDown = true;
+            this._clickedPoint = translatedP;
         }
     };
-    Click.prototype._handleClickUp = function (p, e) {
-        var translatedPoint = this._translateToComponentSpace(p);
-        if (this._clickedDown && this._isInsideComponent(translatedPoint)) {
-            this._onClickCallbacks.callCallbacks(translatedPoint, e);
+    Click.prototype._handleClickUp = function (p, event) {
+        var _this = this;
+        var translatedP = this._translateToComponentSpace(p);
+        if (this._clickedDown && Click._pointsEqual(translatedP, this._clickedPoint)) {
+            setTimeout(function () {
+                if (!_this._doubleClicking) {
+                    _this._onClickCallbacks.callCallbacks(translatedP, event);
+                }
+            }, 0);
         }
         this._clickedDown = false;
+    };
+    Click.prototype._handleDblClick = function (p, event) {
+        var _this = this;
+        var translatedP = this._translateToComponentSpace(p);
+        this._doubleClicking = true;
+        this._onDoubleClickCallbacks.callCallbacks(translatedP, event);
+        setTimeout(function () { return _this._doubleClicking = false; }, 0);
+    };
+    Click._pointsEqual = function (p1, p2) {
+        return p1.x === p2.x && p1.y === p2.y;
     };
     /**
      * Adds a callback to be called when the Component is clicked.
@@ -11489,6 +11513,26 @@ var Click = (function (_super) {
      */
     Click.prototype.offClick = function (callback) {
         this._onClickCallbacks.delete(callback);
+        return this;
+    };
+    /**
+     * Adds a callback to be called when the Component is double-clicked.
+     *
+     * @param {ClickCallback} callback
+     * @return {Interactions.Click} The calling Click Interaction.
+     */
+    Click.prototype.onDoubleClick = function (callback) {
+        this._onDoubleClickCallbacks.add(callback);
+        return this;
+    };
+    /**
+     * Removes a callback that would be called when the Component is double-clicked.
+     *
+     * @param {ClickCallback} callback
+     * @return {Interactions.Click} The calling Click Interaction.
+     */
+    Click.prototype.offDoubleClick = function (callback) {
+        this._onDoubleClickCallbacks.delete(callback);
         return this;
     };
     return Click;
@@ -11513,126 +11557,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Dispatchers = __webpack_require__(13);
 var Utils = __webpack_require__(0);
-var interaction_1 = __webpack_require__(14);
-var ClickState;
-(function (ClickState) {
-    ClickState[ClickState["NotClicked"] = 0] = "NotClicked";
-    ClickState[ClickState["SingleClicked"] = 1] = "SingleClicked";
-    ClickState[ClickState["DoubleClicked"] = 2] = "DoubleClicked";
-})(ClickState || (ClickState = {}));
-var DoubleClick = (function (_super) {
-    __extends(DoubleClick, _super);
-    function DoubleClick() {
-        var _this = this;
-        _super.apply(this, arguments);
-        this._clickState = ClickState.NotClicked;
-        this._clickedDown = false;
-        this._onDoubleClickCallbacks = new Utils.CallbackSet();
-        this._mouseDownCallback = function (p) { return _this._handleClickDown(p); };
-        this._mouseUpCallback = function (p) { return _this._handleClickUp(p); };
-        this._dblClickCallback = function (p) { return _this._handleDblClick(); };
-        this._touchStartCallback = function (ids, idToPoint) { return _this._handleClickDown(idToPoint[ids[0]]); };
-        this._touchEndCallback = function (ids, idToPoint) { return _this._handleClickUp(idToPoint[ids[0]]); };
-        this._touchCancelCallback = function (ids, idToPoint) { return _this._handleClickCancel(); };
-    }
-    DoubleClick.prototype._anchor = function (component) {
-        _super.prototype._anchor.call(this, component);
-        this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(component.content().node());
-        this._mouseDispatcher.onMouseDown(this._mouseDownCallback);
-        this._mouseDispatcher.onMouseUp(this._mouseUpCallback);
-        this._mouseDispatcher.onDblClick(this._dblClickCallback);
-        this._touchDispatcher = Dispatchers.Touch.getDispatcher(component.content().node());
-        this._touchDispatcher.onTouchStart(this._touchStartCallback);
-        this._touchDispatcher.onTouchEnd(this._touchEndCallback);
-        this._touchDispatcher.onTouchCancel(this._touchCancelCallback);
-    };
-    DoubleClick.prototype._unanchor = function () {
-        _super.prototype._unanchor.call(this);
-        this._mouseDispatcher.offMouseDown(this._mouseDownCallback);
-        this._mouseDispatcher.offMouseUp(this._mouseUpCallback);
-        this._mouseDispatcher.offDblClick(this._dblClickCallback);
-        this._mouseDispatcher = null;
-        this._touchDispatcher.offTouchStart(this._touchStartCallback);
-        this._touchDispatcher.offTouchEnd(this._touchEndCallback);
-        this._touchDispatcher.offTouchCancel(this._touchCancelCallback);
-        this._touchDispatcher = null;
-    };
-    DoubleClick.prototype._handleClickDown = function (p) {
-        var translatedP = this._translateToComponentSpace(p);
-        if (this._isInsideComponent(translatedP)) {
-            if (!(this._clickState === ClickState.SingleClicked) || !DoubleClick._pointsEqual(translatedP, this._clickedPoint)) {
-                this._clickState = ClickState.NotClicked;
-            }
-            this._clickedPoint = translatedP;
-            this._clickedDown = true;
-        }
-    };
-    DoubleClick.prototype._handleClickUp = function (p) {
-        var translatedP = this._translateToComponentSpace(p);
-        if (this._clickedDown && DoubleClick._pointsEqual(translatedP, this._clickedPoint)) {
-            this._clickState = this._clickState === ClickState.NotClicked ? ClickState.SingleClicked : ClickState.DoubleClicked;
-        }
-        else {
-            this._clickState = ClickState.NotClicked;
-        }
-        this._clickedDown = false;
-    };
-    DoubleClick.prototype._handleDblClick = function () {
-        if (this._clickState === ClickState.DoubleClicked) {
-            this._onDoubleClickCallbacks.callCallbacks(this._clickedPoint);
-            this._clickState = ClickState.NotClicked;
-        }
-    };
-    DoubleClick.prototype._handleClickCancel = function () {
-        this._clickState = ClickState.NotClicked;
-        this._clickedDown = false;
-    };
-    DoubleClick._pointsEqual = function (p1, p2) {
-        return p1.x === p2.x && p1.y === p2.y;
-    };
-    /**
-     * Adds a callback to be called when the Component is double-clicked.
-     *
-     * @param {ClickCallback} callback
-     * @return {Interactions.DoubleClick} The calling DoubleClick Interaction.
-     */
-    DoubleClick.prototype.onDoubleClick = function (callback) {
-        this._onDoubleClickCallbacks.add(callback);
-        return this;
-    };
-    /**
-     * Removes a callback that would be called when the Component is double-clicked.
-     *
-     * @param {ClickCallback} callback
-     * @return {Interactions.DoubleClick} The calling DoubleClick Interaction.
-     */
-    DoubleClick.prototype.offDoubleClick = function (callback) {
-        this._onDoubleClickCallbacks.delete(callback);
-        return this;
-    };
-    return DoubleClick;
-}(interaction_1.Interaction));
-exports.DoubleClick = DoubleClick;
-
-
-/***/ }),
-/* 76 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var Dispatchers = __webpack_require__(13);
-var Utils = __webpack_require__(0);
-var interaction_1 = __webpack_require__(14);
+var interaction_1 = __webpack_require__(15);
 var Drag = (function (_super) {
     __extends(Drag, _super);
     function Drag() {
@@ -11781,7 +11706,7 @@ exports.Drag = Drag;
 
 
 /***/ }),
-/* 77 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11799,8 +11724,8 @@ var d3 = __webpack_require__(1);
 var Dispatchers = __webpack_require__(13);
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var interaction_1 = __webpack_require__(14);
-var Interactions = __webpack_require__(15);
+var interaction_1 = __webpack_require__(15);
+var Interactions = __webpack_require__(14);
 /**
  * Performs a zoom transformation of the `value` argument scaled by the
  * `zoom` argument about the point defined by the `center` argument.
@@ -12339,7 +12264,7 @@ exports.PanZoom = PanZoom;
 
 
 /***/ }),
-/* 78 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12355,7 +12280,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Dispatchers = __webpack_require__(13);
 var Utils = __webpack_require__(0);
-var interaction_1 = __webpack_require__(14);
+var interaction_1 = __webpack_require__(15);
 var Pointer = (function (_super) {
     __extends(Pointer, _super);
     function Pointer() {
@@ -12470,7 +12395,7 @@ exports.Pointer = Pointer;
 
 
 /***/ }),
-/* 79 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12543,7 +12468,7 @@ exports.ClusteredBar = ClusteredBar;
 
 
 /***/ }),
-/* 80 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13040,7 +12965,7 @@ exports.Pie = Pie;
 
 
 /***/ }),
-/* 81 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13406,7 +13331,7 @@ exports.Rectangle = Rectangle;
 
 
 /***/ }),
-/* 82 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13567,7 +13492,7 @@ exports.Scatter = Scatter;
 
 
 /***/ }),
-/* 83 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13765,7 +13690,7 @@ exports.Segment = Segment;
 
 
 /***/ }),
-/* 84 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13968,7 +13893,7 @@ exports.StackedArea = StackedArea;
 
 
 /***/ }),
-/* 85 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14187,7 +14112,7 @@ exports.StackedBar = StackedBar;
 
 
 /***/ }),
-/* 86 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14398,7 +14323,7 @@ exports.Waterfall = Waterfall;
 
 
 /***/ }),
-/* 87 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14529,7 +14454,7 @@ exports.Color = Color;
 
 
 /***/ }),
-/* 88 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14695,7 +14620,7 @@ exports.InterpolatedColor = InterpolatedColor;
 
 
 /***/ }),
-/* 89 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14774,7 +14699,7 @@ exports.Linear = Linear;
 
 
 /***/ }),
-/* 90 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14998,7 +14923,7 @@ exports.ModifiedLog = ModifiedLog;
 
 
 /***/ }),
-/* 91 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15048,7 +14973,7 @@ exports.integerTickGenerator = integerTickGenerator;
 
 
 /***/ }),
-/* 92 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15184,7 +15109,7 @@ exports.Time = Time;
 
 
 /***/ }),
-/* 93 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15254,7 +15179,7 @@ exports.createFilledArray = createFilledArray;
 
 
 /***/ }),
-/* 94 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15296,7 +15221,7 @@ exports.CallbackSet = CallbackSet;
 
 
 /***/ }),
-/* 95 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15375,7 +15300,7 @@ exports.ClientToSVGTranslator = ClientToSVGTranslator;
 
 
 /***/ }),
-/* 96 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15458,7 +15383,7 @@ function luminance(color) {
 
 
 /***/ }),
-/* 97 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15512,7 +15437,7 @@ exports.EntityArray = EntityArray;
 
 
 /***/ }),
-/* 98 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15603,7 +15528,7 @@ exports.Map = Map;
 
 
 /***/ }),
-/* 99 */
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15728,7 +15653,7 @@ exports.normalizeKey = normalizeKey;
 
 
 /***/ }),
-/* 100 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15800,54 +15725,54 @@ exports.deprecated = deprecated;
 
 
 /***/ }),
-/* 101 */
+/* 100 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_linear__ = __webpack_require__(108);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_linear__ = __webpack_require__(107);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeLinear", function() { return __WEBPACK_IMPORTED_MODULE_0__src_linear__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__src_quad__ = __webpack_require__(110);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__src_quad__ = __webpack_require__(109);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeQuad", function() { return __WEBPACK_IMPORTED_MODULE_1__src_quad__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeQuadIn", function() { return __WEBPACK_IMPORTED_MODULE_1__src_quad__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeQuadOut", function() { return __WEBPACK_IMPORTED_MODULE_1__src_quad__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeQuadInOut", function() { return __WEBPACK_IMPORTED_MODULE_1__src_quad__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__src_cubic__ = __webpack_require__(105);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__src_cubic__ = __webpack_require__(104);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCubic", function() { return __WEBPACK_IMPORTED_MODULE_2__src_cubic__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCubicIn", function() { return __WEBPACK_IMPORTED_MODULE_2__src_cubic__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCubicOut", function() { return __WEBPACK_IMPORTED_MODULE_2__src_cubic__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCubicInOut", function() { return __WEBPACK_IMPORTED_MODULE_2__src_cubic__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__src_poly__ = __webpack_require__(109);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__src_poly__ = __webpack_require__(108);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easePoly", function() { return __WEBPACK_IMPORTED_MODULE_3__src_poly__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easePolyIn", function() { return __WEBPACK_IMPORTED_MODULE_3__src_poly__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easePolyOut", function() { return __WEBPACK_IMPORTED_MODULE_3__src_poly__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easePolyInOut", function() { return __WEBPACK_IMPORTED_MODULE_3__src_poly__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__src_sin__ = __webpack_require__(111);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__src_sin__ = __webpack_require__(110);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeSin", function() { return __WEBPACK_IMPORTED_MODULE_4__src_sin__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeSinIn", function() { return __WEBPACK_IMPORTED_MODULE_4__src_sin__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeSinOut", function() { return __WEBPACK_IMPORTED_MODULE_4__src_sin__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeSinInOut", function() { return __WEBPACK_IMPORTED_MODULE_4__src_sin__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__src_exp__ = __webpack_require__(107);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__src_exp__ = __webpack_require__(106);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeExp", function() { return __WEBPACK_IMPORTED_MODULE_5__src_exp__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeExpIn", function() { return __WEBPACK_IMPORTED_MODULE_5__src_exp__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeExpOut", function() { return __WEBPACK_IMPORTED_MODULE_5__src_exp__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeExpInOut", function() { return __WEBPACK_IMPORTED_MODULE_5__src_exp__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__src_circle__ = __webpack_require__(104);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__src_circle__ = __webpack_require__(103);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCircle", function() { return __WEBPACK_IMPORTED_MODULE_6__src_circle__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCircleIn", function() { return __WEBPACK_IMPORTED_MODULE_6__src_circle__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCircleOut", function() { return __WEBPACK_IMPORTED_MODULE_6__src_circle__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCircleInOut", function() { return __WEBPACK_IMPORTED_MODULE_6__src_circle__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__src_bounce__ = __webpack_require__(103);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__src_bounce__ = __webpack_require__(102);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBounce", function() { return __WEBPACK_IMPORTED_MODULE_7__src_bounce__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBounceIn", function() { return __WEBPACK_IMPORTED_MODULE_7__src_bounce__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBounceOut", function() { return __WEBPACK_IMPORTED_MODULE_7__src_bounce__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBounceInOut", function() { return __WEBPACK_IMPORTED_MODULE_7__src_bounce__["c"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__src_back__ = __webpack_require__(102);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__src_back__ = __webpack_require__(101);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBack", function() { return __WEBPACK_IMPORTED_MODULE_8__src_back__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBackIn", function() { return __WEBPACK_IMPORTED_MODULE_8__src_back__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBackOut", function() { return __WEBPACK_IMPORTED_MODULE_8__src_back__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBackInOut", function() { return __WEBPACK_IMPORTED_MODULE_8__src_back__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__src_elastic__ = __webpack_require__(106);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__src_elastic__ = __webpack_require__(105);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeElastic", function() { return __WEBPACK_IMPORTED_MODULE_9__src_elastic__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeElasticIn", function() { return __WEBPACK_IMPORTED_MODULE_9__src_elastic__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeElasticOut", function() { return __WEBPACK_IMPORTED_MODULE_9__src_elastic__["a"]; });
@@ -15874,7 +15799,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /***/ }),
-/* 102 */
+/* 101 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -15921,7 +15846,7 @@ var backInOut = (function custom(s) {
 
 
 /***/ }),
-/* 103 */
+/* 102 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -15953,7 +15878,7 @@ function bounceInOut(t) {
 
 
 /***/ }),
-/* 104 */
+/* 103 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -15974,7 +15899,7 @@ function circleInOut(t) {
 
 
 /***/ }),
-/* 105 */
+/* 104 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -15995,7 +15920,7 @@ function cubicInOut(t) {
 
 
 /***/ }),
-/* 106 */
+/* 105 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16049,7 +15974,7 @@ var elasticInOut = (function custom(a, p) {
 
 
 /***/ }),
-/* 107 */
+/* 106 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16070,7 +15995,7 @@ function expInOut(t) {
 
 
 /***/ }),
-/* 108 */
+/* 107 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16081,7 +16006,7 @@ function linear(t) {
 
 
 /***/ }),
-/* 109 */
+/* 108 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16128,7 +16053,7 @@ var polyInOut = (function custom(e) {
 
 
 /***/ }),
-/* 110 */
+/* 109 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16149,7 +16074,7 @@ function quadInOut(t) {
 
 
 /***/ }),
-/* 111 */
+/* 110 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16173,7 +16098,7 @@ function sinInOut(t) {
 
 
 /***/ }),
-/* 112 */
+/* 111 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16187,12 +16112,12 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 __export(__webpack_require__(29));
+__export(__webpack_require__(112));
 __export(__webpack_require__(113));
-__export(__webpack_require__(114));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 113 */
+/* 112 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16228,7 +16153,7 @@ exports.OpacityAnimator = OpacityAnimator;
 //# sourceMappingURL=opacityAnimator.js.map
 
 /***/ }),
-/* 114 */
+/* 113 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16303,7 +16228,7 @@ exports.UnveilAnimator = UnveilAnimator;
 //# sourceMappingURL=unveilAnimator.js.map
 
 /***/ }),
-/* 115 */
+/* 114 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16345,7 +16270,7 @@ exports.CacheMeasurer = CacheMeasurer;
 //# sourceMappingURL=cacheMeasurer.js.map
 
 /***/ }),
-/* 116 */
+/* 115 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16360,13 +16285,13 @@ function __export(m) {
 }
 __export(__webpack_require__(42));
 __export(__webpack_require__(43));
-__export(__webpack_require__(115));
+__export(__webpack_require__(114));
 __export(__webpack_require__(44));
 __export(__webpack_require__(45));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 117 */
+/* 116 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16415,7 +16340,7 @@ exports.Cache = Cache;
 //# sourceMappingURL=cache.js.map
 
 /***/ }),
-/* 118 */
+/* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16464,7 +16389,7 @@ exports.DOM = DOM;
 //# sourceMappingURL=dom.js.map
 
 /***/ }),
-/* 119 */
+/* 118 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16522,7 +16447,7 @@ exports.Methods = Methods;
 //# sourceMappingURL=methods.js.map
 
 /***/ }),
-/* 120 */
+/* 119 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16569,7 +16494,7 @@ exports.StringMethods = StringMethods;
 //# sourceMappingURL=stringMethods.js.map
 
 /***/ }),
-/* 121 */
+/* 120 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16617,7 +16542,7 @@ exports.Tokenizer = Tokenizer;
 //# sourceMappingURL=tokenizer.js.map
 
 /***/ }),
-/* 122 */
+/* 121 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16630,12 +16555,12 @@ exports.Tokenizer = Tokenizer;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(123));
+__export(__webpack_require__(122));
 __export(__webpack_require__(46));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 123 */
+/* 122 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16693,7 +16618,7 @@ exports.SingleLineWrapper = SingleLineWrapper;
 //# sourceMappingURL=singleLineWrapper.js.map
 
 /***/ }),
-/* 124 */
+/* 123 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16706,11 +16631,11 @@ exports.SingleLineWrapper = SingleLineWrapper;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(125));
+__export(__webpack_require__(124));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 125 */
+/* 124 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16866,7 +16791,7 @@ exports.Writer = Writer;
 //# sourceMappingURL=writer.js.map
 
 /***/ }),
-/* 126 */
+/* 125 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16898,7 +16823,7 @@ var Dispatchers = __webpack_require__(13);
 exports.Dispatchers = Dispatchers;
 var Drawers = __webpack_require__(9);
 exports.Drawers = Drawers;
-var Interactions = __webpack_require__(15);
+var Interactions = __webpack_require__(14);
 exports.Interactions = Interactions;
 var Plots = __webpack_require__(17);
 exports.Plots = Plots;
@@ -16916,7 +16841,7 @@ var version_1 = __webpack_require__(49);
 exports.version = version_1.version;
 __export(__webpack_require__(21));
 __export(__webpack_require__(7));
-__export(__webpack_require__(14));
+__export(__webpack_require__(15));
 __export(__webpack_require__(32));
 __export(__webpack_require__(16));
 __export(__webpack_require__(2));
