@@ -11,6 +11,16 @@ describe("Interactions", () => {
     let SVG_WIDTH = 400;
     let SVG_HEIGHT = 400;
 
+    function triggerMoveEvent(component: Plottable.Component) {
+      TestMethods.triggerFakeInteractionEvent(
+        TestMethods.InteractionMode.Mouse,
+        TestMethods.InteractionType.Move,
+        component.content(),
+        SVG_WIDTH / 2,
+        SVG_HEIGHT / 2
+      );
+    }
+
     it("attaching/detaching a component modifies the state of the interaction", () => {
       let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       let component = new Plottable.Component();
@@ -33,17 +43,16 @@ describe("Interactions", () => {
       let component = new Plottable.Component();
       component.renderTo(svg);
 
-      let clickInteraction = new Plottable.Interactions.Click();
+      let pointerInteraction= new Plottable.Interactions.Pointer();
 
       let callbackCalled = false;
       let callback = () => callbackCalled = true;
-      clickInteraction.onClick(callback);
+      pointerInteraction.onPointerMove(callback);
 
-      clickInteraction.attachTo(component);
+      pointerInteraction.attachTo(component);
 
-      TestMethods.triggerFakeMouseEvent("mousedown", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      TestMethods.triggerFakeMouseEvent("mouseup", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      assert.isTrue(callbackCalled, "callback called on clicking Component (mouse)");
+      triggerMoveEvent(component);
+      assert.isTrue(callbackCalled, "callback called on moving in Component (mouse)");
 
       svg.remove();
     });
@@ -53,23 +62,21 @@ describe("Interactions", () => {
       let component = new Plottable.Component();
       component.renderTo(svg);
 
-      let clickInteraction = new Plottable.Interactions.Click();
+      let pointerInteraction = new Plottable.Interactions.Pointer();
 
       let callbackCalled = false;
       let callback = () => callbackCalled = true;
-      clickInteraction.onClick(callback);
+      pointerInteraction.onPointerMove(callback);
 
-      clickInteraction.attachTo(component);
+      pointerInteraction.attachTo(component);
 
-      TestMethods.triggerFakeMouseEvent("mousedown", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      TestMethods.triggerFakeMouseEvent("mouseup", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      assert.isTrue(callbackCalled, "callback called on clicking Component (mouse)");
+      triggerMoveEvent(component);
+      assert.isTrue(callbackCalled, "callback called on moving in Component (mouse)");
 
       callbackCalled = false;
-      clickInteraction.detachFrom(component);
+      pointerInteraction.detachFrom(component);
 
-      TestMethods.triggerFakeMouseEvent("mousedown", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      TestMethods.triggerFakeMouseEvent("mouseup", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      triggerMoveEvent(component);
       assert.isFalse(callbackCalled, "callback was removed from component and should not be called");
 
       svg.remove();
@@ -112,47 +119,41 @@ describe("Interactions", () => {
       component1.renderTo(svg1);
       component2.renderTo(svg2);
 
-      let clickInteraction = new Plottable.Interactions.Click();
+      let pointerInteraction = new Plottable.Interactions.Pointer();
 
       let callbackCalled = false;
       let callback = () => callbackCalled = true;
-      clickInteraction.onClick(callback);
+      pointerInteraction.onPointerMove(callback);
 
-      clickInteraction.attachTo(component1);
+      pointerInteraction.attachTo(component1);
 
       callbackCalled = false;
-      TestMethods.triggerFakeMouseEvent("mousedown", component1.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      TestMethods.triggerFakeMouseEvent("mouseup", component1.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      triggerMoveEvent(component1);
       assert.isTrue(callbackCalled, "Round 1 callback called for component 1");
 
       callbackCalled = false;
-      TestMethods.triggerFakeMouseEvent("mousedown", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      TestMethods.triggerFakeMouseEvent("mouseup", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      triggerMoveEvent(component2);
       assert.isFalse(callbackCalled, "Round 1 callback not called for component 2");
 
-      clickInteraction.detachFrom(component1);
-      clickInteraction.attachTo(component2);
+      pointerInteraction.detachFrom(component1);
+      pointerInteraction.attachTo(component2);
 
       callbackCalled = false;
-      TestMethods.triggerFakeMouseEvent("mousedown", component1.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      TestMethods.triggerFakeMouseEvent("mouseup", component1.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      triggerMoveEvent(component1);
       assert.isFalse(callbackCalled, "Round 2 (after longhand attaching) callback not called for component 1");
 
       callbackCalled = false;
-      TestMethods.triggerFakeMouseEvent("mousedown", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      TestMethods.triggerFakeMouseEvent("mouseup", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      triggerMoveEvent(component2);
       assert.isTrue(callbackCalled, "Round 2 (after longhand attaching) callback called for component 2");
 
-      clickInteraction.attachTo(component1);
+      pointerInteraction.attachTo(component1);
 
       callbackCalled = false;
-      TestMethods.triggerFakeMouseEvent("mousedown", component1.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      TestMethods.triggerFakeMouseEvent("mouseup", component1.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      triggerMoveEvent(component1);
       assert.isTrue(callbackCalled, "Round 3 (after shorthand attaching) callback called for component 1");
 
       callbackCalled = false;
-      TestMethods.triggerFakeMouseEvent("mousedown", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      TestMethods.triggerFakeMouseEvent("mouseup", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+      triggerMoveEvent(component2);
       assert.isFalse(callbackCalled, "Round 3 (after shorthand attaching) callback not called for component 2");
 
       svg1.remove();
@@ -174,20 +175,18 @@ describe("Interactions", () => {
         let component = new Plottable.Component();
         component.renderTo(svg);
 
-        let clickInteraction = new Plottable.Interactions.Click();
+        let pointerInteraction = new Plottable.Interactions.Pointer();
         let callbackCalled = false;
         let callback = () => callbackCalled = true;
-        clickInteraction.onClick(callback);
-        clickInteraction.attachTo(component);
+        pointerInteraction.onPointerMove(callback);
+        pointerInteraction.attachTo(component);
 
-        clickInteraction.enabled(false);
-        TestMethods.triggerFakeMouseEvent("mousedown", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-        TestMethods.triggerFakeMouseEvent("mouseup", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+        pointerInteraction.enabled(false);
+        triggerMoveEvent(component);
         assert.isFalse(callbackCalled, "callback is not called when Interaction is disabled");
 
-        clickInteraction.enabled(true);
-        TestMethods.triggerFakeMouseEvent("mousedown", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-        TestMethods.triggerFakeMouseEvent("mouseup", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+        pointerInteraction.enabled(true);
+        triggerMoveEvent(component);
         assert.isTrue(callbackCalled, "callback is called when Interaction is re-enabled");
 
         svg.remove();
@@ -201,21 +200,19 @@ describe("Interactions", () => {
         component1.renderTo(svg1);
         component2.renderTo(svg2);
 
-        let clickInteraction = new Plottable.Interactions.Click();
+        let pointerInteraction = new Plottable.Interactions.Pointer();
         let callbackCalled = false;
         let callback = () => callbackCalled = true;
-        clickInteraction.onClick(callback);
-        clickInteraction.attachTo(component1);
+        pointerInteraction.onPointerMove(callback);
+        pointerInteraction.attachTo(component1);
 
-        clickInteraction.enabled(false);
-        clickInteraction.attachTo(component2);
-        TestMethods.triggerFakeMouseEvent("mousedown", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-        TestMethods.triggerFakeMouseEvent("mouseup", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+        pointerInteraction.enabled(false);
+        pointerInteraction.attachTo(component2);
+        triggerMoveEvent(component2);
         assert.isFalse(callbackCalled, "stays disabled even if attachTo() is called again");
 
-        clickInteraction.enabled(true);
-        TestMethods.triggerFakeMouseEvent("mousedown", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-        TestMethods.triggerFakeMouseEvent("mouseup", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+        pointerInteraction.enabled(true);
+        triggerMoveEvent(component2);
         assert.isTrue(callbackCalled, "re-enabled");
 
         svg1.remove();
