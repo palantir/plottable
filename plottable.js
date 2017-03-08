@@ -10068,12 +10068,11 @@ var Legend = (function (_super) {
                 var textContainer = d3.select(this);
                 var column = symbolEntryPair[1];
                 var writeOptions = {
-                    selection: textContainer,
                     xAlign: "left",
                     yAlign: "top",
                     textRotation: 0,
                 };
-                self._writer.write(self._formatter(column.data.name), column.width, self.height(), writeOptions);
+                self._writer.write(self._formatter(column.data.name), column.width, self.height(), writeOptions, textContainer.node());
             });
             entriesUpdate.exit().remove();
         });

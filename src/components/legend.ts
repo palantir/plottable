@@ -621,13 +621,12 @@ export class Legend extends Component {
           const column = symbolEntryPair[1];
 
           const writeOptions = {
-            selection: textContainer,
             xAlign: "left",
             yAlign: "top",
             textRotation: 0,
           } as Typesetter.IWriteOptions;
 
-          self._writer.write(self._formatter(column.data.name), column.width, self.height(), writeOptions)
+          self._writer.write(self._formatter(column.data.name), column.width, self.height(), writeOptions, textContainer.node())
         });
 
         entriesUpdate.exit().remove();
