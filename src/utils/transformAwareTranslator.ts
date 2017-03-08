@@ -10,7 +10,7 @@ const _TRANSLATOR_KEY = "__Plottable_ClientTranslator";
 
 export function getTranslator(component: Component): Translator {
   // The Translator works by first calculating the offset to root of the chart and then calculating
-  // the offset from the component to the root. It is imperative that the measureElement
+  // the offset from the component to the root. It is imperative that the _measurementElement
   // be added to the root of the hierarchy and nowhere else.
   let root = component.root().rootElement().node() as Element;
 
@@ -42,6 +42,7 @@ function move(node: SimpleSelection<any>, x: number, y: number) {
 }
 
 export class Translator {
+  private static SAMPLE_DISTANCE = 100;
   private _measurementElement: SimpleSelection<void>;
 
   constructor(measurementElement: SimpleSelection<void>) {
@@ -61,8 +62,7 @@ export class Translator {
     let origin = { x: mrBCR.left, y: mrBCR.top };
 
     // calculate the scale
-    let sampleDistance = 100;
-    move(this._measurementElement, sampleDistance, sampleDistance);
+    move(this._measurementElement, Translator.SAMPLE_DISTANCE, Translator.SAMPLE_DISTANCE);
 
     mrBCR = (this._measurementElement.node() as HTMLElement).getBoundingClientRect();
     let testPoint = { x: mrBCR.left, y: mrBCR.top };
@@ -72,8 +72,8 @@ export class Translator {
       return null;
     }
 
-    let scaleX = (testPoint.x - origin.x) / sampleDistance;
-    let scaleY = (testPoint.y - origin.y) / sampleDistance;
+    let scaleX = (testPoint.x - origin.x) / Translator.SAMPLE_DISTANCE;
+    let scaleY = (testPoint.y - origin.y) / Translator.SAMPLE_DISTANCE;
 
     // get the true cursor position
     move(this._measurementElement, ((clientX - origin.x) / scaleX), ((clientY - origin.y) / scaleY));

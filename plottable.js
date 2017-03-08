@@ -708,6 +708,9 @@ var Component = (function () {
          * Subclasses should set this to true in their constructor to prevent content from overflowing.
          */
         this._overflowHidden = false;
+        /**
+         * Origin of this Component relative to its parent.
+         */
         this._origin = { x: 0, y: 0 };
         this._xAlignment = "left";
         this._yAlignment = "top";
@@ -749,7 +752,7 @@ var Component = (function () {
         if (this._destroyed) {
             throw new Error("Can't reuse destroy()-ed Components!");
         }
-        if (this.parent() == null) {
+        if (this.isRoot()) {
             this._rootElement = selection;
             // rootElement gets the "plottable" CSS class
             this._rootElement.classed("plottable", true);
@@ -849,14 +852,14 @@ var Component = (function () {
                 throw new Error("anchor() must be called before computeLayout()");
             }
             else if (this._rootElement != null) {
-                // we are the top-level Component, retrieve height/width from rootElement
+                // retrieve height/width from rootElement
                 origin = { x: 0, y: 0 };
                 var elem = this._rootElement.node();
                 availableWidth = Utils.DOM.elementWidth(elem);
                 availableHeight = Utils.DOM.elementHeight(elem);
             }
             else {
-                throw new Error("null arguments cannot be passed to computeLayout() on a non-root node");
+                throw new Error("null arguments cannot be passed to computeLayout() on a non-root, unanchored node");
             }
         }
         var size = this._sizeFromOffer(availableWidth, availableHeight);
@@ -927,7 +930,7 @@ var Component = (function () {
      */
     Component.prototype.redraw = function () {
         if (this._isAnchored && this._isSetup) {
-            if (this.parent() == null) {
+            if (this.isRoot()) {
                 this._scheduleComputeLayout();
             }
             else {
@@ -969,7 +972,7 @@ var Component = (function () {
                 throw new Error("Plottable requires a valid Element to renderTo");
             }
             if (selection.node().nodeName === "svg") {
-                throw new Error("Plottable 3.x can only renderTo an HTML component; pass a div instead!");
+                throw new Error("Plottable 3.x and later can only renderTo an HTML component; pass a div instead!");
             }
             this.anchor(selection);
         }
@@ -1201,11 +1204,14 @@ var Component = (function () {
      * component is the root, that component will be returned.
      */
     Component.prototype.root = function () {
-        var parent = this;
-        while (parent.parent() != null) {
-            parent = parent.parent();
+        var component = this;
+        while (!component.isRoot()) {
+            component = component.parent();
         }
-        return parent;
+        return component;
+    };
+    Component.prototype.isRoot = function () {
+        return this.parent() == null;
     };
     /**
      * Gets the Selection containing the <g> in front of the visual elements of the Component.
@@ -1235,7 +1241,6 @@ var Component = (function () {
     };
     /**
      * Returns the top-level user supplied element that roots the tree that this Component lives in.
-     * @returns {SimpleSelection<void>}
      */
     Component.prototype.rootElement = function () {
         return this.root()._rootElement;
@@ -15745,7 +15750,7 @@ var Utils = __webpack_require__(0);
 var _TRANSLATOR_KEY = "__Plottable_ClientTranslator";
 function getTranslator(component) {
     // The Translator works by first calculating the offset to root of the chart and then calculating
-    // the offset from the component to the root. It is imperative that the measureElement
+    // the offset from the component to the root. It is imperative that the _measurementElement
     // be added to the root of the hierarchy and nowhere else.
     var root = component.root().rootElement().node();
     var translator = root[_TRANSLATOR_KEY];
@@ -15785,16 +15790,15 @@ var Translator = (function () {
         var mrBCR = this._measurementElement.node().getBoundingClientRect();
         var origin = { x: mrBCR.left, y: mrBCR.top };
         // calculate the scale
-        var sampleDistance = 100;
-        move(this._measurementElement, sampleDistance, sampleDistance);
+        move(this._measurementElement, Translator.SAMPLE_DISTANCE, Translator.SAMPLE_DISTANCE);
         mrBCR = this._measurementElement.node().getBoundingClientRect();
         var testPoint = { x: mrBCR.left, y: mrBCR.top };
         // invalid measurements -- SVG might not be in the DOM
         if (origin.x === testPoint.x || origin.y === testPoint.y) {
             return null;
         }
-        var scaleX = (testPoint.x - origin.x) / sampleDistance;
-        var scaleY = (testPoint.y - origin.y) / sampleDistance;
+        var scaleX = (testPoint.x - origin.x) / Translator.SAMPLE_DISTANCE;
+        var scaleY = (testPoint.y - origin.y) / Translator.SAMPLE_DISTANCE;
         // get the true cursor position
         move(this._measurementElement, ((clientX - origin.x) / scaleX), ((clientY - origin.y) / scaleY));
         mrBCR = this._measurementElement.node().getBoundingClientRect();
@@ -15808,6 +15812,7 @@ var Translator = (function () {
     Translator.prototype.isInside = function (component, e) {
         return Utils.DOM.contains(component.root().rootElement().node(), e.target);
     };
+    Translator.SAMPLE_DISTANCE = 100;
     return Translator;
 }());
 exports.Translator = Translator;

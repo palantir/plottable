@@ -50,6 +50,9 @@ export class Component {
    */
   protected _overflowHidden = false;
   private _resizeHandler: IResizeHandler;
+  /**
+   * Origin of this Component relative to its parent.
+   */
   private _origin: Point = { x: 0, y: 0 };
 
   /**
@@ -128,7 +131,7 @@ export class Component {
       throw new Error("Can't reuse destroy()-ed Components!");
     }
 
-    if (this.parent() == null) {
+    if (this.isRoot()) {
       this._rootElement = selection;
       // rootElement gets the "plottable" CSS class
       this._rootElement.classed("plottable", true);
@@ -234,13 +237,13 @@ export class Component {
       if (this._element == null) {
         throw new Error("anchor() must be called before computeLayout()");
       } else if (this._rootElement != null) {
-        // we are the top-level Component, retrieve height/width from rootElement
+        // retrieve height/width from rootElement
         origin = { x: 0, y: 0 };
         const elem = this._rootElement.node();
         availableWidth = Utils.DOM.elementWidth(elem);
         availableHeight = Utils.DOM.elementHeight(elem);
       } else {
-        throw new Error("null arguments cannot be passed to computeLayout() on a non-root node");
+        throw new Error("null arguments cannot be passed to computeLayout() on a non-root, unanchored node");
       }
     }
 
@@ -321,7 +324,7 @@ export class Component {
    */
   public redraw() {
     if (this._isAnchored && this._isSetup) {
-      if (this.parent() == null) {
+      if (this.isRoot()) {
         this._scheduleComputeLayout();
       } else {
         this.parent().redraw();
@@ -362,7 +365,7 @@ export class Component {
         throw new Error("Plottable requires a valid Element to renderTo");
       }
       if (selection.node().nodeName === "svg") {
-        throw new Error("Plottable 3.x can only renderTo an HTML component; pass a div instead!");
+        throw new Error("Plottable 3.x and later can only renderTo an HTML component; pass a div instead!");
       }
       this.anchor(selection);
     }
@@ -654,13 +657,17 @@ export class Component {
    * component is the root, that component will be returned.
    */
   public root(): Component {
-    let parent: Component = this;
+    let component: Component = this;
 
-    while (parent.parent() != null) {
-      parent = parent.parent();
+    while (!component.isRoot()) {
+      component = component.parent();
     }
 
-    return parent;
+    return component;
+  }
+
+  public isRoot() {
+    return this.parent() == null;
   }
 
   /**
@@ -694,7 +701,6 @@ export class Component {
 
   /**
    * Returns the top-level user supplied element that roots the tree that this Component lives in.
-   * @returns {SimpleSelection<void>}
    */
   public rootElement(): SimpleSelection<void> {
     return this.root()._rootElement;
