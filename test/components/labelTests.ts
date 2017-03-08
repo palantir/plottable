@@ -213,7 +213,7 @@ describe("Labels", () => {
       it("puts space around the label", () => {
         label.renderTo(svg);
 
-        const context = new Typesetter.SvgContext(svg.node() as Element);
+        const context = new Typesetter.SvgContext(svg.node() as SVGElement);
         const measurer = new Typesetter.CacheMeasurer(context);
         const measure = measurer.measure("testing label");
         assert.operator(label.width(), ">", measure.width, "padding increases size of the component");

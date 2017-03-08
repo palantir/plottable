@@ -1,5 +1,5 @@
 /*!
- * Plottable 3.0.0-beta.1 (https://github.com/palantir/plottable)
+ * Plottable 3.0.0-beta.2 (https://github.com/palantir/plottable)
  * Copyright 2014-2017 Palantir Technologies
  * Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
  */
@@ -16,41 +16,41 @@
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
-
+/******/
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
-
+/******/
 /******/ 		// Check if module is in cache
 /******/ 		if(installedModules[moduleId])
 /******/ 			return installedModules[moduleId].exports;
-
+/******/
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
 /******/ 			l: false,
 /******/ 			exports: {}
 /******/ 		};
-
+/******/
 /******/ 		// Execute the module function
 /******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-
+/******/
 /******/ 		// Flag the module as loaded
 /******/ 		module.l = true;
-
+/******/
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-
-
+/******/
+/******/
 /******/ 	// expose the modules object (__webpack_modules__)
 /******/ 	__webpack_require__.m = modules;
-
+/******/
 /******/ 	// expose the module cache
 /******/ 	__webpack_require__.c = installedModules;
-
+/******/
 /******/ 	// identity function for calling harmony imports with the correct context
 /******/ 	__webpack_require__.i = function(value) { return value; };
-
+/******/
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
 /******/ 		if(!__webpack_require__.o(exports, name)) {
@@ -61,7 +61,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 			});
 /******/ 		}
 /******/ 	};
-
+/******/
 /******/ 	// getDefaultExport function for compatibility with non-harmony modules
 /******/ 	__webpack_require__.n = function(module) {
 /******/ 		var getter = module && module.__esModule ?
@@ -70,15 +70,15 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 		__webpack_require__.d(getter, 'a', getter);
 /******/ 		return getter;
 /******/ 	};
-
+/******/
 /******/ 	// Object.prototype.hasOwnProperty.call
 /******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-
+/******/
 /******/ 	// __webpack_public_path__
 /******/ 	__webpack_require__.p = "";
-
+/******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 126);
+/******/ 	return __webpack_require__(__webpack_require__.s = 125);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -94,24 +94,24 @@ return /******/ (function(modules) { // webpackBootstrap
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-var Array = __webpack_require__(92);
+var Array = __webpack_require__(96);
 exports.Array = Array;
-var Color = __webpack_require__(94);
+var Color = __webpack_require__(99);
 exports.Color = Color;
-var DOM = __webpack_require__(95);
+var DOM = __webpack_require__(40);
 exports.DOM = DOM;
 var Math = __webpack_require__(28);
 exports.Math = Math;
-var Stacking = __webpack_require__(98);
+var Stacking = __webpack_require__(102);
 exports.Stacking = Stacking;
-var Window = __webpack_require__(100);
+var Window = __webpack_require__(103);
 exports.Window = Window;
-__export(__webpack_require__(93));
-__export(__webpack_require__(127));
-__export(__webpack_require__(11));
-__export(__webpack_require__(96));
 __export(__webpack_require__(97));
-__export(__webpack_require__(40));
+__export(__webpack_require__(98));
+__export(__webpack_require__(11));
+__export(__webpack_require__(100));
+__export(__webpack_require__(101));
+__export(__webpack_require__(41));
 
 
 /***/ }),
@@ -637,14 +637,14 @@ exports.Plot = Plot;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-var TickGenerators = __webpack_require__(90);
+var TickGenerators = __webpack_require__(94);
 exports.TickGenerators = TickGenerators;
 __export(__webpack_require__(39));
-__export(__webpack_require__(86));
-__export(__webpack_require__(87));
-__export(__webpack_require__(88));
-__export(__webpack_require__(89));
+__export(__webpack_require__(90));
 __export(__webpack_require__(91));
+__export(__webpack_require__(92));
+__export(__webpack_require__(93));
+__export(__webpack_require__(95));
 // ---------------------------------------------------------
 var categoryScale_2 = __webpack_require__(39);
 var quantitativeScale_1 = __webpack_require__(10);
@@ -669,17 +669,18 @@ exports.isTransformable = isTransformable;
 /**
  * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
  * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
+ * license at https://github.com/palantir/typesettable/blob/develop/LICENSE
  */
 
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(112));
-__export(__webpack_require__(116));
-__export(__webpack_require__(12));
-__export(__webpack_require__(122));
-__export(__webpack_require__(124));
+__export(__webpack_require__(42));
+__export(__webpack_require__(45));
+__export(__webpack_require__(118));
+__export(__webpack_require__(18));
+__export(__webpack_require__(47));
+__export(__webpack_require__(49));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
@@ -1261,8 +1262,8 @@ exports.Component = Component;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(50));
-__export(__webpack_require__(51));
+__export(__webpack_require__(54));
+__export(__webpack_require__(55));
 
 
 /***/ }),
@@ -1677,13 +1678,13 @@ function verifyPrecision(precision) {
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(66));
-__export(__webpack_require__(67));
-__export(__webpack_require__(68));
-__export(__webpack_require__(69));
 __export(__webpack_require__(70));
 __export(__webpack_require__(71));
 __export(__webpack_require__(72));
+__export(__webpack_require__(73));
+__export(__webpack_require__(74));
+__export(__webpack_require__(75));
+__export(__webpack_require__(76));
 
 
 /***/ }),
@@ -1702,9 +1703,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var Interactions = __webpack_require__(15);
+var Interactions = __webpack_require__(14);
 var Utils = __webpack_require__(0);
-var scale_1 = __webpack_require__(18);
+var scale_1 = __webpack_require__(17);
 var QuantitativeScale = (function (_super) {
     __extends(QuantitativeScale, _super);
     /**
@@ -1998,27 +1999,6 @@ exports.coerceExternalD3 = coerceExternalD3;
 
 "use strict";
 /**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
-__export(__webpack_require__(117));
-__export(__webpack_require__(118));
-__export(__webpack_require__(119));
-__export(__webpack_require__(120));
-__export(__webpack_require__(121));
-//# sourceMappingURL=index.js.map
-
-/***/ }),
-/* 13 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
  * Copyright 2014-present Palantir Technologies
  * @license MIT
  */
@@ -2026,13 +2006,13 @@ __export(__webpack_require__(121));
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(63));
-__export(__webpack_require__(64));
-__export(__webpack_require__(65));
+__export(__webpack_require__(67));
+__export(__webpack_require__(68));
+__export(__webpack_require__(69));
 
 
 /***/ }),
-/* 14 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2134,7 +2114,7 @@ exports.Interaction = Interaction;
 
 
 /***/ }),
-/* 15 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2146,16 +2126,16 @@ exports.Interaction = Interaction;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(73));
-__export(__webpack_require__(74));
-__export(__webpack_require__(75));
-__export(__webpack_require__(32));
-__export(__webpack_require__(76));
 __export(__webpack_require__(77));
+__export(__webpack_require__(78));
+__export(__webpack_require__(79));
+__export(__webpack_require__(32));
+__export(__webpack_require__(80));
+__export(__webpack_require__(81));
 
 
 /***/ }),
-/* 16 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2520,7 +2500,7 @@ exports.XYPlot = XYPlot;
 
 
 /***/ }),
-/* 17 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2535,19 +2515,19 @@ function __export(m) {
 __export(__webpack_require__(36));
 __export(__webpack_require__(22));
 __export(__webpack_require__(37));
-__export(__webpack_require__(78));
-__export(__webpack_require__(38));
-__export(__webpack_require__(79));
-__export(__webpack_require__(80));
-__export(__webpack_require__(81));
 __export(__webpack_require__(82));
+__export(__webpack_require__(38));
 __export(__webpack_require__(83));
 __export(__webpack_require__(84));
 __export(__webpack_require__(85));
+__export(__webpack_require__(86));
+__export(__webpack_require__(87));
+__export(__webpack_require__(88));
+__export(__webpack_require__(89));
 
 
 /***/ }),
-/* 18 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2704,6 +2684,26 @@ exports.Scale = Scale;
 
 
 /***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may obtain a copy of the
+ * license at https://github.com/palantir/typesettable/blob/develop/LICENSE
+ */
+
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+__export(__webpack_require__(119));
+__export(__webpack_require__(120));
+__export(__webpack_require__(121));
+__export(__webpack_require__(122));
+//# sourceMappingURL=index.js.map
+
+/***/ }),
 /* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -2719,7 +2719,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var SVGTypewriter = __webpack_require__(4);
+var Typesetter = __webpack_require__(4);
 var component_1 = __webpack_require__(5);
 var Formatters = __webpack_require__(8);
 var Utils = __webpack_require__(0);
@@ -2829,8 +2829,9 @@ var Axis = (function (_super) {
         this._annotationContainer.append("g").classed("annotation-circle-container", true);
         this._annotationContainer.append("g").classed("annotation-rect-container", true);
         var annotationLabelContainer = this._annotationContainer.append("g").classed("annotation-label-container", true);
-        this._annotationMeasurer = new SVGTypewriter.CacheMeasurer(annotationLabelContainer);
-        this._annotationWriter = new SVGTypewriter.Writer(this._annotationMeasurer);
+        var typesetterContext = new Typesetter.SvgContext(annotationLabelContainer.node());
+        this._annotationMeasurer = new Typesetter.CacheMeasurer(typesetterContext);
+        this._annotationWriter = new Typesetter.Writer(this._annotationMeasurer, typesetterContext);
     };
     /*
      * Function for generating tick values in data-space (as opposed to pixel values).
@@ -3006,13 +3007,11 @@ var Axis = (function (_super) {
             visibility: visibilityF,
         })
             .each(function (annotationLabel) {
-            var writeOptions = {
-                selection: d3.select(this),
+            annotationWriter.write(annotationFormatter(annotationLabel), isHorizontal ? measurements.get(annotationLabel).width : measurements.get(annotationLabel).height, isHorizontal ? measurements.get(annotationLabel).height : measurements.get(annotationLabel).width, {
                 xAlign: "center",
                 yAlign: "center",
                 textRotation: isHorizontal ? 0 : 90,
-            };
-            annotationWriter.write(annotationFormatter(annotationLabel), isHorizontal ? measurements.get(annotationLabel).width : measurements.get(annotationLabel).height, isHorizontal ? measurements.get(annotationLabel).height : measurements.get(annotationLabel).width, writeOptions);
+            }, d3.select(this).node());
         });
     };
     Axis.prototype._annotatedTicksToRender = function () {
@@ -3460,16 +3459,16 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var SVGTypewriter = __webpack_require__(4);
+var Typesetter = __webpack_require__(4);
 var Animators = __webpack_require__(6);
 var Drawers = __webpack_require__(9);
 var Formatters = __webpack_require__(8);
 var Scales = __webpack_require__(3);
 var quantitativeScale_1 = __webpack_require__(10);
 var Utils = __webpack_require__(0);
-var Plots = __webpack_require__(17);
+var Plots = __webpack_require__(16);
 var plot_1 = __webpack_require__(2);
-var xyPlot_1 = __webpack_require__(16);
+var xyPlot_1 = __webpack_require__(15);
 var Bar = (function (_super) {
     __extends(Bar, _super);
     /**
@@ -3622,8 +3621,9 @@ var Bar = (function (_super) {
         var drawer = _super.prototype._createNodesForDataset.call(this, dataset);
         drawer.renderArea().classed(Bar._BAR_AREA_CLASS, true);
         var labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
-        var measurer = new SVGTypewriter.CacheMeasurer(labelArea);
-        var writer = new SVGTypewriter.Writer(measurer);
+        var context = new Typesetter.SvgContext(labelArea.node());
+        var measurer = new Typesetter.CacheMeasurer(context);
+        var writer = new Typesetter.Writer(measurer, context);
         this._labelConfig.set(dataset, { labelArea: labelArea, measurer: measurer, writer: writer });
         return drawer;
     };
@@ -3930,12 +3930,10 @@ var Bar = (function (_super) {
                 labelOrigin.y + measurement.height > _this.height();
             labelContainer.style("visibility", hideLabel ? "hidden" : "inherit");
             var writeOptions = {
-                selection: labelContainer,
                 xAlign: xAlignment,
                 yAlign: yAlignment,
-                textRotation: 0,
             };
-            writer.write(text, containerWidth, containerHeight, writeOptions);
+            writer.write(text, containerWidth, containerHeight, writeOptions, labelContainer.node());
             var tooWide = _this._isVertical
                 ? barWidth < (measurement.width + Bar._LABEL_PADDING * 2)
                 : barHeight < (measurement.height + Bar._LABEL_PADDING * 2);
@@ -4099,7 +4097,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var SVGTypewriter = __webpack_require__(4);
+var Typesetter = __webpack_require__(4);
 var Formatters = __webpack_require__(8);
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
@@ -4283,7 +4281,8 @@ var Time = (function (_super) {
             this._tierMarkContainers.push(tierContainer.append("g").classed(axis_1.Axis.TICK_MARK_CLASS + "-container", true));
             this._tierBaselines.push(tierContainer.append("line").classed("baseline", true));
         }
-        this._measurer = new SVGTypewriter.CacheMeasurer(this._tierLabelContainers[0]);
+        var context = new Typesetter.SvgContext(this._tierLabelContainers[0].node());
+        this._measurer = new Typesetter.CacheMeasurer(context);
     };
     Time.prototype._getTickIntervalValues = function (config) {
         return this._scale.tickInterval(config.interval, config.step);
@@ -4921,7 +4920,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Interactions = __webpack_require__(15);
+var Interactions = __webpack_require__(14);
 var Utils = __webpack_require__(0);
 var _1 = __webpack_require__(30);
 var selectionBoxLayer_1 = __webpack_require__(35);
@@ -5415,89 +5414,35 @@ exports.within = within;
 /**
  * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
  * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
+ * license at https://github.com/palantir/typesettable/blob/develop/LICENSE
  */
 
-var d3 = __webpack_require__(1);
-var utils_1 = __webpack_require__(12);
-var BaseAnimator = (function () {
-    function BaseAnimator() {
-        this.duration(BaseAnimator.DEFAULT_DURATION_MILLISECONDS);
-        this.delay(0);
-        this.easing(BaseAnimator.DEFAULT_EASING);
-        this.moveX(0);
-        this.moveY(0);
+;
+var AbstractMeasurer = (function () {
+    function AbstractMeasurer(ruler) {
+        if (ruler.createRuler != null) {
+            this.ruler = ruler.createRuler();
+        }
+        else {
+            this.ruler = ruler;
+        }
     }
-    BaseAnimator.prototype.animate = function (selection) {
-        utils_1.DOM.transform(selection, this.moveX(), this.moveY());
-        var initialTranslate = "translate(0, 0)";
-        return this._animate(selection, { transform: initialTranslate });
+    AbstractMeasurer.prototype.measure = function (text) {
+        if (text === void 0) { text = AbstractMeasurer.HEIGHT_TEXT; }
+        return this.ruler(text);
     };
-    BaseAnimator.prototype._animate = function (selection, attr) {
-        var transition = selection.transition()
-            .ease(this.easing())
-            .duration(this.duration())
-            .delay(this.delay());
-        utils_1.DOM.applyAttrs(transition, attr);
-        return transition;
-    };
-    BaseAnimator.prototype.duration = function (duration) {
-        if (duration == null) {
-            return this._duration;
-        }
-        else {
-            this._duration = duration;
-            return this;
-        }
-    };
-    BaseAnimator.prototype.moveX = function (shift) {
-        if (shift == null) {
-            return this._moveX;
-        }
-        else {
-            this._moveX = shift;
-            return this;
-        }
-    };
-    BaseAnimator.prototype.moveY = function (shift) {
-        if (shift == null) {
-            return this._moveY;
-        }
-        else {
-            this._moveY = shift;
-            return this;
-        }
-    };
-    BaseAnimator.prototype.delay = function (delay) {
-        if (delay == null) {
-            return this._delay;
-        }
-        else {
-            this._delay = delay;
-            return this;
-        }
-    };
-    BaseAnimator.prototype.easing = function (easing) {
-        if (easing == null) {
-            return this._easing;
-        }
-        else {
-            this._easing = easing;
-            return this;
-        }
-    };
-    return BaseAnimator;
+    return AbstractMeasurer;
 }());
 /**
- * The default duration of the animation in milliseconds
+ * A string representing the full ascender/descender range of your text.
+ *
+ * Note that this is really only applicable to western alphabets. If you are
+ * using a different locale language such as arabic or chinese, you may want
+ * to override this.
  */
-BaseAnimator.DEFAULT_DURATION_MILLISECONDS = 300;
-/**
- * The default easing of the animation
- */
-BaseAnimator.DEFAULT_EASING = d3.easeExpOut;
-exports.BaseAnimator = BaseAnimator;
-//# sourceMappingURL=baseAnimator.js.map
+AbstractMeasurer.HEIGHT_TEXT = "bdpql";
+exports.AbstractMeasurer = AbstractMeasurer;
+//# sourceMappingURL=abstractMeasurer.js.map
 
 /***/ }),
 /* 30 */
@@ -5513,18 +5458,18 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 __export(__webpack_require__(27));
-__export(__webpack_require__(54));
-__export(__webpack_require__(55));
-__export(__webpack_require__(33));
-__export(__webpack_require__(34));
-__export(__webpack_require__(56));
-__export(__webpack_require__(57));
 __export(__webpack_require__(58));
 __export(__webpack_require__(59));
-__export(__webpack_require__(35));
+__export(__webpack_require__(33));
+__export(__webpack_require__(34));
 __export(__webpack_require__(60));
 __export(__webpack_require__(61));
 __export(__webpack_require__(62));
+__export(__webpack_require__(63));
+__export(__webpack_require__(35));
+__export(__webpack_require__(64));
+__export(__webpack_require__(65));
+__export(__webpack_require__(66));
 var Alignment = (function () {
     function Alignment() {
     }
@@ -5608,9 +5553,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Dispatchers = __webpack_require__(13);
+var Dispatchers = __webpack_require__(12);
 var Utils = __webpack_require__(0);
-var interaction_1 = __webpack_require__(14);
+var interaction_1 = __webpack_require__(13);
 var Key = (function (_super) {
     __extends(Key, _super);
     function Key() {
@@ -6227,7 +6172,7 @@ var d3 = __webpack_require__(1);
 var Drawers = __webpack_require__(9);
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var Plots = __webpack_require__(17);
+var Plots = __webpack_require__(16);
 var linePlot_1 = __webpack_require__(38);
 var plot_1 = __webpack_require__(2);
 var Area = (function (_super) {
@@ -6440,9 +6385,9 @@ var Drawers = __webpack_require__(9);
 var Scales = __webpack_require__(3);
 var quantitativeScale_1 = __webpack_require__(10);
 var Utils = __webpack_require__(0);
-var Plots = __webpack_require__(17);
+var Plots = __webpack_require__(16);
 var plot_1 = __webpack_require__(2);
-var xyPlot_1 = __webpack_require__(16);
+var xyPlot_1 = __webpack_require__(15);
 var CURVE_NAME_MAPPING = {
     "linear": d3.curveLinear,
     "linearClosed": d3.curveLinearClosed,
@@ -6917,9 +6862,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var Interactions = __webpack_require__(15);
+var Interactions = __webpack_require__(14);
 var Utils = __webpack_require__(0);
-var scale_1 = __webpack_require__(18);
+var scale_1 = __webpack_require__(17);
 var TRANSFORMATION_SPACE = [0, 1];
 var Category = (function (_super) {
     __extends(Category, _super);
@@ -7105,6 +7050,261 @@ exports.Category = Category;
  * @license MIT
  */
 
+var nativeMath = window.Math;
+/**
+ * Gets the bounding box of an element.
+ * @param {d3.Selection} element
+ * @returns {SVGRed} The bounding box.
+ */
+function elementBBox(element) {
+    var bbox;
+    // HACKHACK: Firefox won't correctly measure nodes with style "display: none" or their descendents (FF Bug 612118).
+    try {
+        bbox = element.node().getBBox();
+    }
+    catch (err) {
+        bbox = { x: 0, y: 0, width: 0, height: 0 };
+    }
+    return bbox;
+}
+exports.elementBBox = elementBBox;
+/**
+ * Screen refresh rate which is assumed to be 60fps
+ */
+exports.SCREEN_REFRESH_RATE_MILLISECONDS = 1000 / 60;
+/**
+ * Polyfill for `window.requestAnimationFrame`.
+ * If the function exists, then we use the function directly.
+ * Otherwise, we set a timeout on `SCREEN_REFRESH_RATE_MILLISECONDS` and then perform the function.
+ *
+ * @param {() => void} callback The callback to call in the next animation frame
+ */
+function requestAnimationFramePolyfill(callback) {
+    if (window.requestAnimationFrame != null) {
+        window.requestAnimationFrame(callback);
+    }
+    else {
+        setTimeout(callback, exports.SCREEN_REFRESH_RATE_MILLISECONDS);
+    }
+}
+exports.requestAnimationFramePolyfill = requestAnimationFramePolyfill;
+/**
+ * Calculates the width of the element.
+ * The width includes the padding and the border on the element's left and right sides.
+ *
+ * @param {Element} element The element to query
+ * @returns {number} The width of the element.
+ */
+function elementWidth(element) {
+    var style = window.getComputedStyle(element);
+    return _parseStyleValue(style, "width")
+        + _parseStyleValue(style, "padding-left")
+        + _parseStyleValue(style, "padding-right")
+        + _parseStyleValue(style, "border-left-width")
+        + _parseStyleValue(style, "border-right-width");
+}
+exports.elementWidth = elementWidth;
+/**
+ * Calculates the height of the element.
+ * The height includes the padding the and the border on the element's top and bottom sides.
+ *
+ * @param {Element} element The element to query
+ * @returns {number} The height of the element
+ */
+function elementHeight(element) {
+    var style = window.getComputedStyle(element);
+    return _parseStyleValue(style, "height")
+        + _parseStyleValue(style, "padding-top")
+        + _parseStyleValue(style, "padding-bottom")
+        + _parseStyleValue(style, "border-top-width")
+        + _parseStyleValue(style, "border-bottom-width");
+}
+exports.elementHeight = elementHeight;
+// taken from the BNF at https://www.w3.org/TR/SVG/coords.html
+var WSP = "\\s";
+var NUMBER = "(?:[-+]?[0-9]*\\.?[0-9]+)";
+var COMMA_WSP = "(?:(?:" + WSP + "+,?" + WSP + "*)|(?:," + WSP + "*))";
+var TRANSLATE_REGEX = new RegExp("translate" + WSP + "*\\(" + WSP + "*(" + NUMBER + ")(?:" + COMMA_WSP + "(" + NUMBER + "))?" + WSP + "*\\)");
+var ROTATE_REGEX = new RegExp("rotate" + WSP + "*\\(" + WSP + "*(" + NUMBER + ")" + WSP + "*\\)");
+var SCALE_REGEX = new RegExp("scale" + WSP + "*\\(" + WSP + "*(" + NUMBER + ")(?:" + COMMA_WSP + "(" + NUMBER + "))?" + WSP + "*\\)");
+/**
+ * Accepts selections whose .transform contain a "translate(a, b)" and extracts the a and b
+ */
+function getTranslateValues(el) {
+    var match = TRANSLATE_REGEX.exec(el.attr("transform"));
+    if (match != null) {
+        var translateX = match[1], _a = match[2], translateY = _a === void 0 ? 0 : _a;
+        return [+translateX, +translateY];
+    }
+    else {
+        return [0, 0];
+    }
+}
+exports.getTranslateValues = getTranslateValues;
+/**
+ * Accepts selections whose .transform contain a "rotate(angle)" and returns the angle
+ */
+function getRotate(el) {
+    var match = ROTATE_REGEX.exec(el.attr("transform"));
+    if (match != null) {
+        var rotation = match[1];
+        return +rotation;
+    }
+    else {
+        return 0;
+    }
+}
+exports.getRotate = getRotate;
+function getScaleValues(el) {
+    var match = SCALE_REGEX.exec(el.attr("transform"));
+    if (match != null) {
+        var scaleX = match[1], scaleY = match[2];
+        return [+scaleX, scaleY == null ? +scaleX : +scaleY];
+    }
+    else {
+        return [0, 0];
+    }
+}
+exports.getScaleValues = getScaleValues;
+/**
+ * Checks if the first ClientRect overlaps the second.
+ *
+ * @param {ClientRect} clientRectA The first ClientRect
+ * @param {ClientRect} clientRectB The second ClientRect
+ * @returns {boolean} If the ClientRects overlap each other.
+ */
+function clientRectsOverlap(clientRectA, clientRectB) {
+    if (nativeMath.floor(clientRectA.right) <= nativeMath.ceil(clientRectB.left)) {
+        return false;
+    }
+    if (nativeMath.ceil(clientRectA.left) >= nativeMath.floor(clientRectB.right)) {
+        return false;
+    }
+    if (nativeMath.floor(clientRectA.bottom) <= nativeMath.ceil(clientRectB.top)) {
+        return false;
+    }
+    if (nativeMath.ceil(clientRectA.top) >= nativeMath.floor(clientRectB.bottom)) {
+        return false;
+    }
+    return true;
+}
+exports.clientRectsOverlap = clientRectsOverlap;
+/**
+ * Return a new ClientRect that is the old ClientRect expanded by amount in all directions.
+ * @param rect
+ * @param amount
+ */
+function expandRect(rect, amount) {
+    return {
+        left: rect.left - amount,
+        top: rect.top - amount,
+        right: rect.right + amount,
+        bottom: rect.bottom + amount,
+        width: rect.width + amount * 2,
+        height: rect.height + amount * 2
+    };
+}
+exports.expandRect = expandRect;
+/**
+ * Returns true if and only if innerClientRect is inside outerClientRect.
+ *
+ * @param {ClientRect} innerClientRect The first ClientRect
+ * @param {ClientRect} outerClientRect The second ClientRect
+ * @returns {boolean} If and only if the innerClientRect is inside outerClientRect.
+ */
+function clientRectInside(innerClientRect, outerClientRect) {
+    return (nativeMath.floor(outerClientRect.left) <= nativeMath.ceil(innerClientRect.left) &&
+        nativeMath.floor(outerClientRect.top) <= nativeMath.ceil(innerClientRect.top) &&
+        nativeMath.floor(innerClientRect.right) <= nativeMath.ceil(outerClientRect.right) &&
+        nativeMath.floor(innerClientRect.bottom) <= nativeMath.ceil(outerClientRect.bottom));
+}
+exports.clientRectInside = clientRectInside;
+/**
+ * Retrieves the bounding svg of the input element
+ *
+ * @param {SVGElement} element The element to query
+ * @returns {SVGElement} The bounding svg
+ */
+function boundingSVG(element) {
+    var ownerSVG = element.ownerSVGElement;
+    if (ownerSVG != null) {
+        return ownerSVG;
+    }
+    if (element.nodeName.toLowerCase() === "svg") {
+        return element;
+    }
+    return null; // not in the DOM
+}
+exports.boundingSVG = boundingSVG;
+var _latestClipPathId = 0;
+/**
+ * Generates a ClipPath ID that is unique for this instance of Plottable
+ */
+function generateUniqueClipPathId() {
+    return "plottableClipPath" + ++_latestClipPathId;
+}
+exports.generateUniqueClipPathId = generateUniqueClipPathId;
+/**
+ * Returns true if the supplied coordinates or Ranges intersect or are contained by bbox.
+ *
+ * @param {number | Range} xValOrRange The x coordinate or Range to test
+ * @param {number | Range} yValOrRange The y coordinate or Range to test
+ * @param {SVGRect} bbox The bbox
+ * @param {number} tolerance Amount by which to expand bbox, in each dimension, before
+ * testing intersection
+ *
+ * @returns {boolean} True if the supplied coordinates or Ranges intersect or are
+ * contained by bbox, false otherwise.
+ */
+function intersectsBBox(xValOrRange, yValOrRange, bbox, tolerance) {
+    if (tolerance === void 0) { tolerance = 0.5; }
+    var xRange = _parseRange(xValOrRange);
+    var yRange = _parseRange(yValOrRange);
+    // SVGRects are positioned with sub-pixel accuracy (the default unit
+    // for the x, y, height & width attributes), but user selections (e.g. via
+    // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
+    // seems appropriate.
+    return bbox.x + bbox.width >= xRange.min - tolerance &&
+        bbox.x <= xRange.max + tolerance &&
+        bbox.y + bbox.height >= yRange.min - tolerance &&
+        bbox.y <= yRange.max + tolerance;
+}
+exports.intersectsBBox = intersectsBBox;
+/**
+ * Create a Range from a number or an object with "min" and "max" defined.
+ *
+ * @param {any} input The object to parse
+ *
+ * @returns {Range} The generated Range
+ */
+function _parseRange(input) {
+    if (typeof (input) === "number") {
+        var value = input;
+        return { min: value, max: value };
+    }
+    var range = input;
+    if (range instanceof Object && "min" in range && "max" in range) {
+        return range;
+    }
+    throw new Error("input '" + input + "' can't be parsed as an Range");
+}
+function _parseStyleValue(style, property) {
+    var value = style.getPropertyValue(property);
+    var parsedValue = parseFloat(value);
+    return parsedValue || 0;
+}
+
+
+/***/ }),
+/* 41 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
 /**
  * Shim for ES6 set.
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set
@@ -7168,74 +7368,6 @@ exports.Set = Set;
 
 
 /***/ }),
-/* 41 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-
-var utils_1 = __webpack_require__(12);
-;
-var AbstractMeasurer = (function () {
-    function AbstractMeasurer(area, className) {
-        this.textMeasurer = this.getTextMeasurer(area, className);
-    }
-    AbstractMeasurer.prototype.measure = function (text) {
-        if (text === void 0) { text = AbstractMeasurer.HEIGHT_TEXT; }
-        return this.textMeasurer(text);
-    };
-    AbstractMeasurer.prototype.checkSelectionIsText = function (d) {
-        return d.node().tagName === "text" || !d.select("text").empty();
-    };
-    AbstractMeasurer.prototype.getTextMeasurer = function (area, className) {
-        var _this = this;
-        if (!this.checkSelectionIsText(area)) {
-            var textElement_1 = area.append("text");
-            if (className) {
-                textElement_1.classed(className, true);
-            }
-            textElement_1.remove();
-            return function (text) {
-                area.node().appendChild(textElement_1.node());
-                var areaDimension = _this.measureBBox(textElement_1, text);
-                textElement_1.remove();
-                return areaDimension;
-            };
-        }
-        else {
-            var parentNode_1 = area.node().parentNode;
-            var textSelection_1;
-            if (area.node().tagName === "text") {
-                textSelection_1 = area;
-            }
-            else {
-                textSelection_1 = area.select("text");
-            }
-            area.remove();
-            return function (text) {
-                parentNode_1.appendChild(area.node());
-                var areaDimension = _this.measureBBox(textSelection_1, text);
-                area.remove();
-                return areaDimension;
-            };
-        }
-    };
-    AbstractMeasurer.prototype.measureBBox = function (d, text) {
-        d.text(text);
-        var bb = utils_1.DOM.getBBox(d);
-        return { width: bb.width, height: bb.height };
-    };
-    return AbstractMeasurer;
-}());
-AbstractMeasurer.HEIGHT_TEXT = "bqpdl";
-exports.AbstractMeasurer = AbstractMeasurer;
-//# sourceMappingURL=abstractMeasurer.js.map
-
-/***/ }),
 /* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -7243,7 +7375,25 @@ exports.AbstractMeasurer = AbstractMeasurer;
 /**
  * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
  * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
+ * license at https://github.com/palantir/typesettable/blob/develop/LICENSE
+ */
+
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+__export(__webpack_require__(116));
+__export(__webpack_require__(115));
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+/* 43 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may obtain a copy of the
+ * license at https://github.com/palantir/typesettable/blob/develop/LICENSE
  */
 
 var __extends = (this && this.__extends) || function (d, b) {
@@ -7251,12 +7401,12 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var utils_1 = __webpack_require__(12);
-var characterMeasurer_1 = __webpack_require__(43);
+var utils_1 = __webpack_require__(18);
+var characterMeasurer_1 = __webpack_require__(44);
 var CacheCharacterMeasurer = (function (_super) {
     __extends(CacheCharacterMeasurer, _super);
-    function CacheCharacterMeasurer(area, className, useGuards) {
-        var _this = _super.call(this, area, className, useGuards) || this;
+    function CacheCharacterMeasurer(ruler, useGuards) {
+        var _this = _super.call(this, ruler, useGuards) || this;
         _this.cache = new utils_1.Cache(function (c) {
             return _this._measureCharacterNotFromCache(c);
         });
@@ -7277,14 +7427,14 @@ exports.CacheCharacterMeasurer = CacheCharacterMeasurer;
 //# sourceMappingURL=cacheCharacterMeasurer.js.map
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /**
  * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
  * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
+ * license at https://github.com/palantir/typesettable/blob/develop/LICENSE
  */
 
 var __extends = (this && this.__extends) || function (d, b) {
@@ -7292,8 +7442,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var d3 = __webpack_require__(1);
-var measurer_1 = __webpack_require__(44);
+var measurer_1 = __webpack_require__(46);
 var CharacterMeasurer = (function (_super) {
     __extends(CharacterMeasurer, _super);
     function CharacterMeasurer() {
@@ -7306,8 +7455,8 @@ var CharacterMeasurer = (function (_super) {
         var _this = this;
         var charactersDimensions = line.split("").map(function (c) { return _this._measureCharacter(c); });
         return {
-            height: d3.max(charactersDimensions, function (dim) { return dim.height; }),
-            width: d3.sum(charactersDimensions, function (dim) { return dim.width; }),
+            height: charactersDimensions.reduce(function (acc, dim) { return Math.max(acc, dim.height); }, 0),
+            width: charactersDimensions.reduce(function (acc, dim) { return acc + dim.width; }, 0),
         };
     };
     return CharacterMeasurer;
@@ -7316,14 +7465,35 @@ exports.CharacterMeasurer = CharacterMeasurer;
 //# sourceMappingURL=characterMeasurer.js.map
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /**
  * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
  * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
+ * license at https://github.com/palantir/typesettable/blob/develop/LICENSE
+ */
+
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+__export(__webpack_require__(29));
+__export(__webpack_require__(43));
+__export(__webpack_require__(117));
+__export(__webpack_require__(44));
+__export(__webpack_require__(46));
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+/* 46 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may obtain a copy of the
+ * license at https://github.com/palantir/typesettable/blob/develop/LICENSE
  */
 
 var __extends = (this && this.__extends) || function (d, b) {
@@ -7331,14 +7501,12 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var d3 = __webpack_require__(1);
-var abstractMeasurer_1 = __webpack_require__(41);
+var abstractMeasurer_1 = __webpack_require__(29);
 var Measurer = (function (_super) {
     __extends(Measurer, _super);
-    function Measurer(area, className, useGuards) {
-        if (className === void 0) { className = null; }
+    function Measurer(ruler, useGuards) {
         if (useGuards === void 0) { useGuards = false; }
-        var _this = _super.call(this, area, className) || this;
+        var _this = _super.call(this, ruler) || this;
         _this.useGuards = useGuards;
         return _this;
     }
@@ -7362,8 +7530,8 @@ var Measurer = (function (_super) {
         }
         var linesDimensions = text.trim().split("\n").map(function (line) { return _this._measureLine(line); });
         return {
-            height: d3.sum(linesDimensions, function (dim) { return dim.height; }),
-            width: d3.max(linesDimensions, function (dim) { return dim.width; }),
+            height: linesDimensions.reduce(function (acc, dim) { return acc + dim.height; }, 0),
+            width: linesDimensions.reduce(function (acc, dim) { return Math.max(acc, dim.width); }, 0),
         };
     };
     Measurer.prototype.getGuardWidth = function () {
@@ -7378,17 +7546,35 @@ exports.Measurer = Measurer;
 //# sourceMappingURL=measurer.js.map
 
 /***/ }),
-/* 45 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /**
  * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
  * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
+ * license at https://github.com/palantir/typesettable/blob/develop/LICENSE
  */
 
-var Utils = __webpack_require__(12);
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+__export(__webpack_require__(123));
+__export(__webpack_require__(48));
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+/* 48 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may obtain a copy of the
+ * license at https://github.com/palantir/typesettable/blob/develop/LICENSE
+ */
+
+var Utils = __webpack_require__(18);
 var Wrapper = (function () {
     function Wrapper() {
         this.maxLines(Infinity);
@@ -7605,7 +7791,24 @@ exports.Wrapper = Wrapper;
 //# sourceMappingURL=wrapper.js.map
 
 /***/ }),
-/* 46 */
+/* 49 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may obtain a copy of the
+ * license at https://github.com/palantir/typesettable/blob/develop/LICENSE
+ */
+
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+__export(__webpack_require__(124));
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7617,13 +7820,13 @@ exports.Wrapper = Wrapper;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(52));
-__export(__webpack_require__(53));
+__export(__webpack_require__(56));
+__export(__webpack_require__(57));
 __export(__webpack_require__(23));
 
 
 /***/ }),
-/* 47 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7695,7 +7898,7 @@ exports.Dataset = Dataset;
 
 
 /***/ }),
-/* 48 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7713,7 +7916,7 @@ exports.version = "3.0.0-beta.2";
 
 
 /***/ }),
-/* 49 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7812,7 +8015,7 @@ d3Transition.transition.prototype.styles = transition_styles;
 
 
 /***/ }),
-/* 50 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7821,7 +8024,7 @@ d3Transition.transition.prototype.styles = transition_styles;
  * @license MIT
  */
 
-var d3Ease = __webpack_require__(101);
+var d3Ease = __webpack_require__(104);
 var coerceD3_1 = __webpack_require__(11);
 var EASE_NAME_MAPPING = {
     "linear": d3Ease.easeLinear,
@@ -7989,7 +8192,7 @@ exports.Easing = Easing;
 
 
 /***/ }),
-/* 51 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8019,7 +8222,7 @@ exports.Null = Null;
 
 
 /***/ }),
-/* 52 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8034,7 +8237,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var SVGTypewriter = __webpack_require__(4);
+var Typesetter = __webpack_require__(4);
 var axis_1 = __webpack_require__(19);
 var Utils = __webpack_require__(0);
 var Category = (function (_super) {
@@ -8064,10 +8267,10 @@ var Category = (function (_super) {
     Object.defineProperty(Category.prototype, "_wrapper", {
         /**
          * A Wrapper configured according to the other properties on this axis.
-         * @returns {SVGTypewriter.Wrapper}
+         * @returns {Typesetter.Wrapper}
          */
         get: function () {
-            var wrapper = new SVGTypewriter.Wrapper();
+            var wrapper = new Typesetter.Wrapper();
             if (this._tickLabelMaxLines != null) {
                 wrapper.maxLines(this._tickLabelMaxLines);
             }
@@ -8079,17 +8282,18 @@ var Category = (function (_super) {
     Object.defineProperty(Category.prototype, "_writer", {
         /**
          * A Writer attached to this measurer and wrapper.
-         * @returns {SVGTypewriter.Writer}
+         * @returns {Typesetter.Writer}
          */
         get: function () {
-            return new SVGTypewriter.Writer(this._measurer, this._wrapper);
+            return new Typesetter.Writer(this._measurer, this._typesetterContext, this._wrapper);
         },
         enumerable: true,
         configurable: true
     });
     Category.prototype._setup = function () {
         _super.prototype._setup.call(this);
-        this._measurer = new SVGTypewriter.CacheMeasurer(this._tickLabelContainer);
+        this._typesetterContext = new Typesetter.SvgContext(this._tickLabelContainer.node());
+        this._measurer = new Typesetter.CacheMeasurer(this._typesetterContext);
     };
     Category.prototype._rescale = function () {
         return this.redraw();
@@ -8250,10 +8454,10 @@ var Category = (function (_super) {
                 break;
         }
         ticks.each(function (d) {
+            var container = d3.select(this);
             var width = self.isHorizontal() ? stepWidth : self.width() - self._tickSpaceRequired();
             var height = self.isHorizontal() ? self.height() - self._tickSpaceRequired() : stepWidth;
             var writeOptions = {
-                selection: d3.select(this),
                 xAlign: xAlign[self.orientation()],
                 yAlign: yAlign[self.orientation()],
                 textRotation: self.tickLabelAngle(),
@@ -8264,12 +8468,12 @@ var Category = (function (_super) {
                 // aligned with the side of the ticks
                 if (self.orientation() === "left" && width > self._tickLabelMaxWidth) {
                     var cutOffWidth = width - self._tickLabelMaxWidth;
-                    var newTransform = writeOptions.selection.attr("transform") + " translate(" + cutOffWidth + ", 0)";
-                    writeOptions.selection.attr("transform", newTransform);
+                    var newTransform = container.attr("transform") + " translate(" + cutOffWidth + ", 0)";
+                    container.attr("transform", newTransform);
                 }
                 width = Math.min(width, self._tickLabelMaxWidth);
             }
-            self._writer.write(self.formatter()(d), width, height, writeOptions);
+            self._writer.write(self.formatter()(d), width, height, writeOptions, container.node());
         });
     };
     /**
@@ -8390,7 +8594,7 @@ exports.Category = Category;
 
 
 /***/ }),
-/* 53 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8405,7 +8609,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var SVGTypewriter = __webpack_require__(4);
+var Typesetter = __webpack_require__(4);
 var axis_1 = __webpack_require__(19);
 var Formatters = __webpack_require__(8);
 var Utils = __webpack_require__(0);
@@ -8428,8 +8632,9 @@ var Numeric = (function (_super) {
     }
     Numeric.prototype._setup = function () {
         _super.prototype._setup.call(this);
-        this._measurer = new SVGTypewriter.CacheMeasurer(this._tickLabelContainer, axis_1.Axis.TICK_LABEL_CLASS);
-        this._wrapper = new SVGTypewriter.Wrapper().maxLines(1);
+        var context = new Typesetter.SvgContext(this._tickLabelContainer.node(), axis_1.Axis.TICK_LABEL_CLASS);
+        this._measurer = new Typesetter.CacheMeasurer(context);
+        this._wrapper = new Typesetter.Wrapper().maxLines(1);
     };
     Numeric.prototype._computeWidth = function () {
         var maxTextWidth = this._usesTextWidthApproximation ? this._computeApproximateTextWidth() : this._computeExactTextWidth();
@@ -8684,7 +8889,7 @@ exports.Numeric = Numeric;
 
 
 /***/ }),
-/* 54 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8699,7 +8904,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var guideLineLayer_1 = __webpack_require__(34);
-var Interactions = __webpack_require__(15);
+var Interactions = __webpack_require__(14);
 var Utils = __webpack_require__(0);
 var DragLineLayer = (function (_super) {
     __extends(DragLineLayer, _super);
@@ -8873,7 +9078,7 @@ exports.DragLineLayer = DragLineLayer;
 
 
 /***/ }),
-/* 55 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8983,7 +9188,7 @@ exports.Gridlines = Gridlines;
 
 
 /***/ }),
-/* 56 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8997,7 +9202,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var SVGTypewriter = __webpack_require__(4);
+var Typesetter = __webpack_require__(4);
 var Configs = __webpack_require__(20);
 var Formatters = __webpack_require__(8);
 var Utils = __webpack_require__(0);
@@ -9094,9 +9299,10 @@ var InterpolatedColorLegend = (function (_super) {
         this._swatchBoundingBox = this.content().append("rect").classed("swatch-bounding-box", true);
         this._lowerLabel = this.content().append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
         this._upperLabel = this.content().append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
-        this._measurer = new SVGTypewriter.Measurer(this.content());
-        this._wrapper = new SVGTypewriter.Wrapper();
-        this._writer = new SVGTypewriter.Writer(this._measurer, this._wrapper);
+        var context = new Typesetter.SvgContext(this.content().node());
+        this._measurer = new Typesetter.Measurer(context);
+        this._wrapper = new Typesetter.Wrapper();
+        this._writer = new Typesetter.Writer(this._measurer, context, this._wrapper);
     };
     InterpolatedColorLegend.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
         var _this = this;
@@ -9138,13 +9344,11 @@ var InterpolatedColorLegend = (function (_super) {
         var upperLabelShift = { x: 0, y: 0 };
         var lowerLabelShift = { x: 0, y: 0 };
         var lowerWriteOptions = {
-            selection: this._lowerLabel,
             xAlign: "center",
             yAlign: "center",
             textRotation: 0,
         };
         var upperWriteOptions = {
-            selection: this._upperLabel,
             xAlign: "center",
             yAlign: "center",
             textRotation: 0,
@@ -9206,11 +9410,11 @@ var InterpolatedColorLegend = (function (_super) {
         }
         boundingBoxAttr["x"] = swatchX(null, 0); // position of the first swatch
         this._upperLabel.text(""); // clear the upper label
-        this._writer.write(text1, this.width(), this.height(), upperWriteOptions);
+        this._writer.write(text1, this.width(), this.height(), upperWriteOptions, this._upperLabel.node());
         var upperTranslateString = "translate(" + upperLabelShift.x + ", " + upperLabelShift.y + ")";
         this._upperLabel.attr("transform", upperTranslateString);
         this._lowerLabel.text(""); // clear the lower label
-        this._writer.write(text0, this.width(), this.height(), lowerWriteOptions);
+        this._writer.write(text0, this.width(), this.height(), lowerWriteOptions, this._lowerLabel.node());
         var lowerTranslateString = "translate(" + lowerLabelShift.x + ", " + lowerLabelShift.y + ")";
         this._lowerLabel.attr("transform", lowerTranslateString);
         this._swatchBoundingBox.attrs(boundingBoxAttr);
@@ -9244,7 +9448,7 @@ exports.InterpolatedColorLegend = InterpolatedColorLegend;
 
 
 /***/ }),
-/* 57 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9258,7 +9462,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var SVGTypewriter = __webpack_require__(4);
+var Typesetter = __webpack_require__(4);
 var component_1 = __webpack_require__(5);
 var Label = (function (_super) {
     __extends(Label, _super);
@@ -9291,9 +9495,10 @@ var Label = (function (_super) {
     Label.prototype._setup = function () {
         _super.prototype._setup.call(this);
         this._textContainer = this.content().append("g");
-        this._measurer = new SVGTypewriter.CacheMeasurer(this._textContainer);
-        this._wrapper = new SVGTypewriter.Wrapper();
-        this._writer = new SVGTypewriter.Writer(this._measurer, this._wrapper);
+        var context = new Typesetter.SvgContext(this._textContainer.node());
+        this._measurer = new Typesetter.CacheMeasurer(context);
+        this._wrapper = new Typesetter.Wrapper();
+        this._writer = new Typesetter.Writer(this._measurer, context, this._wrapper);
         this.text(this._text);
     };
     Label.prototype.text = function (displayText) {
@@ -9353,7 +9558,7 @@ var Label = (function (_super) {
     };
     Label.prototype.renderImmediately = function () {
         _super.prototype.renderImmediately.call(this);
-        // HACKHACK SVGTypewriter.remove existing content - #21 on SVGTypewriter.
+        // HACKHACK Typesetter.remove existing content - #21 on Typesetter.
         this._textContainer.selectAll("g").remove();
         var textMeasurement = this._measurer.measure(this._text);
         var heightPadding = Math.max(Math.min((this.height() - textMeasurement.height) / 2, this.padding()), 0);
@@ -9362,7 +9567,6 @@ var Label = (function (_super) {
         var writeWidth = this.width() - 2 * widthPadding;
         var writeHeight = this.height() - 2 * heightPadding;
         var writeOptions = {
-            selection: this._textContainer,
             xAlign: this.xAlignment(),
             yAlign: this.yAlignment(),
             textRotation: this.angle(),
@@ -9410,7 +9614,7 @@ exports.AxisLabel = AxisLabel;
 
 
 /***/ }),
-/* 58 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9425,7 +9629,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var SVGTypewriter = __webpack_require__(4);
+var Typesetter = __webpack_require__(4);
 var Configs = __webpack_require__(20);
 var Formatters = __webpack_require__(8);
 var SymbolFactories = __webpack_require__(26);
@@ -9633,9 +9837,10 @@ var Legend = (function (_super) {
         var fakeLegendRow = this.content().append("g").classed(Legend.LEGEND_ROW_CLASS, true);
         var fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
         fakeLegendEntry.append("text");
-        this._measurer = new SVGTypewriter.Measurer(fakeLegendRow);
-        this._wrapper = new SVGTypewriter.Wrapper().maxLines(this.maxLinesPerEntry());
-        this._writer = new SVGTypewriter.Writer(this._measurer, this._wrapper).addTitleElement(Configs.ADD_TITLE_ELEMENTS);
+        var context = new Typesetter.SvgContext(fakeLegendRow.node(), null, Configs.ADD_TITLE_ELEMENTS);
+        this._measurer = new Typesetter.Measurer(context);
+        this._wrapper = new Typesetter.Wrapper().maxLines(this.maxLinesPerEntry());
+        this._writer = new Typesetter.Writer(this._measurer, context, this._wrapper);
     };
     Legend.prototype.formatter = function (formatter) {
         if (formatter == null) {
@@ -9921,7 +10126,7 @@ exports.Legend = Legend;
 
 
 /***/ }),
-/* 59 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9978,7 +10183,7 @@ exports.PlotGroup = PlotGroup;
 
 
 /***/ }),
-/* 60 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10377,7 +10582,7 @@ exports.Table = Table;
 
 
 /***/ }),
-/* 61 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10443,7 +10648,7 @@ exports.XDragBoxLayer = XDragBoxLayer;
 
 
 /***/ }),
-/* 62 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10509,7 +10714,7 @@ exports.YDragBoxLayer = YDragBoxLayer;
 
 
 /***/ }),
-/* 63 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10605,7 +10810,7 @@ exports.Key = Key;
 
 
 /***/ }),
-/* 64 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10805,7 +11010,7 @@ exports.Mouse = Mouse;
 
 
 /***/ }),
-/* 65 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10981,7 +11186,7 @@ exports.Touch = Touch;
 
 
 /***/ }),
-/* 66 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11013,7 +11218,7 @@ exports.Arc = Arc;
 
 
 /***/ }),
-/* 67 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11045,7 +11250,7 @@ exports.ArcOutline = ArcOutline;
 
 
 /***/ }),
-/* 68 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11081,7 +11286,7 @@ exports.Area = Area;
 
 
 /***/ }),
-/* 69 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11117,7 +11322,7 @@ exports.Line = Line;
 
 
 /***/ }),
-/* 70 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11144,7 +11349,7 @@ exports.Rectangle = Rectangle;
 
 
 /***/ }),
-/* 71 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11171,7 +11376,7 @@ exports.Segment = Segment;
 
 
 /***/ }),
-/* 72 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11199,7 +11404,7 @@ exports.Symbol = Symbol;
 
 
 /***/ }),
-/* 73 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11213,9 +11418,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Dispatchers = __webpack_require__(13);
+var Dispatchers = __webpack_require__(12);
 var Utils = __webpack_require__(0);
-var interaction_1 = __webpack_require__(14);
+var interaction_1 = __webpack_require__(13);
 var Click = (function (_super) {
     __extends(Click, _super);
     function Click() {
@@ -11288,7 +11493,7 @@ exports.Click = Click;
 
 
 /***/ }),
-/* 74 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11302,9 +11507,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Dispatchers = __webpack_require__(13);
+var Dispatchers = __webpack_require__(12);
 var Utils = __webpack_require__(0);
-var interaction_1 = __webpack_require__(14);
+var interaction_1 = __webpack_require__(13);
 var ClickState;
 (function (ClickState) {
     ClickState[ClickState["NotClicked"] = 0] = "NotClicked";
@@ -11407,7 +11612,7 @@ exports.DoubleClick = DoubleClick;
 
 
 /***/ }),
-/* 75 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11421,9 +11626,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Dispatchers = __webpack_require__(13);
+var Dispatchers = __webpack_require__(12);
 var Utils = __webpack_require__(0);
-var interaction_1 = __webpack_require__(14);
+var interaction_1 = __webpack_require__(13);
 var Drag = (function (_super) {
     __extends(Drag, _super);
     function Drag() {
@@ -11572,7 +11777,7 @@ exports.Drag = Drag;
 
 
 /***/ }),
-/* 76 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11587,11 +11792,11 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var Dispatchers = __webpack_require__(13);
+var Dispatchers = __webpack_require__(12);
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var interaction_1 = __webpack_require__(14);
-var Interactions = __webpack_require__(15);
+var interaction_1 = __webpack_require__(13);
+var Interactions = __webpack_require__(14);
 /**
  * Performs a zoom transformation of the `value` argument scaled by the
  * `zoom` argument about the point defined by the `center` argument.
@@ -12130,7 +12335,7 @@ exports.PanZoom = PanZoom;
 
 
 /***/ }),
-/* 77 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12144,9 +12349,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Dispatchers = __webpack_require__(13);
+var Dispatchers = __webpack_require__(12);
 var Utils = __webpack_require__(0);
-var interaction_1 = __webpack_require__(14);
+var interaction_1 = __webpack_require__(13);
 var Pointer = (function (_super) {
     __extends(Pointer, _super);
     function Pointer() {
@@ -12261,7 +12466,7 @@ exports.Pointer = Pointer;
 
 
 /***/ }),
-/* 78 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12334,7 +12539,7 @@ exports.ClusteredBar = ClusteredBar;
 
 
 /***/ }),
-/* 79 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12349,7 +12554,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var SVGTypewriter = __webpack_require__(4);
+var Typesetter = __webpack_require__(4);
 var Animators = __webpack_require__(6);
 var Drawers = __webpack_require__(9);
 var Formatters = __webpack_require__(8);
@@ -12772,8 +12977,9 @@ var Pie = (function (_super) {
         var _this = this;
         var attrToProjector = this._generateAttrToProjector();
         var labelArea = this._renderArea.append("g").classed("label-area", true);
-        var measurer = new SVGTypewriter.CacheMeasurer(labelArea);
-        var writer = new SVGTypewriter.Writer(measurer);
+        var context = new Typesetter.SvgContext(labelArea.node());
+        var measurer = new Typesetter.CacheMeasurer(context);
+        var writer = new Typesetter.Writer(measurer, context);
         var dataset = this.datasets()[0];
         var data = this._getDataToDraw().get(dataset);
         data.forEach(function (datum, datumIndex) {
@@ -12815,11 +13021,9 @@ var Pie = (function (_super) {
             g.classed(className, true);
             g.style("visibility", showLabel ? "inherit" : "hidden");
             writer.write(value, measurement.width, measurement.height, {
-                selection: g,
                 xAlign: "center",
                 yAlign: "center",
-                textRotation: 0,
-            });
+            }, g.node());
         });
     };
     Pie._INNER_RADIUS_KEY = "inner-radius";
@@ -12831,7 +13035,7 @@ exports.Pie = Pie;
 
 
 /***/ }),
-/* 80 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12846,13 +13050,13 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var SVGTypewriter = __webpack_require__(4);
+var Typesetter = __webpack_require__(4);
 var Animators = __webpack_require__(6);
 var Drawers = __webpack_require__(9);
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
 var plot_1 = __webpack_require__(2);
-var xyPlot_1 = __webpack_require__(16);
+var xyPlot_1 = __webpack_require__(15);
 var Rectangle = (function (_super) {
     __extends(Rectangle, _super);
     /**
@@ -13132,8 +13336,9 @@ var Rectangle = (function (_super) {
         var _this = this;
         var attrToProjector = this._generateAttrToProjector();
         var labelArea = this._renderArea.append("g").classed("label-area", true);
-        var measurer = new SVGTypewriter.CacheMeasurer(labelArea);
-        var writer = new SVGTypewriter.Writer(measurer);
+        var context = new Typesetter.SvgContext(labelArea.node());
+        var measurer = new Typesetter.CacheMeasurer(context);
+        var writer = new Typesetter.Writer(measurer, context);
         var xRange = this.x().scale.range();
         var yRange = this.y().scale.range();
         var xMin = Math.min.apply(null, xRange);
@@ -13167,11 +13372,9 @@ var Rectangle = (function (_super) {
                 var className = dark ? "dark-label" : "light-label";
                 g.classed(className, true);
                 writer.write(label, measurement.width, measurement.height, {
-                    selection: g,
                     xAlign: "center",
                     yAlign: "center",
-                    textRotation: 0,
-                });
+                }, g.node());
             }
         });
     };
@@ -13197,7 +13400,7 @@ exports.Rectangle = Rectangle;
 
 
 /***/ }),
-/* 81 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13216,9 +13419,9 @@ var SymbolFactories = __webpack_require__(26);
 var Drawers = __webpack_require__(9);
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var Plots = __webpack_require__(17);
+var Plots = __webpack_require__(16);
 var plot_1 = __webpack_require__(2);
-var xyPlot_1 = __webpack_require__(16);
+var xyPlot_1 = __webpack_require__(15);
 var Scatter = (function (_super) {
     __extends(Scatter, _super);
     /**
@@ -13375,7 +13578,7 @@ exports.Scatter = Scatter;
 
 
 /***/ }),
-/* 82 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13393,7 +13596,7 @@ var Animators = __webpack_require__(6);
 var Drawers = __webpack_require__(9);
 var Scales = __webpack_require__(3);
 var plot_1 = __webpack_require__(2);
-var xyPlot_1 = __webpack_require__(16);
+var xyPlot_1 = __webpack_require__(15);
 var Segment = (function (_super) {
     __extends(Segment, _super);
     /**
@@ -13573,7 +13776,7 @@ exports.Segment = Segment;
 
 
 /***/ }),
-/* 83 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13776,7 +13979,7 @@ exports.StackedArea = StackedArea;
 
 
 /***/ }),
-/* 84 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13790,7 +13993,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var SVGTypewriter = __webpack_require__(4);
+var Typesetter = __webpack_require__(4);
 var Utils = __webpack_require__(0);
 var barPlot_1 = __webpack_require__(22);
 var StackedBar = (function (_super) {
@@ -13850,8 +14053,9 @@ var StackedBar = (function (_super) {
     StackedBar.prototype._setup = function () {
         _super.prototype._setup.call(this);
         this._labelArea = this._renderArea.append("g").classed(barPlot_1.Bar._LABEL_AREA_CLASS, true);
-        this._measurer = new SVGTypewriter.CacheMeasurer(this._labelArea);
-        this._writer = new SVGTypewriter.Writer(this._measurer);
+        var context = new Typesetter.SvgContext(this._labelArea.node());
+        this._measurer = new Typesetter.CacheMeasurer(context);
+        this._writer = new Typesetter.Writer(this._measurer, context);
     };
     StackedBar.prototype._drawLabels = function () {
         var _this = this;
@@ -13879,12 +14083,10 @@ var StackedBar = (function (_super) {
                 var labelContainer = _this._labelArea.append("g").attr("transform", "translate(" + x + ", " + y + ")");
                 labelContainer.classed("stacked-bar-label", true);
                 var writeOptions = {
-                    selection: labelContainer,
                     xAlign: "center",
                     yAlign: "center",
-                    textRotation: 0,
                 };
-                _this._writer.write(text, measurement.width, measurement.height, writeOptions);
+                _this._writer.write(text, measurement.width, measurement.height, writeOptions, labelContainer.node());
             }
             return tooWide;
         };
@@ -13995,7 +14197,7 @@ exports.StackedBar = StackedBar;
 
 
 /***/ }),
-/* 85 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14206,7 +14408,7 @@ exports.Waterfall = Waterfall;
 
 
 /***/ }),
-/* 86 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14222,7 +14424,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Utils = __webpack_require__(0);
-var scale_1 = __webpack_require__(18);
+var scale_1 = __webpack_require__(17);
 var Color = (function (_super) {
     __extends(Color, _super);
     /**
@@ -14337,7 +14539,7 @@ exports.Color = Color;
 
 
 /***/ }),
-/* 87 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14353,7 +14555,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Utils = __webpack_require__(0);
-var scale_1 = __webpack_require__(18);
+var scale_1 = __webpack_require__(17);
 var InterpolatedColor = (function (_super) {
     __extends(InterpolatedColor, _super);
     /**
@@ -14503,7 +14705,7 @@ exports.InterpolatedColor = InterpolatedColor;
 
 
 /***/ }),
-/* 88 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14582,7 +14784,7 @@ exports.Linear = Linear;
 
 
 /***/ }),
-/* 89 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14806,7 +15008,7 @@ exports.ModifiedLog = ModifiedLog;
 
 
 /***/ }),
-/* 90 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14856,7 +15058,7 @@ exports.integerTickGenerator = integerTickGenerator;
 
 
 /***/ }),
-/* 91 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14992,7 +15194,7 @@ exports.Time = Time;
 
 
 /***/ }),
-/* 92 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15062,7 +15264,7 @@ exports.createFilledArray = createFilledArray;
 
 
 /***/ }),
-/* 93 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15076,7 +15278,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var set_1 = __webpack_require__(40);
+var set_1 = __webpack_require__(41);
 /**
  * A set of callbacks which can be all invoked at once.
  * Each callback exists at most once in the set (based on reference equality).
@@ -15104,7 +15306,86 @@ exports.CallbackSet = CallbackSet;
 
 
 /***/ }),
-/* 94 */
+/* 98 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+var DOM = __webpack_require__(40);
+var ClientToSVGTranslator = (function () {
+    function ClientToSVGTranslator(svg) {
+        this._svg = svg;
+        this._measureRect = document.createElementNS(svg.namespaceURI, "rect");
+        this._measureRect.setAttribute("class", "measure-rect");
+        this._measureRect.setAttribute("style", "opacity: 0; visibility: hidden;");
+        this._measureRect.setAttribute("stroke-width", "0");
+        this._measureRect.setAttribute("width", "1");
+        this._measureRect.setAttribute("height", "1");
+        this._svg.appendChild(this._measureRect);
+    }
+    /**
+     * Returns the ClientToSVGTranslator for the <svg> containing elem.
+     * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
+     */
+    ClientToSVGTranslator.getTranslator = function (elem) {
+        var svg = DOM.boundingSVG(elem);
+        var translator = svg[ClientToSVGTranslator._TRANSLATOR_KEY];
+        if (translator == null) {
+            translator = new ClientToSVGTranslator(svg);
+            svg[ClientToSVGTranslator._TRANSLATOR_KEY] = translator;
+        }
+        return translator;
+    };
+    /**
+     * Computes the position relative to the <svg> in svg-coordinate-space.
+     */
+    ClientToSVGTranslator.prototype.computePosition = function (clientX, clientY) {
+        // get the origin
+        this._measureRect.setAttribute("x", "0");
+        this._measureRect.setAttribute("y", "0");
+        var mrBCR = this._measureRect.getBoundingClientRect();
+        var origin = { x: mrBCR.left, y: mrBCR.top };
+        // calculate the scale
+        var sampleDistance = 100;
+        this._measureRect.setAttribute("x", String(sampleDistance));
+        this._measureRect.setAttribute("y", String(sampleDistance));
+        mrBCR = this._measureRect.getBoundingClientRect();
+        var testPoint = { x: mrBCR.left, y: mrBCR.top };
+        // invalid measurements -- SVG might not be in the DOM
+        if (origin.x === testPoint.x || origin.y === testPoint.y) {
+            return null;
+        }
+        var scaleX = (testPoint.x - origin.x) / sampleDistance;
+        var scaleY = (testPoint.y - origin.y) / sampleDistance;
+        // get the true cursor position
+        this._measureRect.setAttribute("x", String((clientX - origin.x) / scaleX));
+        this._measureRect.setAttribute("y", String((clientY - origin.y) / scaleY));
+        mrBCR = this._measureRect.getBoundingClientRect();
+        var trueCursorPosition = { x: mrBCR.left, y: mrBCR.top };
+        var scaledPosition = {
+            x: (trueCursorPosition.x - origin.x) / scaleX,
+            y: (trueCursorPosition.y - origin.y) / scaleY,
+        };
+        return scaledPosition;
+    };
+    /**
+     * Checks whether event happened inside <svg> element.
+     */
+    ClientToSVGTranslator.prototype.insideSVG = function (e) {
+        return DOM.boundingSVG(e.target) === this._svg;
+    };
+    ClientToSVGTranslator._TRANSLATOR_KEY = "__Plottable_ClientToSVGTranslator";
+    return ClientToSVGTranslator;
+}());
+exports.ClientToSVGTranslator = ClientToSVGTranslator;
+
+
+/***/ }),
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15187,262 +15468,7 @@ function luminance(color) {
 
 
 /***/ }),
-/* 95 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
-
-var nativeMath = window.Math;
-/**
- * Gets the bounding box of an element.
- * @param {d3.Selection} element
- * @returns {SVGRed} The bounding box.
- */
-function elementBBox(element) {
-    var bbox;
-    // HACKHACK: Firefox won't correctly measure nodes with style "display: none" or their descendents (FF Bug 612118).
-    try {
-        bbox = element.node().getBBox();
-    }
-    catch (err) {
-        bbox = { x: 0, y: 0, width: 0, height: 0 };
-    }
-    return bbox;
-}
-exports.elementBBox = elementBBox;
-/**
- * Screen refresh rate which is assumed to be 60fps
- */
-exports.SCREEN_REFRESH_RATE_MILLISECONDS = 1000 / 60;
-/**
- * Polyfill for `window.requestAnimationFrame`.
- * If the function exists, then we use the function directly.
- * Otherwise, we set a timeout on `SCREEN_REFRESH_RATE_MILLISECONDS` and then perform the function.
- *
- * @param {() => void} callback The callback to call in the next animation frame
- */
-function requestAnimationFramePolyfill(callback) {
-    if (window.requestAnimationFrame != null) {
-        window.requestAnimationFrame(callback);
-    }
-    else {
-        setTimeout(callback, exports.SCREEN_REFRESH_RATE_MILLISECONDS);
-    }
-}
-exports.requestAnimationFramePolyfill = requestAnimationFramePolyfill;
-/**
- * Calculates the width of the element.
- * The width includes the padding and the border on the element's left and right sides.
- *
- * @param {Element} element The element to query
- * @returns {number} The width of the element.
- */
-function elementWidth(element) {
-    var style = window.getComputedStyle(element);
-    return _parseStyleValue(style, "width")
-        + _parseStyleValue(style, "padding-left")
-        + _parseStyleValue(style, "padding-right")
-        + _parseStyleValue(style, "border-left-width")
-        + _parseStyleValue(style, "border-right-width");
-}
-exports.elementWidth = elementWidth;
-/**
- * Calculates the height of the element.
- * The height includes the padding the and the border on the element's top and bottom sides.
- *
- * @param {Element} element The element to query
- * @returns {number} The height of the element
- */
-function elementHeight(element) {
-    var style = window.getComputedStyle(element);
-    return _parseStyleValue(style, "height")
-        + _parseStyleValue(style, "padding-top")
-        + _parseStyleValue(style, "padding-bottom")
-        + _parseStyleValue(style, "border-top-width")
-        + _parseStyleValue(style, "border-bottom-width");
-}
-exports.elementHeight = elementHeight;
-// taken from the BNF at https://www.w3.org/TR/SVG/coords.html
-var WSP = "\\s";
-var NUMBER = "(?:[-+]?[0-9]*\\.?[0-9]+)";
-var COMMA_WSP = "(?:(?:" + WSP + "+,?" + WSP + "*)|(?:," + WSP + "*))";
-var TRANSLATE_REGEX = new RegExp("translate" + WSP + "*\\(" + WSP + "*(" + NUMBER + ")(?:" + COMMA_WSP + "(" + NUMBER + "))?" + WSP + "*\\)");
-var ROTATE_REGEX = new RegExp("rotate" + WSP + "*\\(" + WSP + "*(" + NUMBER + ")" + WSP + "*\\)");
-var SCALE_REGEX = new RegExp("scale" + WSP + "*\\(" + WSP + "*(" + NUMBER + ")(?:" + COMMA_WSP + "(" + NUMBER + "))?" + WSP + "*\\)");
-/**
- * Accepts selections whose .transform contain a "translate(a, b)" and extracts the a and b
- */
-function getTranslateValues(el) {
-    var match = TRANSLATE_REGEX.exec(el.attr("transform"));
-    if (match != null) {
-        var translateX = match[1], _a = match[2], translateY = _a === void 0 ? 0 : _a;
-        return [+translateX, +translateY];
-    }
-    else {
-        return [0, 0];
-    }
-}
-exports.getTranslateValues = getTranslateValues;
-/**
- * Accepts selections whose .transform contain a "rotate(angle)" and returns the angle
- */
-function getRotate(el) {
-    var match = ROTATE_REGEX.exec(el.attr("transform"));
-    if (match != null) {
-        var rotation = match[1];
-        return +rotation;
-    }
-    else {
-        return 0;
-    }
-}
-exports.getRotate = getRotate;
-function getScaleValues(el) {
-    var match = SCALE_REGEX.exec(el.attr("transform"));
-    if (match != null) {
-        var scaleX = match[1], scaleY = match[2];
-        return [+scaleX, scaleY == null ? +scaleX : +scaleY];
-    }
-    else {
-        return [0, 0];
-    }
-}
-exports.getScaleValues = getScaleValues;
-/**
- * Checks if the first ClientRect overlaps the second.
- *
- * @param {ClientRect} clientRectA The first ClientRect
- * @param {ClientRect} clientRectB The second ClientRect
- * @returns {boolean} If the ClientRects overlap each other.
- */
-function clientRectsOverlap(clientRectA, clientRectB) {
-    if (nativeMath.floor(clientRectA.right) <= nativeMath.ceil(clientRectB.left)) {
-        return false;
-    }
-    if (nativeMath.ceil(clientRectA.left) >= nativeMath.floor(clientRectB.right)) {
-        return false;
-    }
-    if (nativeMath.floor(clientRectA.bottom) <= nativeMath.ceil(clientRectB.top)) {
-        return false;
-    }
-    if (nativeMath.ceil(clientRectA.top) >= nativeMath.floor(clientRectB.bottom)) {
-        return false;
-    }
-    return true;
-}
-exports.clientRectsOverlap = clientRectsOverlap;
-/**
- * Return a new ClientRect that is the old ClientRect expanded by amount in all directions.
- * @param rect
- * @param amount
- */
-function expandRect(rect, amount) {
-    return {
-        left: rect.left - amount,
-        top: rect.top - amount,
-        right: rect.right + amount,
-        bottom: rect.bottom + amount,
-        width: rect.width + amount * 2,
-        height: rect.height + amount * 2
-    };
-}
-exports.expandRect = expandRect;
-/**
- * Returns true if and only if innerClientRect is inside outerClientRect.
- *
- * @param {ClientRect} innerClientRect The first ClientRect
- * @param {ClientRect} outerClientRect The second ClientRect
- * @returns {boolean} If and only if the innerClientRect is inside outerClientRect.
- */
-function clientRectInside(innerClientRect, outerClientRect) {
-    return (nativeMath.floor(outerClientRect.left) <= nativeMath.ceil(innerClientRect.left) &&
-        nativeMath.floor(outerClientRect.top) <= nativeMath.ceil(innerClientRect.top) &&
-        nativeMath.floor(innerClientRect.right) <= nativeMath.ceil(outerClientRect.right) &&
-        nativeMath.floor(innerClientRect.bottom) <= nativeMath.ceil(outerClientRect.bottom));
-}
-exports.clientRectInside = clientRectInside;
-/**
- * Retrieves the bounding svg of the input element
- *
- * @param {SVGElement} element The element to query
- * @returns {SVGElement} The bounding svg
- */
-function boundingSVG(element) {
-    var ownerSVG = element.ownerSVGElement;
-    if (ownerSVG != null) {
-        return ownerSVG;
-    }
-    if (element.nodeName.toLowerCase() === "svg") {
-        return element;
-    }
-    return null; // not in the DOM
-}
-exports.boundingSVG = boundingSVG;
-var _latestClipPathId = 0;
-/**
- * Generates a ClipPath ID that is unique for this instance of Plottable
- */
-function generateUniqueClipPathId() {
-    return "plottableClipPath" + ++_latestClipPathId;
-}
-exports.generateUniqueClipPathId = generateUniqueClipPathId;
-/**
- * Returns true if the supplied coordinates or Ranges intersect or are contained by bbox.
- *
- * @param {number | Range} xValOrRange The x coordinate or Range to test
- * @param {number | Range} yValOrRange The y coordinate or Range to test
- * @param {SVGRect} bbox The bbox
- * @param {number} tolerance Amount by which to expand bbox, in each dimension, before
- * testing intersection
- *
- * @returns {boolean} True if the supplied coordinates or Ranges intersect or are
- * contained by bbox, false otherwise.
- */
-function intersectsBBox(xValOrRange, yValOrRange, bbox, tolerance) {
-    if (tolerance === void 0) { tolerance = 0.5; }
-    var xRange = _parseRange(xValOrRange);
-    var yRange = _parseRange(yValOrRange);
-    // SVGRects are positioned with sub-pixel accuracy (the default unit
-    // for the x, y, height & width attributes), but user selections (e.g. via
-    // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
-    // seems appropriate.
-    return bbox.x + bbox.width >= xRange.min - tolerance &&
-        bbox.x <= xRange.max + tolerance &&
-        bbox.y + bbox.height >= yRange.min - tolerance &&
-        bbox.y <= yRange.max + tolerance;
-}
-exports.intersectsBBox = intersectsBBox;
-/**
- * Create a Range from a number or an object with "min" and "max" defined.
- *
- * @param {any} input The object to parse
- *
- * @returns {Range} The generated Range
- */
-function _parseRange(input) {
-    if (typeof (input) === "number") {
-        var value = input;
-        return { min: value, max: value };
-    }
-    var range = input;
-    if (range instanceof Object && "min" in range && "max" in range) {
-        return range;
-    }
-    throw new Error("input '" + input + "' can't be parsed as an Range");
-}
-function _parseStyleValue(style, property) {
-    var value = style.getPropertyValue(property);
-    var parsedValue = parseFloat(value);
-    return parsedValue || 0;
-}
-
-
-/***/ }),
-/* 96 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15496,7 +15522,7 @@ exports.EntityArray = EntityArray;
 
 
 /***/ }),
-/* 97 */
+/* 101 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15587,7 +15613,7 @@ exports.Map = Map;
 
 
 /***/ }),
-/* 98 */
+/* 102 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15712,8 +15738,7 @@ exports.normalizeKey = normalizeKey;
 
 
 /***/ }),
-/* 99 */,
-/* 100 */
+/* 103 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15785,54 +15810,54 @@ exports.deprecated = deprecated;
 
 
 /***/ }),
-/* 101 */
+/* 104 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_linear__ = __webpack_require__(108);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_linear__ = __webpack_require__(111);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeLinear", function() { return __WEBPACK_IMPORTED_MODULE_0__src_linear__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__src_quad__ = __webpack_require__(110);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__src_quad__ = __webpack_require__(113);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeQuad", function() { return __WEBPACK_IMPORTED_MODULE_1__src_quad__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeQuadIn", function() { return __WEBPACK_IMPORTED_MODULE_1__src_quad__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeQuadOut", function() { return __WEBPACK_IMPORTED_MODULE_1__src_quad__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeQuadInOut", function() { return __WEBPACK_IMPORTED_MODULE_1__src_quad__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__src_cubic__ = __webpack_require__(105);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__src_cubic__ = __webpack_require__(108);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCubic", function() { return __WEBPACK_IMPORTED_MODULE_2__src_cubic__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCubicIn", function() { return __WEBPACK_IMPORTED_MODULE_2__src_cubic__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCubicOut", function() { return __WEBPACK_IMPORTED_MODULE_2__src_cubic__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCubicInOut", function() { return __WEBPACK_IMPORTED_MODULE_2__src_cubic__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__src_poly__ = __webpack_require__(109);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__src_poly__ = __webpack_require__(112);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easePoly", function() { return __WEBPACK_IMPORTED_MODULE_3__src_poly__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easePolyIn", function() { return __WEBPACK_IMPORTED_MODULE_3__src_poly__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easePolyOut", function() { return __WEBPACK_IMPORTED_MODULE_3__src_poly__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easePolyInOut", function() { return __WEBPACK_IMPORTED_MODULE_3__src_poly__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__src_sin__ = __webpack_require__(111);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__src_sin__ = __webpack_require__(114);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeSin", function() { return __WEBPACK_IMPORTED_MODULE_4__src_sin__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeSinIn", function() { return __WEBPACK_IMPORTED_MODULE_4__src_sin__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeSinOut", function() { return __WEBPACK_IMPORTED_MODULE_4__src_sin__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeSinInOut", function() { return __WEBPACK_IMPORTED_MODULE_4__src_sin__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__src_exp__ = __webpack_require__(107);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__src_exp__ = __webpack_require__(110);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeExp", function() { return __WEBPACK_IMPORTED_MODULE_5__src_exp__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeExpIn", function() { return __WEBPACK_IMPORTED_MODULE_5__src_exp__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeExpOut", function() { return __WEBPACK_IMPORTED_MODULE_5__src_exp__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeExpInOut", function() { return __WEBPACK_IMPORTED_MODULE_5__src_exp__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__src_circle__ = __webpack_require__(104);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__src_circle__ = __webpack_require__(107);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCircle", function() { return __WEBPACK_IMPORTED_MODULE_6__src_circle__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCircleIn", function() { return __WEBPACK_IMPORTED_MODULE_6__src_circle__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCircleOut", function() { return __WEBPACK_IMPORTED_MODULE_6__src_circle__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCircleInOut", function() { return __WEBPACK_IMPORTED_MODULE_6__src_circle__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__src_bounce__ = __webpack_require__(103);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__src_bounce__ = __webpack_require__(106);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBounce", function() { return __WEBPACK_IMPORTED_MODULE_7__src_bounce__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBounceIn", function() { return __WEBPACK_IMPORTED_MODULE_7__src_bounce__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBounceOut", function() { return __WEBPACK_IMPORTED_MODULE_7__src_bounce__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBounceInOut", function() { return __WEBPACK_IMPORTED_MODULE_7__src_bounce__["c"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__src_back__ = __webpack_require__(102);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__src_back__ = __webpack_require__(105);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBack", function() { return __WEBPACK_IMPORTED_MODULE_8__src_back__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBackIn", function() { return __WEBPACK_IMPORTED_MODULE_8__src_back__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBackOut", function() { return __WEBPACK_IMPORTED_MODULE_8__src_back__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBackInOut", function() { return __WEBPACK_IMPORTED_MODULE_8__src_back__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__src_elastic__ = __webpack_require__(106);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__src_elastic__ = __webpack_require__(109);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeElastic", function() { return __WEBPACK_IMPORTED_MODULE_9__src_elastic__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeElasticIn", function() { return __WEBPACK_IMPORTED_MODULE_9__src_elastic__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeElasticOut", function() { return __WEBPACK_IMPORTED_MODULE_9__src_elastic__["a"]; });
@@ -15859,7 +15884,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /***/ }),
-/* 102 */
+/* 105 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -15906,7 +15931,7 @@ var backInOut = (function custom(s) {
 
 
 /***/ }),
-/* 103 */
+/* 106 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -15938,7 +15963,7 @@ function bounceInOut(t) {
 
 
 /***/ }),
-/* 104 */
+/* 107 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -15959,7 +15984,7 @@ function circleInOut(t) {
 
 
 /***/ }),
-/* 105 */
+/* 108 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -15980,7 +16005,7 @@ function cubicInOut(t) {
 
 
 /***/ }),
-/* 106 */
+/* 109 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16034,7 +16059,7 @@ var elasticInOut = (function custom(a, p) {
 
 
 /***/ }),
-/* 107 */
+/* 110 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16055,7 +16080,7 @@ function expInOut(t) {
 
 
 /***/ }),
-/* 108 */
+/* 111 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16066,7 +16091,7 @@ function linear(t) {
 
 
 /***/ }),
-/* 109 */
+/* 112 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16113,7 +16138,7 @@ var polyInOut = (function custom(e) {
 
 
 /***/ }),
-/* 110 */
+/* 113 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16134,7 +16159,7 @@ function quadInOut(t) {
 
 
 /***/ }),
-/* 111 */
+/* 114 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16158,136 +16183,6 @@ function sinInOut(t) {
 
 
 /***/ }),
-/* 112 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
-__export(__webpack_require__(29));
-__export(__webpack_require__(113));
-__export(__webpack_require__(114));
-//# sourceMappingURL=index.js.map
-
-/***/ }),
-/* 113 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var baseAnimator_1 = __webpack_require__(29);
-var OpacityAnimator = (function (_super) {
-    __extends(OpacityAnimator, _super);
-    function OpacityAnimator() {
-        return _super.apply(this, arguments) || this;
-    }
-    OpacityAnimator.prototype.animate = function (selection) {
-        var area = selection.select(".text-area");
-        area.attr("opacity", 0);
-        var attr = {
-            opacity: 1,
-        };
-        this._animate(area, attr);
-        return _super.prototype.animate.call(this, selection);
-    };
-    return OpacityAnimator;
-}(baseAnimator_1.BaseAnimator));
-exports.OpacityAnimator = OpacityAnimator;
-//# sourceMappingURL=opacityAnimator.js.map
-
-/***/ }),
-/* 114 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var Utils = __webpack_require__(12);
-var baseAnimator_1 = __webpack_require__(29);
-var UnveilAnimator = (function (_super) {
-    __extends(UnveilAnimator, _super);
-    function UnveilAnimator() {
-        var _this = _super.call(this) || this;
-        _this.direction("bottom");
-        return _this;
-    }
-    UnveilAnimator.prototype.direction = function (direction) {
-        if (direction == null) {
-            return this._direction;
-        }
-        else {
-            if (UnveilAnimator.SupportedDirections.indexOf(direction) === -1) {
-                throw new Error("unsupported direction - " + direction);
-            }
-            this._direction = direction;
-            return this;
-        }
-    };
-    UnveilAnimator.prototype.animate = function (selection) {
-        var attr = Utils.DOM.getBBox(selection);
-        var mask = selection.select(".clip-rect");
-        mask.attr("width", 0);
-        mask.attr("height", 0);
-        switch (this._direction) {
-            case "top":
-                mask.attr("y", attr.y + attr.height);
-                mask.attr("x", attr.x);
-                mask.attr("width", attr.width);
-                break;
-            case "bottom":
-                mask.attr("y", attr.y);
-                mask.attr("x", attr.x);
-                mask.attr("width", attr.width);
-                break;
-            case "left":
-                mask.attr("y", attr.y);
-                mask.attr("x", attr.x);
-                mask.attr("height", attr.height);
-                break;
-            case "right":
-                mask.attr("y", attr.y);
-                mask.attr("x", attr.x + attr.width);
-                mask.attr("height", attr.height);
-                break;
-            default:
-                break;
-        }
-        this._animate(mask, attr);
-        return _super.prototype.animate.call(this, selection);
-    };
-    return UnveilAnimator;
-}(baseAnimator_1.BaseAnimator));
-UnveilAnimator.SupportedDirections = ["top", "bottom", "left", "right"];
-exports.UnveilAnimator = UnveilAnimator;
-//# sourceMappingURL=unveilAnimator.js.map
-
-/***/ }),
 /* 115 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -16295,7 +16190,259 @@ exports.UnveilAnimator = UnveilAnimator;
 /**
  * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
  * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
+ * license at https://github.com/palantir/typesettable/blob/develop/LICENSE
+ */
+
+var DEFAULT_FILL_COLOR = "#444";
+/**
+ * A typesetter context for HTML5 Canvas.
+ *
+ * Due to the Canvas API, you must explicitly define the line height, and any
+ * styling for the font must also be explicitly defined in the optional
+ * `ICanvasFontStyle` object.
+ */
+var CanvasContext = (function () {
+    function CanvasContext(ctx, lineHeight, style) {
+        if (lineHeight === void 0) { lineHeight = 10; }
+        if (style === void 0) { style = {}; }
+        var _this = this;
+        this.ctx = ctx;
+        this.lineHeight = lineHeight;
+        this.style = style;
+        this.createRuler = function () {
+            return function (text) {
+                _this.ctx.font = _this.style.font;
+                var width = _this.ctx.measureText(text).width;
+                return { width: width, height: _this.lineHeight };
+            };
+        };
+        this.createPen = function (_text, transform, ctx) {
+            if (ctx == null) {
+                ctx = _this.ctx;
+            }
+            ctx.save();
+            ctx.translate(transform.translate[0], transform.translate[1]);
+            ctx.rotate(transform.rotate * Math.PI / 180.0);
+            return _this.createCanvasPen(ctx);
+        };
+        if (this.style.fill === undefined) {
+            this.style.fill = DEFAULT_FILL_COLOR;
+        }
+    }
+    CanvasContext.prototype.createCanvasPen = function (ctx) {
+        var _this = this;
+        return {
+            destroy: function () {
+                ctx.restore();
+            },
+            write: function (line, anchor, xOffset, yOffset) {
+                ctx.textAlign = anchor;
+                if (_this.style.font != null) {
+                    ctx.font = _this.style.font;
+                }
+                if (_this.style.fill != null) {
+                    ctx.fillStyle = _this.style.fill;
+                    ctx.fillText(line, xOffset, yOffset);
+                }
+                if (_this.style.stroke != null) {
+                    ctx.strokeStyle = _this.style.fill;
+                    ctx.strokeText(line, xOffset, yOffset);
+                }
+            },
+        };
+    };
+    return CanvasContext;
+}());
+exports.CanvasContext = CanvasContext;
+//# sourceMappingURL=canvas.js.map
+
+/***/ }),
+/* 116 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may obtain a copy of the
+ * license at https://github.com/palantir/typesettable/blob/develop/LICENSE
+ */
+
+var SvgUtils = (function () {
+    function SvgUtils() {
+    }
+    /**
+     * Appends an SVG element with the specified tag name to the provided element.
+     * The variadic classnames are added to the new element.
+     *
+     * Returns the new element.
+     */
+    SvgUtils.append = function (element, tagName) {
+        var classNames = [];
+        for (var _i = 2; _i < arguments.length; _i++) {
+            classNames[_i - 2] = arguments[_i];
+        }
+        var child = SvgUtils.create.apply(SvgUtils, [tagName].concat(classNames));
+        element.appendChild(child);
+        return child;
+    };
+    /**
+     * Creates and returns a new SVGElement with the attached classnames.
+     */
+    SvgUtils.create = function (tagName) {
+        var classNames = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            classNames[_i - 1] = arguments[_i];
+        }
+        var element = document.createElementNS(SvgUtils.SVG_NS, tagName);
+        SvgUtils.addClasses.apply(SvgUtils, [element].concat(classNames));
+        return element;
+    };
+    /**
+     * Adds the variadic classnames to the element
+     */
+    SvgUtils.addClasses = function (element) {
+        var classNames = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            classNames[_i - 1] = arguments[_i];
+        }
+        classNames = classNames.filter(function (c) { return c != null; });
+        if (element.classList != null) {
+            classNames.forEach(function (className) {
+                element.classList.add(className);
+            });
+        }
+        else {
+            // IE 11 does not support classList
+            element.setAttribute("class", classNames.join(" "));
+        }
+    };
+    /**
+     * Returns the width/height of svg element's bounding box
+     */
+    SvgUtils.getDimensions = function (element) {
+        // using feature detection, safely return the bounding box dimensions of the
+        // provided svg element
+        if (element.getBBox) {
+            var _a = element.getBBox(), width = _a.width, height = _a.height;
+            // copy to prevent NoModificationAllowedError
+            return { width: width, height: height };
+        }
+        else {
+            return { height: 0, width: 0 };
+        }
+    };
+    return SvgUtils;
+}());
+SvgUtils.SVG_NS = "http://www.w3.org/2000/svg";
+exports.SvgUtils = SvgUtils;
+/**
+ * A typesetter context for SVG.
+ *
+ * @param element - The CSS font styles applied to `element` will determine the
+ * size of text measurements. Also the default text block container.
+ * @param className - added to new text blocks
+ * @param addTitleElement - enable title tags to be added to new text blocks.
+ */
+var SvgContext = (function () {
+    function SvgContext(element, className, addTitleElement) {
+        if (addTitleElement === void 0) { addTitleElement = false; }
+        var _this = this;
+        this.element = element;
+        this.className = className;
+        this.addTitleElement = addTitleElement;
+        this.createRuler = function () {
+            var _a = _this.getTextElements(_this.element), parentElement = _a.parentElement, containerElement = _a.containerElement, textElement = _a.textElement;
+            return function (text) {
+                parentElement.appendChild(containerElement);
+                textElement.textContent = text;
+                var dimensions = SvgUtils.getDimensions(textElement);
+                parentElement.removeChild(containerElement); // element.remove() doesn't work in IE11
+                return dimensions;
+            };
+        };
+        this.createPen = function (text, transform, element) {
+            if (element == null) {
+                element = _this.element;
+            }
+            var textContainer = SvgUtils.append(element, "g", "text-container", _this.className);
+            // attach optional title
+            if (_this.addTitleElement) {
+                SvgUtils.append(textContainer, "title").textContent = text;
+                textContainer.setAttribute("title", text);
+            }
+            // create and transform text block group
+            var textBlockGroup = SvgUtils.append(textContainer, "g", "text-area");
+            textBlockGroup.setAttribute("transform", "translate(" + transform.translate[0] + "," + transform.translate[1] + ")" +
+                ("rotate(" + transform.rotate + ")"));
+            return _this.createSvgLinePen(textBlockGroup);
+        };
+    }
+    SvgContext.prototype.setAddTitleElement = function (addTitleElement) {
+        this.addTitleElement = addTitleElement;
+    };
+    SvgContext.prototype.createSvgLinePen = function (textBlockGroup) {
+        return {
+            write: function (line, anchor, xOffset, yOffset) {
+                var element = SvgUtils.append(textBlockGroup, "text", "text-line");
+                element.textContent = line;
+                element.setAttribute("text-anchor", anchor);
+                element.setAttribute("transform", "translate(" + xOffset + "," + yOffset + ")");
+                element.setAttribute("y", "-0.25em");
+            },
+        };
+    };
+    SvgContext.prototype.getTextElements = function (element) {
+        // if element is already a text element, return it
+        if (element.tagName === "text") {
+            var parentElement = element.parentElement;
+            if (parentElement == null) {
+                parentElement = element.parentNode;
+            }
+            // must be removed from parent since we re-add it on every measurement
+            parentElement.removeChild(element);
+            return {
+                containerElement: element,
+                parentElement: parentElement,
+                textElement: element,
+            };
+        }
+        // if element has a text element descendent, select it and return it
+        var selected = element.querySelector("text");
+        if (selected != null) {
+            var parentElement = element.parentElement;
+            if (parentElement == null) {
+                parentElement = element.parentNode;
+            }
+            // must be removed from parent since we re-add it on every measurement
+            parentElement.removeChild(element);
+            return {
+                containerElement: element,
+                parentElement: parentElement,
+                textElement: selected,
+            };
+        }
+        // otherwise create a new text element
+        var created = SvgUtils.create("text", this.className);
+        return {
+            containerElement: created,
+            parentElement: element,
+            textElement: created,
+        };
+    };
+    return SvgContext;
+}());
+exports.SvgContext = SvgContext;
+//# sourceMappingURL=svg.js.map
+
+/***/ }),
+/* 117 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may obtain a copy of the
+ * license at https://github.com/palantir/typesettable/blob/develop/LICENSE
  */
 
 var __extends = (this && this.__extends) || function (d, b) {
@@ -16303,12 +16450,13 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var utils_1 = __webpack_require__(12);
-var cacheCharacterMeasurer_1 = __webpack_require__(42);
+var utils_1 = __webpack_require__(18);
+var abstractMeasurer_1 = __webpack_require__(29);
+var cacheCharacterMeasurer_1 = __webpack_require__(43);
 var CacheMeasurer = (function (_super) {
     __extends(CacheMeasurer, _super);
-    function CacheMeasurer(area, className) {
-        var _this = _super.call(this, area, className) || this;
+    function CacheMeasurer(ruler) {
+        var _this = _super.call(this, ruler) || this;
         _this.dimCache = new utils_1.Cache(function (s) {
             return _this._measureNotFromCache(s);
         });
@@ -16318,6 +16466,7 @@ var CacheMeasurer = (function (_super) {
         return _super.prototype.measure.call(this, s);
     };
     CacheMeasurer.prototype.measure = function (s) {
+        if (s === void 0) { s = abstractMeasurer_1.AbstractMeasurer.HEIGHT_TEXT; }
         return this.dimCache.get(s);
     };
     CacheMeasurer.prototype.reset = function () {
@@ -16330,38 +16479,70 @@ exports.CacheMeasurer = CacheMeasurer;
 //# sourceMappingURL=cacheMeasurer.js.map
 
 /***/ }),
-/* 116 */
+/* 118 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /**
  * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
  * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
+ * license at https://github.com/palantir/typesettable/blob/develop/LICENSE
  */
 
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
-__export(__webpack_require__(41));
-__export(__webpack_require__(42));
-__export(__webpack_require__(115));
-__export(__webpack_require__(43));
-__export(__webpack_require__(44));
-//# sourceMappingURL=index.js.map
+var contexts_1 = __webpack_require__(42);
+var measurers_1 = __webpack_require__(45);
+var wrappers_1 = __webpack_require__(47);
+var writers_1 = __webpack_require__(49);
+/**
+ * This is a convenience interface for typesetting strings using the default
+ * measurer/wrapper/writer setup.
+ */
+var Typesetter = (function () {
+    function Typesetter(context) {
+        this.context = context;
+        this.measurer = new measurers_1.CacheMeasurer(this.context);
+        this.wrapper = new wrappers_1.Wrapper();
+        this.writer = new writers_1.Writer(this.measurer, this.context, this.wrapper);
+    }
+    Typesetter.svg = function (element, className, addTitleElement) {
+        return new Typesetter(new contexts_1.SvgContext(element, className, addTitleElement));
+    };
+    Typesetter.canvas = function (ctx, lineHeight, style) {
+        return new Typesetter(new contexts_1.CanvasContext(ctx, lineHeight, style));
+    };
+    /**
+     * Wraps the given string into the width/height and writes it into the
+     * canvas or SVG (depending on context).
+     *
+     * Delegates to `Writer.write` using the internal `ITypesetterContext`.
+     */
+    Typesetter.prototype.write = function (text, width, height, options, into) {
+        this.writer.write(text, width, height, options, into);
+    };
+    /**
+     * Clears the `Measurer`'s CacheMeasurer.
+     *
+     * Call this if your font style changee in SVG.
+     */
+    Typesetter.prototype.clearMeasurerCache = function () {
+        this.measurer.reset();
+    };
+    return Typesetter;
+}());
+exports.Typesetter = Typesetter;
+//# sourceMappingURL=typesetter.js.map
 
 /***/ }),
-/* 117 */
+/* 119 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /**
  * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
  * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
+ * license at https://github.com/palantir/typesettable/blob/develop/LICENSE
  */
 
-var d3 = __webpack_require__(1);
 var Cache = (function () {
     /**
      * @constructor
@@ -16369,7 +16550,7 @@ var Cache = (function () {
      * @param {string} compute The function whose results will be cached.
      */
     function Cache(compute) {
-        this.cache = d3.map();
+        this.cache = {};
         this.compute = compute;
     }
     /**
@@ -16380,10 +16561,10 @@ var Cache = (function () {
      * @return {T} The value associated with k; the result of compute(k).
      */
     Cache.prototype.get = function (k) {
-        if (!this.cache.has(k)) {
-            this.cache.set(k, this.compute(k));
+        if (!this.cache.hasOwnProperty(k)) {
+            this.cache[k] = this.compute(k);
         }
-        return this.cache.get(k);
+        return this.cache[k];
     };
     /**
      * Reset the cache empty.
@@ -16391,7 +16572,7 @@ var Cache = (function () {
      * @return {Cache<T>} The calling Cache.
      */
     Cache.prototype.clear = function () {
-        this.cache = d3.map();
+        this.cache = {};
         return this;
     };
     return Cache;
@@ -16400,63 +16581,14 @@ exports.Cache = Cache;
 //# sourceMappingURL=cache.js.map
 
 /***/ }),
-/* 118 */
+/* 120 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /**
  * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
  * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-
-var DOM = (function () {
-    function DOM() {
-    }
-    DOM.transform = function (s, x, y) {
-        if (x == null) {
-            return s.attr("transform");
-        }
-        else {
-            y = (y == null) ? 0 : y;
-            var translate = "translate(" + x + ", " + y + ")";
-            s.attr("transform", translate);
-            return s;
-        }
-    };
-    DOM.getBBox = function (element) {
-        var bbox;
-        try {
-            // getBBox will only be avaiable on SVGLocatable. Otherwise return default.
-            bbox = element.node().getBBox();
-        }
-        catch (err) {
-            bbox = {
-                height: 0,
-                width: 0,
-                x: 0,
-                y: 0,
-            };
-        }
-        return bbox;
-    };
-    DOM.applyAttrs = function (element, attrs) {
-        Object.keys(attrs).forEach(function (key) { return element.attr(key, attrs[key]); });
-    };
-    return DOM;
-}());
-exports.DOM = DOM;
-//# sourceMappingURL=dom.js.map
-
-/***/ }),
-/* 119 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
+ * license at https://github.com/palantir/typesettable/blob/develop/LICENSE
  */
 
 var Methods = (function () {
@@ -16501,20 +16633,43 @@ var Methods = (function () {
     Methods.strictEq = function (a, b) {
         return a === b;
     };
+    /**
+     * Shim for _.defaults
+     */
+    Methods.defaults = function (target) {
+        var objects = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            objects[_i - 1] = arguments[_i];
+        }
+        if (target == null) {
+            throw new TypeError("Cannot convert undefined or null to object");
+        }
+        var result = Object(target);
+        objects.forEach(function (obj) {
+            if (obj != null) {
+                for (var key in obj) {
+                    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                        result[key] = obj[key];
+                    }
+                }
+            }
+        });
+        return result;
+    };
     return Methods;
 }());
 exports.Methods = Methods;
 //# sourceMappingURL=methods.js.map
 
 /***/ }),
-/* 120 */
+/* 121 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /**
  * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
  * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
+ * license at https://github.com/palantir/typesettable/blob/develop/LICENSE
  */
 
 var StringMethods = (function () {
@@ -16554,14 +16709,14 @@ exports.StringMethods = StringMethods;
 //# sourceMappingURL=stringMethods.js.map
 
 /***/ }),
-/* 121 */
+/* 122 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /**
  * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
  * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
+ * license at https://github.com/palantir/typesettable/blob/develop/LICENSE
  */
 
 var Tokenizer = (function () {
@@ -16602,24 +16757,6 @@ exports.Tokenizer = Tokenizer;
 //# sourceMappingURL=tokenizer.js.map
 
 /***/ }),
-/* 122 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
-__export(__webpack_require__(123));
-__export(__webpack_require__(45));
-//# sourceMappingURL=index.js.map
-
-/***/ }),
 /* 123 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -16627,7 +16764,7 @@ __export(__webpack_require__(45));
 /**
  * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
  * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
+ * license at https://github.com/palantir/typesettable/blob/develop/LICENSE
  */
 
 var __extends = (this && this.__extends) || function (d, b) {
@@ -16635,7 +16772,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var wrapper_1 = __webpack_require__(45);
+var wrapper_1 = __webpack_require__(48);
 var SingleLineWrapper = (function (_super) {
     __extends(SingleLineWrapper, _super);
     function SingleLineWrapper() {
@@ -16685,36 +16822,21 @@ exports.SingleLineWrapper = SingleLineWrapper;
 /**
  * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
  * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
+ * license at https://github.com/palantir/typesettable/blob/develop/LICENSE
  */
 
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
-__export(__webpack_require__(125));
-//# sourceMappingURL=index.js.map
-
-/***/ }),
-/* 125 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-
-var utils_1 = __webpack_require__(12);
+var utils_1 = __webpack_require__(18);
+var DEFAULT_WRITE_OPTIONS = {
+    textRotation: 0,
+    textShear: 0,
+    xAlign: "left",
+    yAlign: "top",
+};
 var Writer = (function () {
-    function Writer(measurer, wrapper) {
-        this._writerID = Writer.nextID++;
-        this._elementID = 0;
-        this.measurer(measurer);
-        if (wrapper) {
-            this.wrapper(wrapper);
-        }
-        this.addTitleElement(false);
+    function Writer(_measurer, _penFactory, _wrapper) {
+        this._measurer = _measurer;
+        this._penFactory = _penFactory;
+        this._wrapper = _wrapper;
     }
     Writer.prototype.measurer = function (newMeasurer) {
         this._measurer = newMeasurer;
@@ -16724,11 +16846,19 @@ var Writer = (function () {
         this._wrapper = newWrapper;
         return this;
     };
-    Writer.prototype.addTitleElement = function (add) {
-        this._addTitleElement = add;
+    Writer.prototype.penFactory = function (newPenFactory) {
+        this._penFactory = newPenFactory;
         return this;
     };
-    Writer.prototype.write = function (text, width, height, options) {
+    /**
+     * Writes the text into the container. If no container is specified, the pen's
+     * default container will be used.
+     */
+    Writer.prototype.write = function (text, width, height, options, container) {
+        if (options === void 0) { options = {}; }
+        // apply default options
+        options = utils_1.Methods.defaults({}, DEFAULT_WRITE_OPTIONS, options);
+        // validate input
         if (Writer.SupportedRotation.indexOf(options.textRotation) === -1) {
             throw new Error("unsupported rotation - " + options.textRotation +
                 ". Supported rotations are " + Writer.SupportedRotation.join(", "));
@@ -16740,7 +16870,7 @@ var Writer = (function () {
         var primaryDimension = orientHorizontally ? width : height;
         var secondaryDimension = orientHorizontally ? height : width;
         // compute shear parameters
-        var shearDegrees = (options.textShear || 0);
+        var shearDegrees = options.textShear;
         var shearRadians = shearDegrees * Math.PI / 180;
         var lineHeight = this._measurer.measure().height;
         var shearShift = lineHeight * Math.tan(shearRadians);
@@ -16758,20 +16888,13 @@ var Writer = (function () {
         var wrappedText = this._wrapper ?
             this._wrapper.wrap(normalizedText, this._measurer, shearCorrectedPrimaryDimension, shearCorrectedSecondaryDimension).wrappedText : normalizedText;
         var lines = wrappedText.split("\n");
-        // prepare svg components
-        var textContainer = options.selection.append("g").classed("text-container", true);
-        if (this._addTitleElement) {
-            textContainer.append("title").text(text);
-        }
-        var textArea = textContainer.append("g").classed("text-area", true);
-        this.writeLines(lines, textArea, shearCorrectedPrimaryDimension, shearShift, options.xAlign);
         // correct the intial x/y offset of the text container accounting shear and alignment
         var shearCorrectedXOffset = Writer.XOffsetFactor[options.xAlign] *
             shearCorrectedPrimaryDimension * Math.sin(shearRadians);
         var shearCorrectedYOffset = Writer.YOffsetFactor[options.yAlign] *
-            (shearCorrectedSecondaryDimension - (lines.length) * lineHeight);
+            (shearCorrectedSecondaryDimension - lines.length * lineHeight);
         var shearCorrection = shearCorrectedXOffset - shearCorrectedYOffset;
-        // build and apply transform
+        // compute transform
         var translate = [0, 0];
         var rotate = options.textRotation + shearDegrees;
         switch (options.textRotation) {
@@ -16788,49 +16911,23 @@ var Writer = (function () {
                 translate = [0, -shearCorrection];
                 break;
         }
-        textArea.attr("transform", "translate(" + translate[0] + ", " + translate[1] + ") rotate(" + rotate + ")");
-        // TODO This has never taken into account the transform at all, so it's
-        // certainly in the wrong place. Why do we need it?
-        this.addClipPath(textContainer);
-        if (options.animator) {
-            options.animator.animate(textContainer);
+        // create a new pen and write the lines
+        var linePen = this._penFactory.createPen(text, { translate: translate, rotate: rotate }, container);
+        this.writeLines(lines, linePen, shearCorrectedPrimaryDimension, lineHeight, shearShift, options.xAlign);
+        if (linePen.destroy != null) {
+            linePen.destroy();
         }
     };
-    Writer.prototype.writeLine = function (line, g, width, xAlign, xOffset, yOffset) {
-        var textEl = g.append("text");
-        textEl.text(line);
-        xOffset += width * Writer.XOffsetFactor[xAlign];
-        var anchor = Writer.AnchorConverter[xAlign];
-        textEl.attr("text-anchor", anchor).classed("text-line", true);
-        utils_1.DOM.transform(textEl, xOffset, yOffset).attr("y", "-0.25em");
-    };
-    Writer.prototype.writeLines = function (lines, writingArea, width, shearShift, xAlign) {
-        var _this = this;
-        var lineHeight = this._measurer.measure().height;
+    Writer.prototype.writeLines = function (lines, linePen, width, lineHeight, shearShift, xAlign) {
         lines.forEach(function (line, i) {
-            var xOffset = (shearShift > 0) ? (i + 1) * shearShift : (i) * shearShift;
-            _this.writeLine(line, writingArea, width, xAlign, xOffset, (i + 1) * lineHeight);
-        });
-    };
-    Writer.prototype.addClipPath = function (selection) {
-        var elementID = this._elementID++;
-        var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
-        prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
-        var clipPathID = "clipPath" + this._writerID + "_" + elementID;
-        selection.select(".text-area").attr("clip-path", "url(\"" + prefix + "#" + clipPathID + "\")");
-        var clipPathParent = selection.append("clipPath").attr("id", clipPathID);
-        var bboxAttrs = utils_1.DOM.getBBox(selection.select(".text-area"));
-        var box = clipPathParent.append("rect");
-        utils_1.DOM.applyAttrs(box.classed("clip-rect", true), {
-            height: bboxAttrs.height,
-            width: bboxAttrs.width,
-            x: bboxAttrs.x,
-            y: bboxAttrs.y,
+            var shearOffset = (shearShift > 0) ? (i + 1) * shearShift : (i) * shearShift;
+            var xOffset = shearOffset + width * Writer.XOffsetFactor[xAlign];
+            var anchor = Writer.AnchorConverter[xAlign];
+            linePen.write(line, anchor, xOffset, (i + 1) * lineHeight);
         });
     };
     return Writer;
 }());
-Writer.nextID = 0;
 Writer.SupportedRotation = [-90, 0, 180, 90];
 Writer.AnchorConverter = {
     center: "middle",
@@ -16851,7 +16948,7 @@ exports.Writer = Writer;
 //# sourceMappingURL=writer.js.map
 
 /***/ }),
-/* 126 */
+/* 125 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16862,10 +16959,10 @@ function __export(m) {
 // HACKHACK d3-selection-multi doesn't play well with default "d3" package in a
 // bundler environment (e.g. webpack) - see https://github.com/d3/d3-selection-multi/issues/11
 // we add it manually to the default "d3" bundle
-__webpack_require__(49);
+__webpack_require__(53);
 var Animators = __webpack_require__(6);
 exports.Animators = Animators;
-var Axes = __webpack_require__(46);
+var Axes = __webpack_require__(50);
 exports.Axes = Axes;
 var Components = __webpack_require__(30);
 exports.Components = Components;
@@ -16879,13 +16976,13 @@ var RenderPolicies = __webpack_require__(31);
 exports.RenderPolicies = RenderPolicies;
 var SymbolFactories = __webpack_require__(26);
 exports.SymbolFactories = SymbolFactories;
-var Dispatchers = __webpack_require__(13);
+var Dispatchers = __webpack_require__(12);
 exports.Dispatchers = Dispatchers;
 var Drawers = __webpack_require__(9);
 exports.Drawers = Drawers;
-var Interactions = __webpack_require__(15);
+var Interactions = __webpack_require__(14);
 exports.Interactions = Interactions;
-var Plots = __webpack_require__(17);
+var Plots = __webpack_require__(16);
 exports.Plots = Plots;
 var Scales = __webpack_require__(3);
 exports.Scales = Scales;
@@ -16896,96 +16993,17 @@ var timeAxis_1 = __webpack_require__(23);
 exports.TimeInterval = timeAxis_1.TimeInterval;
 __export(__webpack_require__(5));
 __export(__webpack_require__(24));
-__export(__webpack_require__(47));
-var version_1 = __webpack_require__(48);
+__export(__webpack_require__(51));
+var version_1 = __webpack_require__(52);
 exports.version = version_1.version;
 __export(__webpack_require__(21));
 __export(__webpack_require__(7));
-__export(__webpack_require__(14));
+__export(__webpack_require__(13));
 __export(__webpack_require__(32));
-__export(__webpack_require__(16));
+__export(__webpack_require__(15));
 __export(__webpack_require__(2));
 __export(__webpack_require__(10));
-__export(__webpack_require__(18));
-
-
-/***/ }),
-/* 127 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
-
-var DOM = __webpack_require__(95);
-var ClientToSVGTranslator = (function () {
-    function ClientToSVGTranslator(svg) {
-        this._svg = svg;
-        this._measureRect = document.createElementNS(svg.namespaceURI, "rect");
-        this._measureRect.setAttribute("class", "measure-rect");
-        this._measureRect.setAttribute("style", "opacity: 0; visibility: hidden;");
-        this._measureRect.setAttribute("stroke-width", "0");
-        this._measureRect.setAttribute("width", "1");
-        this._measureRect.setAttribute("height", "1");
-        this._svg.appendChild(this._measureRect);
-    }
-    /**
-     * Returns the ClientToSVGTranslator for the <svg> containing elem.
-     * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
-     */
-    ClientToSVGTranslator.getTranslator = function (elem) {
-        var svg = DOM.boundingSVG(elem);
-        var translator = svg[ClientToSVGTranslator._TRANSLATOR_KEY];
-        if (translator == null) {
-            translator = new ClientToSVGTranslator(svg);
-            svg[ClientToSVGTranslator._TRANSLATOR_KEY] = translator;
-        }
-        return translator;
-    };
-    /**
-     * Computes the position relative to the <svg> in svg-coordinate-space.
-     */
-    ClientToSVGTranslator.prototype.computePosition = function (clientX, clientY) {
-        // get the origin
-        this._measureRect.setAttribute("x", "0");
-        this._measureRect.setAttribute("y", "0");
-        var mrBCR = this._measureRect.getBoundingClientRect();
-        var origin = { x: mrBCR.left, y: mrBCR.top };
-        // calculate the scale
-        var sampleDistance = 100;
-        this._measureRect.setAttribute("x", String(sampleDistance));
-        this._measureRect.setAttribute("y", String(sampleDistance));
-        mrBCR = this._measureRect.getBoundingClientRect();
-        var testPoint = { x: mrBCR.left, y: mrBCR.top };
-        // invalid measurements -- SVG might not be in the DOM
-        if (origin.x === testPoint.x || origin.y === testPoint.y) {
-            return null;
-        }
-        var scaleX = (testPoint.x - origin.x) / sampleDistance;
-        var scaleY = (testPoint.y - origin.y) / sampleDistance;
-        // get the true cursor position
-        this._measureRect.setAttribute("x", String((clientX - origin.x) / scaleX));
-        this._measureRect.setAttribute("y", String((clientY - origin.y) / scaleY));
-        mrBCR = this._measureRect.getBoundingClientRect();
-        var trueCursorPosition = { x: mrBCR.left, y: mrBCR.top };
-        var scaledPosition = {
-            x: (trueCursorPosition.x - origin.x) / scaleX,
-            y: (trueCursorPosition.y - origin.y) / scaleY,
-        };
-        return scaledPosition;
-    };
-    /**
-     * Checks whether event happened inside <svg> element.
-     */
-    ClientToSVGTranslator.prototype.insideSVG = function (e) {
-        return DOM.boundingSVG(e.target) === this._svg;
-    };
-    ClientToSVGTranslator._TRANSLATOR_KEY = "__Plottable_ClientToSVGTranslator";
-    return ClientToSVGTranslator;
-}());
-exports.ClientToSVGTranslator = ClientToSVGTranslator;
+__export(__webpack_require__(17));
 
 
 /***/ })

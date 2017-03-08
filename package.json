@@ -67,6 +67,6 @@
   },
   "dependencies": {
     "d3": "^4.5.0",
-    "typesettable": "^3.0.0"
+    "typesettable": "^3.0.1"
   }
 }
