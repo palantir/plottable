@@ -2,7 +2,7 @@ import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
-import * as SVGTypewriter from "svg-typewriter";
+import * as Typesetter from "typesettable";
 
 import * as Plottable from "../../src";
 
@@ -101,26 +101,32 @@ describe("Labels", () => {
       });
 
       it("renders left-rotated text properly", () => {
-        const label = new Plottable.Components.Label("LEFT-ROTATED LABEL", -90);
+        const str = "LEFT-ROTATED LABEL";
+        const label = new Plottable.Components.Label(str, -90);
         label.renderTo(svg);
         const content = label.content();
         const text = content.select("text");
         const textBBox = Plottable.Utils.DOM.elementBBox(text);
         TestMethods.assertBBoxInclusion((<any> label)._element.select(BBOX_SELECTOR), text);
         assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
-        assert.closeTo(textBBox.width, label.height(), window.Pixel_CloseTo_Requirement, "text width");
+        // OS/Browser specific kerning messes with typesetter's per-character measurement
+        const widthFudge = str.length;
+        assert.closeTo(textBBox.width, label.height(), window.Pixel_CloseTo_Requirement + widthFudge, "text width");
         svg.remove();
       });
 
       it("renders right-rotated text properly", () => {
-        const label = new Plottable.Components.Label("RIGHT-ROTATED LABEL", 90);
+        const str = "RIGHT-ROTATED LABEL";
+        const label = new Plottable.Components.Label(str, 90);
         label.renderTo(svg);
         const content = label.content();
         const text = content.select("text");
         const textBBox = Plottable.Utils.DOM.elementBBox(text);
         TestMethods.assertBBoxInclusion((<any> label)._element.select(BBOX_SELECTOR), text);
         assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
-        assert.closeTo(textBBox.width, label.height(), window.Pixel_CloseTo_Requirement, "text width");
+        // OS/Browser specific kerning messes with typesetter's per-character measurement
+        const widthFudge = str.length;
+        assert.closeTo(textBBox.width, label.height(), window.Pixel_CloseTo_Requirement + widthFudge, "text width");
         svg.remove();
       });
     });
@@ -213,7 +219,8 @@ describe("Labels", () => {
       it("puts space around the label", () => {
         label.renderTo(svg);
 
-        const measurer = new SVGTypewriter.CacheMeasurer(svg);
+        const context = new Typesetter.SvgContext(svg.node() as SVGElement);
+        const measurer = new Typesetter.CacheMeasurer(context);
         const measure = measurer.measure("testing label");
         assert.operator(label.width(), ">", measure.width, "padding increases size of the component");
         assert.operator(label.width(), "<=", measure.width + 2 * PADDING, "width at most incorporates full padding amount");

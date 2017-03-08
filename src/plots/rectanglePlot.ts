@@ -4,7 +4,7 @@
  */
 
 import * as d3 from "d3";
-import * as SVGTypewriter from "svg-typewriter";
+import * as Typesetter from "typesettable";
 
 import * as Animators from "../animators";
 import { Accessor, Point, Bounds, Range, AttributeToProjector } from "../core/interfaces";
@@ -433,17 +433,19 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
   }
 
   private _drawLabel(dataToDraw: Utils.Map<Dataset, any[]>, dataset: Dataset, datasetIndex: number) {
-    let attrToProjector = this._generateAttrToProjector();
-    let labelArea = this._renderArea.append("g").classed("label-area", true);
-    let measurer = new SVGTypewriter.CacheMeasurer(labelArea);
-    let writer = new SVGTypewriter.Writer(measurer);
-    let xRange = this.x().scale.range();
-    let yRange = this.y().scale.range();
-    let xMin = Math.min.apply(null, xRange);
-    let xMax = Math.max.apply(null, xRange);
-    let yMin = Math.min.apply(null, yRange);
-    let yMax = Math.max.apply(null, yRange);
-    let data = dataToDraw.get(dataset);
+    const attrToProjector = this._generateAttrToProjector();
+    const labelArea = this._renderArea.append("g").classed("label-area", true);
+
+    const context = new Typesetter.SvgContext(labelArea.node() as SVGElement);
+    const measurer = new Typesetter.CacheMeasurer(context);
+    const writer = new Typesetter.Writer(measurer, context);
+    const xRange = this.x().scale.range();
+    const yRange = this.y().scale.range();
+    const xMin = Math.min.apply(null, xRange);
+    const xMax = Math.max.apply(null, xRange);
+    const yMin = Math.min.apply(null, yRange);
+    const yMax = Math.max.apply(null, yRange);
+    const data = dataToDraw.get(dataset);
     data.forEach((datum, datumIndex) => {
       let label = "" + this.label()(datum, datumIndex, dataset);
       let measurement = measurer.measure(label);
@@ -475,11 +477,9 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
         g.classed(className, true);
 
         writer.write(label, measurement.width, measurement.height, {
-          selection: g,
           xAlign: "center",
           yAlign: "center",
-          textRotation: 0,
-        });
+        }, g.node());
       }
     });
   }

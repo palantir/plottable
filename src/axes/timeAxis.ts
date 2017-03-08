@@ -4,7 +4,7 @@
  */
 
 import * as d3 from "d3";
-import * as SVGTypewriter from "svg-typewriter";
+import * as Typesetter from "typesettable";
 
 import { Formatter } from "../core/formatters";
 import * as Formatters from "../core/formatters";
@@ -181,7 +181,7 @@ export class Time extends Axis<Date> {
   private _tierHeights: number[];
   private _possibleTimeAxisConfigurations: TimeAxisConfiguration[];
   private _numTiers: number;
-  private _measurer: SVGTypewriter.Measurer;
+  private _measurer: Typesetter.Measurer;
   private _maxTimeIntervalPrecision: string = null;
 
   private _mostPreciseConfigIndex: number;
@@ -415,7 +415,8 @@ export class Time extends Axis<Date> {
       this._tierBaselines.push(tierContainer.append("line").classed("baseline", true));
     }
 
-    this._measurer = new SVGTypewriter.CacheMeasurer(this._tierLabelContainers[0]);
+    const context = new Typesetter.SvgContext(this._tierLabelContainers[0].node() as SVGElement);
+    this._measurer = new Typesetter.CacheMeasurer(context);
   }
 
   private _getTickIntervalValues(config: TimeAxisTierConfiguration): any[] {
@@ -665,6 +666,6 @@ export class Time extends Axis<Date> {
 
   public invalidateCache() {
     super.invalidateCache();
-    (this._measurer as SVGTypewriter.CacheMeasurer).reset();
+    (this._measurer as Typesetter.CacheMeasurer).reset();
   }
 }

@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import * as SVGTypewriter from "svg-typewriter";
+import * as Typesetter from "typesettable";
 
 import { SpaceRequest, SimpleSelection } from "../core/interfaces";
 
@@ -13,9 +13,9 @@ export class Label extends Component {
   private _textContainer: SimpleSelection<void>;
   private _text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
   private _angle: number;
-  private _measurer: SVGTypewriter.CacheMeasurer;
-  private _wrapper: SVGTypewriter.Wrapper;
-  private _writer: SVGTypewriter.Writer;
+  private _measurer: Typesetter.CacheMeasurer;
+  private _wrapper: Typesetter.Wrapper;
+  private _writer: Typesetter.Writer;
   private _padding: number;
 
   /**
@@ -48,9 +48,10 @@ export class Label extends Component {
   protected _setup() {
     super._setup();
     this._textContainer = this.content().append("g");
-    this._measurer = new SVGTypewriter.CacheMeasurer(this._textContainer);
-    this._wrapper = new SVGTypewriter.Wrapper();
-    this._writer = new SVGTypewriter.Writer(this._measurer, this._wrapper);
+    const context = new Typesetter.SvgContext(this._textContainer.node() as SVGElement);
+    this._measurer = new Typesetter.CacheMeasurer(context);
+    this._wrapper = new Typesetter.Wrapper();
+    this._writer = new Typesetter.Writer(this._measurer, context, this._wrapper);
     this.text(this._text);
   }
 
@@ -144,7 +145,7 @@ export class Label extends Component {
 
   public renderImmediately() {
     super.renderImmediately();
-    // HACKHACK SVGTypewriter.remove existing content - #21 on SVGTypewriter.
+    // HACKHACK Typesetter.remove existing content - #21 on Typesetter.
     this._textContainer.selectAll("g").remove();
     let textMeasurement = this._measurer.measure(this._text);
     let heightPadding = Math.max(Math.min((this.height() - textMeasurement.height) / 2, this.padding()), 0);
@@ -153,9 +154,8 @@ export class Label extends Component {
     let writeWidth = this.width() - 2 * widthPadding;
     let writeHeight = this.height() - 2 * heightPadding;
     let writeOptions = {
-      selection: this._textContainer,
-      xAlign: this.xAlignment(),
-      yAlign: this.yAlignment(),
+      xAlign: this.xAlignment() as Typesetter.IXAlign,
+      yAlign: this.yAlignment() as Typesetter.IYAlign,
       textRotation: this.angle(),
     };
     this._writer.write(this._text, writeWidth, writeHeight, writeOptions);

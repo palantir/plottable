@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import * as SVGTypewriter from "svg-typewriter";
+import * as Typesetter from "typesettable";
 
 import * as Configs from "../core/config";
 import { Formatter } from "../core/formatters";
@@ -18,9 +18,9 @@ import { Component } from "./component";
 export class InterpolatedColorLegend extends Component {
   private static _DEFAULT_NUM_SWATCHES = 11;
 
-  private _measurer: SVGTypewriter.Measurer;
-  private _wrapper: SVGTypewriter.Wrapper;
-  private _writer: SVGTypewriter.Writer;
+  private _measurer: Typesetter.Measurer;
+  private _wrapper: Typesetter.Wrapper;
+  private _writer: Typesetter.Writer;
   private _scale: Scales.InterpolatedColor;
   private _orientation: String;
   private _textPadding = 5;
@@ -168,9 +168,10 @@ export class InterpolatedColorLegend extends Component {
     this._lowerLabel = this.content().append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
     this._upperLabel = this.content().append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
 
-    this._measurer = new SVGTypewriter.Measurer(this.content());
-    this._wrapper = new SVGTypewriter.Wrapper();
-    this._writer = new SVGTypewriter.Writer(this._measurer, this._wrapper);
+    const context = new Typesetter.SvgContext(this.content().node() as SVGElement)
+    this._measurer = new Typesetter.Measurer(context);
+    this._wrapper = new Typesetter.Wrapper();
+    this._writer = new Typesetter.Writer(this._measurer, context, this._wrapper);
   }
 
   public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
@@ -219,17 +220,15 @@ export class InterpolatedColorLegend extends Component {
     let upperLabelShift: Point = { x: 0, y: 0 };
     let lowerLabelShift: Point = { x: 0, y: 0 };
     let lowerWriteOptions = {
-      selection: this._lowerLabel,
       xAlign: "center",
       yAlign: "center",
       textRotation: 0,
-    };
+    } as Typesetter.IWriteOptions;
     let upperWriteOptions = {
-      selection: this._upperLabel,
       xAlign: "center",
       yAlign: "center",
       textRotation: 0,
-    };
+    } as Typesetter.IWriteOptions;
 
     let swatchWidth: number;
     let swatchHeight: number;
@@ -244,7 +243,6 @@ export class InterpolatedColorLegend extends Component {
     };
 
     let padding: number;
-
     let numSwatches: number;
 
     if (this._isVertical()) {
@@ -295,12 +293,12 @@ export class InterpolatedColorLegend extends Component {
     boundingBoxAttr["x"] = swatchX(null, 0); // position of the first swatch
 
     this._upperLabel.text(""); // clear the upper label
-    this._writer.write(text1, this.width(), this.height(), upperWriteOptions);
+    this._writer.write(text1, this.width(), this.height(), upperWriteOptions, this._upperLabel.node());
     let upperTranslateString = "translate(" + upperLabelShift.x + ", " + upperLabelShift.y + ")";
     this._upperLabel.attr("transform", upperTranslateString);
 
     this._lowerLabel.text(""); // clear the lower label
-    this._writer.write(text0, this.width(), this.height(), lowerWriteOptions);
+    this._writer.write(text0, this.width(), this.height(), lowerWriteOptions, this._lowerLabel.node());
     let lowerTranslateString = "translate(" + lowerLabelShift.x + ", " + lowerLabelShift.y + ")";
     this._lowerLabel.attr("transform", lowerTranslateString);
 
