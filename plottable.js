@@ -16322,13 +16322,16 @@ var SvgUtils = (function () {
         // using feature detection, safely return the bounding box dimensions of the
         // provided svg element
         if (element.getBBox) {
-            var _a = element.getBBox(), width = _a.width, height = _a.height;
-            // copy to prevent NoModificationAllowedError
-            return { width: width, height: height };
+            try {
+                var _a = element.getBBox(), width = _a.width, height = _a.height;
+                // copy to prevent NoModificationAllowedError
+                return { width: width, height: height };
+            }
+            catch (err) {
+            }
         }
-        else {
-            return { height: 0, width: 0 };
-        }
+        // if can't get valid bbox, return 0,0
+        return { height: 0, width: 0 };
     };
     return SvgUtils;
 }());
