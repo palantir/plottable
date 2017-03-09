@@ -2850,6 +2850,29 @@ var Axis = (function (_super) {
         _super.prototype.destroy.call(this);
         this._scale.offUpdate(this._rescaleCallback);
     };
+    /**
+     * Gets the tick label data at a particular point. Returns undefined if point has no label.
+     *
+     * @param {Point} point
+     */
+    Axis.prototype.tickLabelAt = function (point) {
+        // only measure in the direction of the axis.
+        var pointValue = this.isHorizontal() ? point.x : point.y;
+        var tickValues = this._getTickValues();
+        var axisScale = this._scale;
+        var tickLabel;
+        this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS)
+            .each(function (data, index) {
+            var labelWidth = this.getBBox().width;
+            var scaledTick = axisScale.scale(tickValues[index]);
+            var start = scaledTick - (labelWidth / 2);
+            var end = scaledTick + (labelWidth / 2);
+            if (start <= pointValue && pointValue <= end) {
+                tickLabel = data;
+            }
+        });
+        return tickLabel;
+    };
     Axis.prototype._computeWidth = function () {
         // to be overridden by subclass logic
         return this._maxLabelTickLength();
@@ -7743,12 +7766,14 @@ exports.Dataset = Dataset;
  * @license MIT
  */
 
+// __VERSION__ is a global constant which will be replaced by webpack's DefinePlugin
+var __VERSION__ = "blargh";
 /*
  * WARNING: The js output of this expression is searched by string (yes, I know) and replaced with a
  * real version number during the dist phase for for npm module publishing. Modifying this line should
  * be accompanied by modifying the "sed-version" task in package.json accordingly.
  */
-exports.version = "3.0.0-beta.3";
+exports.version = __VERSION__;
 
 
 /***/ }),

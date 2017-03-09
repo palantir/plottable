@@ -8,10 +8,10 @@ import * as d3 from "d3";
 import * as Typesetter from "typesettable";
 
 import { Component } from "../components/component";
-import { Scale, ScaleCallback } from "../scales/scale";
 import { Formatter } from "../core/formatters";
 import * as Formatters from "../core/formatters";
-import { SpaceRequest, Point, SimpleSelection } from "../core/interfaces";
+import { Point, SimpleSelection, SpaceRequest } from "../core/interfaces";
+import { Scale, ScaleCallback } from "../scales/scale";
 import * as Utils from "../utils";
 
 export type AxisOrientation =  "bottom" | "left" | "right" | "top";
@@ -102,6 +102,33 @@ export class Axis<D> extends Component {
   public destroy() {
     super.destroy();
     this._scale.offUpdate(this._rescaleCallback);
+  }
+
+  /**
+   * Gets the tick label data at a particular point. Returns undefined if point has no label.
+   *
+   * @param {Point} point
+   */
+  public tickLabelAt(point: Point): D {
+    // only measure in the direction of the axis.
+    const pointValue = this.isHorizontal() ? point.x : point.y;
+    const tickValues = this._getTickValues();
+
+    const axisScale = this._scale;
+    let tickLabel: D;
+    this._tickLabelContainer.selectAll<SVGGElement, any>("." + Axis.TICK_LABEL_CLASS)
+      .each(function (data: D, index: number) {
+        const labelWidth = this.getBBox().width;
+        const scaledTick = axisScale.scale(tickValues[index]);
+        const start = scaledTick - (labelWidth / 2);
+        const end = scaledTick + (labelWidth / 2);
+
+        if (start <= pointValue && pointValue <= end) {
+          tickLabel = data;
+        }
+      });
+
+    return tickLabel;
   }
 
   protected _computeWidth() {
