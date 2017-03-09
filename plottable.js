@@ -464,9 +464,13 @@ var Plot = (function (_super) {
                 if (Utils.Math.isNaN(position.x) || Utils.Math.isNaN(position.y)) {
                     return;
                 }
+                var plot = _this;
                 lightweightPlotEntities.push({
                     datum: datum,
-                    position: position,
+                    get position() {
+                        // only calculate position when needing to improve pan zoom performance #3159
+                        return plot._pixelPoint.call(plot, datum, datumIndex, dataset);
+                    },
                     index: datumIndex,
                     dataset: dataset,
                     datasetIndex: datasetIndex,
@@ -552,7 +556,7 @@ var Plot = (function (_super) {
     Plot.prototype._lightweightPlotEntityToPlotEntity = function (entity) {
         var plotEntity = {
             datum: entity.datum,
-            position: this._pixelPoint(entity.datum, entity.index, entity.dataset),
+            position: entity.position,
             dataset: entity.dataset,
             datasetIndex: entity.datasetIndex,
             index: entity.index,
@@ -2261,14 +2265,6 @@ var XYPlot = (function (_super) {
             }
         };
     }
-    XYPlot.prototype.entityNearest = function (queryPoint) {
-        // by default, the entity index stores position information in the data space
-        // the default impelentation of the entityNearest must convert the chart bounding
-        // box as well as the query point to the data space before it can make a comparison
-        var invertedChartBounds = this._invertedBounds();
-        var invertedQueryPoint = this._invertPixelPoint(queryPoint);
-        return _super.prototype.entityNearest.call(this, invertedQueryPoint, invertedChartBounds);
-    };
     XYPlot.prototype.deferredRendering = function (deferredRendering) {
         if (deferredRendering == null) {
             return this._deferredRendering;
@@ -2454,13 +2450,6 @@ var XYPlot = (function (_super) {
             this._updateXExtentsAndAutodomain();
         }
     };
-    XYPlot.prototype._buildLightweightPlotEntities = function (datasets) {
-        var _this = this;
-        return _super.prototype._buildLightweightPlotEntities.call(this, datasets).map(function (lightweightPlotEntity) {
-            lightweightPlotEntity.position = _this._invertPixelPoint(lightweightPlotEntity.position);
-            return lightweightPlotEntity;
-        });
-    };
     XYPlot.prototype._projectorsReady = function () {
         var xBinding = this.x();
         var yBinding = this.y();
@@ -2468,41 +2457,6 @@ var XYPlot = (function (_super) {
             xBinding.accessor != null &&
             yBinding != null &&
             yBinding.accessor != null;
-    };
-    /**
-     * Returns the bounds of the plot in the Data space ensures that the topLeft
-     * and bottomRight points represent the minima and maxima of the Data space, respectively
-     @returns {Bounds}
-     */
-    XYPlot.prototype._invertedBounds = function () {
-        var bounds = this.bounds();
-        var maybeTopLeft = this._invertPixelPoint(bounds.topLeft);
-        var maybeBottomRight = this._invertPixelPoint(bounds.bottomRight);
-        // Scale domains can map from lowest to highest or highest to lowest (eg [0, 1] or [1, 0]).
-        // What we're interested in is a domain space equivalent to the concept of topLeft
-        // and bottomRight, not a true mapping from point to domain. This is in keeping
-        // with our definition of {Bounds}, where the topLeft coordinate is minimal
-        // and the bottomRight is maximal.
-        return {
-            topLeft: {
-                x: Math.min(maybeTopLeft.x, maybeBottomRight.x),
-                y: Math.min(maybeTopLeft.y, maybeBottomRight.y)
-            },
-            bottomRight: {
-                x: Math.max(maybeBottomRight.x, maybeTopLeft.x),
-                y: Math.max(maybeBottomRight.y, maybeTopLeft.y)
-            }
-        };
-    };
-    /**
-     * _invertPixelPoint converts a point in pixel coordinates to a point in data coordinates
-     * @param {Point} point Representation of the point in pixel coordinates
-     * @return {Point} Returns the point represented in data coordinates
-     */
-    XYPlot.prototype._invertPixelPoint = function (point) {
-        var xScale = this.x();
-        var yScale = this.y();
-        return { x: xScale.scale.invertedTransformation(point.x), y: yScale.scale.invertedTransformation(point.y) };
     };
     XYPlot.prototype._pixelPoint = function (datum, index, dataset) {
         var xProjector = plot_1.Plot._scaledAccessor(this.x());
@@ -13152,8 +13106,7 @@ var Scatter = (function (_super) {
         var lightweightPlotEntities = _super.prototype._buildLightweightPlotEntities.call(this, datasets);
         return lightweightPlotEntities.map(function (lightweightPlotEntity) {
             var diameter = plot_1.Plot._scaledAccessor(_this.size())(lightweightPlotEntity.datum, lightweightPlotEntity.index, lightweightPlotEntity.dataset);
-            // convert diameter into data space to be on the same scale as the scatter point position
-            lightweightPlotEntity.diameter = _this._invertedPixelSize({ x: diameter, y: diameter });
+            lightweightPlotEntity.diameter = diameter;
             return lightweightPlotEntity;
         });
     };
@@ -13194,10 +13147,10 @@ var Scatter = (function (_super) {
         var xRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
         var yRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
         var translatedBbox = {
-            x: entity.position.x - entity.diameter.x,
-            y: entity.position.y - entity.diameter.y,
-            width: entity.diameter.x,
-            height: entity.diameter.y,
+            x: entity.position.x - entity.diameter,
+            y: entity.position.y - entity.diameter,
+            width: entity.diameter,
+            height: entity.diameter,
         };
         return Utils.DOM.intersectsBBox(xRange, yRange, translatedBbox);
     };
@@ -13257,22 +13210,6 @@ var Scatter = (function (_super) {
             var size = sizeProjector(datum, index, dataset);
             return x - size / 2 <= p.x && p.x <= x + size / 2 && y - size / 2 <= p.y && p.y <= y + size / 2;
         });
-    };
-    /**
-     * _invertedPixelSize returns the size of the object in data space
-     * @param {Point} [point] The size of the object in pixel space. X corresponds to
-     * the width of the object, and Y corresponds to the height of the object
-     * @return {Point} Returns the size of the object in data space. X corresponds to
-     * the width of the object in data space, and Y corresponds to the height of the
-     * object in data space.
-     */
-    Scatter.prototype._invertedPixelSize = function (point) {
-        var invertedOrigin = this._invertPixelPoint(this.origin());
-        var invertedSize = this._invertPixelPoint({ x: point.x, y: point.y });
-        return {
-            x: Math.abs(invertedSize.x - invertedOrigin.x),
-            y: Math.abs(invertedSize.y - invertedOrigin.y)
-        };
     };
     Scatter._SIZE_KEY = "size";
     Scatter._SYMBOL_KEY = "symbol";

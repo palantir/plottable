@@ -451,9 +451,13 @@ export class Plot extends Component {
           return;
         }
 
+        const plot = this;
         lightweightPlotEntities.push({
           datum,
-          position,
+          get position() {
+            // only calculate position when needing to improve pan zoom performance #3159
+            return plot._pixelPoint.call(plot, datum, datumIndex, dataset);
+          },
           index: datumIndex,
           dataset,
           datasetIndex,
@@ -547,7 +551,7 @@ export class Plot extends Component {
   protected _lightweightPlotEntityToPlotEntity(entity: Plots.LightweightPlotEntity) {
     let plotEntity: Plots.PlotEntity = {
       datum: entity.datum,
-      position: this._pixelPoint(entity.datum, entity.index, entity.dataset),
+      position: entity.position,
       dataset: entity.dataset,
       datasetIndex: entity.datasetIndex,
       index: entity.index,
