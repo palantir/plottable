@@ -4,7 +4,7 @@
  */
 
 import * as d3 from "d3";
-import * as SVGTypewriter from "svg-typewriter";
+import * as Typesetter from "typesettable";
 
 import { Axis, AxisOrientation } from "./axis";
 import { SpaceRequest, Point, SimpleSelection } from "../core/interfaces";
@@ -42,14 +42,15 @@ export class Category extends Axis<string> {
    */
   private _tickLabelMaxLines: number;
 
-  private _measurer: SVGTypewriter.CacheMeasurer;
+  private _measurer: Typesetter.CacheMeasurer;
+  private _typesetterContext: Typesetter.ITypesetterContext<any>;
 
   /**
    * A Wrapper configured according to the other properties on this axis.
-   * @returns {SVGTypewriter.Wrapper}
+   * @returns {Typesetter.Wrapper}
    */
   private get _wrapper() {
-    const wrapper = new SVGTypewriter.Wrapper();
+    const wrapper = new Typesetter.Wrapper();
     if (this._tickLabelMaxLines != null) {
       wrapper.maxLines(this._tickLabelMaxLines)
     }
@@ -58,10 +59,10 @@ export class Category extends Axis<string> {
 
   /**
    * A Writer attached to this measurer and wrapper.
-   * @returns {SVGTypewriter.Writer}
+   * @returns {Typesetter.Writer}
    */
   private get _writer() {
-    return new SVGTypewriter.Writer(this._measurer, this._wrapper);
+    return new Typesetter.Writer(this._measurer, this._typesetterContext, this._wrapper);
   }
 
   /**
@@ -80,7 +81,8 @@ export class Category extends Axis<string> {
 
   protected _setup() {
     super._setup();
-    this._measurer = new SVGTypewriter.CacheMeasurer(this._tickLabelContainer);
+    this._typesetterContext = new Typesetter.SvgContext(this._tickLabelContainer.node() as SVGElement);
+    this._measurer = new Typesetter.CacheMeasurer(this._typesetterContext);
   }
 
   protected _rescale() {
@@ -265,8 +267,8 @@ export class Category extends Axis<string> {
    */
   private _drawTicks(stepWidth: number, ticks: SimpleSelection<string>) {
     let self = this;
-    let xAlign: {[s: string]: string};
-    let yAlign: {[s: string]: string};
+    let xAlign: {[s: string]: Typesetter.IXAlign};
+    let yAlign: {[s: string]: Typesetter.IYAlign};
     switch (this.tickLabelAngle()) {
       case 0:
         xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
@@ -282,27 +284,27 @@ export class Category extends Axis<string> {
         break;
     }
     ticks.each(function (this: SVGElement, d: string) {
+      const container = d3.select(this);
       let width = self.isHorizontal() ? stepWidth : self.width() - self._tickSpaceRequired();
-      let height = self.isHorizontal() ? self.height() - self._tickSpaceRequired() : stepWidth;
-      let writeOptions = {
-        selection: d3.select(this),
+      const height = self.isHorizontal() ? self.height() - self._tickSpaceRequired() : stepWidth;
+      const writeOptions = {
         xAlign: xAlign[self.orientation()],
         yAlign: yAlign[self.orientation()],
         textRotation: self.tickLabelAngle(),
         textShear: self.tickLabelShearAngle(),
-      };
+      } as Typesetter.IWriteOptions;
       if (self._tickLabelMaxWidth != null) {
         // for left-oriented axes, we must move the ticks by the amount we've cut off in order to keep the text
         // aligned with the side of the ticks
         if (self.orientation() === "left" && width > self._tickLabelMaxWidth) {
           const cutOffWidth = width - self._tickLabelMaxWidth;
-          const newTransform = `${writeOptions.selection.attr("transform")} translate(${cutOffWidth}, 0)`;
-          writeOptions.selection.attr("transform", newTransform);
+          const newTransform = `${container.attr("transform")} translate(${cutOffWidth}, 0)`;
+          container.attr("transform", newTransform);
         }
         width = Math.min(width, self._tickLabelMaxWidth);
       }
 
-      self._writer.write(self.formatter()(d), width, height, writeOptions);
+      self._writer.write(self.formatter()(d), width, height, writeOptions, container.node());
     });
   }
 
@@ -359,10 +361,10 @@ export class Category extends Axis<string> {
     let widthFn = (this.isHorizontal() && this._tickLabelAngle === 0) ? d3.sum : Utils.Math.max;
     let heightFn = (this.isHorizontal() && this._tickLabelAngle === 0) ? Utils.Math.max : d3.sum;
 
-    let usedWidth = widthFn<SVGTypewriter.IWrappingResult, number>(wrappingResults,
-      (t: SVGTypewriter.IWrappingResult) => this._measurer.measure(t.wrappedText).width, 0);
-    let usedHeight = heightFn<SVGTypewriter.IWrappingResult, number>(wrappingResults,
-      (t: SVGTypewriter.IWrappingResult) => this._measurer.measure(t.wrappedText).height, 0);
+    let usedWidth = widthFn<Typesetter.IWrappingResult, number>(wrappingResults,
+      (t: Typesetter.IWrappingResult) => this._measurer.measure(t.wrappedText).width, 0);
+    let usedHeight = heightFn<Typesetter.IWrappingResult, number>(wrappingResults,
+      (t: Typesetter.IWrappingResult) => this._measurer.measure(t.wrappedText).height, 0);
 
     // If the tick labels are rotated, reverse usedWidth and usedHeight
     // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25

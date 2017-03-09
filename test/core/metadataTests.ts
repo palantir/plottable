@@ -20,7 +20,7 @@ describe("Metadata", () => {
   });
 
   it("Dataset is passed in", () => {
-    let svg = TestMethods.generateSVG(400, 400);
+    let div = TestMethods.generateDiv(400, 400);
     let metadata = {foo: 10, bar: 20};
     let xAccessor = (d: any, i: number, dataset: Plottable.Dataset) => d.x + i * dataset.metadata().foo;
     let yAccessor = (d: any, i: number, dataset: Plottable.Dataset) => dataset.metadata().bar;
@@ -29,7 +29,7 @@ describe("Metadata", () => {
                                   .x(xAccessor, xScale)
                                   .y(yAccessor, yScale);
     plot.addDataset(dataset);
-    plot.renderTo(svg);
+    plot.renderTo(div);
     let circles = plot.selections().nodes();
     let c1 = d3.select(circles[0]);
     let c2 = d3.select(circles[1]);
@@ -50,11 +50,11 @@ describe("Metadata", () => {
     assert.closeTo(c2Position[0], 1, 0.01, "second circle cx is correct after metadata change");
     assert.closeTo(c2Position[1], 0, 0.01, "second circle cy is correct after metadata change");
 
-    svg.remove();
+    div.remove();
   });
 
   it("user metadata is applied to associated dataset", () => {
-    let svg = TestMethods.generateSVG(400, 400);
+    let div = TestMethods.generateDiv(400, 400);
     let metadata1 = {foo: 10};
     let metadata2 = {foo: 30};
     let xAccessor = (d: any, i: number, dataset: Plottable.Dataset) => d.x + (i + 1) * dataset.metadata().foo;
@@ -66,7 +66,7 @@ describe("Metadata", () => {
                                   .y(yAccessor, yScale);
     plot.addDataset(dataset1);
     plot.addDataset(dataset2);
-    plot.renderTo(svg);
+    plot.renderTo(div);
     let circles = plot.selections().nodes();
     let c1 = d3.select(circles[0]);
     let c2 = d3.select(circles[1]);
@@ -82,11 +82,11 @@ describe("Metadata", () => {
     assert.closeTo(c3Position[0], 32, 0.01, "third circle is correct");
     assert.closeTo(c4Position[0], 63, 0.01, "fourth circle is correct");
 
-    svg.remove();
+    div.remove();
   });
 
   it("each plot passes metadata to projectors", () => {
-    let svg = TestMethods.generateSVG(400, 400);
+    let div = TestMethods.generateDiv(400, 400);
     let metadata = {foo: 11};
     let dataset1 = new Plottable.Dataset(data1, metadata);
     let dataset2 = new Plottable.Dataset(data2, metadata);
@@ -104,7 +104,7 @@ describe("Metadata", () => {
           .y(yAccessor, yScale);
 
       // This should not crash. If some metadata is not passed, undefined property error will be raised during accessor call.
-      plot.renderTo(svg);
+      plot.renderTo(div);
       plot.destroy();
     };
 
@@ -112,7 +112,7 @@ describe("Metadata", () => {
       plot.sectorValue((d) => d.x).addDataset(dataset1);
 
       // This should not crash. If some metadata is not passed, undefined property error will be raised during accessor call.
-      plot.renderTo(svg);
+      plot.renderTo(div);
       plot.destroy();
     };
 
@@ -125,6 +125,6 @@ describe("Metadata", () => {
     checkXYPlot(new Plottable.Plots.Bar(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL));
     checkXYPlot(new Plottable.Plots.Scatter());
     checkPiePlot(new Plottable.Plots.Pie());
-    svg.remove();
+    div.remove();
   });
 });

@@ -5,7 +5,7 @@
 
 
 import * as d3 from "d3";
-import * as SVGTypewriter from "svg-typewriter";
+import * as Typesetter from "typesettable";
 
 import { Component } from "../components/component";
 import { Scale, ScaleCallback } from "../scales/scale";
@@ -64,8 +64,8 @@ export class Axis<D> extends Component {
   private _annotationsEnabled = false;
   private _annotationTierCount = 1;
   private _annotationContainer: SimpleSelection<void>;
-  private _annotationMeasurer: SVGTypewriter.Measurer;
-  private _annotationWriter: SVGTypewriter.Writer;
+  private _annotationMeasurer: Typesetter.Measurer;
+  private _annotationWriter: Typesetter.Writer;
 
   /**
    * Constructs an Axis.
@@ -173,9 +173,10 @@ export class Axis<D> extends Component {
     this._annotationContainer.append("g").classed("annotation-line-container", true);
     this._annotationContainer.append("g").classed("annotation-circle-container", true);
     this._annotationContainer.append("g").classed("annotation-rect-container", true);
-    let annotationLabelContainer = this._annotationContainer.append("g").classed("annotation-label-container", true);
-    this._annotationMeasurer = new SVGTypewriter.CacheMeasurer(annotationLabelContainer);
-    this._annotationWriter = new SVGTypewriter.Writer(this._annotationMeasurer);
+    const annotationLabelContainer = this._annotationContainer.append("g").classed("annotation-label-container", true);
+    const typesetterContext = new Typesetter.SvgContext(annotationLabelContainer.node() as SVGElement);
+    this._annotationMeasurer = new Typesetter.CacheMeasurer(typesetterContext);
+    this._annotationWriter = new Typesetter.Writer(this._annotationMeasurer, typesetterContext);
   }
 
   /*
@@ -296,7 +297,7 @@ export class Axis<D> extends Component {
 
   protected _drawAnnotations() {
     let labelPadding = Axis._ANNOTATION_LABEL_PADDING;
-    let measurements = new Utils.Map<D, SVGTypewriter.IDimensions>();
+    let measurements = new Utils.Map<D, Typesetter.IDimensions>();
     let annotatedTicks = this._annotatedTicksToRender();
     annotatedTicks.forEach((annotatedTick) => {
       let measurement = this._annotationMeasurer.measure(this.annotationFormatter()(annotatedTick));
@@ -408,16 +409,15 @@ export class Axis<D> extends Component {
       visibility: visibilityF,
     })
       .each(function (annotationLabel) {
-        let writeOptions = {
-          selection: d3.select(this),
-          xAlign: "center",
-          yAlign: "center",
-          textRotation: isHorizontal ? 0 : 90,
-        };
         annotationWriter.write(annotationFormatter(annotationLabel),
           isHorizontal ? measurements.get(annotationLabel).width : measurements.get(annotationLabel).height,
           isHorizontal ? measurements.get(annotationLabel).height : measurements.get(annotationLabel).width,
-          writeOptions);
+          {
+            xAlign: "center",
+            yAlign: "center",
+            textRotation: isHorizontal ? 0 : 90,
+          },
+          d3.select(this).node());
       });
   }
 
@@ -446,7 +446,7 @@ export class Axis<D> extends Component {
     return this._annotationMeasurer.measure().height + 2 * Axis._ANNOTATION_LABEL_PADDING;
   }
 
-  private _annotationToTier(measurements: Utils.Map<D, SVGTypewriter.IDimensions>) {
+  private _annotationToTier(measurements: Utils.Map<D, Typesetter.IDimensions>) {
     let annotationTiers: D[][] = [[]];
     let annotationToTier = new Utils.Map<D, number>();
     let dimension = this.isHorizontal() ? this.width() : this.height();
@@ -831,6 +831,6 @@ export class Axis<D> extends Component {
 
   public invalidateCache() {
     super.invalidateCache();
-    (this._annotationMeasurer as SVGTypewriter.CacheMeasurer).reset();
+    (this._annotationMeasurer as Typesetter.CacheMeasurer).reset();
   }
 }

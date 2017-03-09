@@ -19,7 +19,7 @@ describe("Plots", () => {
           { x: 4, y: 4, x2: 5, y2: 5 },
         ];
 
-        const svg = TestMethods.generateSVG();
+        const div = TestMethods.generateDiv();
         const xScale = new Plottable.Scales.Linear();
         const yScale = new Plottable.Scales.Linear();
         const plot = new Plottable.Plots.Rectangle<number, number>();
@@ -30,7 +30,7 @@ describe("Plots", () => {
         plot.x(xAccessor, xScale).x2(x2Accessor);
         plot.y(yAccessor, yScale).y2(y2Accessor);
         plot.addDataset(new Plottable.Dataset(data));
-        plot.renderTo(svg);
+        plot.renderTo(div);
 
         const rects = plot.content().selectAll<Element, any>("rect");
         assert.strictEqual(rects.size(), data.length, "one rectangle per datum");
@@ -45,18 +45,18 @@ describe("Plots", () => {
           assert.closeTo(TestMethods.numAttr(rect, "y"), Math.min(yScale.scale(yAccessor(d)), yScale.scale(y2Accessor(d))),
             window.Pixel_CloseTo_Requirement, `rect ${i} y coordinate is correct`);
         });
-        svg.remove();
+        div.remove();
       });
     });
 
     describe("retreiving entities", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let plot: Plottable.Plots.Rectangle<number, number>;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG();
+        div = TestMethods.generateDiv();
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Linear();
         plot = new Plottable.Plots.Rectangle<number, number>();
@@ -89,19 +89,19 @@ describe("Plots", () => {
       it("retrieves the correct entity under a point", () => {
         const data = createNonIntersectingRectangleData(5);
         plot.addDataset(new Plottable.Dataset(data));
-        plot.renderTo(svg);
+        plot.renderTo(div);
 
         const entities = plot.entitiesAt({ x: (xScale.scale(data[2].x) + xScale.scale(data[3].x)) / 2,
           y: (yScale.scale(data[2].y) + yScale.scale(data[3].y)) / 2, });
         assert.lengthOf(entities, 1, "found only one entity when querying a point inside a rectangle");
         assert.strictEqual(entities[0].index, 2, "entity retrieved is at index 2");
-        svg.remove();
+        div.remove();
       });
 
       it("retrieves correct entities under a point when rectangles intersect", () => {
         const data = createIntersectingRectangleData(2);
         plot.addDataset(new Plottable.Dataset(data));
-        plot.renderTo(svg);
+        plot.renderTo(div);
 
         const intersectingEntities = plot.entitiesAt({ x: xScale.scale(data[1].x), y: yScale.scale(data[1].y) });
         assert.lengthOf(intersectingEntities, 2, "two entities when querying a point in intersection");
@@ -115,13 +115,13 @@ describe("Plots", () => {
         nonIntersectingEntities = plot.entitiesAt({ x: xScale.scale(data[0].x), y: yScale.scale(data[1].y) });
         assert.lengthOf(nonIntersectingEntities, 1, "found only one entity when querying a point inside the first rectangle");
         assert.strictEqual(nonIntersectingEntities[0].index, 0, "entity retrieved is at index 0");
-        svg.remove();
+        div.remove();
       });
 
       it("retrieves the entities that intersect with the bounding box", () => {
         const data = createNonIntersectingRectangleData(5);
         plot.addDataset(new Plottable.Dataset(data));
-        plot.renderTo(svg);
+        plot.renderTo(div);
 
         const entities = plot.entitiesIn({
           topLeft: { x: (xScale.scale(data[1].x) + xScale.scale(data[2].x)) / 2,
@@ -131,13 +131,13 @@ describe("Plots", () => {
         assert.lengthOf(entities, 2, "retrieved 2 entities intersect with the box");
         assert.strictEqual(entities[0].index, 1, "the entity of index 1 is retrieved");
         assert.strictEqual(entities[1].index, 2, "the entity of index 2 is retrieved");
-        svg.remove();
+        div.remove();
       });
 
       it("retrieves the entities that intersect with the given ranges", () => {
         const data = createNonIntersectingRectangleData(5);
         plot.addDataset(new Plottable.Dataset(data));
-        plot.renderTo(svg);
+        plot.renderTo(div);
 
         const entities = plot.entitiesIn(
           {
@@ -152,26 +152,26 @@ describe("Plots", () => {
         assert.lengthOf(entities, 2, "retrieved 2 entities intersect with the box");
         assert.strictEqual(entities[0].index, 1, "the entity of index 1 is retrieved");
         assert.strictEqual(entities[1].index, 2, "the entity of index 2 is retrieved");
-        svg.remove();
+        div.remove();
       });
 
       it("retrieves undefined from entityNearest when no entities are rendered", () => {
         plot.addDataset(new Plottable.Dataset([]));
-        plot.renderTo(svg);
+        plot.renderTo(div);
         let closest = plot.entityNearest({
           x: plot.width() / 2,
           y: plot.height() / 2,
         });
         assert.strictEqual(closest, undefined, "no datum has been retrieved");
-        svg.remove();
+        div.remove();
       });
     });
 
     describe("autoranging the x and y scales", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG();
+        div = TestMethods.generateDiv();
       });
 
       it("adjusts the xScale domain with respect to the yScale domain when autorangeMode is set to x", () => {
@@ -190,7 +190,7 @@ describe("Plots", () => {
         plot.y((d) => d.y, yScale);
         plot.addDataset(new Plottable.Dataset(data));
         plot.autorangeMode("x");
-        plot.renderTo(svg);
+        plot.renderTo(div);
 
         assert.deepEqual(xScale.domain(), [0, 2], "x domain includes both visible segments");
 
@@ -199,7 +199,7 @@ describe("Plots", () => {
 
         yScale.domain(["B"]);
         assert.deepEqual(xScale.domain(), [1, 2], "x domain includes only the visible segment (second)");
-        svg.remove();
+        div.remove();
       });
 
       it("adjusts the yScale domain with respect to the xScale domain when autorangeMode is set to y", () => {
@@ -218,7 +218,7 @@ describe("Plots", () => {
         plot.y2((d) => d.y2);
         plot.addDataset(new Plottable.Dataset(data));
         plot.autorangeMode("y");
-        plot.renderTo(svg);
+        plot.renderTo(div);
 
         assert.deepEqual(yScale.domain(), [0, 2], "y domain includes both visible segments");
 
@@ -227,13 +227,13 @@ describe("Plots", () => {
 
         xScale.domain(["B"]);
         assert.deepEqual(yScale.domain(), [1, 2], "y domain includes only the visible segment (second)");
-        svg.remove();
+        div.remove();
       });
     });
 
     describe("using invalid data", () => {
       it("does not draw rectangles for data points containing NaN", () => {
-        const svg = TestMethods.generateSVG();
+        const div = TestMethods.generateDiv();
 
         const data = [
           { x: "A", y: 1, y2: 2 },
@@ -250,7 +250,7 @@ describe("Plots", () => {
         plot.y2((d: any) => d.y2);
         plot.addDataset(new Plottable.Dataset(data));
 
-        plot.renderTo(svg);
+        plot.renderTo(div);
 
         const rectangles = plot.selections();
 
@@ -264,18 +264,18 @@ describe("Plots", () => {
           assert.isFalse(Plottable.Utils.Math.isNaN(TestMethods.numAttr(rect, "width")), `width is not NaN for rect ${i}`);
         });
 
-        svg.remove();
+        div.remove();
       });
     });
 
     describe("using category scales", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let xScale: Plottable.Scales.Category;
       let yScale: Plottable.Scales.Category;
       let plot: Plottable.Plots.Rectangle<string, string>;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG();
+        div = TestMethods.generateDiv();
         xScale = new Plottable.Scales.Category();
         yScale = new Plottable.Scales.Category();
 
@@ -292,7 +292,7 @@ describe("Plots", () => {
           {x: "B", y: "V"},
         ];
         plot.addDataset(new Plottable.Dataset(data));
-        plot.renderTo(svg);
+        plot.renderTo(div);
 
         const rects = plot.content().selectAll<Element, any>("rect");
         assert.strictEqual(rects.size(), data.length, "rect for each datum");
@@ -306,13 +306,13 @@ describe("Plots", () => {
           assert.closeTo(yScale.scale(d.y), rectCenterY,
             window.Pixel_CloseTo_Requirement, `center of rect ${i} in y is scaled version of input data`);
         });
-        svg.remove();
+        div.remove();
       });
 
       it("renders rectangles when data is set after construction", () => {
         const dataset = new Plottable.Dataset();
         plot.addDataset(dataset);
-        plot.renderTo(svg);
+        plot.renderTo(div);
         const data = [
           {x: "X", y: "Z"},
           {x: "Y", y: "T"},
@@ -331,7 +331,7 @@ describe("Plots", () => {
           assert.closeTo(yScale.scale(d.y), rectCenterY,
             window.Pixel_CloseTo_Requirement, `center of rect ${i} in y is scaled version of input data`);
         });
-        svg.remove();
+        div.remove();
       });
 
       it("renders rectangles even when there isn't data for every spot", () => {
@@ -342,7 +342,7 @@ describe("Plots", () => {
           {x: "D", y: "Z"},
         ];
         plot.addDataset(new Plottable.Dataset(data));
-        plot.renderTo(svg);
+        plot.renderTo(div);
 
         const rects = plot.content().selectAll<Element, any>("rect");
         assert.strictEqual(rects.size(), data.length, "rect for each datum");
@@ -356,7 +356,7 @@ describe("Plots", () => {
           assert.closeTo(yScale.scale(d.y), rectCenterY,
             window.Pixel_CloseTo_Requirement, `center of rect ${i} in y is scaled version of input data`);
         });
-        svg.remove();
+        div.remove();
       });
 
       it("renders rectangles in the correct x and y locations even with a reversed y domain", () => {
@@ -367,7 +367,7 @@ describe("Plots", () => {
           {x: "B", y: "V"},
         ];
         plot.addDataset(new Plottable.Dataset(data));
-        plot.renderTo(svg);
+        plot.renderTo(div);
 
         yScale.domain(yScale.domain().reverse());
 
@@ -383,18 +383,18 @@ describe("Plots", () => {
           assert.closeTo(yScale.scale(d.y), rectCenterY,
             window.Pixel_CloseTo_Requirement, `center of rect ${i} in y is scaled version of input data`);
         });
-        svg.remove();
+        div.remove();
       });
     });
 
     describe("retrieving D3 Selections from the plot", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let xScale: Plottable.Scales.Category;
       let yScale: Plottable.Scales.Category;
       let plot: Plottable.Plots.Rectangle<string, string>;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG();
+        div = TestMethods.generateDiv();
         xScale = new Plottable.Scales.Category();
         yScale = new Plottable.Scales.Category();
 
@@ -410,7 +410,7 @@ describe("Plots", () => {
         ];
         const dataset = new Plottable.Dataset(data);
         plot.addDataset(dataset);
-        plot.renderTo(svg);
+        plot.renderTo(div);
       });
 
       it("retrieves all selections with no args", () => {
@@ -418,7 +418,7 @@ describe("Plots", () => {
         assert.strictEqual(allCells.size(), plot.datasets()[0].data().length, "rect for each datum");
         let selectionData = allCells.data();
         assert.includeMembers(selectionData, plot.datasets()[0].data(), "data in selection data");
-        svg.remove();
+        div.remove();
       });
 
       it("retrieves correct selections", () => {
@@ -426,7 +426,7 @@ describe("Plots", () => {
         assert.strictEqual(allCells.size(), plot.datasets()[0].data().length, "rect for each datum");
         let selectionData = allCells.data();
         assert.includeMembers(selectionData, plot.datasets()[0].data(), "data in selection data");
-        svg.remove();
+        div.remove();
       });
 
       it("skips invalid Datasets", () => {
@@ -435,7 +435,7 @@ describe("Plots", () => {
         assert.strictEqual(allCells.size(), plot.datasets()[0].data().length, "rect for each datum");
         let selectionData = allCells.data();
         assert.includeMembers(selectionData, plot.datasets()[0].data(), "data in selection data");
-        svg.remove();
+        div.remove();
       });
 
     });
@@ -444,10 +444,10 @@ describe("Plots", () => {
       let plot: Plottable.Plots.Rectangle<number, number>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG();
+        div = TestMethods.generateDiv();
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Linear();
         plot = new Plottable.Plots.Rectangle<number, number>();
@@ -467,14 +467,14 @@ describe("Plots", () => {
       });
 
       it("does not display rectangle labels by default", () => {
-        plot.renderTo(svg);
+        plot.renderTo(div);
         const texts = plot.content().selectAll<Element, any>("text");
         assert.strictEqual(texts.size(), 0, "no labels are drawn by default");
-        svg.remove();
+        div.remove();
       });
 
       it("renders correct text for the labels", () => {
-        plot.renderTo(svg);
+        plot.renderTo(div);
         plot.labelsEnabled(true);
         const texts = plot.content().selectAll<Element, any>("text");
         assert.strictEqual(texts.size(), 2, "all labels are drawn");
@@ -482,33 +482,33 @@ describe("Plots", () => {
           const textString = d3.select(this).text();
           assert.strictEqual(textString, plot.datasets()[0].data()[i].val, `label ${i} is rendered`);
         });
-        svg.remove();
+        div.remove();
       });
 
       it("hides labels when rectangles do not offer enough width", () => {
         let constrainedWidth = 150;
-        svg.attr("width", constrainedWidth);
-        plot.renderTo(svg);
+        div.style("width", constrainedWidth + "px");
+        plot.renderTo(div);
         plot.labelsEnabled(true);
         plot.label(() => "a really really really long string");
         const texts = plot.content().selectAll<Element, any>("text");
         assert.strictEqual(texts.size(), 0, "labels not drawn if not enough width");
-        svg.remove();
+        div.remove();
       });
 
       it("hides labels when rectangles do not offer enough height", () => {
         const constrainedHeight = 30;
-        svg.attr("height", constrainedHeight);
-        plot.renderTo(svg);
+        div.style("height", constrainedHeight + "px");
+        plot.renderTo(div);
         plot.labelsEnabled(true);
         plot.label((d: any) => d.val);
         const texts = plot.content().selectAll<Element, any>("text");
         assert.strictEqual(texts.size(), 0, "labels not drawn if not enough height");
-        svg.remove();
+        div.remove();
       });
 
       it("updates labels on dataset change", () => {
-        plot.renderTo(svg);
+        plot.renderTo(div);
         plot.labelsEnabled(true);
         const texts = plot.content().selectAll<Element, any>("text");
         assert.strictEqual(texts.size(), plot.datasets()[0].data().length, "all labels are drawn");
@@ -521,7 +521,7 @@ describe("Plots", () => {
           const textString = d3.select(this).text();
           assert.strictEqual(textString, data2[i].val, "new label drawn");
         });
-        svg.remove();
+        div.remove();
       });
 
       it("hides labels cut off by edges", () => {
@@ -536,7 +536,7 @@ describe("Plots", () => {
 
         plot.datasets()[0].data(data);
         xScale.domain([xDomainMin, xDomainMax]);
-        plot.renderTo(svg);
+        plot.renderTo(div);
 
         const texts = plot.content().selectAll<Element, any>("text");
         assert.strictEqual(texts.size(), (xDomainMax - xDomainMin) / 0.5, "labels inside the edges are drawn");
@@ -545,7 +545,7 @@ describe("Plots", () => {
           assert.operator(value, ">=", xDomainMin, "label drawn inside left edge");
           assert.operator(value, "<=", xDomainMax, "label drawn inside right edge");
         });
-        svg.remove();
+        div.remove();
       });
 
       it("hides labels cut off by other rectangles", () => {
@@ -556,11 +556,11 @@ describe("Plots", () => {
           return { x: constantValue, y: constantValue, x2: constantValue + 2, y2: constantValue + 2, val: index.toString() };
         });
         plot.datasets()[0].data(overlappingRectangleData);
-        plot.renderTo(svg);
+        plot.renderTo(div);
 
         let texts = plot.content().selectAll<Element, any>("text");
         assert.strictEqual(texts.size(), 1, "only top most label is rendered");
-        svg.remove();
+        div.remove();
       });
     });
   });

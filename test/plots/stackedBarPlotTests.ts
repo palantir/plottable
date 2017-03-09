@@ -10,13 +10,13 @@ import * as TestMethods from "../testMethods";
 describe("Plots", () => {
   describe("Vertical Stacked Bar Plot", () => {
     describe("rendering using positive data", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let xScale: Plottable.Scales.Category;
       let yScale: Plottable.Scales.Linear;
       let stackedBarPlot: Plottable.Plots.StackedBar<string, number>;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG();
+        div = TestMethods.generateDiv();
         xScale = new Plottable.Scales.Category();
         yScale = new Plottable.Scales.Linear();
 
@@ -36,12 +36,12 @@ describe("Plots", () => {
         stackedBarPlot.addDataset(dataset2);
         stackedBarPlot.x((d) => d.x, xScale);
         stackedBarPlot.y((d) => d.y, yScale);
-        stackedBarPlot.renderTo(svg);
+        stackedBarPlot.renderTo(div);
       });
 
       afterEach(() => {
         stackedBarPlot.destroy();
-        svg.remove();
+        div.remove();
       });
 
       it("renders rects offset by previous values", () => {
@@ -128,7 +128,7 @@ describe("Plots", () => {
 
         stackedBar.x((d) => d.x, xScale);
         stackedBar.y((d) => d.y, yScale);
-        stackedBar.renderTo(svg);
+        stackedBar.renderTo(div);
 
         stackedBar.labelsEnabled(true);
         yScale.domain([0, 30]);
@@ -171,13 +171,13 @@ describe("Plots", () => {
     });
 
     describe("rendering using negative data", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let xScale: Plottable.Scales.Category;
       let yScale: Plottable.Scales.Linear;
       let stackedBarPlot: Plottable.Plots.StackedBar<string, number>;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG();
+        div = TestMethods.generateDiv();
         xScale = new Plottable.Scales.Category();
         yScale = new Plottable.Scales.Linear();
 
@@ -197,12 +197,12 @@ describe("Plots", () => {
         stackedBarPlot.addDataset(dataset2);
         stackedBarPlot.x((d) => d.x, xScale);
         stackedBarPlot.y((d) => d.y, yScale);
-        stackedBarPlot.renderTo(svg);
+        stackedBarPlot.renderTo(div);
       });
 
       afterEach(() => {
         stackedBarPlot.destroy();
-        svg.remove();
+        div.remove();
       });
 
       it("shows stacked bar labels", () => {
@@ -265,12 +265,12 @@ describe("Plots", () => {
     });
 
     describe("non-overlapping datasets", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let xScale: Plottable.Scales.Category;
       let stackedBarPlot: Plottable.Plots.StackedBar<string, number>;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG();
+        div = TestMethods.generateDiv();
         xScale = new Plottable.Scales.Category();
         let yScale = new Plottable.Scales.Linear();
 
@@ -294,12 +294,12 @@ describe("Plots", () => {
         stackedBarPlot.addDataset(new Plottable.Dataset(data3));
         stackedBarPlot.x((d) => d.x, xScale);
         stackedBarPlot.y((d) => d.y, yScale);
-        stackedBarPlot.renderTo(svg);
+        stackedBarPlot.renderTo(div);
       });
 
       afterEach(() => {
         stackedBarPlot.destroy();
-        svg.remove();
+        div.remove();
       });
 
       it("draws bars at specified x location and stacks in order of datasets", () => {
@@ -345,7 +345,7 @@ describe("Plots", () => {
     describe("fail safe tests", () => {
 
       it("should default to 0 when calculating stack offsets with non-numbers", () => {
-        let svg = TestMethods.generateSVG();
+        let div = TestMethods.generateDiv();
         let stringData = [
           { x: "A", y: "s"},
         ];
@@ -376,27 +376,27 @@ describe("Plots", () => {
         stackedBarPlot.addDataset(ds4);
         stackedBarPlot.addDataset(ds5);
         stackedBarPlot.x((d: any) => d.x, xScale).y((d: any) => d.y, yScale);
-        stackedBarPlot.renderTo(svg);
+        stackedBarPlot.renderTo(div);
 
         let validBar = stackedBarPlot.content().selectAll<Element, any>("rect").filter((d) => d.y === 1);
         assert.closeTo(TestMethods.numAttr(validBar, "y"), yScale.scale(1),
           window.Pixel_CloseTo_Requirement, "bar stacks from 0");
 
         stackedBarPlot.destroy();
-        svg.remove();
+        div.remove();
       });
     });
   });
 
   describe("Horizontal Stacked Bar Plot", () => {
     describe("rendering using positive data", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Category;
       let stackedBarPlot: Plottable.Plots.StackedBar<number, string>;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG();
+        div = TestMethods.generateDiv();
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Category();
 
@@ -416,12 +416,12 @@ describe("Plots", () => {
         stackedBarPlot.addDataset(dataset2);
         stackedBarPlot.x((d) => d.x, xScale);
         stackedBarPlot.y((d) => d.y, yScale);
-        stackedBarPlot.renderTo(svg);
+        stackedBarPlot.renderTo(div);
       });
 
       afterEach(() => {
         stackedBarPlot.destroy();
-        svg.remove();
+        div.remove();
       });
 
       it("shows stacked bar labels", () => {
@@ -495,12 +495,12 @@ describe("Plots", () => {
     });
 
     describe("non-overlapping datasets", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let yScale: Plottable.Scales.Category;
       let stackedBarPlot: Plottable.Plots.StackedBar<number, string>;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG();
+        div = TestMethods.generateDiv();
         let xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Category();
 
@@ -524,12 +524,12 @@ describe("Plots", () => {
         stackedBarPlot.addDataset(new Plottable.Dataset(data3));
         stackedBarPlot.x((d) => d.x, xScale);
         stackedBarPlot.y((d) => d.y, yScale);
-        stackedBarPlot.renderTo(svg);
+        stackedBarPlot.renderTo(div);
       });
 
       afterEach(() => {
         stackedBarPlot.destroy();
-        svg.remove();
+        div.remove();
       });
 
       it("draws bars at specified y location and stacks in order of datasets", () => {
@@ -553,7 +553,7 @@ describe("Plots", () => {
 
     describe("fail safe tests", () => {
       it("should default to 0 when calculating stack offsets with non-numbers", () => {
-        let svg = TestMethods.generateSVG();
+        let div = TestMethods.generateDiv();
         let stringData = [
           { x: "s", y: "A"},
         ];
@@ -584,14 +584,14 @@ describe("Plots", () => {
         stackedBarPlot.addDataset(ds4);
         stackedBarPlot.addDataset(ds5);
         stackedBarPlot.x((d: any) => d.x, xScale).y((d: any) => d.y, yScale);
-        stackedBarPlot.renderTo(svg);
+        stackedBarPlot.renderTo(div);
 
         let validBar = stackedBarPlot.content().selectAll<Element, any>("rect").filter((d) => d.x === 1);
         assert.closeTo(TestMethods.numAttr(validBar, "x"), xScale.scale(0),
           window.Pixel_CloseTo_Requirement, "bar stacks from 0");
 
         stackedBarPlot.destroy();
-        svg.remove();
+        div.remove();
       });
     });
   });

@@ -9,7 +9,7 @@ import * as TestMethods from "../testMethods";
 
 describe("SymbolFactory", () => {
   describe("Generates correct path", () => {
-    let svg: SimpleSelection<void>;
+    let svg: d3.Selection<SVGSVGElement, any, any, any>;
     let symbolSize = 5;
 
     beforeEach(() => {

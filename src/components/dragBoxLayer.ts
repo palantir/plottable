@@ -461,7 +461,7 @@ export class DragBoxLayer extends SelectionBoxLayer {
     return this;
   }
 
-  public anchor(selection: SimpleSelection<void>) {
+  public anchor(selection: d3.Selection<HTMLElement, any, any, any>) {
     selection = coerceExternalD3(selection);
     this._dragInteraction.attachTo(this);
     super.anchor(selection);

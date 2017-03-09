@@ -8,13 +8,13 @@ import * as Plottable from "../../src";
 import * as TestMethods from "../testMethods";
 
 describe("Gridlines", () => {
-  let svg: SimpleSelection<void>;
+  let div: d3.Selection<HTMLDivElement, any, any, any>;
   let xScale: Plottable.Scales.Linear;
   let yScale: Plottable.Scales.Linear;
   let gridlines: Plottable.Components.Gridlines;
 
   beforeEach(() => {
-    svg = TestMethods.generateSVG();
+    div = TestMethods.generateDiv();
     xScale = new Plottable.Scales.Linear();
     xScale.domain([0, 10]);
 
@@ -24,16 +24,16 @@ describe("Gridlines", () => {
   });
 
   it("sets ranges of scales to the Gridlines dimensions when layout is computed", () => {
-    gridlines.renderTo(svg);
+    gridlines.renderTo(div);
 
-    assert.deepEqual(xScale.range(), [0, TestMethods.numAttr(svg, "width")], "x scale range extends to the width of the svg");
-    assert.deepEqual(yScale.range(), [TestMethods.numAttr(svg, "height"), 0], "y scale range extends to the height of the svg");
+    assert.deepEqual(xScale.range(), [0, Plottable.Utils.DOM.elementWidth(div)], "x scale range extends to the width of the div");
+    assert.deepEqual(yScale.range(), [Plottable.Utils.DOM.elementHeight(div), 0], "y scale range extends to the height of the div");
 
-    svg.remove();
+    div.remove();
   });
 
   it("draws gridlines on ticks of its scales and updates when scale update", () => {
-    gridlines.renderTo(svg);
+    gridlines.renderTo(div);
 
     let xGridlines = gridlines.content().select(".x-gridlines").selectAll<Element, any>("line");
     let xTicks = xScale.ticks();
@@ -67,7 +67,7 @@ describe("Gridlines", () => {
       const y = TestMethods.numAttr(d3.select(this), "y1");
       assert.closeTo(y, yScale.scale(yTicks[i]), window.Pixel_CloseTo_Requirement, "y gridline is updated");
     });
-    svg.remove();
+    div.remove();
   });
 
   it("throws error on non-Quantitative Scales", () => {
@@ -84,6 +84,6 @@ describe("Gridlines", () => {
     (<any> assert).throw(() => new Plottable.Components.Gridlines(null, <any> colorScale), Error,
       "yScale needs to inherit from Scale.QuantitativeScale", "can't set yScale to color scale");
 
-     svg.remove();
+     div.remove();
   });
 });

@@ -43,7 +43,7 @@ describe("Utils.DOM", () => {
 
   describe("elementWidth(), elementHeight()", () => {
     it("can get a plain element's size", () => {
-      let parent = TestMethods.getSVGParent();
+      let parent = TestMethods.getElementParent();
       parent.style("width", "300px");
       parent.style("height", "200px");
       let parentElem = <Element> parent.node();
@@ -66,7 +66,7 @@ describe("Utils.DOM", () => {
     });
 
     it("can accept multiple units and convert to pixels", () => {
-      let parent = TestMethods.getSVGParent();
+      let parent = TestMethods.getElementParent();
       let parentElem = <Element> parent.node();
       let child = parent.append("div");
       let childElem = <Element> child.node();
@@ -95,33 +95,6 @@ describe("Utils.DOM", () => {
       parent.style("width", "auto");
       parent.style("height", "auto");
       child.remove();
-    });
-
-    it("generateUniqueClipPathId()", () => {
-      let firstClipPathId = Plottable.Utils.DOM.generateUniqueClipPathId();
-      let secondClipPathId = Plottable.Utils.DOM.generateUniqueClipPathId();
-
-      let firstClipPathIDPrefix = firstClipPathId.split(/\d/)[0];
-      let secondClipPathIDPrefix = secondClipPathId.split(/\d/)[0];
-
-      assert.strictEqual(firstClipPathIDPrefix, secondClipPathIDPrefix,
-        "clip path ids should have the same prefix");
-
-      let prefix = firstClipPathIDPrefix;
-
-      assert.isTrue(/plottable/.test(prefix),
-        "the prefix should contain the word plottable to avoid collisions");
-
-      let firstClipPathIdNumber = +firstClipPathId.replace(prefix, "");
-      let secondClipPathIdNumber = +secondClipPathId.replace(prefix, "");
-
-      assert.isFalse(Plottable.Utils.Math.isNaN(firstClipPathIdNumber),
-        "first clip path id should only have a number after the prefix");
-      assert.isFalse(Plottable.Utils.Math.isNaN(secondClipPathIdNumber),
-        "second clip path id should only have a number after the prefix");
-
-      assert.strictEqual(firstClipPathIdNumber + 1, secondClipPathIdNumber,
-        "Consecutive calls to generateUniqueClipPathId should give consecutive numbers after the prefix");
     });
   });
 });

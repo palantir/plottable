@@ -27,10 +27,10 @@ export class Pointer extends Interaction {
 
   protected _anchor(component: Component) {
     super._anchor(component);
-    this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentAttachedTo.content().node());
+    this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(this._componentAttachedTo);
     this._mouseDispatcher.onMouseMove(this._mouseMoveCallback);
 
-    this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> this._componentAttachedTo.content().node());
+    this._touchDispatcher = Dispatchers.Touch.getDispatcher(this._componentAttachedTo);
     this._touchDispatcher.onTouchStart(this._touchStartCallback);
   }
 
@@ -44,12 +44,12 @@ export class Pointer extends Interaction {
   }
 
   private _handleMouseEvent(p: Point, e: MouseEvent) {
-    let insideSVG = this._mouseDispatcher.eventInsideSVG(e);
+    let insideSVG = this._mouseDispatcher.eventInside(this._componentAttachedTo, e);
     this._handlePointerEvent(p, insideSVG);
   }
 
   private _handleTouchEvent(p: Point, e: TouchEvent) {
-    let insideSVG = this._touchDispatcher.eventInsideSVG(e);
+    let insideSVG = this._touchDispatcher.eventInside(this._componentAttachedTo, e);
     this._handlePointerEvent(p, insideSVG);
   }
 

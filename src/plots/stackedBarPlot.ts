@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import * as SVGTypewriter from "svg-typewriter";
+import * as Typesetter from "typesettable";
 
 import { Accessor, Point, SimpleSelection } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
@@ -17,8 +17,8 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
   protected static _STACKED_BAR_LABEL_PADDING = 5;
 
   private _labelArea: SimpleSelection<void>;
-  private _measurer: SVGTypewriter.CacheMeasurer;
-  private _writer: SVGTypewriter.Writer;
+  private _measurer: Typesetter.CacheMeasurer;
+  private _writer: Typesetter.Writer;
   private _stackingOrder: Utils.Stacking.IStackingOrder;
   private _stackingResult: Utils.Stacking.StackingResult;
   private _stackedExtent: number[];
@@ -102,8 +102,9 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
   protected _setup() {
     super._setup();
     this._labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
-    this._measurer = new SVGTypewriter.CacheMeasurer(this._labelArea);
-    this._writer = new SVGTypewriter.Writer(this._measurer);
+    const context = new Typesetter.SvgContext(this._labelArea.node() as SVGElement);
+    this._measurer = new Typesetter.CacheMeasurer(context);
+    this._writer = new Typesetter.Writer(this._measurer, context);
   }
 
   protected _drawLabels() {
@@ -137,13 +138,10 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
         labelContainer.classed("stacked-bar-label", true);
 
         const writeOptions = {
-          selection: labelContainer,
           xAlign: "center",
           yAlign: "center",
-          textRotation: 0,
-        };
-
-        this._writer.write(text, measurement.width, measurement.height, writeOptions);
+        } as Typesetter.IWriteOptions;
+        this._writer.write(text, measurement.width, measurement.height, writeOptions, labelContainer.node());
       }
 
       return tooWide;

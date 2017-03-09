@@ -7,8 +7,8 @@ import * as Plottable from "../../src";
 import * as TestMethods from "../testMethods";
 
 describe("RenderController", () => {
-  let SVG_WIDTH = 400;
-  let SVG_HEIGHT = 300;
+  let DIV_WIDTH = 400;
+  let DIV_HEIGHT = 300;
 
   describe("configuring the render policy", () => {
     after(() => {
@@ -31,46 +31,46 @@ describe("RenderController", () => {
   });
 
   it("can queue a component to render", () => {
-    let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    let div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
     let component = new Plottable.Component();
     let renderedClass = "rendered";
     component.renderImmediately = () => {
       component.content().append("g").classed(renderedClass, true);
       return component;
     };
-    component.anchor(svg);
+    component.anchor(div);
     Plottable.RenderController.registerToRender(component);
     assert.isFalse(component.content().select(`.${renderedClass}`).empty(), "component has rendered");
     component.destroy();
-    svg.remove();
+    div.remove();
   });
 
   it("can queue a component to undergo layout computation and render", () => {
-    let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    let div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
     let component = new Plottable.Component();
     let renderedClass = "rendered";
     component.renderImmediately = () => {
       component.content().append("g").classed(renderedClass, true);
       return component;
     };
-    component.anchor(svg);
+    component.anchor(div);
     Plottable.RenderController.registerToComputeLayoutAndRender(component);
     assert.isFalse(component.content().select(`.${renderedClass}`).empty(), "component has rendered");
     assert.deepEqual(component.origin(), {x: 0, y: 0}, "origin set");
-    assert.strictEqual(component.width(), SVG_WIDTH, "width set");
-    assert.strictEqual(component.height(), SVG_HEIGHT, "height set");
+    assert.strictEqual(component.width(), DIV_WIDTH, "width set");
+    assert.strictEqual(component.height(), DIV_HEIGHT, "height set");
     component.destroy();
-    svg.remove();
+    div.remove();
   });
 
   // HACKHACK: https://github.com/palantir/plottable/issues/2083
   it.skip("can render components that are triggered by another component's render", () => {
     let link1 = new Plottable.Component();
-    let svg1 = TestMethods.generateSVG();
-    link1.anchor(svg1).computeLayout();
+    let div1 = TestMethods.generateDiv();
+    link1.anchor(div1).computeLayout();
     let link2 = new Plottable.Component();
-    let svg2 = TestMethods.generateSVG();
-    link2.anchor(svg2).computeLayout();
+    let div2 = TestMethods.generateDiv();
+    link2.anchor(div2).computeLayout();
 
     (<any> link1).renderImmediately = () => link2.render();
     let link2Rendered = false;
@@ -79,7 +79,7 @@ describe("RenderController", () => {
     link1.render();
     assert.isTrue(link2Rendered, "dependent Component was render()-ed");
 
-    svg1.remove();
-    svg2.remove();
+    div1.remove();
+    div2.remove();
   });
 });

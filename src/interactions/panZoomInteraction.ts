@@ -130,10 +130,10 @@ export class PanZoom extends Interaction {
     super._anchor(component);
     this._dragInteraction.attachTo(component);
 
-    this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentAttachedTo.content().node());
+    this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(this._componentAttachedTo);
     this._mouseDispatcher.onWheel(this._wheelCallback);
 
-    this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> this._componentAttachedTo.content().node());
+    this._touchDispatcher = Dispatchers.Touch.getDispatcher(this._componentAttachedTo);
     this._touchDispatcher.onTouchStart(this._touchStartCallback);
     this._touchDispatcher.onTouchMove(this._touchMoveCallback);
     this._touchDispatcher.onTouchEnd(this._touchEndCallback);

@@ -16,16 +16,49 @@ export type ComponentCallback = (component: Component) => void;
 
 export type IResizeHandler = (size: { height: number, width: number }) => void;
 
+/**
+ * Components are the core logical units that build Plottable visualizations.
+ *
+ * This class deals with Component lifecycle (anchoring, getting a size, and rendering
+ * infrastructure), as well as building the framework of DOM elements for all Components.
+ */
 export class Component {
-  private _element: SimpleSelection<void>;
+  /**
+   * Holds all the DOM associated with this component. A direct child of the element we're
+   * anchored to.
+   */
+  private _element: d3.Selection<HTMLElement, any, any, any>;
+  /**
+   * Container for the visual content that this Component displays. Subclasses should attach
+   * elements onto the _content. Located in between the background and the foreground.
+   */
   private _content: SimpleSelection<void>;
+  /**
+   * Used by axes to hide cut off axis labels.
+   */
   protected _boundingBox: SimpleSelection<void>;
+  /**
+   * Place more objects just behind this Component's Content by appending them to the _backgroundContainer.
+   */
   private _backgroundContainer: SimpleSelection<void>;
+  /**
+   * Place more objects just in front of this Component's Content by appending them to the _foregroundContainer.
+   */
   private _foregroundContainer: SimpleSelection<void>;
-  protected _clipPathEnabled = false;
+  /**
+   * Subclasses should set this to true in their constructor to prevent content from overflowing.
+   */
+  protected _overflowHidden = false;
   private _resizeHandler: IResizeHandler;
-  private _origin: Point = { x: 0, y: 0 }; // Origin of the coordinate space for the Component.
+  /**
+   * Origin of this Component relative to its parent.
+   */
+  private _origin: Point = { x: 0, y: 0 };
 
+  /**
+   * The ComponentContainer that holds this Component in its children, or null, if this
+   * Component is top-level.
+   */
   private _parent: ComponentContainer;
   private _xAlignment: string = "left";
   private static _xAlignToProportion: { [alignment: string]: number } = {
@@ -42,18 +75,45 @@ export class Component {
   protected _isSetup = false;
   protected _isAnchored = false;
 
+  /**
+   * List of "boxes"; SVGComponent has a "box" API that lets subclasses add boxes
+   * with "addBox". Two boxes are added:
+   *
+   * .background-fill - for the background container (unclear what it's use is)
+   * .bounding-box - this._boundingBox
+   *
+   * boxes get their width/height attributes updated in computeLayout.
+   *
+   * I think this API is to make an idea of a "100% width/height" box that could be
+   * useful in a variety of situations. But enumerating the three usages of it, it
+   * doesn't look like it's being used very much.
+   *
+   * TODO possily remove in HTML world
+   */
   private _boxes: SimpleSelection<void>[] = [];
+  /**
+   * Element containing all the boxes.
+   */
   private _boxContainer: SimpleSelection<void>;
-  private _rootSVG: SimpleSelection<void>;
-  private _isTopLevelComponent = false;
-  private _width: number; // Width and height of the Component. Used to size the hitbox, bounding box, etc
+  /**
+   * If we're the root Component (top-level), this is the HTMLElement we've anchored to (user-supplied).
+   */
+  private _rootElement: d3.Selection<HTMLElement, any, any, any>;
+  /**
+   * width of the Component as computed in computeLayout. Used to size the hitbox, bounding box, etc
+   */
+  private _width: number;
+  /**
+   * height of the Component as computed in computeLayout. Used to size the hitbox, bounding box, etc
+   */
   private _height: number;
   private _cssClasses = new Utils.Set<string>();
+  /**
+   * If .destroy() has been called on this Component.
+   */
   private _destroyed = false;
-  private _clipPathID: string;
   private _onAnchorCallbacks = new Utils.CallbackSet<ComponentCallback>();
   private _onDetachCallbacks = new Utils.CallbackSet<ComponentCallback>();
-  private static _SAFARI_EVENT_BACKING_CLASS = "safari-event-backing";
 
   public constructor() {
     this._cssClasses.add("component");
@@ -65,38 +125,23 @@ export class Component {
    * @param {d3.Selection} selection.
    * @returns {Component} The calling Component.
    */
-  public anchor(selection: SimpleSelection<void>) {
+  public anchor(selection: d3.Selection<HTMLElement, any, any, any>) {
     selection = coerceExternalD3(selection);
     if (this._destroyed) {
       throw new Error("Can't reuse destroy()-ed Components!");
     }
 
-    this._isTopLevelComponent = (<Node> selection.node()).nodeName.toLowerCase() === "svg";
-
-    if (this._isTopLevelComponent) {
-      // svg node gets the "plottable" CSS class
-      this._rootSVG = selection;
-      this._rootSVG.classed("plottable", true);
-      // visible overflow for firefox https://stackoverflow.com/questions/5926986/why-does-firefox-appear-to-truncate-embedded-svgs
-      this._rootSVG.style("overflow", "visible");
-
-      // HACKHACK: Safari fails to register events on the <svg> itself
-      const safariBacking = this._rootSVG.select(`.${Component._SAFARI_EVENT_BACKING_CLASS}`);
-      if (safariBacking.empty()) {
-        this._rootSVG.append("rect").classed(Component._SAFARI_EVENT_BACKING_CLASS, true).attrs({
-          x: 0,
-          y: 0,
-          width: "100%",
-          height: "100%",
-        }).style("opacity", 0);
-      }
+    if (this.isRoot()) {
+      this._rootElement = selection;
+      // rootElement gets the "plottable" CSS class
+      this._rootElement.classed("plottable", true);
     }
 
     if (this._element != null) {
       // reattach existing element
       (<Node> selection.node()).appendChild(<Node> this._element.node());
     } else {
-      this._element = selection.append("g");
+      this._element = selection.append<HTMLDivElement>("div");
       this._setup();
     }
 
@@ -146,16 +191,17 @@ export class Component {
     });
     this._cssClasses = new Utils.Set<string>();
 
-    this._backgroundContainer = this._element.append("g").classed("background-container", true);
+    this._backgroundContainer = this._element.append("svg").classed("background-container", true);
     this._addBox("background-fill", this._backgroundContainer);
-    this._content = this._element.append("g").classed("content", true);
-    this._foregroundContainer = this._element.append("g").classed("foreground-container", true);
-    this._boxContainer = this._element.append("g").classed("box-container", true);
+    this._content = this._element.append("svg").classed("content", true);
+    this._foregroundContainer = this._element.append("svg").classed("foreground-container", true);
+    this._boxContainer = this._element.append("svg").classed("box-container", true);
 
-    if (this._clipPathEnabled) {
-      this._generateClipPath();
+    if (this._overflowHidden) {
+      this._content.classed("component-overflow-hidden", true);
+    } else {
+      this._content.classed("component-overflow-visible", true);
     }
-    ;
 
     this._boundingBox = this._addBox("bounding-box");
 
@@ -190,25 +236,14 @@ export class Component {
     if (origin == null || availableWidth == null || availableHeight == null) {
       if (this._element == null) {
         throw new Error("anchor() must be called before computeLayout()");
-      } else if (this._isTopLevelComponent) {
-        // we are the root node, retrieve height/width from root SVG
+      } else if (this._rootElement != null) {
+        // retrieve height/width from rootElement
         origin = { x: 0, y: 0 };
-
-        // Set width/height to 100% if not specified, to allow accurate size calculation
-        // see http://www.w3.org/TR/CSS21/visudet.html#block-replaced-width
-        // and http://www.w3.org/TR/CSS21/visudet.html#inline-replaced-height
-        if (this._rootSVG.attr("width") == null) {
-          this._rootSVG.attr("width", "100%");
-        }
-        if (this._rootSVG.attr("height") == null) {
-          this._rootSVG.attr("height", "100%");
-        }
-
-        let elem: HTMLScriptElement = (<HTMLScriptElement> this._rootSVG.node());
+        const elem = this._rootElement.node();
         availableWidth = Utils.DOM.elementWidth(elem);
         availableHeight = Utils.DOM.elementHeight(elem);
       } else {
-        throw new Error("null arguments cannot be passed to computeLayout() on a non-root node");
+        throw new Error("null arguments cannot be passed to computeLayout() on a non-root, unanchored node");
       }
     }
 
@@ -222,7 +257,12 @@ export class Component {
       x: origin.x + (availableWidth - this.width()) * xAlignProportion,
       y: origin.y + (availableHeight - this.height()) * yAlignProportion,
     };
-    this._element.attr("transform", "translate(" + this._origin.x + "," + this._origin.y + ")");
+    this._element.styles({
+      left: `${this._origin.x}px`,
+      height: `${this.height()}px`,
+      top: `${this._origin.y}px`,
+      width: `${this.width()}px`,
+    });
     this._boxes.forEach((b: SimpleSelection<void>) => b.attr("width", this.width()).attr("height", this.height()));
 
     if (this._resizeHandler != null) {
@@ -274,9 +314,6 @@ export class Component {
    * Component, Table, and Group; render them immediately with .renderTo() instead.
    */
   public renderImmediately() {
-    if (this._clipPathEnabled) {
-      this._updateClipPath();
-    }
     return this;
   }
 
@@ -287,7 +324,7 @@ export class Component {
    */
   public redraw() {
     if (this._isAnchored && this._isSetup) {
-      if (this._isTopLevelComponent) {
+      if (this.isRoot()) {
         this._scheduleComputeLayout();
       } else {
         this.parent().redraw();
@@ -308,24 +345,27 @@ export class Component {
   }
 
   /**
-   * Renders the Component to a given <svg>.
+   * Renders the Component to a given HTML Element.
    *
-   * @param {String|d3.Selection} element A selector-string for the <svg>, or a d3 selection containing an <svg>.
+   * @param {String|d3.Selection} element The element, a selector string for the element, or a d3.Selection for the element.
    * @returns {Component} The calling Component.
    */
-  public renderTo(element: string | Element | SimpleSelection<void>): this {
+  public renderTo(element: string | HTMLElement | d3.Selection<HTMLElement, any, any, any>): this {
     this.detach();
     if (element != null) {
-      let selection: SimpleSelection<void>;
+      let selection: d3.Selection<HTMLElement, any, any, any>;
       if (typeof(element) === "string") {
-        selection = d3.select<d3.BaseType, void>(element);
+        selection = d3.select<HTMLElement, any>(element);
       } else if (element instanceof Element) {
-        selection = d3.select<d3.BaseType, void>(element);
+        selection = d3.select<HTMLElement, any>(element);
       } else {
         selection = coerceExternalD3(element);
       }
-      if (!selection.node() || (<Node> selection.node()).nodeName.toLowerCase() !== "svg") {
-        throw new Error("Plottable requires a valid SVG to renderTo");
+      if (!selection.node() || selection.node().nodeName == null) {
+        throw new Error("Plottable requires a valid Element to renderTo");
+      }
+      if (selection.node().nodeName === "svg") {
+        throw new Error("Plottable 3.x and later can only renderTo an HTML component; pass a div instead!");
       }
       this.anchor(selection);
     }
@@ -405,22 +445,6 @@ export class Component {
       box.attr("width", this.width()).attr("height", this.height());
     }
     return box;
-  }
-
-  private _generateClipPath() {
-    // The clip path will prevent content from overflowing its Component space.
-    this._clipPathID = Utils.DOM.generateUniqueClipPathId();
-    let clipPathParent = this._boxContainer.append("clipPath").attr("id", this._clipPathID);
-    this._addBox("clip-rect", clipPathParent);
-    this._updateClipPath();
-  }
-
-  private _updateClipPath() {
-    // HACKHACK: IE <= 9 does not respect the HTML base element in SVG.
-    // They don't need the current URL in the clip path reference.
-    let prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
-    prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
-    this._element.attr("clip-path", "url(\"" + prefix + "#" + this._clipPathID + "\")");
   }
 
   /**
@@ -508,9 +532,6 @@ export class Component {
 
     if (this._isAnchored) {
       this._element.remove();
-      if (this._isTopLevelComponent) {
-        this._rootSVG.select(`.${Component._SAFARI_EVENT_BACKING_CLASS}`).remove();
-      }
     }
     this._isAnchored = false;
     this._onDetachCallbacks.callCallbacks(this);
@@ -615,11 +636,11 @@ export class Component {
   }
 
   /**
-   * Gets the origin of the Component relative to the root <svg>.
+   * Gets the origin of the Component relative to the root Component.
    *
    * @return {Point}
    */
-  public originToSVG(): Point {
+  public originToRoot(): Point {
     let origin = this.origin();
     let ancestor = this.parent();
     while (ancestor != null) {
@@ -629,6 +650,24 @@ export class Component {
       ancestor = ancestor.parent();
     }
     return origin;
+  }
+
+  /**
+   * Gets the root component of the hierarchy. If the provided
+   * component is the root, that component will be returned.
+   */
+  public root(): Component {
+    let component: Component = this;
+
+    while (!component.isRoot()) {
+      component = component.parent();
+    }
+
+    return component;
+  }
+
+  public isRoot() {
+    return this.parent() == null;
   }
 
   /**
@@ -643,7 +682,7 @@ export class Component {
   }
 
   /**
-   * Gets a Selection containing a <g> that holds the visual elements of the Component.
+   * Gets the SVG that holds the visual elements of the Component.
    *
    * Will return undefined if the Component has not been anchored.
    *
@@ -651,6 +690,20 @@ export class Component {
    */
   public content(): SimpleSelection<void> {
     return this._content;
+  }
+
+  /**
+   * Returns the HTML Element at the root of this component's DOM tree.
+   */
+  public element(): d3.Selection<HTMLElement, any, any, any> {
+    return this._element;
+  }
+
+  /**
+   * Returns the top-level user supplied element that roots the tree that this Component lives in.
+   */
+  public rootElement(): SimpleSelection<void> {
+    return this.root()._rootElement;
   }
 
   /**

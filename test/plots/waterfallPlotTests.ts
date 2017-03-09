@@ -11,7 +11,7 @@ describe("Plots", () => {
   describe("Waterfall", () => {
     describe("rendering growth bars", () => {
       let numAttr = TestMethods.numAttr;
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let dataset: Plottable.Dataset;
       let xScale: Plottable.Scales.Category;
       let yScale: Plottable.Scales.Linear;
@@ -25,7 +25,7 @@ describe("Plots", () => {
       let growthClass = "waterfall-growth";
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG();
+        div = TestMethods.generateDiv();
         dataset = new Plottable.Dataset(growthBarData);
         xScale = new Plottable.Scales.Category();
         yScale = new Plottable.Scales.Linear();
@@ -34,7 +34,7 @@ describe("Plots", () => {
         plot.y((d) => d.y, yScale);
         plot.total((d, i) => i === 0);
         plot.addDataset(dataset);
-        plot.renderTo(svg);
+        plot.renderTo(div);
       });
 
       it("classes growth bars", () => {
@@ -48,7 +48,7 @@ describe("Plots", () => {
           assert.isTrue(bar.classed(growthClass), "bar classed as growth bar");
         });
         plot.destroy();
-        svg.remove();
+        div.remove();
       });
 
       it("places bars at current sum", () => {
@@ -67,13 +67,13 @@ describe("Plots", () => {
         });
 
         plot.destroy();
-        svg.remove();
+        div.remove();
       });
     });
 
     describe("rendering decline bars", () => {
       let numAttr = TestMethods.numAttr;
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let dataset: Plottable.Dataset;
       let xScale: Plottable.Scales.Category;
       let yScale: Plottable.Scales.Linear;
@@ -88,7 +88,7 @@ describe("Plots", () => {
       let declineClass = "waterfall-decline";
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG();
+        div = TestMethods.generateDiv();
         dataset = new Plottable.Dataset(declineBarData);
         xScale = new Plottable.Scales.Category();
         yScale = new Plottable.Scales.Linear();
@@ -97,7 +97,7 @@ describe("Plots", () => {
         plot.y((d) => d.y, yScale);
         plot.total((d, i) => i === 0);
         plot.addDataset(dataset);
-        plot.renderTo(svg);
+        plot.renderTo(div);
       });
 
       it("classes decline bars", () => {
@@ -111,7 +111,7 @@ describe("Plots", () => {
           assert.isTrue(bar.classed(declineClass), "bar classed as decline bars");
         });
         plot.destroy();
-        svg.remove();
+        div.remove();
       });
 
       it("places bars at current sum", () => {
@@ -130,12 +130,12 @@ describe("Plots", () => {
         });
 
         plot.destroy();
-        svg.remove();
+        div.remove();
       });
     });
 
     describe("denoting total bars", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let dataset: Plottable.Dataset;
       let xScale: Plottable.Scales.Category;
       let yScale: Plottable.Scales.Linear;
@@ -150,7 +150,7 @@ describe("Plots", () => {
       let totalClass = "waterfall-total";
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG();
+        div = TestMethods.generateDiv();
         dataset = new Plottable.Dataset(data);
         xScale = new Plottable.Scales.Category();
         yScale = new Plottable.Scales.Linear();
@@ -164,14 +164,14 @@ describe("Plots", () => {
         assert.strictEqual(plot.total(accessor), plot, "setter returns calling object");
 
         plot.addDataset(dataset);
-        plot.renderTo(svg);
+        plot.renderTo(div);
         let bars = plot.content().selectAll<Element, any>("rect").filter((d) => accessor(d));
         bars.each(function(d) {
           let totalBar = d3.select(this);
           assert.isTrue(totalBar.classed(totalClass));
         });
         plot.destroy();
-        svg.remove();
+        div.remove();
       });
 
       it("can get the total property", () => {
@@ -179,13 +179,13 @@ describe("Plots", () => {
         plot.total(accessor);
         assert.strictEqual(plot.total().accessor, accessor, "can get if connectors are enabled");
         plot.destroy();
-        svg.remove();
+        div.remove();
       });
     });
 
     describe("enabling connectors", () => {
       let numAttr = TestMethods.numAttr;
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let dataset: Plottable.Dataset;
       let xScale: Plottable.Scales.Category;
       let yScale: Plottable.Scales.Linear;
@@ -199,7 +199,7 @@ describe("Plots", () => {
       ];
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG();
+        div = TestMethods.generateDiv();
         dataset = new Plottable.Dataset(data);
         xScale = new Plottable.Scales.Category();
         yScale = new Plottable.Scales.Linear();
@@ -213,7 +213,7 @@ describe("Plots", () => {
       it("can set if connectors are enabled", () => {
         assert.isFalse(plot.connectorsEnabled(), "no connectors by default");
         assert.strictEqual(plot.connectorsEnabled(true), plot, "setter returns calling object");
-        plot.renderTo(svg);
+        plot.renderTo(div);
         let bars = plot.content().selectAll<Element, any>("rect");
         let connectors = plot.content().selectAll<Element, any>("line.connector");
         assert.strictEqual(bars.size(), connectors.size() + 1, "there is one more bar than number of connectors");
@@ -231,7 +231,7 @@ describe("Plots", () => {
           assert.strictEqual(numAttr(connector, "y1"), numAttr(connector, "y2"), "connector stays at same height");
         });
         plot.destroy();
-        svg.remove();
+        div.remove();
       });
 
       it("can get if connectors are enabled", () => {
@@ -239,7 +239,7 @@ describe("Plots", () => {
         plot.connectorsEnabled(connectorsEnabled);
         assert.strictEqual(plot.connectorsEnabled(), connectorsEnabled, "can get if connectors are enabled");
         plot.destroy();
-        svg.remove();
+        div.remove();
       });
     });
 

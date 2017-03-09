@@ -10,13 +10,13 @@ import * as TestMethods from "../testMethods";
 describe("Plots", () => {
   describe("AreaPlot", () => {
     describe("Basic Usage", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let plot: Plottable.Plots.Area<{}>;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG();
+        div = TestMethods.generateDiv();
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Linear();
         plot = new Plottable.Plots.Area();
@@ -25,8 +25,8 @@ describe("Plots", () => {
       });
 
       it("does not throw error when rendering without data", () => {
-        assert.doesNotThrow(() => plot.renderTo(svg), Error, "rendering without data does not throw an error");
-        svg.remove();
+        assert.doesNotThrow(() => plot.renderTo(div), Error, "rendering without data does not throw an error");
+        div.remove();
       });
 
       it("adds a padding exception to the y scale at the constant y0 value", () => {
@@ -35,14 +35,14 @@ describe("Plots", () => {
         yScale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => [constantY0, constantY0 + 10]);
         plot.y0(constantY0);
         plot.addDataset(new Plottable.Dataset([{ x: 0, y: constantY0 + 5 }]));
-        plot.renderTo(svg);
+        plot.renderTo(div);
         assert.strictEqual(yScale.domain()[0], constantY0, "y Scale doesn't pad beyond 0 when used in a Plots.Area");
-        svg.remove();
+        div.remove();
       });
     });
 
     describe("Rendering", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let areaPlot: Plottable.Plots.Area<number>;
@@ -51,7 +51,7 @@ describe("Plots", () => {
       beforeEach(() => {
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Linear();
-        svg = TestMethods.generateSVG();
+        div = TestMethods.generateDiv();
         let twoPointData = [{x: 0, y: 0}, {x: 1, y: 1}];
         let simpleDataset = new Plottable.Dataset(twoPointData);
         areaPlot = new Plottable.Plots.Area<number>();
@@ -61,7 +61,7 @@ describe("Plots", () => {
         areaPlot.y0(() => 0)
                 .attr("fill", () => fill)
                 .attr("stroke", (d, i) => d3.rgb(d.x, d.y, i).toString())
-                .renderTo(svg);
+                .renderTo(div);
       });
 
       it("draws area and line with correct data points and correct fill and stroke attributes", () => {
@@ -79,7 +79,7 @@ describe("Plots", () => {
           assert.strictEqual(linePath.attr("stroke"), "rgb(0, 0, 0)", "line stroke was set correctly");
           assert.strictEqual(linePath.style("fill"), "none", "line fill renders as \"none\"");
         });
-        svg.remove();
+        div.remove();
       });
 
       it("draws area appropriately with non-constant y0 values", () => {
@@ -90,7 +90,7 @@ describe("Plots", () => {
           let pointsInArea = getPointsInArea(areaPlot, data);
           TestMethods.assertPathEqualToDataPoints(areaPath.attr("d"), pointsInArea, xScale, yScale);
         });
-        svg.remove();
+        div.remove();
       });
 
       it("places the area before line", () => {
@@ -99,18 +99,18 @@ describe("Plots", () => {
         let areaElement = content.select<Element>(".area").node();
         let lineElement = content.select<Element>(".line").node();
         assert.operator(paths.indexOf(areaElement), "<", paths.indexOf(lineElement), "area appended before line");
-        svg.remove();
+        div.remove();
       });
 
       it("removes the plot svg elements when removing Datasets", () => {
-        areaPlot.renderTo(svg);
+        areaPlot.renderTo(div);
         let paths = areaPlot.content().selectAll<Element, any>("path");
         let pathSize = paths.size();
         let dataset = areaPlot.datasets()[0];
         areaPlot.removeDataset(dataset);
         paths = areaPlot.content().selectAll<Element, any>("path");
         assert.strictEqual(paths.size(), pathSize - 2, "removing a Dataset cleans up both <path>s associated with it");
-        svg.remove();
+        div.remove();
       });
 
       it("skips data points consisting of NaN and undefined x and y values", () => {
@@ -147,22 +147,22 @@ describe("Plots", () => {
 
         TestMethods.assertPathEqualToDataPoints(areaPath.attr("d"), pointsInArea, xScale, yScale);
 
-        svg.remove();
+        div.remove();
       });
 
       it("retains the area class when setting css class via attr", () => {
         let cssClass = "pink";
         areaPlot.attr("class", cssClass);
-        areaPlot.renderTo(svg);
+        areaPlot.renderTo(div);
         let areaPath = areaPlot.content().select(".area");
         assert.isTrue(areaPath.classed(cssClass), "it has css class set via attr");
         assert.isTrue(areaPath.classed("area"), "it has default css class");
-        svg.remove();
+        div.remove();
       });
     });
 
     describe("Selections", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let areaPlot: Plottable.Plots.Area<number>;
@@ -170,7 +170,7 @@ describe("Plots", () => {
       beforeEach(() => {
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Linear();
-        svg = TestMethods.generateSVG();
+        div = TestMethods.generateDiv();
         let simpleDataset = new Plottable.Dataset([{x: 0, y: 0}, {x: 1, y: 1}]);
         areaPlot = new Plottable.Plots.Area<number>();
         areaPlot.addDataset(simpleDataset);
@@ -179,7 +179,7 @@ describe("Plots", () => {
         areaPlot.y0(0)
                 .attr("fill", "steelblue")
                 .attr("stroke", (d: any, i: number, m: any) => d3.rgb(d.foo, d.bar, i).toString())
-                .renderTo(svg);
+                .renderTo(div);
       });
 
       it("retrieves all selections with no args", () => {
@@ -189,7 +189,7 @@ describe("Plots", () => {
         assert.strictEqual(allAreas.filter(".line").size(), 2, "2 lines retrieved");
         assert.strictEqual(allAreas.filter(".area").size(), 2, "2 areas retrieved");
 
-        svg.remove();
+        div.remove();
       });
 
       it("retrieves correct selections", () => {
@@ -200,7 +200,7 @@ describe("Plots", () => {
         let selectionData = allAreas.data()[0];
         assert.deepEqual(selectionData, twoPointDataset.data(), "new dataset data in selection data");
 
-        svg.remove();
+        div.remove();
       });
     });
 
