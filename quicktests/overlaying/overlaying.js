@@ -70,8 +70,8 @@ function showSizeControls(){
 var plottableBranches = [];
 var firstBranch;
 var secondBranch;
-var svgWidth;
-var svgHeight;
+var targetWidth;
+var targetHeight;
 
 //METHODS
 
@@ -198,15 +198,15 @@ function setupBindings(){
 }//setupBindings
 
 function setTestBoxDimensions(){
-  //quicktest class is the black border container div for all svgs
-  $(".quicktest").css("width", svgWidth + 20); //20 needed to make up for taken up space for quicktest label
-  $(".quicktest").css("height", svgHeight + 20);
+  //quicktest class is the black border container div for all divs
+  $(".quicktest").css("width", targetWidth + 20); //20 needed to make up for taken up space for quicktest label
+  $(".quicktest").css("height", targetHeight + 20);
 }
 
 //run a single quicktest
-function runQuickTest(result, svg, data, branch){
+function runQuickTest(result, target, data, branch){
   try {
-    result.run(svg, data, plottableBranches[branch]);
+    result.run(target, data, plottableBranches[branch]);
     setTestBoxDimensions();
   } catch (err) {
     setTimeout(function() {throw err; }, 0);
@@ -218,23 +218,7 @@ function loadAllQuickTests(quicktestsPaths, firstQTBranch, secondQTBranch){
     var name = path.replace(/\w*\/|\.js/g, "");
     var relativePath = path.replace(/^quicktests\/overlaying\//, "");
     d3.text(relativePath, function(error, text) {
-      if (error !== null) {
-        throw new Error("Tried to load nonexistant quicktest.");
-      }
-      text = "(function(){" + text +
-          "\nreturn {makeData: makeData, run: run};" +
-               "})();" +
-          "\n////# sourceURL=" + relativePath;
-      var result = eval(text);
-      var className = "quicktest " + name;
-      var div = d3.select("#results").append("div").attr("class", className);
-      div.insert("label").text(name);
-      var firstsvg = div.append("div").attr("class", "first").append("svg").attr("width", svgWidth).attr("height", svgHeight);
-      var secondsvg = div.append("div").attr("class", "second").append("svg").attr("width", svgWidth).attr("height", svgHeight);
-      var data = result.makeData();
-
-      runQuickTest(result, firstsvg, data, firstQTBranch);
-      runQuickTest(result, secondsvg, data, secondQTBranch);
+      evalAndRunTest(name, error, text, firstQTBranch, secondQTBranch);
     });
   });
 }
@@ -243,26 +227,30 @@ function loadQuickTestsInCategory(quickTestNames, category, firstQTBranch, secon
   quickTestNames.forEach(function(q) { //for each quicktest
     var name = q;
     d3.text("/quicktests/overlaying/tests/" + category + "/" + name + ".js", function(error, text) {
-      if (error !== null) {
-        throw new Error("Tried to load nonexistant quicktest.");
-      }
-      text = "(function(){" + text +
-          "\nreturn {makeData: makeData, run: run};" +
-               "})();" +
-          "\n////# sourceURL=" + name + ".js\n";
-      var result = eval(text);
-      var className = "quicktest " + name;
-
-      var div = d3.select("#results").append("div").attr("class", className);
-      div.insert("label").text(name);
-      var firstsvg = div.append("div").attr("class", "first").append("svg").attr({width: svgWidth, height: svgHeight});
-      var secondsvg = div.append("div").attr("class", "second").append("svg").attr({width: svgWidth, height: svgHeight});
-      var data = result.makeData();
-
-      runQuickTest(result, firstsvg, data, firstQTBranch);
-      runQuickTest(result, secondsvg, data, secondQTBranch);
+      evalAndRunTest(name, error, text, firstQTBranch, secondQTBranch);
     });
   });
+}
+
+function evalAndRunTest(name, error, text, firstQTBranch, secondQTBranch) {
+  if (error !== null) {
+    throw new Error("Tried to load nonexistant quicktest.");
+  }
+  text = "(function(){" + text +
+    "\nreturn {makeData: makeData, run: run};" +
+    "})();" +
+    "\n////# sourceURL=" + name + ".js\n";
+  var result = eval(text);
+  var className = "quicktest " + name;
+  var div = d3.select("#results").append("div").attr("class", className);
+  div.insert("label").text(name);
+  // var firstTarget = div.append("div").attr("class", "first").append("div").styles({"width": targetWidth + "px", "height": targetHeight + "px"});
+  var firstTarget = div.append("div").attr("class", "first").append("svg").styles({"width": targetWidth + "px", "height": targetHeight + "px"});
+  var secondTarget = div.append("div").attr("class", "second").append("div").styles({"width": targetWidth + "px", "height": targetHeight + "px"});
+  var data = result.makeData();
+
+  runQuickTest(result, firstTarget, data, firstQTBranch);
+  runQuickTest(result, secondTarget, data, secondQTBranch);
 }
 
 //filter all quicktests by category from list_of_quicktests.json & also load sidebar
@@ -340,10 +328,10 @@ function initialize(){
 
   firstBranch = $("#branch1").val();
   secondBranch = $("#branch2").val();
-  svgWidth = Number($("#width").val());
-  svgHeight = Number($("#height").val());
+  targetWidth = Number($("#width").val());
+  targetHeight = Number($("#height").val());
 
-  setTestBoxDimensions(svgWidth, svgHeight);
+  setTestBoxDimensions(targetWidth, targetHeight);
 
   branches.push(firstBranch, secondBranch);
   clearTests();

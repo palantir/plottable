@@ -5,12 +5,17 @@ import * as d3 from "d3";
 import * as Plottable from "../src";
 import { getTranslateValues } from "../src/utils/domUtils";
 
+export function generateDiv(width = 400, height = 400): d3.Selection<HTMLDivElement, void | {}, any, any> {
+  let parent = getElementParent();
+  return parent.append<HTMLDivElement>("div").style("width", `${width}px`).style("height", `${height}px`).attr("class", "div");
+}
+
 export function generateSVG(width = 400, height = 400): d3.Selection<SVGSVGElement, void | {}, any, any> {
-  let parent = getSVGParent();
+  let parent = getElementParent();
   return parent.append<SVGSVGElement>("svg").attr("width", width).attr("height", height).attr("class", "svg");
 }
 
-export function getSVGParent(): SimpleSelection<void> {
+export function getElementParent(): SimpleSelection<void> {
   let mocha = d3.select("#mocha-report");
   if (mocha.node() != null) {
     let suites = mocha.selectAll<Element, any>(".suite");
@@ -22,9 +27,9 @@ export function getSVGParent(): SimpleSelection<void> {
 }
 
 export function isInDOM(component: Plottable.Component) {
-  let contentNode = component.content().node();
-  return contentNode != null && Plottable.Utils.DOM.boundingSVG(<SVGElement> contentNode) != null;
-};
+  let contentNode = <Element> component.content().node();
+  return contentNode != null && Plottable.Utils.DOM.contains(document.body, contentNode);
+}
 
 export function verifySpaceRequest(sr: Plottable.SpaceRequest, expectedMinWidth: number, expectedMinHeight: number, message: string) {
   assert.strictEqual(sr.minWidth, expectedMinWidth, message + " (space request: minWidth)");
@@ -356,17 +361,6 @@ function tokenizePathString(pathString: string) {
           }
         }))));
   return numbers;
-}
-
-export function verifyClipPath(c: Plottable.Component) {
-  let clipPathId = (<any>c)._boxContainer.node().firstChild.id;
-  let expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
-  expectedPrefix = expectedPrefix.replace(/#.*/g, "");
-  let expectedClipPathURL = "url(" + expectedPrefix + "#" + clipPathId + ")";
-  // IE 9 has clipPath like 'url("#clipPath")', must accomodate
-  let normalizeClipPath = (s: string) => s.replace(/"/g, "");
-  assert.isTrue(normalizeClipPath((<any> c)._element.attr("clip-path")) === expectedClipPathURL,
-    "the element has clip-path url attached");
 }
 
 export type RGB = {

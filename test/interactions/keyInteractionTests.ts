@@ -38,14 +38,14 @@ describe("Interactions", () => {
       describe(`on${event}`, () => {
         const ACTION = event === "KeyPress" ? "pressed" : "released";
 
-        let svg: SimpleSelection<void>;
+        let div: d3.Selection<HTMLDivElement, any, any, any>;
         let eventTarget: SimpleSelection<void>;
         let keyInteraction: Plottable.Interactions.Key;
         let callback: KeyTestCallback;
 
         beforeEach(() => {
-          svg = TestMethods.generateSVG();
-          let component = new Plottable.Component().renderTo(svg);
+          div = TestMethods.generateDiv();
+          let component = new Plottable.Component().renderTo(div);
           eventTarget = component.background();
           keyInteraction = new Plottable.Interactions.Key();
           keyInteraction.attachTo(component);
@@ -54,7 +54,7 @@ describe("Interactions", () => {
 
         afterEach(function() {
           if (this.currentTest.state === "passed") {
-            svg.remove();
+            div.remove();
           }
         });
 
@@ -154,14 +154,14 @@ describe("Interactions", () => {
     });
 
     describe("onKeyPress respects mouse position", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let eventTarget: SimpleSelection<void>;
       let keyInteraction: Plottable.Interactions.Key;
       let callback: KeyTestCallback;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG();
-        let component = new Plottable.Component().renderTo(svg);
+        div = TestMethods.generateDiv();
+        let component = new Plottable.Component().renderTo(div);
         eventTarget = component.background();
         keyInteraction = new Plottable.Interactions.Key();
         keyInteraction.attachTo(component);
@@ -170,7 +170,7 @@ describe("Interactions", () => {
 
       afterEach(function() {
         if (this.currentTest.state === "passed") {
-          svg.remove();
+          div.remove();
         }
       });
 
@@ -199,14 +199,14 @@ describe("Interactions", () => {
     });
 
     describe("onKeyRelease respects mouse position", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let eventTarget: SimpleSelection<void>;
       let keyInteraction: Plottable.Interactions.Key;
       let callback: KeyTestCallback;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG();
-        let component = new Plottable.Component().renderTo(svg);
+        div = TestMethods.generateDiv();
+        let component = new Plottable.Component().renderTo(div);
         eventTarget = component.background();
         keyInteraction = new Plottable.Interactions.Key();
         keyInteraction.attachTo(component);
@@ -215,7 +215,7 @@ describe("Interactions", () => {
 
       afterEach(function() {
         if (this.currentTest.state === "passed") {
-          svg.remove();
+          div.remove();
         }
       });
 

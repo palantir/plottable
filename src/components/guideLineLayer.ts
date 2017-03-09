@@ -30,7 +30,7 @@ export class GuideLineLayer<D> extends Component {
       throw new Error(orientation + " is not a valid orientation for GuideLineLayer");
     }
     this._orientation = orientation;
-    this._clipPathEnabled = true;
+    this._overflowHidden = true;
     this.addClass("guide-line-layer");
     if (this._isVertical()) {
       this.addClass("vertical");

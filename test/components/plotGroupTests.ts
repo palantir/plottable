@@ -9,7 +9,7 @@ import * as TestMethods from "../testMethods";
 
 describe("Components", () => {
   describe("PlotGroup", () => {
-    let svg: SimpleSelection<void>;
+    let div: d3.Selection<HTMLDivElement, any, any, any>;
     let xScale: Plottable.Scales.Linear;
     let yScale: Plottable.Scales.Linear;
     let plotGroup: Plottable.Components.PlotGroup;
@@ -19,7 +19,7 @@ describe("Components", () => {
     let topData: any[];
 
     beforeEach(() => {
-      svg = TestMethods.generateSVG();
+      div = TestMethods.generateDiv();
       xScale = new Plottable.Scales.Linear();
       yScale = new Plottable.Scales.Linear();
       plotGroup = new Plottable.Components.PlotGroup();
@@ -46,19 +46,19 @@ describe("Components", () => {
     it("throws error when appending not plot", () => {
       let label = new Plottable.Components.Label();
       assert.throw(() => plotGroup.append((<any>label)), Error, "Plot Group only accepts plots");
-      svg.remove();
+      div.remove();
     });
 
     it("can retrieve the nearest Entity in case of empty group", () => {
-      plotGroup.renderTo(svg);
+      plotGroup.renderTo(div);
       assert.isUndefined(plotGroup.entityNearest({x: 0, y: 0}));
-      svg.remove();
+      div.remove();
     });
 
     it("can retrieve the nearest Entity", () => {
       plotGroup.append(bottomPlot);
       plotGroup.append(topPlot);
-      plotGroup.renderTo(svg);
+      plotGroup.renderTo(div);
       let px = xScale.scale(topData[1].x);
       let py = yScale.scale(topData[1].y);
       let closest = plotGroup.entityNearest({x: px, y: py});
@@ -76,7 +76,7 @@ describe("Components", () => {
       py = yScale.scale(topData[0].y);
       closest = plotGroup.entityNearest({x: px, y: py});
       assert.strictEqual(closest.datum, topData[0], "it retrieves the closest point to upper plot in case of tie");
-      svg.remove();
+      div.remove();
     });
   });
 });

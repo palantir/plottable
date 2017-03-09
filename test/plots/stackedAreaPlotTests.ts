@@ -10,11 +10,11 @@ import * as TestMethods from "../testMethods";
 describe("Plots", () => {
   describe("StackedAreaPlot", () => {
     describe("setting the x property", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let stackedAreaPlot: Plottable.Plots.StackedArea<number>;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG();
+        div = TestMethods.generateDiv();
         let data1 = [
           {x: 1},
           {x: 3},
@@ -36,7 +36,7 @@ describe("Plots", () => {
       it("can set the x property accessor to a constant value", () => {
         let constantValue = 10;
         assert.strictEqual(stackedAreaPlot.x(constantValue), stackedAreaPlot, "setter returns calling object");
-        stackedAreaPlot.renderTo(svg);
+        stackedAreaPlot.renderTo(div);
 
         let stackedAreas = stackedAreaPlot.content().selectAll<Element, any>("path");
         assert.strictEqual(stackedAreas.size(),
@@ -54,14 +54,14 @@ describe("Plots", () => {
           assert.closeTo(areaEdgeXs[1], constantValue, window.Pixel_CloseTo_Requirement, "right edge x pixel value correctly set");
         });
         stackedAreaPlot.destroy();
-        svg.remove();
+        div.remove();
       });
 
       it("can set the x property accessor to be dependent on the input data", () => {
         let accessor = (d: {x: number}, i: number, ds: Plottable.Dataset) => d.x * 100 + i * 10 + ds.metadata().bar;
         assert.strictEqual(stackedAreaPlot.x(accessor), stackedAreaPlot, "setter returns calling object");
         assert.strictEqual(stackedAreaPlot.x().accessor, accessor, `property set for datum`);
-        stackedAreaPlot.renderTo(svg);
+        stackedAreaPlot.renderTo(div);
 
         let stackedAreas = stackedAreaPlot.content().selectAll<Element, any>("path");
         assert.strictEqual(stackedAreas.size(),
@@ -82,7 +82,7 @@ describe("Plots", () => {
             window.Pixel_CloseTo_Requirement, "right edge x pixel value correctly set");
         });
         stackedAreaPlot.destroy();
-        svg.remove();
+        div.remove();
       });
 
       it("can set the x property scale", () => {
@@ -90,7 +90,7 @@ describe("Plots", () => {
         let linearScale = new Plottable.Scales.Linear();
         assert.strictEqual(stackedAreaPlot.x(accessor, linearScale), stackedAreaPlot, "setter returns calling object");
         assert.strictEqual(stackedAreaPlot.x().accessor, accessor, `property set for datum`);
-        stackedAreaPlot.renderTo(svg);
+        stackedAreaPlot.renderTo(div);
 
         let stackedAreas = stackedAreaPlot.content().selectAll<Element, any>("path");
         assert.strictEqual(stackedAreas.size(),
@@ -111,16 +111,16 @@ describe("Plots", () => {
             window.Pixel_CloseTo_Requirement, "right edge x pixel value correctly set");
         });
         stackedAreaPlot.destroy();
-        svg.remove();
+        div.remove();
       });
     });
 
     describe("setting the y property", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let stackedAreaPlot: Plottable.Plots.StackedArea<number>;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG();
+        div = TestMethods.generateDiv();
         let data1 = [
           {y: 1},
           {y: 3},
@@ -158,7 +158,7 @@ describe("Plots", () => {
         let constantValue = 10;
         assert.strictEqual(stackedAreaPlot.y(constantValue), stackedAreaPlot, "setter returns calling object");
         stackedAreaPlot.destroy();
-        svg.remove();
+        div.remove();
       });
 
       it("can set to be dependent on the input data", () => {
@@ -166,7 +166,7 @@ describe("Plots", () => {
         assert.strictEqual(stackedAreaPlot.y(accessor), stackedAreaPlot, "setter returns calling object");
         assert.strictEqual(stackedAreaPlot.y().accessor, accessor, "accessor set");
         stackedAreaPlot.destroy();
-        svg.remove();
+        div.remove();
       });
 
       it("can set the property scale", () => {
@@ -174,7 +174,7 @@ describe("Plots", () => {
         let linearScale = new Plottable.Scales.Linear();
         assert.strictEqual(stackedAreaPlot.y(accessor, linearScale), stackedAreaPlot, "setter returns calling object");
         assert.strictEqual(stackedAreaPlot.y().accessor, accessor, "accessor set");
-        stackedAreaPlot.renderTo(svg);
+        stackedAreaPlot.renderTo(div);
 
         let stackedAreas = stackedAreaPlot.content().selectAll<Element, any>("path");
         assert.strictEqual(stackedAreas.size(),
@@ -204,7 +204,7 @@ describe("Plots", () => {
 
         });
         stackedAreaPlot.destroy();
-        svg.remove();
+        div.remove();
       });
     });
 
@@ -253,19 +253,19 @@ describe("Plots", () => {
 
     describe("rendering on edge case scenarios", () => {
       it("renders nothing when no data", () => {
-        let svg = TestMethods.generateSVG();
+        let div = TestMethods.generateDiv();
         let stackedAreaPlot = new Plottable.Plots.StackedArea();
         stackedAreaPlot.x(() => null);
         // HACKHACK https://github.com/palantir/plottable/issues/2712 y scale must be set.
         stackedAreaPlot.y(() => null, new Plottable.Scales.Linear());
-        stackedAreaPlot.renderTo(svg);
+        stackedAreaPlot.renderTo(div);
         assert.strictEqual(stackedAreaPlot.selections().size(), 0, "no areas rendered");
         stackedAreaPlot.destroy();
-        svg.remove();
+        div.remove();
       });
 
       it("coerces strings to numbers for calculating offsets", () => {
-        let svg = TestMethods.generateSVG();
+        let div = TestMethods.generateDiv();
         let data0 = [
           { x: 2, y: "2" },
           { x: 3, y: 2 },
@@ -289,7 +289,7 @@ describe("Plots", () => {
         let dataset2 = new Plottable.Dataset(data2);
         plot.addDataset(dataset2);
         plot.x((d: any) => d.x, xScale).y((d: any) => d.y, yScale);
-        plot.renderTo(svg);
+        plot.renderTo(div);
 
         let stackedAreaSelections = plot.content().selectAll<Element, any>("path");
         let stackedAreaSelection0 = d3.select(stackedAreaSelections.node());
@@ -310,11 +310,11 @@ describe("Plots", () => {
         assert.closeTo(areaYs2[0], yScale.scale(data2[0].y + parseFloat(<any> data1[0].y) + parseFloat(<any> data0[0].y)),
           window.Pixel_CloseTo_Requirement, "dataset2 should be offset with previous datasets");
         plot.destroy();
-        svg.remove();
+        div.remove();
       });
 
       it("coerces null to 0 for calculating offsets", () => {
-        let svg = TestMethods.generateSVG();
+        let div = TestMethods.generateDiv();
         let data0 = [
           { x: 2, y: 2 },
           { x: 3, y: 2 },
@@ -338,7 +338,7 @@ describe("Plots", () => {
         let dataset2 = new Plottable.Dataset(data2);
         plot.addDataset(dataset2);
         plot.x((d: any) => d.x, xScale).y((d: any) => d.y, yScale);
-        plot.renderTo(svg);
+        plot.renderTo(div);
 
         let stackedAreaSelections = plot.content().selectAll<Element, any>("path");
         let stackedAreaSelection0 = d3.select(stackedAreaSelections.node());
@@ -359,7 +359,7 @@ describe("Plots", () => {
         assert.closeTo(areaYs2[0], yScale.scale(data2[0].y + data0[0].y), window.Pixel_CloseTo_Requirement,
           "dataset2 should be offset with only dataset0");
         plot.destroy();
-        svg.remove();
+        div.remove();
       });
     });
 
@@ -378,7 +378,7 @@ describe("Plots", () => {
     });
 
     describe("stacking order", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let xScale: Plottable.Scales.Category;
       let stackedAreaPlot: Plottable.Plots.StackedArea<string>;
       const datas = [
@@ -387,14 +387,14 @@ describe("Plots", () => {
       ];
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG();
+        div = TestMethods.generateDiv();
         xScale = new Plottable.Scales.Category();
         stackedAreaPlot = new Plottable.Plots.StackedArea<string>()
           .addDataset(new Plottable.Dataset(datas[0]))
           .addDataset(new Plottable.Dataset(datas[1]))
           .x((d, i) => `${i}`, xScale)
           .y((d) => d, new Plottable.Scales.Linear())
-          .renderTo(svg);
+          .renderTo(div);
       });
 
       it("stacks bottomup by default", () => {
@@ -423,7 +423,7 @@ describe("Plots", () => {
 
       afterEach(() => {
         stackedAreaPlot.destroy();
-        svg.remove();
+        div.remove();
       });
     });
   });

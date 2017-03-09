@@ -10,6 +10,18 @@ import { Range, SimpleSelection } from "../core/interfaces";
 let nativeMath: Math = (<any>window).Math;
 
 /**
+ * Returns whether the child is in fact a child of the parent
+ */
+export function contains(parent: Element, child: Element): boolean {
+  let maybeParent = child;
+  while (maybeParent != null && maybeParent !== parent) {
+    maybeParent = maybeParent.parentNode as Element;
+  }
+
+  return maybeParent === parent;
+}
+
+/**
  * Gets the bounding box of an element.
  * @param {d3.Selection} element
  * @returns {SVGRed} The bounding box.
@@ -52,7 +64,10 @@ export function requestAnimationFramePolyfill(callback: () => void) {
  * @param {Element} element The element to query
  * @returns {number} The width of the element.
  */
-export function elementWidth(element: Element) {
+export function elementWidth(elementOrSelection: Element | d3.Selection<Element, any, any, any>) {
+  const element = elementOrSelection instanceof d3.selection
+    ? (elementOrSelection as d3.Selection<HTMLElement, any, any, any>).node()
+    : (elementOrSelection as Element);
   let style = window.getComputedStyle(element);
   return _parseStyleValue(style, "width")
     + _parseStyleValue(style, "padding-left")
@@ -68,7 +83,10 @@ export function elementWidth(element: Element) {
  * @param {Element} element The element to query
  * @returns {number} The height of the element
  */
-export function elementHeight(element: Element) {
+export function elementHeight(elementOrSelection: Element | d3.Selection<Element, any, any, any>) {
+  const element = elementOrSelection instanceof d3.selection
+    ? (elementOrSelection as d3.Selection<HTMLElement, any, any, any>).node()
+    : (elementOrSelection as Element);
   let style = window.getComputedStyle(element);
   return _parseStyleValue(style, "height")
     + _parseStyleValue(style, "padding-top")
@@ -173,31 +191,6 @@ export function clientRectInside(innerClientRect: ClientRect, outerClientRect: C
     nativeMath.floor(innerClientRect.right) <= nativeMath.ceil(outerClientRect.right) &&
     nativeMath.floor(innerClientRect.bottom) <= nativeMath.ceil(outerClientRect.bottom)
   );
-}
-
-/**
- * Retrieves the bounding svg of the input element
- *
- * @param {SVGElement} element The element to query
- * @returns {SVGElement} The bounding svg
- */
-export function boundingSVG(element: SVGElement): SVGElement {
-  let ownerSVG = element.ownerSVGElement;
-  if (ownerSVG != null) {
-    return ownerSVG;
-  }
-  if (element.nodeName.toLowerCase() === "svg") { // elem itself is an SVG
-    return element;
-  }
-  return null; // not in the DOM
-}
-
-let _latestClipPathId = 0;
-/**
- * Generates a ClipPath ID that is unique for this instance of Plottable
- */
-export function generateUniqueClipPathId() {
-  return "plottableClipPath" + ++_latestClipPathId;
 }
 
 /**

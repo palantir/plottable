@@ -36,7 +36,7 @@ export class SelectionBoxLayer extends Component {
     this._adjustBoundsCallback = () => {
       this.render();
     };
-    this._clipPathEnabled = true;
+    this._overflowHidden = true;
     this._xExtent = [undefined, undefined];
     this._yExtent = [undefined, undefined];
   }

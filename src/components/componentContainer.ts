@@ -21,10 +21,10 @@ export class ComponentContainer extends Component {
     this._detachCallback = (component: Component) => this.remove(component);
   }
 
-  public anchor(selection: SimpleSelection<void>) {
+  public anchor(selection: d3.Selection<HTMLElement, any, any, any>) {
     selection = coerceExternalD3(selection);
     super.anchor(selection);
-    this._forEach((c) => c.anchor(this.content()));
+    this._forEach((c) => c.anchor(this.element()));
     return this;
   }
 
@@ -44,7 +44,7 @@ export class ComponentContainer extends Component {
     component.parent(this);
     component.onDetach(this._detachCallback);
     if (this._isAnchored) {
-      component.anchor(this.content());
+      component.anchor(this.element());
     }
   }
 

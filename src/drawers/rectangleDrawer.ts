@@ -13,5 +13,4 @@ export class Rectangle extends Drawer {
     super(dataset);
     this._svgElementName = "rect";
   }
-
 }

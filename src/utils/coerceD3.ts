@@ -9,7 +9,7 @@ import * as d3 from "d3";
  * Any public facing API that accepts a d3 selection should first pass that user-supplied selection
  * through here - this ensures all selection objects that go through the Plottable codebase are "vetted".
  */
-export function coerceExternalD3(externalD3Selection: d3.Selection<any, any, any, any>): SimpleSelection<any> {
+export function coerceExternalD3<S extends d3.Selection<any, any, any, any>>(externalD3Selection: S): S {
   // if .attrs isn't defined; convert the selection
   if (externalD3Selection.attrs == null) {
     if (externalD3Selection.nodes == null) {
@@ -18,9 +18,9 @@ export function coerceExternalD3(externalD3Selection: d3.Selection<any, any, any
       externalD3Selection.each(function() {
         nodes.push(this);
       });
-      return d3.selectAll<d3.BaseType, any>(nodes);
+      return <S> d3.selectAll(nodes);
     } else {
-      return d3.selectAll<d3.BaseType, any>(externalD3Selection.nodes());
+      return <S> d3.selectAll(externalD3Selection.nodes());
     }
   } else {
     return externalD3Selection;

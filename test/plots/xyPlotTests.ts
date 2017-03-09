@@ -11,7 +11,7 @@ import { getTranslateValues, getScaleValues } from "../../src/utils/domUtils";
 describe("Plots", () => {
   describe("XY Plot", () => {
     describe("autoranging on the x and y scales", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let plot: Plottable.XYPlot<number, number>;
@@ -21,7 +21,7 @@ describe("Plots", () => {
       const xTransform = (d: number) => Math.pow(d, 0.5);
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG();
+        div = TestMethods.generateDiv();
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Linear();
         plot = new Plottable.XYPlot<number, number>();
@@ -29,7 +29,7 @@ describe("Plots", () => {
         plot.addDataset(simpleDataset);
         plot.x(xAccessor, xScale)
             .y(yAccessor, yScale)
-            .anchor(svg);
+            .anchor(div);
         xScale.padProportion(0);
         yScale.padProportion(0);
       });
@@ -51,12 +51,12 @@ describe("Plots", () => {
         assert.strictEqual(plot.autorangeMode(), "y", "autorange mode set to y");
         plot.autorangeMode("none");
         assert.strictEqual(plot.autorangeMode(), "none", "autorange mode set to none");
-        svg.remove();
+        div.remove();
       });
 
       it("throws an error on setting an invalid autorange mode", () => {
         (<any> assert).throws(() => plot.autorangeMode("foobar"), "Invalid scale", "cannot set an invalid mode");
-        svg.remove();
+        div.remove();
       });
 
       it("automatically adjusts Y domain over visible points", () => {
@@ -66,7 +66,7 @@ describe("Plots", () => {
         assert.deepEqual(yScale.domain(), oldYDomain, "domain not adjusted to visible points");
         plot.autorangeMode("y");
         assert.deepEqual(yScale.domain(), newXDomain.map(yTransform), "domain has been adjusted to visible points");
-        svg.remove();
+        div.remove();
       });
 
       it("automatically adjusts Y domain to the default when no points are visible", () => {
@@ -74,7 +74,7 @@ describe("Plots", () => {
         const newXDomain = [-2, -1];
         xScale.domain(newXDomain);
         assert.deepEqual(yScale.domain(), [0, 1], "scale uses default domain");
-        svg.remove();
+        div.remove();
       });
 
       it("automatically adjusts Y domain when X scale is replaced", () => {
@@ -85,7 +85,7 @@ describe("Plots", () => {
         assert.deepEqual(yScale.domain(), newXScaleDomain.map(yTransform), "domain adjusted to visible points on new X scale domain");
         xScale.domain([-2, 2]);
         assert.deepEqual(yScale.domain(), newXScaleDomain.map(yTransform), "y scale domain does not change");
-        svg.remove();
+        div.remove();
       });
 
       it("automatically adjusts X domain over visible points", () => {
@@ -94,14 +94,14 @@ describe("Plots", () => {
         assert.deepEqual(xScale.domain(), oldXDomain, "domain has not been adjusted to visible points");
         plot.autorangeMode("x");
         assert.deepEqual(xScale.domain(), yScale.domain().map(xTransform), "domain has been adjusted to visible points");
-        svg.remove();
+        div.remove();
       });
 
       it("automatically adjusts X domain to the default when no points are visible", () => {
         plot.autorangeMode("x");
         yScale.domain([-2, -1]);
         assert.deepEqual(xScale.domain(), [0, 1], "scale uses default domain");
-        svg.remove();
+        div.remove();
       });
 
       it("automatically adjusts X domain when Y scale is replaced", () => {
@@ -112,7 +112,7 @@ describe("Plots", () => {
         assert.deepEqual(xScale.domain(), newYScaleDomain.map(xTransform), "domain adjusted to visible points on new Y scale domain");
         yScale.domain([-2, 2]);
         assert.deepEqual(xScale.domain(), newYScaleDomain.map(xTransform), "x scale domain does not change");
-        svg.remove();
+        div.remove();
       });
 
       it("can show all of the data regardless of autoranging", () => {
@@ -121,7 +121,7 @@ describe("Plots", () => {
         plot.showAllData();
         assert.deepEqual(yScale.domain(), [0, 16], "y domain adjusted to show all data");
         assert.deepEqual(xScale.domain(), [0, 4], "x domain adjusted to show all data");
-        svg.remove();
+        div.remove();
       });
 
       it("stops autoranging after the plot is destroyed", () => {
@@ -132,7 +132,7 @@ describe("Plots", () => {
 
         assert.deepEqual(yScale.domain(), [0, 1], "autoranging no longer occurs");
 
-        svg.remove();
+        div.remove();
       });
     });
 
@@ -153,8 +153,8 @@ describe("Plots", () => {
 
       it("immediately translates the render area when the scale domain is translated", () => {
         plot.deferredRendering(true);
-        const svg = TestMethods.generateSVG();
-        plot.anchor(svg);
+        const div = TestMethods.generateDiv();
+        plot.anchor(div);
 
         const xScale = new Plottable.Scales.Linear();
         plot.x(0, xScale);
@@ -164,12 +164,12 @@ describe("Plots", () => {
         const renderAreaTranslate = getTranslateValues(plot.content().select(".render-area"));
         assert.deepEqual(renderAreaTranslate[0], -translateAmount, "translates with the same amount as domain shift");
 
-        svg.remove();
+        div.remove();
       });
 
       it("immediately scales the render area when the scale domain is scaled", () => {
-        const svg = TestMethods.generateSVG();
-        plot.anchor(svg);
+        const div = TestMethods.generateDiv();
+        plot.anchor(div);
 
         const xScale = new Plottable.Scales.Linear();
         plot.x(0, xScale);
@@ -181,51 +181,51 @@ describe("Plots", () => {
         const renderAreaScale = getScaleValues(plot.content().select(".render-area"));
         assert.deepEqual(renderAreaScale[0], 1 / magnifyAmount, "translates with the same amount as domain shift");
 
-        svg.remove();
+        div.remove();
       });
     });
 
     describe("computing the layout", () => {
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG();
+        div = TestMethods.generateDiv();
       });
 
       it("extends the x scale range to the component width", () => {
         const xScale = new Plottable.Scales.Linear();
         const plot = new Plottable.XYPlot<number, number>();
         plot.x(0, xScale);
-        plot.anchor(svg);
+        plot.anchor(div);
         plot.computeLayout();
 
         assert.deepEqual(xScale.range(), [0, plot.width()], "range extends to the width");
 
-        svg.remove();
+        div.remove();
       });
 
       it("sets the y scale range to start from the bottom for non-Category scales", () => {
         const yScale = new Plottable.Scales.Linear();
         const plot = new Plottable.XYPlot<number, number>();
         plot.y(0, yScale);
-        plot.anchor(svg);
+        plot.anchor(div);
         plot.computeLayout();
 
         assert.deepEqual(yScale.range(), [plot.height(), 0], "range extends from the height");
 
-        svg.remove();
+        div.remove();
       });
 
       it("sets the y scale range to start from the top if it is a Category scale", () => {
         const yScale = new Plottable.Scales.Category();
         const plot = new Plottable.XYPlot<number, string>();
         plot.y("one", yScale);
-        plot.anchor(svg);
+        plot.anchor(div);
         plot.computeLayout();
 
         assert.deepEqual(yScale.range(), [0, plot.height()], "range extends to the height");
 
-        svg.remove();
+        div.remove();
       });
     });
 
@@ -276,8 +276,8 @@ describe("Plots", () => {
       });
 
       it("sets the range on the input scale if the plot has a width", () => {
-        const svg = TestMethods.generateSVG();
-        plot.anchor(svg);
+        const div = TestMethods.generateDiv();
+        plot.anchor(div);
         plot.computeLayout();
 
         const scale = new Plottable.Scales.Linear();
@@ -285,15 +285,15 @@ describe("Plots", () => {
 
         assert.deepEqual(scale.range(), [0, plot.width()], "range goes to width on scale");
 
-        svg.remove();
+        div.remove();
       });
 
       it("can install its extent onto the input scale", () => {
-        const svg = TestMethods.generateSVG();
+        const div = TestMethods.generateDiv();
         const data = [0, 1, 2, 3, 4];
         plot.addDataset(new Plottable.Dataset(data));
 
-        plot.anchor(svg);
+        plot.anchor(div);
 
         const scale = new Plottable.Scales.Linear();
         scale.padProportion(0);
@@ -302,7 +302,7 @@ describe("Plots", () => {
         const mathUtils = Plottable.Utils.Math;
         assert.deepEqual(scale.domain(), [mathUtils.min(data, 0), mathUtils.max(data, 0)], "range goes to width on scale");
 
-        svg.remove();
+        div.remove();
       });
     });
 
@@ -353,8 +353,8 @@ describe("Plots", () => {
       });
 
       it("sets the range on the input scale if the plot has a height", () => {
-        const svg = TestMethods.generateSVG();
-        plot.anchor(svg);
+        const div = TestMethods.generateDiv();
+        plot.anchor(div);
         plot.computeLayout();
 
         const scale = new Plottable.Scales.Linear();
@@ -362,12 +362,12 @@ describe("Plots", () => {
 
         assert.deepEqual(scale.range(), [plot.height(), 0], "range goes from height on scale");
 
-        svg.remove();
+        div.remove();
       });
 
       it("sets the range to be reversed on the input Category scale if the plot has a height", () => {
-        const svg = TestMethods.generateSVG();
-        plot.anchor(svg);
+        const div = TestMethods.generateDiv();
+        plot.anchor(div);
         plot.computeLayout();
 
         const scale = new Plottable.Scales.Category();
@@ -375,15 +375,15 @@ describe("Plots", () => {
 
         assert.deepEqual(scale.range(), [0, plot.height()], "range goes to height on scale");
 
-        svg.remove();
+        div.remove();
       });
 
       it("can install its extent onto the input scale", () => {
-        const svg = TestMethods.generateSVG();
+        const div = TestMethods.generateDiv();
         const data = [0, 1, 2, 3, 4];
         plot.addDataset(new Plottable.Dataset(data));
 
-        plot.anchor(svg);
+        plot.anchor(div);
 
         const scale = new Plottable.Scales.Linear();
         scale.padProportion(0);
@@ -392,7 +392,7 @@ describe("Plots", () => {
         const mathUtils = Plottable.Utils.Math;
         assert.deepEqual(scale.domain(), [mathUtils.min(data, 0), mathUtils.max(data, 0)], "range goes to width on scale");
 
-        svg.remove();
+        div.remove();
       });
     });
   });

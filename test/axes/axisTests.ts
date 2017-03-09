@@ -60,10 +60,10 @@ describe("Axis", () => {
 
   orientations.forEach((orientation) => {
     it(`updates the layout when updating the margin after rendering for orientation ${orientation}`, () => {
-      let svg = TestMethods.generateSVG();
+      let div = TestMethods.generateDiv();
       let scale = new Plottable.Scales.Linear();
       let axis = new Plottable.Axis(scale, orientation);
-      axis.renderTo(svg);
+      axis.renderTo(div);
 
       let relevantDimensionF = () => isHorizOrient(orientation) ? axis.height() : axis.width();
 
@@ -76,16 +76,16 @@ describe("Axis", () => {
       assert.strictEqual(relevantDimensionF(), axisSize, "changing the margin size updates the size");
 
       axis.destroy();
-      svg.remove();
+      div.remove();
     });
   });
 
   orientations.forEach((orientation) => {
     it(`draws the baseline at the correct edge for ${orientation} orientation`, () => {
-      let svg = TestMethods.generateSVG();
+      let div = TestMethods.generateDiv();
       let scale = new Plottable.Scales.Linear();
       let axis = new Plottable.Axis(scale, orientation);
-      axis.renderTo(svg);
+      axis.renderTo(div);
 
       let baseline = axis.content().select(".baseline");
       assert.isFalse(baseline.empty(), "baseline exists");
@@ -95,7 +95,7 @@ describe("Axis", () => {
       assert.strictEqual(baseline.attr("y2"), orientation !== "bottom" ? String(axis.height()) : "0", "y2");
 
       axis.destroy();
-      svg.remove();
+      div.remove();
     });
   });
 
@@ -121,11 +121,11 @@ describe("Axis", () => {
     });
 
     it("adjusts the height to the greater of innerTickLength and endTickLength", () => {
-      let svg = TestMethods.generateSVG();
+      let div = TestMethods.generateDiv();
       let scale = new Plottable.Scales.Linear();
       let axis = new Plottable.Axis(scale, "bottom");
       axis.showEndTickLabels(true);
-      axis.renderTo(svg);
+      axis.renderTo(div);
 
       let expectedHeight = Math.max(axis.innerTickLength(), axis.endTickLength()) + axis.margin();
       assert.strictEqual(axis.height(), expectedHeight, "height should be equal to the maximum of the two");
@@ -143,7 +143,7 @@ describe("Axis", () => {
       assert.strictEqual(axis.height(), increasingEndTickLength + axis.margin(), "height should not decrease");
 
       axis.destroy();
-      svg.remove();
+      div.remove();
     });
   });
 
@@ -168,22 +168,22 @@ describe("Axis", () => {
       let annotatedTicks = [new Date((scale.domain()[0].valueOf() + scale.domain()[1].valueOf()) / 2)];
       axis.annotatedTicks(annotatedTicks);
 
-      let svg = TestMethods.generateSVG();
-      axis.renderTo(svg);
+      let div = TestMethods.generateDiv();
+      axis.renderTo(div);
 
       assert.isFalse(axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_CIRCLE_CLASS}`).empty(), "annotations render");
 
       axis.destroy();
-      svg.remove();
+      div.remove();
     });
 
     it("can enable annotations after render", () => {
-      let svg = TestMethods.generateSVG();
+      let div = TestMethods.generateDiv();
       let domainValues = [scale.domain()[0].valueOf(), scale.domain()[1].valueOf()];
       let annotatedTicks = Plottable.Utils.Math.range(domainValues[0], domainValues[1], (domainValues[1] - domainValues[0]) / 10)
         .map((d) => new Date(d));
       axis.annotatedTicks(annotatedTicks);
-      axis.renderTo(svg);
+      axis.renderTo(div);
 
       assert.strictEqual(axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS}`).size(),
         0, "no annotations by default");
@@ -193,17 +193,17 @@ describe("Axis", () => {
       assert.strictEqual(axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS}`).size(),
         annotatedTicks.length, "annotations render");
 
-      svg.remove();
+      div.remove();
     });
 
     it("can disable annotations after render", () => {
-      let svg = TestMethods.generateSVG();
+      let div = TestMethods.generateDiv();
       let domainValues = [scale.domain()[0].valueOf(), scale.domain()[1].valueOf()];
       let annotatedTicks = Plottable.Utils.Math.range(domainValues[0], domainValues[1], (domainValues[1] - domainValues[0]) / 10)
         .map((d) => new Date(d));
       axis.annotationsEnabled(true);
       axis.annotatedTicks(annotatedTicks);
-      axis.renderTo(svg);
+      axis.renderTo(div);
 
       assert.strictEqual(axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS}`).size(),
         annotatedTicks.length, "annotations render");
@@ -213,7 +213,7 @@ describe("Axis", () => {
       assert.strictEqual(axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS}`).size(),
         0, "no annotations by default");
 
-      svg.remove();
+      div.remove();
     });
   });
 
@@ -239,21 +239,21 @@ describe("Axis", () => {
 
       axis.annotationsEnabled(true);
 
-      let svg = TestMethods.generateSVG();
-      axis.renderTo(svg);
+      let div = TestMethods.generateDiv();
+      axis.renderTo(div);
 
       assert.deepEqual(axis.content().selectAll<Element, any>(".annotation-label").data(), annotatedTicks, "annotated ticks set");
 
       axis.destroy();
-      svg.remove();
+      div.remove();
     });
 
     it("re-renders when annotated ticks are set after render", () => {
       let domainValues = [scale.domain()[0].valueOf(), scale.domain()[1].valueOf()];
       let annotatedTicks = Plottable.Utils.Math.range(domainValues[0], domainValues[1], 10);
-      let svg = TestMethods.generateSVG();
+      let div = TestMethods.generateDiv();
       axis.annotationsEnabled(true);
-      axis.renderTo(svg);
+      axis.renderTo(div);
 
       assert.strictEqual(axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS}`).size(),
         0, "no annotations by default");
@@ -268,7 +268,7 @@ describe("Axis", () => {
       annotationLabels.each(function(d, i) {
         assert.strictEqual(d3.select(this).text(), annotationFormatter(annotatedTicks[i]), `annotated tick ${i} has been formatted`);
       });
-      svg.remove();
+      div.remove();
     });
   });
 
@@ -299,8 +299,8 @@ describe("Axis", () => {
       axis.annotatedTicks(annotatedTicks);
       axis.annotationsEnabled(true);
 
-      let svg = TestMethods.generateSVG();
-      axis.renderTo(svg);
+      let div = TestMethods.generateDiv();
+      axis.renderTo(div);
 
       let annotationLabels = axis.content().selectAll<Element, any>(".annotation-label");
       assert.strictEqual(annotationLabels.size(), annotatedTicks.length, "same number of annotation labels as annotated ticks");
@@ -309,15 +309,15 @@ describe("Axis", () => {
       });
 
       axis.destroy();
-      svg.remove();
+      div.remove();
     });
 
     it("re-renders when the annotation formatter is changed", () => {
-      let svg = TestMethods.generateSVG();
+      let div = TestMethods.generateDiv();
       let annotatedTicks = Plottable.Utils.Math.range(scale.domain()[0], scale.domain()[1], 10);
       axis.annotationsEnabled(true);
       axis.annotatedTicks(annotatedTicks);
-      axis.renderTo(svg);
+      axis.renderTo(div);
 
       assert.strictEqual(axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS}`).size(),
         annotatedTicks.length, "annotations have rendered");
@@ -332,7 +332,7 @@ describe("Axis", () => {
         assert.strictEqual(d3.select(this).text(), bazFormatter(annotatedTicks[i]), `new formatter used for annotation label ${i}`);
       });
       axis.destroy();
-      svg.remove();
+      div.remove();
     });
   });
 
@@ -355,8 +355,8 @@ describe("Axis", () => {
 
       axis.annotationsEnabled(true);
 
-      let svg = TestMethods.generateSVG();
-      axis.renderTo(svg);
+      let div = TestMethods.generateDiv();
+      axis.renderTo(div);
 
       let oldAxisHeight = axis.height();
       let increaseAmount = 2;
@@ -364,7 +364,7 @@ describe("Axis", () => {
       assert.operator(axis.height(), ">", oldAxisHeight, "axis takes number of tiers into account");
 
       axis.destroy();
-      svg.remove();
+      div.remove();
     });
 
     it("throws an error when annotation tier count is not valid", () => {
@@ -387,11 +387,11 @@ describe("Axis", () => {
       let annotatedTicks = [3, 100, 250];
 
       it(`renders annotation lines, circles, and text extending out from baseline to rect with orientation ${orientation}`, () => {
-        let svg = TestMethods.generateSVG();
+        let div = TestMethods.generateDiv();
         let axis = new Plottable.Axis(scale, orientation);
         axis.annotatedTicks(annotatedTicks);
         axis.annotationsEnabled(true);
-        axis.renderTo(svg);
+        axis.renderTo(div);
 
         let annotationRects = axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
 
@@ -440,7 +440,7 @@ describe("Axis", () => {
           TestMethods.assertBBoxInclusion(surroundingRect, annotationLabel);
         });
         axis.destroy();
-        svg.remove();
+        div.remove();
       });
     });
 
@@ -450,11 +450,11 @@ describe("Axis", () => {
       let annotatedTicks = [3, 100, 250];
 
       it(`places the rectangle at the scaled x position for ${orientation} orientation`, () => {
-        let svg = TestMethods.generateSVG();
+        let div = TestMethods.generateDiv();
         let axis = new Plottable.Axis(scale, orientation);
         axis.annotatedTicks(annotatedTicks);
         axis.annotationsEnabled(true);
-        axis.renderTo(svg);
+        axis.renderTo(div);
 
         let annotationRects = axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
 
@@ -468,7 +468,7 @@ describe("Axis", () => {
             window.Pixel_CloseTo_Requirement, `rectangle ${i} positioned at scaled position`);
         });
         axis.destroy();
-        svg.remove();
+        div.remove();
       });
     });
 
@@ -478,11 +478,11 @@ describe("Axis", () => {
       let annotatedTicks = [3, 100, 250];
 
       it(`places the first row right at the beginning of the annotation area for ${orientation} orientation`, () => {
-        let svg = TestMethods.generateSVG();
+        let div = TestMethods.generateDiv();
         let axis = new Plottable.Axis(scale, orientation);
         axis.annotatedTicks(annotatedTicks);
         axis.annotationsEnabled(true);
-        axis.renderTo(svg);
+        axis.renderTo(div);
 
         let firstAnnotationRect = axis.content().select(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
 
@@ -509,7 +509,7 @@ describe("Axis", () => {
 
         assert.closeTo(rectangleRowPos, expectedRowPos, window.Pixel_CloseTo_Requirement, "rectangle positioned right above margin");
         axis.destroy();
-        svg.remove();
+        div.remove();
       });
     });
 
@@ -519,11 +519,11 @@ describe("Axis", () => {
       let annotatedTicks = [50, 51];
 
       it(`moves rectangles that would overlap to different rows for ${orientation} orientation`, () => {
-        let svg = TestMethods.generateSVG();
+        let div = TestMethods.generateDiv();
         let axis = new Plottable.Axis(scale, orientation);
         axis.annotatedTicks(annotatedTicks);
         axis.annotationsEnabled(true);
-        axis.renderTo(svg);
+        axis.renderTo(div);
 
         let annotationRects = axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
         let firstAnnotationRect = d3.select(annotationRects.nodes()[0]);
@@ -535,7 +535,7 @@ describe("Axis", () => {
         assert.strictEqual(Math.abs(numAttr(secondAnnotationRect, positionAttr) - numAttr(firstAnnotationRect, positionAttr)),
           numAttr(firstAnnotationRect, offsetAttr), "rectangle offset by previous rectangle");
         axis.destroy();
-        svg.remove();
+        div.remove();
       });
     });
   });
@@ -549,8 +549,8 @@ describe("Axis", () => {
     axis.annotatedTicks(annotatedTicks);
     axis.annotationsEnabled(true);
 
-    let svg = TestMethods.generateSVG(300, 300);
-    axis.renderTo(svg);
+    let div = TestMethods.generateDiv(300, 300);
+    axis.renderTo(div);
 
     let annotationRects = axis.content().selectAll<SVGRectElement, any>(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
 
@@ -568,7 +568,7 @@ describe("Axis", () => {
       }
     });
     axis.destroy();
-    svg.remove();
+    div.remove();
   });
 
   it("shows annotation circles regardless if rectangles are hidden", () => {
@@ -580,8 +580,8 @@ describe("Axis", () => {
     axis.annotatedTicks(annotatedTicks);
     axis.annotationsEnabled(true);
 
-    let svg = TestMethods.generateSVG(300, 300);
-    axis.renderTo(svg);
+    let div = TestMethods.generateDiv(300, 300);
+    axis.renderTo(div);
 
     let annotationCircles = axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_CIRCLE_CLASS}`);
 
@@ -592,7 +592,7 @@ describe("Axis", () => {
       assert.notStrictEqual(annotationCircle.attr("visibility"), "hidden", `circle ${i} inside margin area should be visible`);
     });
     axis.destroy();
-    svg.remove();
+    div.remove();
   });
 
   it("does not render the null as an annotation", () => {
@@ -601,15 +601,15 @@ describe("Axis", () => {
     scale.domain([new Date(1994, 11, 17), new Date(1995, 11, 17)]);
     let axis = new Plottable.Axis(scale, "bottom");
     axis.annotationsEnabled(true);
-    let svg = TestMethods.generateSVG(300, 300);
-    axis.renderTo(svg);
+    let div = TestMethods.generateDiv(300, 300);
+    axis.renderTo(div);
 
     axis.annotatedTicks(annotatedTicks);
 
     assert.strictEqual(axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS}`).size(), 0, "no annotated ticks");
 
     axis.destroy();
-    svg.remove();
+    div.remove();
   });
 
   it("only renders unique annotated ticks", () => {
@@ -618,8 +618,8 @@ describe("Axis", () => {
     scale.domain([100, 200]);
     let axis = new Plottable.Axis(scale, "bottom");
     axis.annotationsEnabled(true);
-    let svg = TestMethods.generateSVG(300, 300);
-    axis.renderTo(svg);
+    let div = TestMethods.generateDiv(300, 300);
+    axis.renderTo(div);
 
     axis.annotatedTicks(annotatedTicks);
 
@@ -631,7 +631,7 @@ describe("Axis", () => {
       annotatedTickSet.size, "only unique annotations rendered");
 
     axis.destroy();
-    svg.remove();
+    div.remove();
   });
 
   it("places the tick at the top most row even if it is a duplicated tick", () => {
@@ -640,8 +640,8 @@ describe("Axis", () => {
     scale.domain([100, 200]);
     let axis = new Plottable.Axis(scale, "bottom");
     axis.annotationsEnabled(true);
-    let svg = TestMethods.generateSVG(300, 300);
-    axis.renderTo(svg);
+    let div = TestMethods.generateDiv(300, 300);
+    axis.renderTo(div);
 
     axis.annotatedTicks(annotatedTicks);
 
@@ -653,6 +653,6 @@ describe("Axis", () => {
       axis.height() - axis.margin(), window.Pixel_CloseTo_Requirement, "rectangle positioned correctly");
 
     axis.destroy();
-    svg.remove();
+    div.remove();
   });
 });

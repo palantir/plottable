@@ -24,27 +24,27 @@ describe("Labels", () => {
   describe("Label", () => {
     describe("Basic Usage", () => {
       const BBOX_SELECTOR = ".bounding-box";
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG();
+        div = TestMethods.generateDiv();
       });
 
       it("can update text after label is created", () => {
         const label = new Plottable.Components.Label("a");
-        label.renderTo(svg);
+        label.renderTo(div);
         assert.strictEqual(label.content().select("text").text(), "a", "the text starts at the specified string");
         assert.operator(label.height(), ">", 0, "height is positive for non-empty string");
         label.text("hello world");
-        label.renderTo(svg);
+        label.renderTo(div);
         assert.strictEqual(label.content().select("text").text(), "hello world", "the label text updated properly");
         assert.operator(label.height(), ">", 0, "height is positive for non-empty string");
-        svg.remove();
+        div.remove();
       });
 
       it("can change label angle after label is created", () => {
         const label = new Plottable.Components.Label("CHANGING ORIENTATION");
-        label.renderTo(svg);
+        label.renderTo(div);
 
         const content = label.content();
         let text = content.select("text");
@@ -57,53 +57,53 @@ describe("Labels", () => {
         TestMethods.assertBBoxInclusion((<any> label)._element.select(BBOX_SELECTOR), text);
         assert.closeTo(bbox.height, label.width(), window.Pixel_CloseTo_Requirement, "label is in vertical position");
 
-        svg.remove();
+        div.remove();
       });
 
       it("positions centered text in the middle of horizontal space", () => {
-        const SVG_WIDTH = TestMethods.numAttr(svg, "width");
-        const label = new Plottable.Components.Label("X").renderTo(svg);
+        const DIV_WIDTH = Plottable.Utils.DOM.elementWidth(div);
+        const label = new Plottable.Components.Label("X").renderTo(div);
         const textTranslate = getTranslateValues(label.content().select("g"));
-        const eleTranslate = getTranslateValues((<any> label)._element);
+        const eleLeft = parseFloat(label.element().style("left"));
         const textWidth = Plottable.Utils.DOM.elementBBox(label.content().select("text")).width;
-        const midPoint = eleTranslate[0] + textTranslate[0] + textWidth / 2;
-        assert.closeTo(midPoint, SVG_WIDTH / 2, window.Pixel_CloseTo_Requirement, "label is centered");
-        svg.remove();
+        const midPoint = eleLeft + textTranslate[0] + textWidth / 2;
+        assert.closeTo(midPoint, DIV_WIDTH / 2, window.Pixel_CloseTo_Requirement, "label is centered");
+        div.remove();
       });
 
       it("truncates text that is too long to be render", () => {
-        const SVG_WIDTH = TestMethods.numAttr(svg, "width");
+        const DIV_WIDTH = Plottable.Utils.DOM.elementWidth(div);
         const label = new Plottable.Components.Label("THIS LABEL IS SO LONG WHOEVER WROTE IT WAS PROBABLY DERANGED");
-        label.renderTo(svg);
+        label.renderTo(div);
         const content = label.content();
         const text = content.select("text");
         const bbox = Plottable.Utils.DOM.elementBBox(text);
         assert.strictEqual(bbox.height, label.height(), "text height === label.minimumHeight()");
-        assert.operator(bbox.width, "<=", SVG_WIDTH, "the text is not wider than the SVG width");
-        svg.remove();
+        assert.operator(bbox.width, "<=", DIV_WIDTH, "the text is not wider than the SVG width");
+        div.remove();
       });
 
       it("truncates text to empty string if space given is too small", () => {
-        svg.attr("width", 5);
+        div.style("width", "5px");
         const label = new Plottable.Components.Label("Yeah, not gonna fit...");
-        label.renderTo(svg);
+        label.renderTo(div);
         const text =  label.content().select("text");
         assert.strictEqual(text.text(), "", "text was truncated to empty string");
-        svg.remove();
+        div.remove();
       });
 
       it("sets width to 0 if a label text is changed to empty string", () => {
         const label = new Plottable.Components.Label("foo");
-        label.renderTo(svg);
+        label.renderTo(div);
         label.text("");
         assert.strictEqual(label.width(), 0, "width updated to 0");
-        svg.remove();
+        div.remove();
       });
 
       it("renders left-rotated text properly", () => {
         const str = "LEFT-ROTATED LABEL";
         const label = new Plottable.Components.Label(str, -90);
-        label.renderTo(svg);
+        label.renderTo(div);
         const content = label.content();
         const text = content.select("text");
         const textBBox = Plottable.Utils.DOM.elementBBox(text);
@@ -112,13 +112,13 @@ describe("Labels", () => {
         // OS/Browser specific kerning messes with typesetter's per-character measurement
         const widthFudge = str.length;
         assert.closeTo(textBBox.width, label.height(), window.Pixel_CloseTo_Requirement + widthFudge, "text width");
-        svg.remove();
+        div.remove();
       });
 
       it("renders right-rotated text properly", () => {
         const str = "RIGHT-ROTATED LABEL";
         const label = new Plottable.Components.Label(str, 90);
-        label.renderTo(svg);
+        label.renderTo(div);
         const content = label.content();
         const text = content.select("text");
         const textBBox = Plottable.Utils.DOM.elementBBox(text);
@@ -127,7 +127,7 @@ describe("Labels", () => {
         // OS/Browser specific kerning messes with typesetter's per-character measurement
         const widthFudge = str.length;
         assert.closeTo(textBBox.width, label.height(), window.Pixel_CloseTo_Requirement + widthFudge, "text width");
-        svg.remove();
+        div.remove();
       });
     });
 
@@ -168,89 +168,89 @@ describe("Labels", () => {
 
     describe("Padding", () => {
       const PADDING = 30;
-      let svg: SimpleSelection<void>;
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
       let label: Plottable.Components.Label;
 
       beforeEach(() => {
-      svg = TestMethods.generateSVG();
+      div = TestMethods.generateDiv();
       label = new Plottable.Components.Label("testing label").padding(PADDING);
       });
 
       it("adds padding for label accordingly under left alignment", () => {
-        label.xAlignment("left").renderTo(svg);
+        label.xAlignment("left").renderTo(div);
         const testTextRect = (<Element> label.content().select("text").node()).getBoundingClientRect();
         const elementRect = (<any> label)._element.node().getBoundingClientRect();
         assert.closeTo(testTextRect.left, elementRect.left + PADDING, window.Pixel_CloseTo_Requirement,
           "left difference by padding amount");
 
-        svg.remove();
+        div.remove();
       });
 
       it("adds padding for label accordingly under right alignment", () => {
-        label.xAlignment("right").renderTo(svg);
+        label.xAlignment("right").renderTo(div);
         const testTextRect = (<Element> label.content().select("text").node()).getBoundingClientRect();
         const elementRect = (<any> label)._element.node().getBoundingClientRect();
         assert.closeTo(testTextRect.right, elementRect.right - PADDING, window.Pixel_CloseTo_Requirement,
           "right difference by padding amount");
 
-        svg.remove();
+        div.remove();
       });
 
       it("adds padding for label accordingly under top alignment", () => {
-        label.yAlignment("top").renderTo(svg);
+        label.yAlignment("top").renderTo(div);
         const testTextRect = (<Element> label.content().select("text").node()).getBoundingClientRect();
         const elementRect = (<any> label)._element.node().getBoundingClientRect();
         assert.closeTo(testTextRect.top, elementRect.top + PADDING, window.Pixel_CloseTo_Requirement,
           "top difference by padding amount");
 
-        svg.remove();
+        div.remove();
       });
 
       it("adds padding for label accordingly under bottom alignment", () => {
-        label.yAlignment("bottom").renderTo(svg);
+        label.yAlignment("bottom").renderTo(div);
         const testTextRect = (<Element> label.content().select("text").node()).getBoundingClientRect();
         const elementRect = (<any> label)._element.node().getBoundingClientRect();
         assert.closeTo(testTextRect.bottom, elementRect.bottom - PADDING, window.Pixel_CloseTo_Requirement,
           "bottom difference by padding amount");
 
-        svg.remove();
+        div.remove();
       });
 
       it("puts space around the label", () => {
-        label.renderTo(svg);
+        label.renderTo(div);
 
-        const context = new Typesetter.SvgContext(svg.node() as SVGElement);
+        const context = new Typesetter.SvgContext(label.content().node() as SVGElement);
         const measurer = new Typesetter.CacheMeasurer(context);
         const measure = measurer.measure("testing label");
         assert.operator(label.width(), ">", measure.width, "padding increases size of the component");
         assert.operator(label.width(), "<=", measure.width + 2 * PADDING, "width at most incorporates full padding amount");
         assert.operator(label.height(), ">", measure.height, "padding increases size of the component");
         assert.operator(label.height(), ">=", measure.height + 2 * PADDING, "height at most incorporates full padding amount");
-        svg.remove();
+        div.remove();
       });
     });
   });
   describe("TitleLabel", () => {
     it("has appropriate css class", () => {
       const label = new Plottable.Components.TitleLabel("A CHART TITLE");
-      const svg = TestMethods.generateSVG();
-      label.renderTo(svg);
+      const div = TestMethods.generateDiv();
+      label.renderTo(div);
 
       assert.isTrue(label.hasClass(LABEL_CLASS), "element has label css class");
       assert.isTrue(label.hasClass(Plottable.Components.TitleLabel.TITLE_LABEL_CLASS), "element has title-label css class");
-      svg.remove();
+      div.remove();
     });
   });
 
   describe("AxisLabel", () => {
     it("has appropriate css class", () => {
       const label = new Plottable.Components.AxisLabel("Axis Label");
-      const svg = TestMethods.generateSVG();
-      label.renderTo(svg);
+      const div = TestMethods.generateDiv();
+      label.renderTo(div);
 
       assert.isTrue(label.hasClass(LABEL_CLASS), "element has label css class");
       assert.isTrue(label.hasClass(Plottable.Components.AxisLabel.AXIS_LABEL_CLASS), "title element has axis-label css class");
-      svg.remove();
+      div.remove();
     });
   });
 });

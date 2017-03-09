@@ -16,41 +16,41 @@
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
-/******/
+
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
-/******/
+
 /******/ 		// Check if module is in cache
 /******/ 		if(installedModules[moduleId])
 /******/ 			return installedModules[moduleId].exports;
-/******/
+
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
 /******/ 			l: false,
 /******/ 			exports: {}
 /******/ 		};
-/******/
+
 /******/ 		// Execute the module function
 /******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/
+
 /******/ 		// Flag the module as loaded
 /******/ 		module.l = true;
-/******/
+
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-/******/
-/******/
+
+
 /******/ 	// expose the modules object (__webpack_modules__)
 /******/ 	__webpack_require__.m = modules;
-/******/
+
 /******/ 	// expose the module cache
 /******/ 	__webpack_require__.c = installedModules;
-/******/
+
 /******/ 	// identity function for calling harmony imports with the correct context
 /******/ 	__webpack_require__.i = function(value) { return value; };
-/******/
+
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
 /******/ 		if(!__webpack_require__.o(exports, name)) {
@@ -61,7 +61,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 			});
 /******/ 		}
 /******/ 	};
-/******/
+
 /******/ 	// getDefaultExport function for compatibility with non-harmony modules
 /******/ 	__webpack_require__.n = function(module) {
 /******/ 		var getter = module && module.__esModule ?
@@ -70,13 +70,13 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 		__webpack_require__.d(getter, 'a', getter);
 /******/ 		return getter;
 /******/ 	};
-/******/
+
 /******/ 	// Object.prototype.hasOwnProperty.call
 /******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-/******/
+
 /******/ 	// __webpack_public_path__
 /******/ 	__webpack_require__.p = "";
-/******/
+
 /******/ 	// Load entry module and return exports
 /******/ 	return __webpack_require__(__webpack_require__.s = 124);
 /******/ })
@@ -94,24 +94,24 @@ return /******/ (function(modules) { // webpackBootstrap
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-var Array = __webpack_require__(95);
+var Array = __webpack_require__(94);
 exports.Array = Array;
-var Color = __webpack_require__(98);
+var Color = __webpack_require__(96);
 exports.Color = Color;
-var DOM = __webpack_require__(40);
+var DOM = __webpack_require__(97);
 exports.DOM = DOM;
 var Math = __webpack_require__(28);
 exports.Math = Math;
-var Stacking = __webpack_require__(101);
+var Stacking = __webpack_require__(100);
 exports.Stacking = Stacking;
 var Window = __webpack_require__(102);
 exports.Window = Window;
-__export(__webpack_require__(96));
-__export(__webpack_require__(97));
+__export(__webpack_require__(95));
 __export(__webpack_require__(11));
+__export(__webpack_require__(98));
 __export(__webpack_require__(99));
-__export(__webpack_require__(100));
-__export(__webpack_require__(41));
+__export(__webpack_require__(40));
+__export(__webpack_require__(101));
 
 
 /***/ }),
@@ -155,7 +155,7 @@ var Plot = (function (_super) {
         this._dataChanged = false;
         this._animate = false;
         this._animators = {};
-        this._clipPathEnabled = true;
+        this._overflowHidden = true;
         this.addClass("plot");
         this._datasetToDrawer = new Utils.Map();
         this._attrBindings = d3.map();
@@ -637,14 +637,14 @@ exports.Plot = Plot;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-var TickGenerators = __webpack_require__(93);
+var TickGenerators = __webpack_require__(92);
 exports.TickGenerators = TickGenerators;
 __export(__webpack_require__(39));
+__export(__webpack_require__(88));
 __export(__webpack_require__(89));
 __export(__webpack_require__(90));
 __export(__webpack_require__(91));
-__export(__webpack_require__(92));
-__export(__webpack_require__(94));
+__export(__webpack_require__(93));
 // ---------------------------------------------------------
 var categoryScale_2 = __webpack_require__(39);
 var quantitativeScale_1 = __webpack_require__(10);
@@ -675,12 +675,12 @@ exports.isTransformable = isTransformable;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(42));
-__export(__webpack_require__(45));
+__export(__webpack_require__(41));
+__export(__webpack_require__(44));
 __export(__webpack_require__(117));
 __export(__webpack_require__(18));
-__export(__webpack_require__(47));
-__export(__webpack_require__(49));
+__export(__webpack_require__(46));
+__export(__webpack_require__(48));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
@@ -697,17 +697,46 @@ var d3 = __webpack_require__(1);
 var RenderController = __webpack_require__(25);
 var Utils = __webpack_require__(0);
 var coerceD3_1 = __webpack_require__(11);
+/**
+ * Components are the core logical units that build Plottable visualizations.
+ *
+ * This class deals with Component lifecycle (anchoring, getting a size, and rendering
+ * infrastructure), as well as building the framework of DOM elements for all Components.
+ */
 var Component = (function () {
     function Component() {
-        this._clipPathEnabled = false;
-        this._origin = { x: 0, y: 0 }; // Origin of the coordinate space for the Component.
+        /**
+         * Subclasses should set this to true in their constructor to prevent content from overflowing.
+         */
+        this._overflowHidden = false;
+        /**
+         * Origin of this Component relative to its parent.
+         */
+        this._origin = { x: 0, y: 0 };
         this._xAlignment = "left";
         this._yAlignment = "top";
         this._isSetup = false;
         this._isAnchored = false;
+        /**
+         * List of "boxes"; SVGComponent has a "box" API that lets subclasses add boxes
+         * with "addBox". Two boxes are added:
+         *
+         * .background-fill - for the background container (unclear what it's use is)
+         * .bounding-box - this._boundingBox
+         *
+         * boxes get their width/height attributes updated in computeLayout.
+         *
+         * I think this API is to make an idea of a "100% width/height" box that could be
+         * useful in a variety of situations. But enumerating the three usages of it, it
+         * doesn't look like it's being used very much.
+         *
+         * TODO possily remove in HTML world
+         */
         this._boxes = [];
-        this._isTopLevelComponent = false;
         this._cssClasses = new Utils.Set();
+        /**
+         * If .destroy() has been called on this Component.
+         */
         this._destroyed = false;
         this._onAnchorCallbacks = new Utils.CallbackSet();
         this._onDetachCallbacks = new Utils.CallbackSet();
@@ -724,30 +753,17 @@ var Component = (function () {
         if (this._destroyed) {
             throw new Error("Can't reuse destroy()-ed Components!");
         }
-        this._isTopLevelComponent = selection.node().nodeName.toLowerCase() === "svg";
-        if (this._isTopLevelComponent) {
-            // svg node gets the "plottable" CSS class
-            this._rootSVG = selection;
-            this._rootSVG.classed("plottable", true);
-            // visible overflow for firefox https://stackoverflow.com/questions/5926986/why-does-firefox-appear-to-truncate-embedded-svgs
-            this._rootSVG.style("overflow", "visible");
-            // HACKHACK: Safari fails to register events on the <svg> itself
-            var safariBacking = this._rootSVG.select("." + Component._SAFARI_EVENT_BACKING_CLASS);
-            if (safariBacking.empty()) {
-                this._rootSVG.append("rect").classed(Component._SAFARI_EVENT_BACKING_CLASS, true).attrs({
-                    x: 0,
-                    y: 0,
-                    width: "100%",
-                    height: "100%",
-                }).style("opacity", 0);
-            }
+        if (this.isRoot()) {
+            this._rootElement = selection;
+            // rootElement gets the "plottable" CSS class
+            this._rootElement.classed("plottable", true);
         }
         if (this._element != null) {
             // reattach existing element
             selection.node().appendChild(this._element.node());
         }
         else {
-            this._element = selection.append("g");
+            this._element = selection.append("div");
             this._setup();
         }
         this._isAnchored = true;
@@ -793,15 +809,17 @@ var Component = (function () {
             _this._element.classed(cssClass, true);
         });
         this._cssClasses = new Utils.Set();
-        this._backgroundContainer = this._element.append("g").classed("background-container", true);
+        this._backgroundContainer = this._element.append("svg").classed("background-container", true);
         this._addBox("background-fill", this._backgroundContainer);
-        this._content = this._element.append("g").classed("content", true);
-        this._foregroundContainer = this._element.append("g").classed("foreground-container", true);
-        this._boxContainer = this._element.append("g").classed("box-container", true);
-        if (this._clipPathEnabled) {
-            this._generateClipPath();
+        this._content = this._element.append("svg").classed("content", true);
+        this._foregroundContainer = this._element.append("svg").classed("foreground-container", true);
+        this._boxContainer = this._element.append("svg").classed("box-container", true);
+        if (this._overflowHidden) {
+            this._content.classed("component-overflow-hidden", true);
         }
-        ;
+        else {
+            this._content.classed("component-overflow-visible", true);
+        }
         this._boundingBox = this._addBox("bounding-box");
         this._isSetup = true;
     };
@@ -834,24 +852,15 @@ var Component = (function () {
             if (this._element == null) {
                 throw new Error("anchor() must be called before computeLayout()");
             }
-            else if (this._isTopLevelComponent) {
-                // we are the root node, retrieve height/width from root SVG
+            else if (this._rootElement != null) {
+                // retrieve height/width from rootElement
                 origin = { x: 0, y: 0 };
-                // Set width/height to 100% if not specified, to allow accurate size calculation
-                // see http://www.w3.org/TR/CSS21/visudet.html#block-replaced-width
-                // and http://www.w3.org/TR/CSS21/visudet.html#inline-replaced-height
-                if (this._rootSVG.attr("width") == null) {
-                    this._rootSVG.attr("width", "100%");
-                }
-                if (this._rootSVG.attr("height") == null) {
-                    this._rootSVG.attr("height", "100%");
-                }
-                var elem = this._rootSVG.node();
+                var elem = this._rootElement.node();
                 availableWidth = Utils.DOM.elementWidth(elem);
                 availableHeight = Utils.DOM.elementHeight(elem);
             }
             else {
-                throw new Error("null arguments cannot be passed to computeLayout() on a non-root node");
+                throw new Error("null arguments cannot be passed to computeLayout() on a non-root, unanchored node");
             }
         }
         var size = this._sizeFromOffer(availableWidth, availableHeight);
@@ -863,7 +872,12 @@ var Component = (function () {
             x: origin.x + (availableWidth - this.width()) * xAlignProportion,
             y: origin.y + (availableHeight - this.height()) * yAlignProportion,
         };
-        this._element.attr("transform", "translate(" + this._origin.x + "," + this._origin.y + ")");
+        this._element.styles({
+            left: this._origin.x + "px",
+            height: this.height() + "px",
+            top: this._origin.y + "px",
+            width: this.width() + "px",
+        });
         this._boxes.forEach(function (b) { return b.attr("width", _this.width()).attr("height", _this.height()); });
         if (this._resizeHandler != null) {
             this._resizeHandler(size);
@@ -908,9 +922,6 @@ var Component = (function () {
      * Component, Table, and Group; render them immediately with .renderTo() instead.
      */
     Component.prototype.renderImmediately = function () {
-        if (this._clipPathEnabled) {
-            this._updateClipPath();
-        }
         return this;
     };
     /**
@@ -920,7 +931,7 @@ var Component = (function () {
      */
     Component.prototype.redraw = function () {
         if (this._isAnchored && this._isSetup) {
-            if (this._isTopLevelComponent) {
+            if (this.isRoot()) {
                 this._scheduleComputeLayout();
             }
             else {
@@ -940,9 +951,9 @@ var Component = (function () {
         // Core component has no caching.
     };
     /**
-     * Renders the Component to a given <svg>.
+     * Renders the Component to a given HTML Element.
      *
-     * @param {String|d3.Selection} element A selector-string for the <svg>, or a d3 selection containing an <svg>.
+     * @param {String|d3.Selection} element The element, a selector string for the element, or a d3.Selection for the element.
      * @returns {Component} The calling Component.
      */
     Component.prototype.renderTo = function (element) {
@@ -958,8 +969,11 @@ var Component = (function () {
             else {
                 selection = coerceD3_1.coerceExternalD3(element);
             }
-            if (!selection.node() || selection.node().nodeName.toLowerCase() !== "svg") {
-                throw new Error("Plottable requires a valid SVG to renderTo");
+            if (!selection.node() || selection.node().nodeName == null) {
+                throw new Error("Plottable requires a valid Element to renderTo");
+            }
+            if (selection.node().nodeName === "svg") {
+                throw new Error("Plottable 3.x and later can only renderTo an HTML component; pass a div instead!");
             }
             this.anchor(selection);
         }
@@ -1011,20 +1025,6 @@ var Component = (function () {
             box.attr("width", this.width()).attr("height", this.height());
         }
         return box;
-    };
-    Component.prototype._generateClipPath = function () {
-        // The clip path will prevent content from overflowing its Component space.
-        this._clipPathID = Utils.DOM.generateUniqueClipPathId();
-        var clipPathParent = this._boxContainer.append("clipPath").attr("id", this._clipPathID);
-        this._addBox("clip-rect", clipPathParent);
-        this._updateClipPath();
-    };
-    Component.prototype._updateClipPath = function () {
-        // HACKHACK: IE <= 9 does not respect the HTML base element in SVG.
-        // They don't need the current URL in the clip path reference.
-        var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
-        prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
-        this._element.attr("clip-path", "url(\"" + prefix + "#" + this._clipPathID + "\")");
     };
     /**
      * Checks if the Component has a given CSS class.
@@ -1103,9 +1103,6 @@ var Component = (function () {
         this.parent(null);
         if (this._isAnchored) {
             this._element.remove();
-            if (this._isTopLevelComponent) {
-                this._rootSVG.select("." + Component._SAFARI_EVENT_BACKING_CLASS).remove();
-            }
         }
         this._isAnchored = false;
         this._onDetachCallbacks.callCallbacks(this);
@@ -1188,11 +1185,11 @@ var Component = (function () {
         };
     };
     /**
-     * Gets the origin of the Component relative to the root <svg>.
+     * Gets the origin of the Component relative to the root Component.
      *
      * @return {Point}
      */
-    Component.prototype.originToSVG = function () {
+    Component.prototype.originToRoot = function () {
         var origin = this.origin();
         var ancestor = this.parent();
         while (ancestor != null) {
@@ -1202,6 +1199,20 @@ var Component = (function () {
             ancestor = ancestor.parent();
         }
         return origin;
+    };
+    /**
+     * Gets the root component of the hierarchy. If the provided
+     * component is the root, that component will be returned.
+     */
+    Component.prototype.root = function () {
+        var component = this;
+        while (!component.isRoot()) {
+            component = component.parent();
+        }
+        return component;
+    };
+    Component.prototype.isRoot = function () {
+        return this.parent() == null;
     };
     /**
      * Gets the Selection containing the <g> in front of the visual elements of the Component.
@@ -1214,7 +1225,7 @@ var Component = (function () {
         return this._foregroundContainer;
     };
     /**
-     * Gets a Selection containing a <g> that holds the visual elements of the Component.
+     * Gets the SVG that holds the visual elements of the Component.
      *
      * Will return undefined if the Component has not been anchored.
      *
@@ -1222,6 +1233,18 @@ var Component = (function () {
      */
     Component.prototype.content = function () {
         return this._content;
+    };
+    /**
+     * Returns the HTML Element at the root of this component's DOM tree.
+     */
+    Component.prototype.element = function () {
+        return this._element;
+    };
+    /**
+     * Returns the top-level user supplied element that roots the tree that this Component lives in.
+     */
+    Component.prototype.rootElement = function () {
+        return this.root()._rootElement;
     };
     /**
      * Gets the Selection containing the <g> behind the visual elements of the Component.
@@ -1243,7 +1266,6 @@ var Component = (function () {
         "center": 0.5,
         "bottom": 1,
     };
-    Component._SAFARI_EVENT_BACKING_CLASS = "safari-event-backing";
     return Component;
 }());
 exports.Component = Component;
@@ -1262,8 +1284,8 @@ exports.Component = Component;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+__export(__webpack_require__(53));
 __export(__webpack_require__(54));
-__export(__webpack_require__(55));
 
 
 /***/ }),
@@ -1279,6 +1301,16 @@ __export(__webpack_require__(55));
 var d3 = __webpack_require__(1);
 var Utils = __webpack_require__(0);
 var coerceD3_1 = __webpack_require__(11);
+/**
+ * A Drawer is responsible for actually committing the DrawSteps to the DOM. You first pass a renderArea
+ * to the Drawer, which is the root DOM node holding all the drawing elements. Subclasses set an _svgElementName
+ * which is an HTML/SVG tag name. Then you call .draw() with the DrawSteps to draw, and the Drawer will draw
+ * to the DOM by clearing old DOM elements, adding new DOM elements, and then passing those DOM elements to
+ * the animator, which will set the appropriate attributes on the DOM.
+ *
+ * "Drawing" in Plottable really means "making the DOM elements and their attributes correctly reflect
+ * the data being passed in".
+ */
 var Drawer = (function () {
     /**
      * A Drawer draws svg elements based on the input Dataset.
@@ -1678,13 +1710,13 @@ function verifyPrecision(precision) {
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+__export(__webpack_require__(69));
 __export(__webpack_require__(70));
 __export(__webpack_require__(71));
 __export(__webpack_require__(72));
 __export(__webpack_require__(73));
 __export(__webpack_require__(74));
 __export(__webpack_require__(75));
-__export(__webpack_require__(76));
 
 
 /***/ }),
@@ -2006,9 +2038,9 @@ exports.coerceExternalD3 = coerceExternalD3;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+__export(__webpack_require__(66));
 __export(__webpack_require__(67));
 __export(__webpack_require__(68));
-__export(__webpack_require__(69));
 
 
 /***/ }),
@@ -2024,11 +2056,11 @@ __export(__webpack_require__(69));
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+__export(__webpack_require__(76));
 __export(__webpack_require__(77));
-__export(__webpack_require__(78));
 __export(__webpack_require__(32));
+__export(__webpack_require__(78));
 __export(__webpack_require__(79));
-__export(__webpack_require__(80));
 
 
 /***/ }),
@@ -2111,7 +2143,7 @@ var Interaction = (function () {
      * @return {Point} The same location in Component-space coordinates.
      */
     Interaction.prototype._translateToComponentSpace = function (p) {
-        var origin = this._componentAttachedTo.originToSVG();
+        var origin = this._componentAttachedTo.originToRoot();
         return {
             x: p.x - origin.x,
             y: p.y - origin.y,
@@ -2514,15 +2546,15 @@ function __export(m) {
 __export(__webpack_require__(36));
 __export(__webpack_require__(22));
 __export(__webpack_require__(37));
-__export(__webpack_require__(81));
+__export(__webpack_require__(80));
 __export(__webpack_require__(38));
+__export(__webpack_require__(81));
 __export(__webpack_require__(82));
 __export(__webpack_require__(83));
 __export(__webpack_require__(84));
 __export(__webpack_require__(85));
 __export(__webpack_require__(86));
 __export(__webpack_require__(87));
-__export(__webpack_require__(88));
 
 
 /***/ }),
@@ -4663,7 +4695,7 @@ var ComponentContainer = (function (_super) {
         var _this = this;
         selection = coerceD3_1.coerceExternalD3(selection);
         _super.prototype.anchor.call(this, selection);
-        this._forEach(function (c) { return c.anchor(_this.content()); });
+        this._forEach(function (c) { return c.anchor(_this.element()); });
         return this;
     };
     ComponentContainer.prototype.render = function () {
@@ -4680,7 +4712,7 @@ var ComponentContainer = (function (_super) {
         component.parent(this);
         component.onDetach(this._detachCallback);
         if (this._isAnchored) {
-            component.anchor(this.content());
+            component.anchor(this.element());
         }
     };
     /**
@@ -5457,18 +5489,18 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 __export(__webpack_require__(27));
+__export(__webpack_require__(57));
 __export(__webpack_require__(58));
-__export(__webpack_require__(59));
 __export(__webpack_require__(33));
 __export(__webpack_require__(34));
+__export(__webpack_require__(59));
 __export(__webpack_require__(60));
 __export(__webpack_require__(61));
 __export(__webpack_require__(62));
-__export(__webpack_require__(63));
 __export(__webpack_require__(35));
+__export(__webpack_require__(63));
 __export(__webpack_require__(64));
 __export(__webpack_require__(65));
-__export(__webpack_require__(66));
 var Alignment = (function () {
     function Alignment() {
     }
@@ -5569,7 +5601,7 @@ var Key = (function (_super) {
     }
     Key.prototype._anchor = function (component) {
         _super.prototype._anchor.call(this, component);
-        this._positionDispatcher = Dispatchers.Mouse.getDispatcher(this._componentAttachedTo._element.node());
+        this._positionDispatcher = Dispatchers.Mouse.getDispatcher(this._componentAttachedTo);
         this._positionDispatcher.onMouseMove(this._mouseMoveCallback);
         this._keyDispatcher = Dispatchers.Key.getDispatcher();
         this._keyDispatcher.onKeyDown(this._keyDownCallback);
@@ -5799,7 +5831,7 @@ var GuideLineLayer = (function (_super) {
             throw new Error(orientation + " is not a valid orientation for GuideLineLayer");
         }
         this._orientation = orientation;
-        this._clipPathEnabled = true;
+        this._overflowHidden = true;
         this.addClass("guide-line-layer");
         if (this._isVertical()) {
             this.addClass("vertical");
@@ -5961,7 +5993,7 @@ var SelectionBoxLayer = (function (_super) {
         this._adjustBoundsCallback = function () {
             _this.render();
         };
-        this._clipPathEnabled = true;
+        this._overflowHidden = true;
         this._xExtent = [undefined, undefined];
         this._yExtent = [undefined, undefined];
     }
@@ -6730,6 +6762,11 @@ var Line = (function (_super) {
             return curve;
         }
     };
+    /**
+     * Line plots represent each dataset with a single <path> element, so we wrap the dataset data in a single element array.
+     * @returns {Map<Dataset, any[]>}
+     * @private
+     */
     Line.prototype._getDataToDraw = function () {
         var _this = this;
         var dataToDraw = new Utils.Map();
@@ -7049,261 +7086,6 @@ exports.Category = Category;
  * @license MIT
  */
 
-var nativeMath = window.Math;
-/**
- * Gets the bounding box of an element.
- * @param {d3.Selection} element
- * @returns {SVGRed} The bounding box.
- */
-function elementBBox(element) {
-    var bbox;
-    // HACKHACK: Firefox won't correctly measure nodes with style "display: none" or their descendents (FF Bug 612118).
-    try {
-        bbox = element.node().getBBox();
-    }
-    catch (err) {
-        bbox = { x: 0, y: 0, width: 0, height: 0 };
-    }
-    return bbox;
-}
-exports.elementBBox = elementBBox;
-/**
- * Screen refresh rate which is assumed to be 60fps
- */
-exports.SCREEN_REFRESH_RATE_MILLISECONDS = 1000 / 60;
-/**
- * Polyfill for `window.requestAnimationFrame`.
- * If the function exists, then we use the function directly.
- * Otherwise, we set a timeout on `SCREEN_REFRESH_RATE_MILLISECONDS` and then perform the function.
- *
- * @param {() => void} callback The callback to call in the next animation frame
- */
-function requestAnimationFramePolyfill(callback) {
-    if (window.requestAnimationFrame != null) {
-        window.requestAnimationFrame(callback);
-    }
-    else {
-        setTimeout(callback, exports.SCREEN_REFRESH_RATE_MILLISECONDS);
-    }
-}
-exports.requestAnimationFramePolyfill = requestAnimationFramePolyfill;
-/**
- * Calculates the width of the element.
- * The width includes the padding and the border on the element's left and right sides.
- *
- * @param {Element} element The element to query
- * @returns {number} The width of the element.
- */
-function elementWidth(element) {
-    var style = window.getComputedStyle(element);
-    return _parseStyleValue(style, "width")
-        + _parseStyleValue(style, "padding-left")
-        + _parseStyleValue(style, "padding-right")
-        + _parseStyleValue(style, "border-left-width")
-        + _parseStyleValue(style, "border-right-width");
-}
-exports.elementWidth = elementWidth;
-/**
- * Calculates the height of the element.
- * The height includes the padding the and the border on the element's top and bottom sides.
- *
- * @param {Element} element The element to query
- * @returns {number} The height of the element
- */
-function elementHeight(element) {
-    var style = window.getComputedStyle(element);
-    return _parseStyleValue(style, "height")
-        + _parseStyleValue(style, "padding-top")
-        + _parseStyleValue(style, "padding-bottom")
-        + _parseStyleValue(style, "border-top-width")
-        + _parseStyleValue(style, "border-bottom-width");
-}
-exports.elementHeight = elementHeight;
-// taken from the BNF at https://www.w3.org/TR/SVG/coords.html
-var WSP = "\\s";
-var NUMBER = "(?:[-+]?[0-9]*\\.?[0-9]+)";
-var COMMA_WSP = "(?:(?:" + WSP + "+,?" + WSP + "*)|(?:," + WSP + "*))";
-var TRANSLATE_REGEX = new RegExp("translate" + WSP + "*\\(" + WSP + "*(" + NUMBER + ")(?:" + COMMA_WSP + "(" + NUMBER + "))?" + WSP + "*\\)");
-var ROTATE_REGEX = new RegExp("rotate" + WSP + "*\\(" + WSP + "*(" + NUMBER + ")" + WSP + "*\\)");
-var SCALE_REGEX = new RegExp("scale" + WSP + "*\\(" + WSP + "*(" + NUMBER + ")(?:" + COMMA_WSP + "(" + NUMBER + "))?" + WSP + "*\\)");
-/**
- * Accepts selections whose .transform contain a "translate(a, b)" and extracts the a and b
- */
-function getTranslateValues(el) {
-    var match = TRANSLATE_REGEX.exec(el.attr("transform"));
-    if (match != null) {
-        var translateX = match[1], _a = match[2], translateY = _a === void 0 ? 0 : _a;
-        return [+translateX, +translateY];
-    }
-    else {
-        return [0, 0];
-    }
-}
-exports.getTranslateValues = getTranslateValues;
-/**
- * Accepts selections whose .transform contain a "rotate(angle)" and returns the angle
- */
-function getRotate(el) {
-    var match = ROTATE_REGEX.exec(el.attr("transform"));
-    if (match != null) {
-        var rotation = match[1];
-        return +rotation;
-    }
-    else {
-        return 0;
-    }
-}
-exports.getRotate = getRotate;
-function getScaleValues(el) {
-    var match = SCALE_REGEX.exec(el.attr("transform"));
-    if (match != null) {
-        var scaleX = match[1], scaleY = match[2];
-        return [+scaleX, scaleY == null ? +scaleX : +scaleY];
-    }
-    else {
-        return [0, 0];
-    }
-}
-exports.getScaleValues = getScaleValues;
-/**
- * Checks if the first ClientRect overlaps the second.
- *
- * @param {ClientRect} clientRectA The first ClientRect
- * @param {ClientRect} clientRectB The second ClientRect
- * @returns {boolean} If the ClientRects overlap each other.
- */
-function clientRectsOverlap(clientRectA, clientRectB) {
-    if (nativeMath.floor(clientRectA.right) <= nativeMath.ceil(clientRectB.left)) {
-        return false;
-    }
-    if (nativeMath.ceil(clientRectA.left) >= nativeMath.floor(clientRectB.right)) {
-        return false;
-    }
-    if (nativeMath.floor(clientRectA.bottom) <= nativeMath.ceil(clientRectB.top)) {
-        return false;
-    }
-    if (nativeMath.ceil(clientRectA.top) >= nativeMath.floor(clientRectB.bottom)) {
-        return false;
-    }
-    return true;
-}
-exports.clientRectsOverlap = clientRectsOverlap;
-/**
- * Return a new ClientRect that is the old ClientRect expanded by amount in all directions.
- * @param rect
- * @param amount
- */
-function expandRect(rect, amount) {
-    return {
-        left: rect.left - amount,
-        top: rect.top - amount,
-        right: rect.right + amount,
-        bottom: rect.bottom + amount,
-        width: rect.width + amount * 2,
-        height: rect.height + amount * 2
-    };
-}
-exports.expandRect = expandRect;
-/**
- * Returns true if and only if innerClientRect is inside outerClientRect.
- *
- * @param {ClientRect} innerClientRect The first ClientRect
- * @param {ClientRect} outerClientRect The second ClientRect
- * @returns {boolean} If and only if the innerClientRect is inside outerClientRect.
- */
-function clientRectInside(innerClientRect, outerClientRect) {
-    return (nativeMath.floor(outerClientRect.left) <= nativeMath.ceil(innerClientRect.left) &&
-        nativeMath.floor(outerClientRect.top) <= nativeMath.ceil(innerClientRect.top) &&
-        nativeMath.floor(innerClientRect.right) <= nativeMath.ceil(outerClientRect.right) &&
-        nativeMath.floor(innerClientRect.bottom) <= nativeMath.ceil(outerClientRect.bottom));
-}
-exports.clientRectInside = clientRectInside;
-/**
- * Retrieves the bounding svg of the input element
- *
- * @param {SVGElement} element The element to query
- * @returns {SVGElement} The bounding svg
- */
-function boundingSVG(element) {
-    var ownerSVG = element.ownerSVGElement;
-    if (ownerSVG != null) {
-        return ownerSVG;
-    }
-    if (element.nodeName.toLowerCase() === "svg") {
-        return element;
-    }
-    return null; // not in the DOM
-}
-exports.boundingSVG = boundingSVG;
-var _latestClipPathId = 0;
-/**
- * Generates a ClipPath ID that is unique for this instance of Plottable
- */
-function generateUniqueClipPathId() {
-    return "plottableClipPath" + ++_latestClipPathId;
-}
-exports.generateUniqueClipPathId = generateUniqueClipPathId;
-/**
- * Returns true if the supplied coordinates or Ranges intersect or are contained by bbox.
- *
- * @param {number | Range} xValOrRange The x coordinate or Range to test
- * @param {number | Range} yValOrRange The y coordinate or Range to test
- * @param {SVGRect} bbox The bbox
- * @param {number} tolerance Amount by which to expand bbox, in each dimension, before
- * testing intersection
- *
- * @returns {boolean} True if the supplied coordinates or Ranges intersect or are
- * contained by bbox, false otherwise.
- */
-function intersectsBBox(xValOrRange, yValOrRange, bbox, tolerance) {
-    if (tolerance === void 0) { tolerance = 0.5; }
-    var xRange = _parseRange(xValOrRange);
-    var yRange = _parseRange(yValOrRange);
-    // SVGRects are positioned with sub-pixel accuracy (the default unit
-    // for the x, y, height & width attributes), but user selections (e.g. via
-    // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
-    // seems appropriate.
-    return bbox.x + bbox.width >= xRange.min - tolerance &&
-        bbox.x <= xRange.max + tolerance &&
-        bbox.y + bbox.height >= yRange.min - tolerance &&
-        bbox.y <= yRange.max + tolerance;
-}
-exports.intersectsBBox = intersectsBBox;
-/**
- * Create a Range from a number or an object with "min" and "max" defined.
- *
- * @param {any} input The object to parse
- *
- * @returns {Range} The generated Range
- */
-function _parseRange(input) {
-    if (typeof (input) === "number") {
-        var value = input;
-        return { min: value, max: value };
-    }
-    var range = input;
-    if (range instanceof Object && "min" in range && "max" in range) {
-        return range;
-    }
-    throw new Error("input '" + input + "' can't be parsed as an Range");
-}
-function _parseStyleValue(style, property) {
-    var value = style.getPropertyValue(property);
-    var parsedValue = parseFloat(value);
-    return parsedValue || 0;
-}
-
-
-/***/ }),
-/* 41 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
-
 /**
  * Shim for ES6 set.
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set
@@ -7367,7 +7149,7 @@ exports.Set = Set;
 
 
 /***/ }),
-/* 42 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7385,7 +7167,7 @@ __export(__webpack_require__(114));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 43 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7401,7 +7183,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var utils_1 = __webpack_require__(18);
-var characterMeasurer_1 = __webpack_require__(44);
+var characterMeasurer_1 = __webpack_require__(43);
 var CacheCharacterMeasurer = (function (_super) {
     __extends(CacheCharacterMeasurer, _super);
     function CacheCharacterMeasurer(ruler, useGuards) {
@@ -7426,7 +7208,7 @@ exports.CacheCharacterMeasurer = CacheCharacterMeasurer;
 //# sourceMappingURL=cacheCharacterMeasurer.js.map
 
 /***/ }),
-/* 44 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7441,7 +7223,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var measurer_1 = __webpack_require__(46);
+var measurer_1 = __webpack_require__(45);
 var CharacterMeasurer = (function (_super) {
     __extends(CharacterMeasurer, _super);
     function CharacterMeasurer() {
@@ -7464,7 +7246,7 @@ exports.CharacterMeasurer = CharacterMeasurer;
 //# sourceMappingURL=characterMeasurer.js.map
 
 /***/ }),
-/* 45 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7478,14 +7260,14 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 __export(__webpack_require__(29));
-__export(__webpack_require__(43));
+__export(__webpack_require__(42));
 __export(__webpack_require__(116));
-__export(__webpack_require__(44));
-__export(__webpack_require__(46));
+__export(__webpack_require__(43));
+__export(__webpack_require__(45));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 46 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7545,7 +7327,7 @@ exports.Measurer = Measurer;
 //# sourceMappingURL=measurer.js.map
 
 /***/ }),
-/* 47 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7559,11 +7341,11 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 __export(__webpack_require__(122));
-__export(__webpack_require__(48));
+__export(__webpack_require__(47));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 48 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7790,7 +7572,7 @@ exports.Wrapper = Wrapper;
 //# sourceMappingURL=wrapper.js.map
 
 /***/ }),
-/* 49 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7807,7 +7589,7 @@ __export(__webpack_require__(123));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 50 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7819,13 +7601,13 @@ __export(__webpack_require__(123));
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+__export(__webpack_require__(55));
 __export(__webpack_require__(56));
-__export(__webpack_require__(57));
 __export(__webpack_require__(23));
 
 
 /***/ }),
-/* 51 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7897,7 +7679,7 @@ exports.Dataset = Dataset;
 
 
 /***/ }),
-/* 52 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7915,7 +7697,7 @@ exports.version = "3.0.0-beta.2";
 
 
 /***/ }),
-/* 53 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8014,7 +7796,7 @@ d3Transition.transition.prototype.styles = transition_styles;
 
 
 /***/ }),
-/* 54 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8191,7 +7973,7 @@ exports.Easing = Easing;
 
 
 /***/ }),
-/* 55 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8221,7 +8003,7 @@ exports.Null = Null;
 
 
 /***/ }),
-/* 56 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8593,7 +8375,7 @@ exports.Category = Category;
 
 
 /***/ }),
-/* 57 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8888,7 +8670,7 @@ exports.Numeric = Numeric;
 
 
 /***/ }),
-/* 58 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9077,7 +8859,7 @@ exports.DragLineLayer = DragLineLayer;
 
 
 /***/ }),
-/* 59 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9187,7 +8969,7 @@ exports.Gridlines = Gridlines;
 
 
 /***/ }),
-/* 60 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9447,7 +9229,7 @@ exports.InterpolatedColorLegend = InterpolatedColorLegend;
 
 
 /***/ }),
-/* 61 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9613,7 +9395,7 @@ exports.AxisLabel = AxisLabel;
 
 
 /***/ }),
-/* 62 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10124,7 +9906,7 @@ exports.Legend = Legend;
 
 
 /***/ }),
-/* 63 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10181,7 +9963,7 @@ exports.PlotGroup = PlotGroup;
 
 
 /***/ }),
-/* 64 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10580,7 +10362,7 @@ exports.Table = Table;
 
 
 /***/ }),
-/* 65 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10646,7 +10428,7 @@ exports.XDragBoxLayer = XDragBoxLayer;
 
 
 /***/ }),
-/* 66 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10712,7 +10494,7 @@ exports.YDragBoxLayer = YDragBoxLayer;
 
 
 /***/ }),
-/* 67 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10808,7 +10590,7 @@ exports.Key = Key;
 
 
 /***/ }),
-/* 68 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10830,39 +10612,38 @@ var Mouse = (function (_super) {
      * This constructor not be invoked directly.
      *
      * @constructor
-     * @param {SVGElement} svg The root <svg> to attach to.
      */
-    function Mouse(svg) {
+    function Mouse(component) {
         var _this = this;
         _super.call(this);
-        this._translator = Utils.ClientToSVGTranslator.getTranslator(svg);
+        this._translator = Utils.getTranslator(component);
         this._lastMousePosition = { x: -1, y: -1 };
-        var processMoveCallback = function (e) { return _this._measureAndDispatch(e, Mouse._MOUSEMOVE_EVENT_NAME, "page"); };
+        var processMoveCallback = function (e) { return _this._measureAndDispatch(component, e, Mouse._MOUSEMOVE_EVENT_NAME, "page"); };
         this._eventToProcessingFunction[Mouse._MOUSEOVER_EVENT_NAME] = processMoveCallback;
         this._eventToProcessingFunction[Mouse._MOUSEMOVE_EVENT_NAME] = processMoveCallback;
         this._eventToProcessingFunction[Mouse._MOUSEOUT_EVENT_NAME] = processMoveCallback;
         this._eventToProcessingFunction[Mouse._MOUSEDOWN_EVENT_NAME] =
-            function (e) { return _this._measureAndDispatch(e, Mouse._MOUSEDOWN_EVENT_NAME); };
+            function (e) { return _this._measureAndDispatch(component, e, Mouse._MOUSEDOWN_EVENT_NAME); };
         this._eventToProcessingFunction[Mouse._MOUSEUP_EVENT_NAME] =
-            function (e) { return _this._measureAndDispatch(e, Mouse._MOUSEUP_EVENT_NAME, "page"); };
+            function (e) { return _this._measureAndDispatch(component, e, Mouse._MOUSEUP_EVENT_NAME, "page"); };
         this._eventToProcessingFunction[Mouse._WHEEL_EVENT_NAME] =
-            function (e) { return _this._measureAndDispatch(e, Mouse._WHEEL_EVENT_NAME); };
+            function (e) { return _this._measureAndDispatch(component, e, Mouse._WHEEL_EVENT_NAME); };
         this._eventToProcessingFunction[Mouse._DBLCLICK_EVENT_NAME] =
-            function (e) { return _this._measureAndDispatch(e, Mouse._DBLCLICK_EVENT_NAME); };
+            function (e) { return _this._measureAndDispatch(component, e, Mouse._DBLCLICK_EVENT_NAME); };
     }
     /**
-     * Get a Mouse Dispatcher for the <svg> containing elem.
+     * Get a Mouse Dispatcher for the component tree.
      * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
      *
      * @param {SVGElement} elem
      * @return {Dispatchers.Mouse}
      */
-    Mouse.getDispatcher = function (elem) {
-        var svg = Utils.DOM.boundingSVG(elem);
-        var dispatcher = svg[Mouse._DISPATCHER_KEY];
+    Mouse.getDispatcher = function (component) {
+        var element = component.root().rootElement();
+        var dispatcher = element[Mouse._DISPATCHER_KEY];
         if (dispatcher == null) {
-            dispatcher = new Mouse(svg);
-            svg[Mouse._DISPATCHER_KEY] = dispatcher;
+            dispatcher = new Mouse(component);
+            element[Mouse._DISPATCHER_KEY] = dispatcher;
         }
         return dispatcher;
     };
@@ -10970,12 +10751,12 @@ var Mouse = (function (_super) {
      * Computes the mouse position from the given event, and if successful
      * calls all the callbacks in the provided callbackSet.
      */
-    Mouse.prototype._measureAndDispatch = function (event, eventName, scope) {
+    Mouse.prototype._measureAndDispatch = function (component, event, eventName, scope) {
         if (scope === void 0) { scope = "element"; }
         if (scope !== "page" && scope !== "element") {
             throw new Error("Invalid scope '" + scope + "', must be 'element' or 'page'");
         }
-        if (scope === "page" || this.eventInsideSVG(event)) {
+        if (scope === "page" || this.eventInside(component, event)) {
             var newMousePosition = this._translator.computePosition(event.clientX, event.clientY);
             if (newMousePosition != null) {
                 this._lastMousePosition = newMousePosition;
@@ -10983,8 +10764,8 @@ var Mouse = (function (_super) {
             }
         }
     };
-    Mouse.prototype.eventInsideSVG = function (event) {
-        return this._translator.insideSVG(event);
+    Mouse.prototype.eventInside = function (component, event) {
+        return this._translator.isInside(component, event);
     };
     /**
      * Returns the last computed mouse position in <svg> coordinate space.
@@ -11008,7 +10789,7 @@ exports.Mouse = Mouse;
 
 
 /***/ }),
-/* 69 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11029,34 +10810,33 @@ var Touch = (function (_super) {
     /**
      * This constructor should not be invoked directly.
      *
-     * @constructor
      * @param {SVGElement} svg The root <svg> to attach to.
      */
-    function Touch(svg) {
+    function Touch(component) {
         var _this = this;
         _super.call(this);
-        this._translator = Utils.ClientToSVGTranslator.getTranslator(svg);
+        this._translator = Utils.getTranslator(component);
         this._eventToProcessingFunction[Touch._TOUCHSTART_EVENT_NAME] =
-            function (e) { return _this._measureAndDispatch(e, Touch._TOUCHSTART_EVENT_NAME, "page"); };
+            function (e) { return _this._measureAndDispatch(component, e, Touch._TOUCHSTART_EVENT_NAME, "page"); };
         this._eventToProcessingFunction[Touch._TOUCHMOVE_EVENT_NAME] =
-            function (e) { return _this._measureAndDispatch(e, Touch._TOUCHMOVE_EVENT_NAME, "page"); };
+            function (e) { return _this._measureAndDispatch(component, e, Touch._TOUCHMOVE_EVENT_NAME, "page"); };
         this._eventToProcessingFunction[Touch._TOUCHEND_EVENT_NAME] =
-            function (e) { return _this._measureAndDispatch(e, Touch._TOUCHEND_EVENT_NAME, "page"); };
+            function (e) { return _this._measureAndDispatch(component, e, Touch._TOUCHEND_EVENT_NAME, "page"); };
         this._eventToProcessingFunction[Touch._TOUCHCANCEL_EVENT_NAME] =
-            function (e) { return _this._measureAndDispatch(e, Touch._TOUCHCANCEL_EVENT_NAME, "page"); };
+            function (e) { return _this._measureAndDispatch(component, e, Touch._TOUCHCANCEL_EVENT_NAME, "page"); };
     }
     /**
-     * Gets a Touch Dispatcher for the <svg> containing elem.
-     * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
+     * Gets a Touch Dispatcher for the component.
+     * If one already exists, it will be returned; otherwise, a new one will be created.
      *
-     * @param {SVGElement} elem
+     * @param component
      * @return {Dispatchers.Touch}
      */
-    Touch.getDispatcher = function (elem) {
-        var svg = Utils.DOM.boundingSVG(elem);
+    Touch.getDispatcher = function (component) {
+        var svg = component.root().rootElement();
         var dispatcher = svg[Touch._DISPATCHER_KEY];
         if (dispatcher == null) {
-            dispatcher = new Touch(svg);
+            dispatcher = new Touch(component);
             svg[Touch._DISPATCHER_KEY] = dispatcher;
         }
         return dispatcher;
@@ -11145,12 +10925,12 @@ var Touch = (function (_super) {
      * Computes the Touch position from the given event, and if successful
      * calls all the callbacks in the provided callbackSet.
      */
-    Touch.prototype._measureAndDispatch = function (event, eventName, scope) {
+    Touch.prototype._measureAndDispatch = function (component, event, eventName, scope) {
         if (scope === void 0) { scope = "element"; }
         if (scope !== "page" && scope !== "element") {
             throw new Error("Invalid scope '" + scope + "', must be 'element' or 'page'");
         }
-        if (scope === "element" && !this.eventInsideSVG(event)) {
+        if (scope === "element" && !this.eventInside(component, event)) {
             return;
         }
         var touches = event.changedTouches;
@@ -11170,8 +10950,8 @@ var Touch = (function (_super) {
             this._callCallbacksForEvent(eventName, touchIdentifiers, touchPositions, event);
         }
     };
-    Touch.prototype.eventInsideSVG = function (event) {
-        return this._translator.insideSVG(event);
+    Touch.prototype.eventInside = function (component, event) {
+        return this._translator.isInside(component, event);
     };
     Touch._DISPATCHER_KEY = "__Plottable_Dispatcher_Touch";
     Touch._TOUCHSTART_EVENT_NAME = "touchstart";
@@ -11184,7 +10964,7 @@ exports.Touch = Touch;
 
 
 /***/ }),
-/* 70 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11216,7 +10996,7 @@ exports.Arc = Arc;
 
 
 /***/ }),
-/* 71 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11248,7 +11028,7 @@ exports.ArcOutline = ArcOutline;
 
 
 /***/ }),
-/* 72 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11284,7 +11064,7 @@ exports.Area = Area;
 
 
 /***/ }),
-/* 73 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11320,7 +11100,7 @@ exports.Line = Line;
 
 
 /***/ }),
-/* 74 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11347,7 +11127,7 @@ exports.Rectangle = Rectangle;
 
 
 /***/ }),
-/* 75 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11374,7 +11154,7 @@ exports.Segment = Segment;
 
 
 /***/ }),
-/* 76 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11402,7 +11182,7 @@ exports.Symbol = Symbol;
 
 
 /***/ }),
-/* 77 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11441,11 +11221,11 @@ var Click = (function (_super) {
     }
     Click.prototype._anchor = function (component) {
         _super.prototype._anchor.call(this, component);
-        this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(component.content().node());
+        this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(component);
         this._mouseDispatcher.onMouseDown(this._mouseDownCallback);
         this._mouseDispatcher.onMouseUp(this._mouseUpCallback);
         this._mouseDispatcher.onDblClick(this._dblClickCallback);
-        this._touchDispatcher = Dispatchers.Touch.getDispatcher(component.content().node());
+        this._touchDispatcher = Dispatchers.Touch.getDispatcher(component);
         this._touchDispatcher.onTouchStart(this._touchStartCallback);
         this._touchDispatcher.onTouchEnd(this._touchEndCallback);
         this._touchDispatcher.onTouchCancel(this._touchCancelCallback);
@@ -11536,7 +11316,7 @@ exports.Click = Click;
 
 
 /***/ }),
-/* 78 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11572,11 +11352,11 @@ var Drag = (function (_super) {
     }
     Drag.prototype._anchor = function (component) {
         _super.prototype._anchor.call(this, component);
-        this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(this._componentAttachedTo.content().node());
+        this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(this._componentAttachedTo);
         this._mouseDispatcher.onMouseDown(this._mouseDownCallback);
         this._mouseDispatcher.onMouseMove(this._mouseMoveCallback);
         this._mouseDispatcher.onMouseUp(this._mouseUpCallback);
-        this._touchDispatcher = Dispatchers.Touch.getDispatcher(this._componentAttachedTo.content().node());
+        this._touchDispatcher = Dispatchers.Touch.getDispatcher(this._componentAttachedTo);
         this._touchDispatcher.onTouchStart(this._touchStartCallback);
         this._touchDispatcher.onTouchMove(this._touchMoveCallback);
         this._touchDispatcher.onTouchEnd(this._touchEndCallback);
@@ -11701,7 +11481,7 @@ exports.Drag = Drag;
 
 
 /***/ }),
-/* 79 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11807,9 +11587,9 @@ var PanZoom = (function (_super) {
     PanZoom.prototype._anchor = function (component) {
         _super.prototype._anchor.call(this, component);
         this._dragInteraction.attachTo(component);
-        this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(this._componentAttachedTo.content().node());
+        this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(this._componentAttachedTo);
         this._mouseDispatcher.onWheel(this._wheelCallback);
-        this._touchDispatcher = Dispatchers.Touch.getDispatcher(this._componentAttachedTo.content().node());
+        this._touchDispatcher = Dispatchers.Touch.getDispatcher(this._componentAttachedTo);
         this._touchDispatcher.onTouchStart(this._touchStartCallback);
         this._touchDispatcher.onTouchMove(this._touchMoveCallback);
         this._touchDispatcher.onTouchEnd(this._touchEndCallback);
@@ -12259,7 +12039,7 @@ exports.PanZoom = PanZoom;
 
 
 /***/ }),
-/* 80 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12290,9 +12070,9 @@ var Pointer = (function (_super) {
     }
     Pointer.prototype._anchor = function (component) {
         _super.prototype._anchor.call(this, component);
-        this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(this._componentAttachedTo.content().node());
+        this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(this._componentAttachedTo);
         this._mouseDispatcher.onMouseMove(this._mouseMoveCallback);
-        this._touchDispatcher = Dispatchers.Touch.getDispatcher(this._componentAttachedTo.content().node());
+        this._touchDispatcher = Dispatchers.Touch.getDispatcher(this._componentAttachedTo);
         this._touchDispatcher.onTouchStart(this._touchStartCallback);
     };
     Pointer.prototype._unanchor = function () {
@@ -12303,11 +12083,11 @@ var Pointer = (function (_super) {
         this._touchDispatcher = null;
     };
     Pointer.prototype._handleMouseEvent = function (p, e) {
-        var insideSVG = this._mouseDispatcher.eventInsideSVG(e);
+        var insideSVG = this._mouseDispatcher.eventInside(this._componentAttachedTo, e);
         this._handlePointerEvent(p, insideSVG);
     };
     Pointer.prototype._handleTouchEvent = function (p, e) {
-        var insideSVG = this._touchDispatcher.eventInsideSVG(e);
+        var insideSVG = this._touchDispatcher.eventInside(this._componentAttachedTo, e);
         this._handlePointerEvent(p, insideSVG);
     };
     Pointer.prototype._handlePointerEvent = function (p, insideSVG) {
@@ -12390,7 +12170,7 @@ exports.Pointer = Pointer;
 
 
 /***/ }),
-/* 81 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12463,7 +12243,7 @@ exports.ClusteredBar = ClusteredBar;
 
 
 /***/ }),
-/* 82 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12959,7 +12739,7 @@ exports.Pie = Pie;
 
 
 /***/ }),
-/* 83 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13324,7 +13104,7 @@ exports.Rectangle = Rectangle;
 
 
 /***/ }),
-/* 84 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13502,7 +13282,7 @@ exports.Scatter = Scatter;
 
 
 /***/ }),
-/* 85 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13700,7 +13480,7 @@ exports.Segment = Segment;
 
 
 /***/ }),
-/* 86 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13903,7 +13683,7 @@ exports.StackedArea = StackedArea;
 
 
 /***/ }),
-/* 87 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14121,7 +13901,7 @@ exports.StackedBar = StackedBar;
 
 
 /***/ }),
-/* 88 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14332,7 +14112,7 @@ exports.Waterfall = Waterfall;
 
 
 /***/ }),
-/* 89 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14463,7 +14243,7 @@ exports.Color = Color;
 
 
 /***/ }),
-/* 90 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14629,7 +14409,7 @@ exports.InterpolatedColor = InterpolatedColor;
 
 
 /***/ }),
-/* 91 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14708,7 +14488,7 @@ exports.Linear = Linear;
 
 
 /***/ }),
-/* 92 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14932,7 +14712,7 @@ exports.ModifiedLog = ModifiedLog;
 
 
 /***/ }),
-/* 93 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14982,7 +14762,7 @@ exports.integerTickGenerator = integerTickGenerator;
 
 
 /***/ }),
-/* 94 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15118,7 +14898,7 @@ exports.Time = Time;
 
 
 /***/ }),
-/* 95 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15188,7 +14968,7 @@ exports.createFilledArray = createFilledArray;
 
 
 /***/ }),
-/* 96 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15202,7 +14982,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var set_1 = __webpack_require__(41);
+var set_1 = __webpack_require__(40);
 /**
  * A set of callbacks which can be all invoked at once.
  * Each callback exists at most once in the set (based on reference equality).
@@ -15230,86 +15010,7 @@ exports.CallbackSet = CallbackSet;
 
 
 /***/ }),
-/* 97 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
-
-var DOM = __webpack_require__(40);
-var ClientToSVGTranslator = (function () {
-    function ClientToSVGTranslator(svg) {
-        this._svg = svg;
-        this._measureRect = document.createElementNS(svg.namespaceURI, "rect");
-        this._measureRect.setAttribute("class", "measure-rect");
-        this._measureRect.setAttribute("style", "opacity: 0; visibility: hidden;");
-        this._measureRect.setAttribute("stroke-width", "0");
-        this._measureRect.setAttribute("width", "1");
-        this._measureRect.setAttribute("height", "1");
-        this._svg.appendChild(this._measureRect);
-    }
-    /**
-     * Returns the ClientToSVGTranslator for the <svg> containing elem.
-     * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
-     */
-    ClientToSVGTranslator.getTranslator = function (elem) {
-        var svg = DOM.boundingSVG(elem);
-        var translator = svg[ClientToSVGTranslator._TRANSLATOR_KEY];
-        if (translator == null) {
-            translator = new ClientToSVGTranslator(svg);
-            svg[ClientToSVGTranslator._TRANSLATOR_KEY] = translator;
-        }
-        return translator;
-    };
-    /**
-     * Computes the position relative to the <svg> in svg-coordinate-space.
-     */
-    ClientToSVGTranslator.prototype.computePosition = function (clientX, clientY) {
-        // get the origin
-        this._measureRect.setAttribute("x", "0");
-        this._measureRect.setAttribute("y", "0");
-        var mrBCR = this._measureRect.getBoundingClientRect();
-        var origin = { x: mrBCR.left, y: mrBCR.top };
-        // calculate the scale
-        var sampleDistance = 100;
-        this._measureRect.setAttribute("x", String(sampleDistance));
-        this._measureRect.setAttribute("y", String(sampleDistance));
-        mrBCR = this._measureRect.getBoundingClientRect();
-        var testPoint = { x: mrBCR.left, y: mrBCR.top };
-        // invalid measurements -- SVG might not be in the DOM
-        if (origin.x === testPoint.x || origin.y === testPoint.y) {
-            return null;
-        }
-        var scaleX = (testPoint.x - origin.x) / sampleDistance;
-        var scaleY = (testPoint.y - origin.y) / sampleDistance;
-        // get the true cursor position
-        this._measureRect.setAttribute("x", String((clientX - origin.x) / scaleX));
-        this._measureRect.setAttribute("y", String((clientY - origin.y) / scaleY));
-        mrBCR = this._measureRect.getBoundingClientRect();
-        var trueCursorPosition = { x: mrBCR.left, y: mrBCR.top };
-        var scaledPosition = {
-            x: (trueCursorPosition.x - origin.x) / scaleX,
-            y: (trueCursorPosition.y - origin.y) / scaleY,
-        };
-        return scaledPosition;
-    };
-    /**
-     * Checks whether event happened inside <svg> element.
-     */
-    ClientToSVGTranslator.prototype.insideSVG = function (e) {
-        return DOM.boundingSVG(e.target) === this._svg;
-    };
-    ClientToSVGTranslator._TRANSLATOR_KEY = "__Plottable_ClientToSVGTranslator";
-    return ClientToSVGTranslator;
-}());
-exports.ClientToSVGTranslator = ClientToSVGTranslator;
-
-
-/***/ }),
-/* 98 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15392,7 +15093,255 @@ function luminance(color) {
 
 
 /***/ }),
-/* 99 */
+/* 97 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+var d3 = __webpack_require__(1);
+var nativeMath = window.Math;
+/**
+ * Returns whether the child is in fact a child of the parent
+ */
+function contains(parent, child) {
+    var maybeParent = child;
+    while (maybeParent != null && maybeParent !== parent) {
+        maybeParent = maybeParent.parentNode;
+    }
+    return maybeParent === parent;
+}
+exports.contains = contains;
+/**
+ * Gets the bounding box of an element.
+ * @param {d3.Selection} element
+ * @returns {SVGRed} The bounding box.
+ */
+function elementBBox(element) {
+    var bbox;
+    // HACKHACK: Firefox won't correctly measure nodes with style "display: none" or their descendents (FF Bug 612118).
+    try {
+        bbox = element.node().getBBox();
+    }
+    catch (err) {
+        bbox = { x: 0, y: 0, width: 0, height: 0 };
+    }
+    return bbox;
+}
+exports.elementBBox = elementBBox;
+/**
+ * Screen refresh rate which is assumed to be 60fps
+ */
+exports.SCREEN_REFRESH_RATE_MILLISECONDS = 1000 / 60;
+/**
+ * Polyfill for `window.requestAnimationFrame`.
+ * If the function exists, then we use the function directly.
+ * Otherwise, we set a timeout on `SCREEN_REFRESH_RATE_MILLISECONDS` and then perform the function.
+ *
+ * @param {() => void} callback The callback to call in the next animation frame
+ */
+function requestAnimationFramePolyfill(callback) {
+    if (window.requestAnimationFrame != null) {
+        window.requestAnimationFrame(callback);
+    }
+    else {
+        setTimeout(callback, exports.SCREEN_REFRESH_RATE_MILLISECONDS);
+    }
+}
+exports.requestAnimationFramePolyfill = requestAnimationFramePolyfill;
+/**
+ * Calculates the width of the element.
+ * The width includes the padding and the border on the element's left and right sides.
+ *
+ * @param {Element} element The element to query
+ * @returns {number} The width of the element.
+ */
+function elementWidth(elementOrSelection) {
+    var element = elementOrSelection instanceof d3.selection
+        ? elementOrSelection.node()
+        : elementOrSelection;
+    var style = window.getComputedStyle(element);
+    return _parseStyleValue(style, "width")
+        + _parseStyleValue(style, "padding-left")
+        + _parseStyleValue(style, "padding-right")
+        + _parseStyleValue(style, "border-left-width")
+        + _parseStyleValue(style, "border-right-width");
+}
+exports.elementWidth = elementWidth;
+/**
+ * Calculates the height of the element.
+ * The height includes the padding the and the border on the element's top and bottom sides.
+ *
+ * @param {Element} element The element to query
+ * @returns {number} The height of the element
+ */
+function elementHeight(elementOrSelection) {
+    var element = elementOrSelection instanceof d3.selection
+        ? elementOrSelection.node()
+        : elementOrSelection;
+    var style = window.getComputedStyle(element);
+    return _parseStyleValue(style, "height")
+        + _parseStyleValue(style, "padding-top")
+        + _parseStyleValue(style, "padding-bottom")
+        + _parseStyleValue(style, "border-top-width")
+        + _parseStyleValue(style, "border-bottom-width");
+}
+exports.elementHeight = elementHeight;
+// taken from the BNF at https://www.w3.org/TR/SVG/coords.html
+var WSP = "\\s";
+var NUMBER = "(?:[-+]?[0-9]*\\.?[0-9]+)";
+var COMMA_WSP = "(?:(?:" + WSP + "+,?" + WSP + "*)|(?:," + WSP + "*))";
+var TRANSLATE_REGEX = new RegExp("translate" + WSP + "*\\(" + WSP + "*(" + NUMBER + ")(?:" + COMMA_WSP + "(" + NUMBER + "))?" + WSP + "*\\)");
+var ROTATE_REGEX = new RegExp("rotate" + WSP + "*\\(" + WSP + "*(" + NUMBER + ")" + WSP + "*\\)");
+var SCALE_REGEX = new RegExp("scale" + WSP + "*\\(" + WSP + "*(" + NUMBER + ")(?:" + COMMA_WSP + "(" + NUMBER + "))?" + WSP + "*\\)");
+/**
+ * Accepts selections whose .transform contain a "translate(a, b)" and extracts the a and b
+ */
+function getTranslateValues(el) {
+    var match = TRANSLATE_REGEX.exec(el.attr("transform"));
+    if (match != null) {
+        var translateX = match[1], _a = match[2], translateY = _a === void 0 ? 0 : _a;
+        return [+translateX, +translateY];
+    }
+    else {
+        return [0, 0];
+    }
+}
+exports.getTranslateValues = getTranslateValues;
+/**
+ * Accepts selections whose .transform contain a "rotate(angle)" and returns the angle
+ */
+function getRotate(el) {
+    var match = ROTATE_REGEX.exec(el.attr("transform"));
+    if (match != null) {
+        var rotation = match[1];
+        return +rotation;
+    }
+    else {
+        return 0;
+    }
+}
+exports.getRotate = getRotate;
+function getScaleValues(el) {
+    var match = SCALE_REGEX.exec(el.attr("transform"));
+    if (match != null) {
+        var scaleX = match[1], scaleY = match[2];
+        return [+scaleX, scaleY == null ? +scaleX : +scaleY];
+    }
+    else {
+        return [0, 0];
+    }
+}
+exports.getScaleValues = getScaleValues;
+/**
+ * Checks if the first ClientRect overlaps the second.
+ *
+ * @param {ClientRect} clientRectA The first ClientRect
+ * @param {ClientRect} clientRectB The second ClientRect
+ * @returns {boolean} If the ClientRects overlap each other.
+ */
+function clientRectsOverlap(clientRectA, clientRectB) {
+    if (nativeMath.floor(clientRectA.right) <= nativeMath.ceil(clientRectB.left)) {
+        return false;
+    }
+    if (nativeMath.ceil(clientRectA.left) >= nativeMath.floor(clientRectB.right)) {
+        return false;
+    }
+    if (nativeMath.floor(clientRectA.bottom) <= nativeMath.ceil(clientRectB.top)) {
+        return false;
+    }
+    if (nativeMath.ceil(clientRectA.top) >= nativeMath.floor(clientRectB.bottom)) {
+        return false;
+    }
+    return true;
+}
+exports.clientRectsOverlap = clientRectsOverlap;
+/**
+ * Return a new ClientRect that is the old ClientRect expanded by amount in all directions.
+ * @param rect
+ * @param amount
+ */
+function expandRect(rect, amount) {
+    return {
+        left: rect.left - amount,
+        top: rect.top - amount,
+        right: rect.right + amount,
+        bottom: rect.bottom + amount,
+        width: rect.width + amount * 2,
+        height: rect.height + amount * 2
+    };
+}
+exports.expandRect = expandRect;
+/**
+ * Returns true if and only if innerClientRect is inside outerClientRect.
+ *
+ * @param {ClientRect} innerClientRect The first ClientRect
+ * @param {ClientRect} outerClientRect The second ClientRect
+ * @returns {boolean} If and only if the innerClientRect is inside outerClientRect.
+ */
+function clientRectInside(innerClientRect, outerClientRect) {
+    return (nativeMath.floor(outerClientRect.left) <= nativeMath.ceil(innerClientRect.left) &&
+        nativeMath.floor(outerClientRect.top) <= nativeMath.ceil(innerClientRect.top) &&
+        nativeMath.floor(innerClientRect.right) <= nativeMath.ceil(outerClientRect.right) &&
+        nativeMath.floor(innerClientRect.bottom) <= nativeMath.ceil(outerClientRect.bottom));
+}
+exports.clientRectInside = clientRectInside;
+/**
+ * Returns true if the supplied coordinates or Ranges intersect or are contained by bbox.
+ *
+ * @param {number | Range} xValOrRange The x coordinate or Range to test
+ * @param {number | Range} yValOrRange The y coordinate or Range to test
+ * @param {SVGRect} bbox The bbox
+ * @param {number} tolerance Amount by which to expand bbox, in each dimension, before
+ * testing intersection
+ *
+ * @returns {boolean} True if the supplied coordinates or Ranges intersect or are
+ * contained by bbox, false otherwise.
+ */
+function intersectsBBox(xValOrRange, yValOrRange, bbox, tolerance) {
+    if (tolerance === void 0) { tolerance = 0.5; }
+    var xRange = _parseRange(xValOrRange);
+    var yRange = _parseRange(yValOrRange);
+    // SVGRects are positioned with sub-pixel accuracy (the default unit
+    // for the x, y, height & width attributes), but user selections (e.g. via
+    // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
+    // seems appropriate.
+    return bbox.x + bbox.width >= xRange.min - tolerance &&
+        bbox.x <= xRange.max + tolerance &&
+        bbox.y + bbox.height >= yRange.min - tolerance &&
+        bbox.y <= yRange.max + tolerance;
+}
+exports.intersectsBBox = intersectsBBox;
+/**
+ * Create a Range from a number or an object with "min" and "max" defined.
+ *
+ * @param {any} input The object to parse
+ *
+ * @returns {Range} The generated Range
+ */
+function _parseRange(input) {
+    if (typeof (input) === "number") {
+        var value = input;
+        return { min: value, max: value };
+    }
+    var range = input;
+    if (range instanceof Object && "min" in range && "max" in range) {
+        return range;
+    }
+    throw new Error("input '" + input + "' can't be parsed as an Range");
+}
+function _parseStyleValue(style, property) {
+    var value = style.getPropertyValue(property);
+    var parsedValue = parseFloat(value);
+    return parsedValue || 0;
+}
+
+
+/***/ }),
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15446,7 +15395,7 @@ exports.EntityArray = EntityArray;
 
 
 /***/ }),
-/* 100 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15537,7 +15486,7 @@ exports.Map = Map;
 
 
 /***/ }),
-/* 101 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15659,6 +15608,85 @@ function normalizeKey(key) {
     return String(key);
 }
 exports.normalizeKey = normalizeKey;
+
+
+/***/ }),
+/* 101 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var d3 = __webpack_require__(1);
+var Utils = __webpack_require__(0);
+var _TRANSLATOR_KEY = "__Plottable_ClientTranslator";
+function getTranslator(component) {
+    // The Translator works by first calculating the offset to root of the chart and then calculating
+    // the offset from the component to the root. It is imperative that the _measurementElement
+    // be added to the root of the hierarchy and nowhere else.
+    var root = component.root().rootElement().node();
+    var translator = root[_TRANSLATOR_KEY];
+    if (translator == null) {
+        var measurer = document.createElementNS(root.namespaceURI, "svg");
+        measurer.setAttribute("class", "measurer");
+        measurer.setAttribute("style", "opacity: 0; visibility: hidden; position: absolute; width: 1px; height: 1px;");
+        root.appendChild(measurer);
+        translator = new Translator(d3.select(measurer));
+        root[_TRANSLATOR_KEY] = translator;
+    }
+    return translator;
+}
+exports.getTranslator = getTranslator;
+/**
+ * Applies position as a style and attribute to the svg element
+ * as the position of the element varies by the type of parent.
+ * When nested within an SVG, the attribute position is respected.
+ * When nested within an HTML, the style position is respected.
+ */
+function move(node, x, y) {
+    node.styles({ "left": x + "px", "top": y + "px" });
+    node.attrs({ "x": "" + x, "y": "" + y });
+}
+var Translator = (function () {
+    function Translator(measurementElement) {
+        this._measurementElement = measurementElement;
+    }
+    /**
+     * Computes the position relative to the component. Converts screen clientX/clientY
+     * coordinates to the coordinates relative to the measurementElement, taking into
+     * account transform() factors from CSS or SVG up the DOM tree.
+     */
+    Translator.prototype.computePosition = function (clientX, clientY) {
+        // get the origin
+        move(this._measurementElement, 0, 0);
+        var mrBCR = this._measurementElement.node().getBoundingClientRect();
+        var origin = { x: mrBCR.left, y: mrBCR.top };
+        // calculate the scale
+        move(this._measurementElement, Translator.SAMPLE_DISTANCE, Translator.SAMPLE_DISTANCE);
+        mrBCR = this._measurementElement.node().getBoundingClientRect();
+        var testPoint = { x: mrBCR.left, y: mrBCR.top };
+        // invalid measurements -- SVG might not be in the DOM
+        if (origin.x === testPoint.x || origin.y === testPoint.y) {
+            return null;
+        }
+        var scaleX = (testPoint.x - origin.x) / Translator.SAMPLE_DISTANCE;
+        var scaleY = (testPoint.y - origin.y) / Translator.SAMPLE_DISTANCE;
+        // get the true cursor position
+        move(this._measurementElement, ((clientX - origin.x) / scaleX), ((clientY - origin.y) / scaleY));
+        mrBCR = this._measurementElement.node().getBoundingClientRect();
+        var trueCursorPosition = { x: mrBCR.left, y: mrBCR.top };
+        var scaledPosition = {
+            x: (trueCursorPosition.x - origin.x) / scaleX,
+            y: (trueCursorPosition.y - origin.y) / scaleY,
+        };
+        return scaledPosition;
+    };
+    Translator.prototype.isInside = function (component, e) {
+        return Utils.DOM.contains(component.root().rootElement().node(), e.target);
+    };
+    Translator.SAMPLE_DISTANCE = 100;
+    return Translator;
+}());
+exports.Translator = Translator;
 
 
 /***/ }),
@@ -16379,7 +16407,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var utils_1 = __webpack_require__(18);
 var abstractMeasurer_1 = __webpack_require__(29);
-var cacheCharacterMeasurer_1 = __webpack_require__(43);
+var cacheCharacterMeasurer_1 = __webpack_require__(42);
 var CacheMeasurer = (function (_super) {
     __extends(CacheMeasurer, _super);
     function CacheMeasurer(ruler) {
@@ -16416,10 +16444,10 @@ exports.CacheMeasurer = CacheMeasurer;
  * license at https://github.com/palantir/typesettable/blob/develop/LICENSE
  */
 
-var contexts_1 = __webpack_require__(42);
-var measurers_1 = __webpack_require__(45);
-var wrappers_1 = __webpack_require__(47);
-var writers_1 = __webpack_require__(49);
+var contexts_1 = __webpack_require__(41);
+var measurers_1 = __webpack_require__(44);
+var wrappers_1 = __webpack_require__(46);
+var writers_1 = __webpack_require__(48);
 /**
  * This is a convenience interface for typesetting strings using the default
  * measurer/wrapper/writer setup.
@@ -16699,7 +16727,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var wrapper_1 = __webpack_require__(48);
+var wrapper_1 = __webpack_require__(47);
 var SingleLineWrapper = (function (_super) {
     __extends(SingleLineWrapper, _super);
     function SingleLineWrapper() {
@@ -16886,10 +16914,10 @@ function __export(m) {
 // HACKHACK d3-selection-multi doesn't play well with default "d3" package in a
 // bundler environment (e.g. webpack) - see https://github.com/d3/d3-selection-multi/issues/11
 // we add it manually to the default "d3" bundle
-__webpack_require__(53);
+__webpack_require__(52);
 var Animators = __webpack_require__(6);
 exports.Animators = Animators;
-var Axes = __webpack_require__(50);
+var Axes = __webpack_require__(49);
 exports.Axes = Axes;
 var Components = __webpack_require__(30);
 exports.Components = Components;
@@ -16920,8 +16948,8 @@ var timeAxis_1 = __webpack_require__(23);
 exports.TimeInterval = timeAxis_1.TimeInterval;
 __export(__webpack_require__(5));
 __export(__webpack_require__(24));
-__export(__webpack_require__(51));
-var version_1 = __webpack_require__(52);
+__export(__webpack_require__(50));
+var version_1 = __webpack_require__(51);
 exports.version = version_1.version;
 __export(__webpack_require__(21));
 __export(__webpack_require__(7));

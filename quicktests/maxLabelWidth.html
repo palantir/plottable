@@ -7,7 +7,7 @@
     <link rel="stylesheet" type="text/css" href="../plottable.css">
     <script src="../plottable.js"></script>
     <style>
-        svg.plottable {
+        .plottable {
             display: inline-block;
             margin: 20px;
             background: white;
@@ -40,7 +40,7 @@
             ]);
         }
 
-        function createSVG(width, height) {
+        function createDiv(width, height) {
             if (width == null) {
                 width = "500px";
             }
@@ -48,33 +48,33 @@
                 height = "500px";
             }
 
-            const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-            svg.style.width = width;
-            svg.style.height = height;
-            return svg;
+            const div = document.createElement("div");
+            div.style.width = width;
+            div.style.height = height;
+            return div;
         }
 
         function renderAllAxisOrientationComparisons(tickLabelAngle) {
             const bigDiv = document.createElement("div");
             $(bigDiv).addClass("bigdiv").append("<h1>" + tickLabelAngle + " degrees</h1>");
             document.body.appendChild(bigDiv);
-            function renderAxisComparison(orientation, constrainedWidth, svgWidth, svgHeight) {
+            function renderAxisComparison(orientation, constrainedWidth, divWidth, divHeight) {
                 var scale = getLongCategoricalScale();
 
                 var unconstrained = new Plottable.Axes.Category(scale, orientation).tickLabelAngle(tickLabelAngle).innerTickLength(15).endTickLength(15);
                 var constrained = new Plottable.Axes.Category(scale, orientation).tickLabelAngle(tickLabelAngle).innerTickLength(15).endTickLength(15).tickLabelMaxWidth(constrainedWidth);
 
-                const svgUnconstrained = createSVG(svgWidth, svgHeight);
-                const svgConstrained = createSVG(svgWidth, svgHeight);
+                const divUnconstrained = createDiv(divWidth, divHeight);
+                const divConstrained = createDiv(divWidth, divHeight);
 
                 const div = document.createElement("div");
                 $(div).append("<h3>Comparison of " + orientation + " axes (" + constrainedWidth + "px constrained)</h3>");
-                div.appendChild(svgUnconstrained);
-                div.appendChild(svgConstrained);
+                div.appendChild(divUnconstrained);
+                div.appendChild(divConstrained);
                 bigDiv.appendChild(div);
 
-                unconstrained.renderTo(svgUnconstrained);
-                constrained.renderTo(svgConstrained);
+                unconstrained.renderTo(divUnconstrained);
+                constrained.renderTo(divConstrained);
             }
             renderAxisComparison("left", 60, "150px", "600px");
             renderAxisComparison("right", 60, "150px", "600px");
@@ -121,17 +121,17 @@
             const unconstrained = makeGridChart(false);
             const constrained = makeGridChart(true);
 
-            const svgUnconstrained = createSVG();
-            const svgConstrained = createSVG();
+            const divUnconstrained = createDiv();
+            const divConstrained = createDiv();
 
             const div = document.createElement("div");
             $(div).append("<h3>Comparison in grid chart</h3>");
-            div.appendChild(svgUnconstrained);
-            div.appendChild(svgConstrained);
+            div.appendChild(divUnconstrained);
+            div.appendChild(divConstrained);
             document.body.appendChild(div);
 
-            unconstrained.renderTo(svgUnconstrained);
-            constrained.renderTo(svgConstrained);
+            unconstrained.renderTo(divUnconstrained);
+            constrained.renderTo(divConstrained);
         }
         renderGridComparison();
     </script>

@@ -12,6 +12,16 @@ import { AttributeToProjector, AttributeToAppliedProjector, SimpleSelection } fr
 import * as Drawers from "./";
 import { coerceExternalD3 } from "../utils/coerceD3";
 
+/**
+ * A Drawer is responsible for actually committing the DrawSteps to the DOM. You first pass a renderArea
+ * to the Drawer, which is the root DOM node holding all the drawing elements. Subclasses set an _svgElementName
+ * which is an HTML/SVG tag name. Then you call .draw() with the DrawSteps to draw, and the Drawer will draw
+ * to the DOM by clearing old DOM elements, adding new DOM elements, and then passing those DOM elements to
+ * the animator, which will set the appropriate attributes on the DOM.
+ *
+ * "Drawing" in Plottable really means "making the DOM elements and their attributes correctly reflect
+ * the data being passed in".
+ */
 export class Drawer {
   private _renderArea: SimpleSelection<void>;
   protected _svgElementName: string;

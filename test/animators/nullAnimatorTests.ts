@@ -20,10 +20,10 @@ describe("Animators", () => {
       const attrToAppliedProjector: Plottable.AttributeToAppliedProjector = {};
       attrToAppliedProjector[attributeName] = attributeProjector;
 
-      const svg = TestMethods.generateSVG();
+      const div = TestMethods.generateDiv();
       const elementName = "g";
-      attributeValues.forEach(() => svg.append(elementName));
-      const elements = svg.selectAll<SVGGElement, any>(elementName);
+      attributeValues.forEach(() => div.append(elementName));
+      const elements = div.selectAll<SVGGElement, any>(elementName);
 
       const animator = new Plottable.Animators.Null();
       animator.animate(elements, attrToAppliedProjector);
@@ -34,7 +34,7 @@ describe("Animators", () => {
         assert.strictEqual(actualAttribute, expectedAttribute, `set the correct attribute on element with index ${i}`);
       });
 
-      svg.remove();
+      div.remove();
     });
   });
 });

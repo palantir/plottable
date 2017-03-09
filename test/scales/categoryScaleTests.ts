@@ -46,9 +46,9 @@ describe("Scales", () => {
         barPlot.addDataset(dataset);
         barPlot.x((d: any) => d.x, xScale);
         barPlot.y((d: any) => d.y, yScale);
-        let svg = TestMethods.generateSVG();
+        let div = TestMethods.generateDiv();
         assert.deepEqual(xScale.domain(), [], "before anchoring, the bar plot doesn't proxy data to the scale");
-        barPlot.renderTo(svg);
+        barPlot.renderTo(div);
         assert.deepEqual(xScale.domain(), ["A", "B"], "after anchoring, the bar plot's data is on the scale");
 
         iterateDataChanges([], [dA, dB, dC], []);
@@ -59,7 +59,7 @@ describe("Scales", () => {
         iterateDataChanges([], [dA, dB, dC]);
         assert.lengthOf(xScale.domain(), 3);
 
-        svg.remove();
+        div.remove();
 
         function iterateDataChanges(...dataChanges: any[]) {
           dataChanges.forEach((dataChange) => {
