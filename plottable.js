@@ -501,10 +501,6 @@ var Plot = (function (_super) {
         this._onDatasetUpdate();
         return this;
     };
-    Plot.prototype._getDrawersInOrder = function () {
-        var _this = this;
-        return this.datasets().map(function (dataset) { return _this._datasetToDrawer.get(dataset); });
-    };
     Plot.prototype._generateDrawSteps = function () {
         return [{ attrToProjector: this._generateAttrToProjector(), animator: new Animators.Null() }];
     };
@@ -548,9 +544,10 @@ var Plot = (function (_super) {
         return dataToDraw;
     };
     Plot.prototype._paint = function () {
+        var _this = this;
         var drawSteps = this._generateDrawSteps();
         var dataToDraw = this._getDataToDraw();
-        var drawers = this._getDrawersInOrder();
+        var drawers = this.datasets().map(function (dataset) { return _this._datasetToDrawer.get(dataset); });
         this.datasets().forEach(function (ds, i) { return drawers[i].draw(dataToDraw.get(ds), drawSteps); });
         var times = this.datasets().map(function (ds, i) { return drawers[i].totalDrawTime(dataToDraw.get(ds), drawSteps); });
         var maxTime = Utils.Math.max(times, 0);
@@ -1371,8 +1368,9 @@ var coerceD3_1 = __webpack_require__(11);
  * to the DOM by clearing old DOM elements, adding new DOM elements, and then passing those DOM elements to
  * the animator, which will set the appropriate attributes on the DOM.
  *
- * "Drawing" in Plottable really means "making the DOM elements and their attributes correctly reflect
- * the data being passed in".
+ * "Drawing" in Plottable really means either:
+ * (a) "making the DOM elements and their attributes correctly reflect the data being passed in", using SVG.
+ * (b) "making draw commands to the Canvas element", using Canvas.
  */
 var Drawer = (function () {
     /**

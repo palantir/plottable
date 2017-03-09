@@ -4,6 +4,7 @@
  */
 
 import * as d3 from "d3";
+
 import * as Utils from "../utils";
 
 import { Dataset } from "../core/dataset";
@@ -19,8 +20,9 @@ import { coerceExternalD3 } from "../utils/coerceD3";
  * to the DOM by clearing old DOM elements, adding new DOM elements, and then passing those DOM elements to
  * the animator, which will set the appropriate attributes on the DOM.
  *
- * "Drawing" in Plottable really means "making the DOM elements and their attributes correctly reflect
- * the data being passed in".
+ * "Drawing" in Plottable really means either:
+ * (a) "making the DOM elements and their attributes correctly reflect the data being passed in", using SVG.
+ * (b) "making draw commands to the Canvas element", using Canvas.
  */
 export class Drawer {
   private _renderArea: SimpleSelection<void>;
@@ -46,6 +48,10 @@ export class Drawer {
   }
 
   public canvas(): d3.Selection<HTMLCanvasElement, any, any, any>;
+  /**
+   * Sets the renderArea() to null and tells this Drawer to draw to the specified canvas instead.
+   * @param canvas
+   */
   public canvas(canvas: d3.Selection<HTMLCanvasElement, any, any, any>): this;
   public canvas(canvas?: d3.Selection<HTMLCanvasElement, any, any, any>): any {
     if (canvas === undefined) {
@@ -63,7 +69,7 @@ export class Drawer {
    */
   public renderArea(): SimpleSelection<void>;
   /**
-   * Sets the renderArea selection for the Drawer.
+   * Sets the canvas() to null and tells this Drawer to draw to the specified SVG area instead.
    *
    * @param {d3.Selection} Selection containing the <g> to render to.
    * @returns {Drawer} The calling Drawer.

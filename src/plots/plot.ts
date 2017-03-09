@@ -541,10 +541,6 @@ export class Plot extends Component {
     return this;
   }
 
-  protected _getDrawersInOrder(): Drawer[] {
-    return this.datasets().map((dataset) => this._datasetToDrawer.get(dataset));
-  }
-
   protected _generateDrawSteps(): Drawers.DrawStep[] {
     return [{ attrToProjector: this._generateAttrToProjector(), animator: new Animators.Null() }];
   }
@@ -596,7 +592,7 @@ export class Plot extends Component {
   private _paint() {
     let drawSteps = this._generateDrawSteps();
     let dataToDraw = this._getDataToDraw();
-    let drawers = this._getDrawersInOrder();
+    let drawers = this.datasets().map((dataset) => this._datasetToDrawer.get(dataset));
 
     this.datasets().forEach((ds, i) => drawers[i].draw(dataToDraw.get(ds), drawSteps));
 
