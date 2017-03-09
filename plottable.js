@@ -194,8 +194,21 @@ var Plot = (function (_super) {
     Plot.prototype._setup = function () {
         var _this = this;
         _super.prototype._setup.call(this);
+        if (this._canvas != null) {
+            this.element().node().appendChild(this._canvas.node());
+        }
         this._renderArea = this.content().append("g").classed("render-area", true);
         this.datasets().forEach(function (dataset) { return _this._createNodesForDataset(dataset); });
+    };
+    Plot.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
+        _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
+        if (this._canvas != null) {
+            // update canvas width/height; this will also clear the canvas of any drawn elements so we should
+            // be sure not to computeLayout() without a render() in the future.
+            this._canvas.attr("width", this.width());
+            this._canvas.attr("height", this.height());
+        }
+        return this;
     };
     Plot.prototype.destroy = function () {
         var _this = this;
@@ -205,7 +218,12 @@ var Plot = (function (_super) {
     };
     Plot.prototype._createNodesForDataset = function (dataset) {
         var drawer = this._datasetToDrawer.get(dataset);
-        drawer.renderArea(this._renderArea.append("g"));
+        if (this.renderer() === "svg") {
+            drawer.renderArea(this._renderArea.append("g"));
+        }
+        else {
+            drawer.canvas(this._canvas);
+        }
         return drawer;
     };
     Plot.prototype._createDrawer = function (dataset) {
@@ -392,6 +410,37 @@ var Plot = (function (_super) {
         }
         else {
             this._animators[animatorKey] = animator;
+            return this;
+        }
+    };
+    Plot.prototype.renderer = function (renderer) {
+        var _this = this;
+        if (renderer === undefined) {
+            return this._canvas == null ? "svg" : "canvas";
+        }
+        else {
+            if (this._canvas == null && renderer === "canvas") {
+                // construct the canvas, remove drawer's renderAreas, set drawer's canvas
+                this._canvas = d3.select(document.createElement("canvas")).classed("plot-canvas", true);
+                if (this.element() != null) {
+                    this.element().node().appendChild(this._canvas.node());
+                }
+                this._datasetToDrawer.forEach(function (drawer) {
+                    if (drawer.renderArea() != null) {
+                        drawer.renderArea().remove();
+                    }
+                    drawer.canvas(_this._canvas);
+                });
+                this.render();
+            }
+            else if (this._canvas != null && renderer == "svg") {
+                this._canvas.remove();
+                this._canvas = null;
+                this._datasetToDrawer.forEach(function (drawer) {
+                    drawer.renderArea(_this._renderArea.append("g"));
+                });
+                this.render();
+            }
             return this;
         }
     };
@@ -1337,12 +1386,23 @@ var Drawer = (function () {
         this._dataset = dataset;
         this._svgElementName = "path";
     }
+    Drawer.prototype.canvas = function (canvas) {
+        if (canvas === undefined) {
+            return this._canvas;
+        }
+        canvas = coerceD3_1.coerceExternalD3(canvas);
+        this._canvas = canvas;
+        this._renderArea = null;
+        this._cachedSelectionValid = false;
+        return this;
+    };
     Drawer.prototype.renderArea = function (area) {
-        if (area == null) {
+        if (area === undefined) {
             return this._renderArea;
         }
         area = coerceD3_1.coerceExternalD3(area);
         this._renderArea = area;
+        this._canvas = null;
         this._cachedSelectionValid = false;
         return this;
     };
@@ -1391,6 +1451,9 @@ var Drawer = (function () {
             this.selection().classed(this._className, true);
         }
     };
+    Drawer.prototype._drawStepCanvas = function (data, step) {
+        Utils.Window.warn("canvas rendering not yet implemented on " + this.constructor.name);
+    };
     Drawer.prototype._appliedProjectors = function (attrToProjector) {
         var _this = this;
         var modifiedAttrToProjector = {};
@@ -1429,13 +1492,26 @@ var Drawer = (function () {
                 animator: dr.animator,
             };
         });
-        this._bindSelectionData(data);
-        this._cachedSelectionValid = false;
-        var delay = 0;
-        appliedDrawSteps.forEach(function (drawStep, i) {
-            Utils.Window.setTimeout(function () { return _this._drawStep(drawStep); }, delay);
-            delay += drawStep.animator.totalTime(data.length);
-        });
+        if (this._renderArea != null) {
+            this._bindSelectionData(data);
+            this._cachedSelectionValid = false;
+            var delay_1 = 0;
+            appliedDrawSteps.forEach(function (drawStep, i) {
+                Utils.Window.setTimeout(function () { return _this._drawStep(drawStep); }, delay_1);
+                delay_1 += drawStep.animator.totalTime(data.length);
+            });
+        }
+        else if (this._canvas != null) {
+            var canvas = this.canvas().node();
+            var context_1 = canvas.getContext("2d");
+            context_1.clearRect(0, 0, canvas.width, canvas.height);
+            // don't support animations for now; just draw the last draw step immediately
+            var lastDrawStep_1 = appliedDrawSteps[appliedDrawSteps.length - 1];
+            Utils.Window.setTimeout(function () { return _this._drawStepCanvas(data, lastDrawStep_1); }, 0);
+        }
+        else {
+            throw new Error("Drawer's canvas and renderArea are both null!");
+        }
         return this;
     };
     Drawer.prototype.selection = function () {
@@ -1453,12 +1529,23 @@ var Drawer = (function () {
      */
     Drawer.prototype.selectionForIndex = function (index) {
         this.maybeRefreshCache();
-        return d3.select(this._cachedSelectionNodes[index]);
+        if (this._cachedSelectionNodes != null) {
+            return d3.select(this._cachedSelectionNodes[index]);
+        }
+        else {
+            return null;
+        }
     };
     Drawer.prototype.maybeRefreshCache = function () {
         if (!this._cachedSelectionValid) {
-            this._cachedSelection = this.renderArea().selectAll(this.selector());
-            this._cachedSelectionNodes = this._cachedSelection.nodes();
+            if (this._renderArea != null) {
+                this._cachedSelection = this.renderArea().selectAll(this.selector());
+                this._cachedSelectionNodes = this._cachedSelection.nodes();
+            }
+            else {
+                this._cachedSelection = null;
+                this._cachedSelectionNodes = null;
+            }
             this._cachedSelectionValid = true;
         }
     };
@@ -3664,7 +3751,9 @@ var Bar = (function (_super) {
     };
     Bar.prototype._createNodesForDataset = function (dataset) {
         var drawer = _super.prototype._createNodesForDataset.call(this, dataset);
-        drawer.renderArea().classed(Bar._BAR_AREA_CLASS, true);
+        if (drawer.renderArea() != null) {
+            drawer.renderArea().classed(Bar._BAR_AREA_CLASS, true);
+        }
         var labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
         var context = new Typesetter.SvgContext(labelArea.node());
         var measurer = new Typesetter.CacheMeasurer(context);
@@ -11128,6 +11217,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+var d3 = __webpack_require__(1);
 var drawer_1 = __webpack_require__(7);
 var Rectangle = (function (_super) {
     __extends(Rectangle, _super);
@@ -11135,6 +11225,39 @@ var Rectangle = (function (_super) {
         _super.call(this, dataset);
         this._svgElementName = "rect";
     }
+    Rectangle.prototype._drawStepCanvas = function (data, step) {
+        var context = this.canvas().node().getContext("2d");
+        var attrToAppliedProjector = step.attrToAppliedProjector;
+        context.save();
+        data.forEach(function (point, index) {
+            var resolvedAttrs = Object.keys(attrToAppliedProjector).reduce(function (obj, attrName) {
+                obj[attrName] = attrToAppliedProjector[attrName](point, index);
+                return obj;
+            }, {});
+            context.beginPath();
+            context.rect(resolvedAttrs["x"], resolvedAttrs["y"], resolvedAttrs["width"], resolvedAttrs["height"]);
+            if (resolvedAttrs["stroke-width"]) {
+                context.lineWidth = resolvedAttrs["stroke-width"];
+            }
+            if (resolvedAttrs["stroke"]) {
+                var strokeColor = d3.color(resolvedAttrs["stroke"]);
+                if (resolvedAttrs["opacity"]) {
+                    strokeColor.opacity = resolvedAttrs["opacity"];
+                }
+                context.strokeStyle = strokeColor.rgb().toString();
+                context.stroke();
+            }
+            if (resolvedAttrs["fill"]) {
+                var fillColor = d3.color(resolvedAttrs["fill"]);
+                if (resolvedAttrs["opacity"]) {
+                    fillColor.opacity = resolvedAttrs["opacity"];
+                }
+                context.fillStyle = fillColor.rgb().toString();
+                context.fill();
+            }
+        });
+        context.restore();
+    };
     return Rectangle;
 }(drawer_1.Drawer));
 exports.Rectangle = Rectangle;

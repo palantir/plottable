@@ -19,6 +19,8 @@ import * as Utils from "../utils";
 import * as Plots from "./commons";
 import { coerceExternalD3 } from "../utils/coerceD3";
 
+export type Renderer = "svg" | "canvas";
+
 export class Plot extends Component {
   protected static _ANIMATION_MAX_DURATION = 600;
 
@@ -86,13 +88,24 @@ export class Plot extends Component {
   /**
    * Mapping from property names to the AccessorScale that defines that property.
    *
-   * TODO figure out the difference between properties and attributes
+   * e.g. Line may register an "x" -> binding and a "y" -> binding;
+   * Rectangle would register "x", "y", "x2", and "y2"
+   *
+   * Only subclasses control how they register properties, while attrs can be registered by the user.
+   * By default, only attrs are passed to the _generateDrawStep's attrToProjector; properties are not.
    */
   protected _propertyBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
   /**
    * Mapping from property names to the extents ([min, max]) values that that property takes on.
    */
   protected _propertyExtents: d3.Map<any[]>;
+
+  /**
+   * The canvas element that this Plot will render to if using the canvas renderer, or null if not using the SVG
+   * renderer. The node may be parent-less (which means that the plot isn't setup yet but is still using the canvas
+   * renderer).
+   */
+  private _canvas: d3.Selection<HTMLCanvasElement, any, any, any>;
 
   /**
    * A Plot draws some visualization of the inputted Datasets.
@@ -127,8 +140,23 @@ export class Plot extends Component {
 
   protected _setup() {
     super._setup();
+    if (this._canvas != null) {
+      this.element().node().appendChild(this._canvas.node());
+    }
     this._renderArea = this.content().append("g").classed("render-area", true);
     this.datasets().forEach((dataset) => this._createNodesForDataset(dataset));
+  }
+
+
+  public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
+    super.computeLayout(origin, availableWidth, availableHeight);
+    if (this._canvas != null) {
+      // update canvas width/height; this will also clear the canvas of any drawn elements so we should
+      // be sure not to computeLayout() without a render() in the future.
+      this._canvas.attr("width", this.width());
+      this._canvas.attr("height", this.height());
+    }
+    return this;
   }
 
   public destroy() {
@@ -139,7 +167,11 @@ export class Plot extends Component {
 
   protected _createNodesForDataset(dataset: Dataset) {
     let drawer = this._datasetToDrawer.get(dataset);
-    drawer.renderArea(this._renderArea.append("g"));
+    if (this.renderer() === "svg") {
+      drawer.renderArea(this._renderArea.append("g"));
+    } else {
+      drawer.canvas(this._canvas);
+    }
     return drawer;
   }
 
@@ -399,6 +431,44 @@ export class Plot extends Component {
       return this._animators[animatorKey];
     } else {
       this._animators[animatorKey] = animator;
+      return this;
+    }
+  }
+
+  /**
+   * Get the renderer for this Plot, either "svg" or "canvas".
+   */
+  public renderer(): Renderer;
+  /**
+   * Set the Renderer to be either "svg" or "canvas" on this Plot.
+   * @param renderer
+   */
+  public renderer(renderer: Renderer): this;
+  public renderer(renderer?: Renderer): Renderer | this {
+    if (renderer === undefined) {
+      return this._canvas == null ? "svg" : "canvas";
+    } else {
+      if (this._canvas == null && renderer === "canvas") {
+        // construct the canvas, remove drawer's renderAreas, set drawer's canvas
+        this._canvas = d3.select(document.createElement("canvas")).classed("plot-canvas", true);
+        if (this.element() != null) {
+          this.element().node().appendChild(this._canvas.node());
+        }
+        this._datasetToDrawer.forEach((drawer) => {
+          if (drawer.renderArea() != null) {
+            drawer.renderArea().remove();
+          }
+          drawer.canvas(this._canvas);
+        });
+        this.render();
+      } else if (this._canvas != null && renderer == "svg") {
+        this._canvas.remove();
+        this._canvas = null;
+        this._datasetToDrawer.forEach((drawer) => {
+          drawer.renderArea(this._renderArea.append("g"));
+        })
+        this.render();
+      }
       return this;
     }
   }

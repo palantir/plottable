@@ -24,6 +24,8 @@ import { coerceExternalD3 } from "../utils/coerceD3";
  */
 export class Drawer {
   private _renderArea: SimpleSelection<void>;
+  private _canvas: d3.Selection<HTMLCanvasElement, any, any, any>;
+
   protected _svgElementName: string;
   protected _className: string;
   private _dataset: Dataset;
@@ -43,6 +45,19 @@ export class Drawer {
     this._svgElementName = "path";
   }
 
+  public canvas(): d3.Selection<HTMLCanvasElement, any, any, any>;
+  public canvas(canvas: d3.Selection<HTMLCanvasElement, any, any, any>): this;
+  public canvas(canvas?: d3.Selection<HTMLCanvasElement, any, any, any>): any {
+    if (canvas === undefined) {
+      return this._canvas;
+    }
+    canvas = coerceExternalD3(canvas);
+    this._canvas = canvas;
+    this._renderArea = null;
+    this._cachedSelectionValid = false;
+    return this;
+  }
+
   /**
    * Retrieves the renderArea selection for the Drawer.
    */
@@ -55,11 +70,12 @@ export class Drawer {
    */
   public renderArea(area: SimpleSelection<void>): this;
   public renderArea(area?: SimpleSelection<void>): any {
-    if (area == null) {
+    if (area === undefined) {
       return this._renderArea;
     }
     area = coerceExternalD3(area);
     this._renderArea = area;
+    this._canvas = null;
     this._cachedSelectionValid = false;
     return this;
   }
@@ -115,6 +131,10 @@ export class Drawer {
     }
   }
 
+  protected _drawStepCanvas(data: any[], step: Drawers.AppliedDrawStep) {
+    Utils.Window.warn("canvas rendering not yet implemented on " + (<any> this.constructor).name);
+  }
+
   private _appliedProjectors(attrToProjector: AttributeToProjector): AttributeToAppliedProjector {
     let modifiedAttrToProjector: AttributeToAppliedProjector = {};
     Object.keys(attrToProjector).forEach((attr: string) => {
@@ -156,19 +176,30 @@ export class Drawer {
       };
     });
 
-    this._bindSelectionData(data);
-    this._cachedSelectionValid = false;
+    if (this._renderArea != null) {
+      this._bindSelectionData(data);
+      this._cachedSelectionValid = false;
 
-    let delay = 0;
-    appliedDrawSteps.forEach((drawStep, i) => {
-      Utils.Window.setTimeout(() => this._drawStep(drawStep), delay);
-      delay += drawStep.animator.totalTime(data.length);
-    });
+      let delay = 0;
+      appliedDrawSteps.forEach((drawStep, i) => {
+        Utils.Window.setTimeout(() => this._drawStep(drawStep), delay);
+        delay += drawStep.animator.totalTime(data.length);
+      });
+    } else if (this._canvas != null) {
+      const canvas = this.canvas().node();
+      const context = canvas.getContext("2d");
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      // don't support animations for now; just draw the last draw step immediately
+      const lastDrawStep = appliedDrawSteps[appliedDrawSteps.length - 1];
+      Utils.Window.setTimeout(() => this._drawStepCanvas(data, lastDrawStep), 0);
+    } else {
+      throw new Error("Drawer's canvas and renderArea are both null!");
+    }
 
     return this;
   }
 
-  public selection(): SimpleSelection<any> {
+  public selection(): SimpleSelection<any> | null {
     this.maybeRefreshCache();
     return this._cachedSelection;
   }
@@ -183,15 +214,24 @@ export class Drawer {
   /**
    * Returns the D3 selection corresponding to the datum with the specified index.
    */
-  public selectionForIndex(index: number): SimpleSelection<any> {
+  public selectionForIndex(index: number): SimpleSelection<any> | null {
     this.maybeRefreshCache();
-    return d3.select(this._cachedSelectionNodes[index]);
+    if (this._cachedSelectionNodes != null) {
+      return d3.select(this._cachedSelectionNodes[index]);
+    } else {
+      return null;
+    }
   }
 
   private maybeRefreshCache() {
     if (!this._cachedSelectionValid) {
-      this._cachedSelection = this.renderArea().selectAll(this.selector());
-      this._cachedSelectionNodes = this._cachedSelection.nodes();
+      if (this._renderArea != null) {
+        this._cachedSelection = this.renderArea().selectAll(this.selector());
+        this._cachedSelectionNodes = this._cachedSelection.nodes();
+      } else {
+        this._cachedSelection = null;
+        this._cachedSelectionNodes = null;
+      }
       this._cachedSelectionValid = true;
     }
   }
