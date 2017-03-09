@@ -4,7 +4,7 @@
  */
 
 import * as d3 from "d3";
-import * as SVGTypewriter from "svg-typewriter";
+import * as Typesetter from "typesettable";
 
 import * as Animators from "../animators";
 import { Accessor, Point, Bounds, Range, SimpleSelection } from "../core/interfaces";
@@ -26,8 +26,8 @@ import { LightweightPlotEntity } from "./commons";
 
 type LabelConfig = {
   labelArea: SimpleSelection<void>;
-  measurer: SVGTypewriter.Measurer;
-  writer: SVGTypewriter.Writer;
+  measurer: Typesetter.Measurer;
+  writer: Typesetter.Writer;
 };
 
 export class Bar<X, Y> extends XYPlot<X, Y> {
@@ -258,11 +258,12 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   }
 
   protected _createNodesForDataset(dataset: Dataset): Drawer {
-    let drawer = super._createNodesForDataset(dataset);
+    const drawer = super._createNodesForDataset(dataset);
     drawer.renderArea().classed(Bar._BAR_AREA_CLASS, true);
-    let labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
-    let measurer = new SVGTypewriter.CacheMeasurer(labelArea);
-    let writer = new SVGTypewriter.Writer(measurer);
+    const labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
+    const context = new Typesetter.SvgContext(labelArea.node() as SVGElement);
+    const measurer = new Typesetter.CacheMeasurer(context);
+    const writer = new Typesetter.Writer(measurer, context);
     this._labelConfig.set(dataset, { labelArea: labelArea, measurer: measurer, writer: writer });
     return drawer;
   }
@@ -607,12 +608,10 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       labelContainer.style("visibility", hideLabel ? "hidden" : "inherit");
 
       let writeOptions = {
-        selection: labelContainer,
-        xAlign: xAlignment,
-        yAlign: yAlignment,
-        textRotation: 0,
+        xAlign: xAlignment as Typesetter.IXAlign,
+        yAlign: yAlignment as Typesetter.IYAlign,
       };
-      writer.write(text, containerWidth, containerHeight, writeOptions);
+      writer.write(text, containerWidth, containerHeight, writeOptions, labelContainer.node());
 
       let tooWide = this._isVertical
         ? barWidth < (measurement.width + Bar._LABEL_PADDING * 2)

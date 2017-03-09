@@ -4,7 +4,7 @@
  */
 
 import * as d3 from "d3";
-import * as SVGTypewriter from "svg-typewriter";
+import * as Typesetter from "typesettable";
 
 import * as Configs from "../core/config";
 import * as Formatters from "../core/formatters";
@@ -234,9 +234,9 @@ export class Legend extends Component {
   private _maxLinesPerEntry: number;
   private _maxWidth: number;
   private _comparator: (a: string, b: string) => number;
-  private _measurer: SVGTypewriter.Measurer;
-  private _wrapper: SVGTypewriter.Wrapper;
-  private _writer: SVGTypewriter.Writer;
+  private _measurer: Typesetter.Measurer;
+  private _wrapper: Typesetter.Wrapper;
+  private _writer: Typesetter.Writer;
   private _symbolFactoryAccessor: (datum: any, index: number) => SymbolFactory;
   private _symbolOpacityAccessor: (datum: any, index: number) => number;
   private _redrawCallback: ScaleCallback<Scales.Color>;
@@ -275,9 +275,10 @@ export class Legend extends Component {
     let fakeLegendRow = this.content().append("g").classed(Legend.LEGEND_ROW_CLASS, true);
     let fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
     fakeLegendEntry.append("text");
-    this._measurer = new SVGTypewriter.Measurer(fakeLegendRow);
-    this._wrapper = new SVGTypewriter.Wrapper().maxLines(this.maxLinesPerEntry());
-    this._writer = new SVGTypewriter.Writer(this._measurer, this._wrapper).addTitleElement(Configs.ADD_TITLE_ELEMENTS);
+    const context = new Typesetter.SvgContext(fakeLegendRow.node() as SVGElement, null, Configs.ADD_TITLE_ELEMENTS);
+    this._measurer = new Typesetter.Measurer(context);
+    this._wrapper = new Typesetter.Wrapper().maxLines(this.maxLinesPerEntry());
+    this._writer = new Typesetter.Writer(this._measurer, context, this._wrapper);
   }
 
   /**
@@ -620,13 +621,12 @@ export class Legend extends Component {
           const column = symbolEntryPair[1];
 
           const writeOptions = {
-            selection: textContainer,
             xAlign: "left",
             yAlign: "top",
             textRotation: 0,
-          };
+          } as Typesetter.IWriteOptions;
 
-          self._writer.write(self._formatter(column.data.name), column.width, self.height(), writeOptions)
+          self._writer.write(self._formatter(column.data.name), column.width, self.height(), writeOptions, textContainer.node())
         });
 
         entriesUpdate.exit().remove();

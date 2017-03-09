@@ -4,7 +4,7 @@
  */
 
 import * as d3 from "d3";
-import * as SVGTypewriter from "svg-typewriter";
+import * as Typesetter from "typesettable";
 
 import { Axis, AxisOrientation } from "./axis";
 import * as Formatters from "../core/formatters";
@@ -15,8 +15,8 @@ export class Numeric extends Axis<number> {
 
   private _tickLabelPositioning = "center";
   private _usesTextWidthApproximation = false;
-  private _measurer: SVGTypewriter.Measurer;
-  private _wrapper: SVGTypewriter.Wrapper;
+  private _measurer: Typesetter.Measurer;
+  private _wrapper: Typesetter.Wrapper;
 
   /**
    * Constructs a Numeric Axis.
@@ -34,8 +34,9 @@ export class Numeric extends Axis<number> {
 
   protected _setup() {
     super._setup();
-    this._measurer = new SVGTypewriter.CacheMeasurer(this._tickLabelContainer, Axis.TICK_LABEL_CLASS);
-    this._wrapper = new SVGTypewriter.Wrapper().maxLines(1);
+    const context = new Typesetter.SvgContext(this._tickLabelContainer.node() as SVGElement, Axis.TICK_LABEL_CLASS);
+    this._measurer = new Typesetter.CacheMeasurer(context);
+    this._wrapper = new Typesetter.Wrapper().maxLines(1);
   }
 
   protected _computeWidth() {
@@ -343,6 +344,6 @@ export class Numeric extends Axis<number> {
 
   public invalidateCache() {
     super.invalidateCache();
-    (this._measurer as SVGTypewriter.CacheMeasurer).reset();
+    (this._measurer as Typesetter.CacheMeasurer).reset();
   }
 }
