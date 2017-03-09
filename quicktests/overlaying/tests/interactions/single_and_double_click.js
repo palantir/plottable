@@ -16,7 +16,7 @@ function run(svg, data, Plottable) {
         .y(function(d) { return d.y; }, yScale)
         .addDataset(new Plottable.Dataset(data));
 
-    var interaction = new Plottable.Interactions.DoubleClick();
+    var interaction = new Plottable.Interactions.Click();
 
     interaction.onDoubleClick(function(point) {
         plot.selections().attr("fill", "#5279c7");
