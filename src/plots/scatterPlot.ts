@@ -19,7 +19,8 @@ import { Plot } from "./plot";
 import { XYPlot } from "./xyPlot";
 
 export interface LightweightScatterPlotEntity extends LightweightPlotEntity {
-  diameter: Point;
+  // size of the entity in pixel space
+  diameter: number;
 }
 
 export class Scatter<X, Y> extends XYPlot<X, Y> {
@@ -55,7 +56,7 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
         lightweightPlotEntity.index,
         lightweightPlotEntity.dataset);
 
-      lightweightPlotEntity.diameter = { x: diameter, y: diameter };
+      lightweightPlotEntity.diameter = diameter;
       return lightweightPlotEntity;
     });
   }
@@ -137,10 +138,10 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
     const yRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
 
     const translatedBbox = {
-      x: entity.position.x - entity.diameter.x,
-      y: entity.position.y - entity.diameter.y,
-      width: entity.diameter.x,
-      height: entity.diameter.y,
+      x: entity.position.x - entity.diameter,
+      y: entity.position.y - entity.diameter,
+      width: entity.diameter,
+      height: entity.diameter,
     };
 
     return Utils.DOM.intersectsBBox(xRange, yRange, translatedBbox);

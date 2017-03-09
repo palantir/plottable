@@ -78,7 +78,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 125);
+/******/ 	return __webpack_require__(__webpack_require__.s = 124);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -94,23 +94,23 @@ return /******/ (function(modules) { // webpackBootstrap
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-var Array = __webpack_require__(92);
+var Array = __webpack_require__(95);
 exports.Array = Array;
-var Color = __webpack_require__(95);
+var Color = __webpack_require__(98);
 exports.Color = Color;
 var DOM = __webpack_require__(40);
 exports.DOM = DOM;
 var Math = __webpack_require__(28);
 exports.Math = Math;
-var Stacking = __webpack_require__(98);
+var Stacking = __webpack_require__(101);
 exports.Stacking = Stacking;
-var Window = __webpack_require__(99);
+var Window = __webpack_require__(102);
 exports.Window = Window;
-__export(__webpack_require__(93));
-__export(__webpack_require__(94));
-__export(__webpack_require__(11));
 __export(__webpack_require__(96));
 __export(__webpack_require__(97));
+__export(__webpack_require__(11));
+__export(__webpack_require__(99));
+__export(__webpack_require__(100));
 __export(__webpack_require__(41));
 
 
@@ -641,14 +641,14 @@ exports.Plot = Plot;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-var TickGenerators = __webpack_require__(90);
+var TickGenerators = __webpack_require__(93);
 exports.TickGenerators = TickGenerators;
 __export(__webpack_require__(39));
-__export(__webpack_require__(86));
-__export(__webpack_require__(87));
-__export(__webpack_require__(88));
 __export(__webpack_require__(89));
+__export(__webpack_require__(90));
 __export(__webpack_require__(91));
+__export(__webpack_require__(92));
+__export(__webpack_require__(94));
 // ---------------------------------------------------------
 var categoryScale_2 = __webpack_require__(39);
 var quantitativeScale_1 = __webpack_require__(10);
@@ -666,27 +666,7 @@ exports.isTransformable = isTransformable;
 
 
 /***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
-__export(__webpack_require__(111));
-__export(__webpack_require__(115));
-__export(__webpack_require__(12));
-__export(__webpack_require__(121));
-__export(__webpack_require__(123));
-//# sourceMappingURL=index.js.map
-
-/***/ }),
+/* 4 */,
 /* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1265,8 +1245,8 @@ exports.Component = Component;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(51));
-__export(__webpack_require__(52));
+__export(__webpack_require__(54));
+__export(__webpack_require__(55));
 
 
 /***/ }),
@@ -1681,13 +1661,13 @@ function verifyPrecision(precision) {
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(67));
-__export(__webpack_require__(68));
-__export(__webpack_require__(69));
 __export(__webpack_require__(70));
 __export(__webpack_require__(71));
 __export(__webpack_require__(72));
 __export(__webpack_require__(73));
+__export(__webpack_require__(74));
+__export(__webpack_require__(75));
+__export(__webpack_require__(76));
 
 
 /***/ }),
@@ -1706,9 +1686,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var Interactions = __webpack_require__(14);
+var Interactions = __webpack_require__(13);
 var Utils = __webpack_require__(0);
-var scale_1 = __webpack_require__(18);
+var scale_1 = __webpack_require__(17);
 var QuantitativeScale = (function (_super) {
     __extends(QuantitativeScale, _super);
     /**
@@ -2002,20 +1982,17 @@ exports.coerceExternalD3 = coerceExternalD3;
 
 "use strict";
 /**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
  */
 
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(116));
-__export(__webpack_require__(117));
-__export(__webpack_require__(118));
-__export(__webpack_require__(119));
-__export(__webpack_require__(120));
-//# sourceMappingURL=index.js.map
+__export(__webpack_require__(67));
+__export(__webpack_require__(68));
+__export(__webpack_require__(69));
+
 
 /***/ }),
 /* 13 */
@@ -2030,33 +2007,15 @@ __export(__webpack_require__(120));
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(64));
-__export(__webpack_require__(65));
-__export(__webpack_require__(66));
+__export(__webpack_require__(77));
+__export(__webpack_require__(78));
+__export(__webpack_require__(32));
+__export(__webpack_require__(79));
+__export(__webpack_require__(80));
 
 
 /***/ }),
 /* 14 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
-
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
-__export(__webpack_require__(74));
-__export(__webpack_require__(75));
-__export(__webpack_require__(32));
-__export(__webpack_require__(76));
-__export(__webpack_require__(77));
-
-
-/***/ }),
-/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2158,7 +2117,7 @@ exports.Interaction = Interaction;
 
 
 /***/ }),
-/* 16 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2473,7 +2432,7 @@ exports.XYPlot = XYPlot;
 
 
 /***/ }),
-/* 17 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2488,19 +2447,19 @@ function __export(m) {
 __export(__webpack_require__(36));
 __export(__webpack_require__(22));
 __export(__webpack_require__(37));
-__export(__webpack_require__(78));
-__export(__webpack_require__(38));
-__export(__webpack_require__(79));
-__export(__webpack_require__(80));
 __export(__webpack_require__(81));
+__export(__webpack_require__(38));
 __export(__webpack_require__(82));
 __export(__webpack_require__(83));
 __export(__webpack_require__(84));
 __export(__webpack_require__(85));
+__export(__webpack_require__(86));
+__export(__webpack_require__(87));
+__export(__webpack_require__(88));
 
 
 /***/ }),
-/* 18 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2657,6 +2616,7 @@ exports.Scale = Scale;
 
 
 /***/ }),
+/* 18 */,
 /* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -2672,7 +2632,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var SVGTypewriter = __webpack_require__(4);
+var SVGTypewriter = __webpack_require__(125);
 var component_1 = __webpack_require__(5);
 var Formatters = __webpack_require__(8);
 var Utils = __webpack_require__(0);
@@ -3413,16 +3373,16 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var SVGTypewriter = __webpack_require__(4);
+var SVGTypewriter = __webpack_require__(125);
 var Animators = __webpack_require__(6);
 var Drawers = __webpack_require__(9);
 var Formatters = __webpack_require__(8);
 var Scales = __webpack_require__(3);
 var quantitativeScale_1 = __webpack_require__(10);
 var Utils = __webpack_require__(0);
-var Plots = __webpack_require__(17);
+var Plots = __webpack_require__(16);
 var plot_1 = __webpack_require__(2);
-var xyPlot_1 = __webpack_require__(16);
+var xyPlot_1 = __webpack_require__(15);
 var Bar = (function (_super) {
     __extends(Bar, _super);
     /**
@@ -4052,7 +4012,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var SVGTypewriter = __webpack_require__(4);
+var SVGTypewriter = __webpack_require__(125);
 var Formatters = __webpack_require__(8);
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
@@ -4874,7 +4834,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Interactions = __webpack_require__(14);
+var Interactions = __webpack_require__(13);
 var Utils = __webpack_require__(0);
 var _1 = __webpack_require__(30);
 var selectionBoxLayer_1 = __webpack_require__(35);
@@ -5361,98 +5321,7 @@ exports.within = within;
 
 
 /***/ }),
-/* 29 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-
-var d3 = __webpack_require__(1);
-var utils_1 = __webpack_require__(12);
-var BaseAnimator = (function () {
-    function BaseAnimator() {
-        this.duration(BaseAnimator.DEFAULT_DURATION_MILLISECONDS);
-        this.delay(0);
-        this.easing(BaseAnimator.DEFAULT_EASING);
-        this.moveX(0);
-        this.moveY(0);
-    }
-    BaseAnimator.prototype.animate = function (selection) {
-        utils_1.DOM.transform(selection, this.moveX(), this.moveY());
-        var initialTranslate = "translate(0, 0)";
-        return this._animate(selection, { transform: initialTranslate });
-    };
-    BaseAnimator.prototype._animate = function (selection, attr) {
-        var transition = selection.transition()
-            .ease(this.easing())
-            .duration(this.duration())
-            .delay(this.delay());
-        utils_1.DOM.applyAttrs(transition, attr);
-        return transition;
-    };
-    BaseAnimator.prototype.duration = function (duration) {
-        if (duration == null) {
-            return this._duration;
-        }
-        else {
-            this._duration = duration;
-            return this;
-        }
-    };
-    BaseAnimator.prototype.moveX = function (shift) {
-        if (shift == null) {
-            return this._moveX;
-        }
-        else {
-            this._moveX = shift;
-            return this;
-        }
-    };
-    BaseAnimator.prototype.moveY = function (shift) {
-        if (shift == null) {
-            return this._moveY;
-        }
-        else {
-            this._moveY = shift;
-            return this;
-        }
-    };
-    BaseAnimator.prototype.delay = function (delay) {
-        if (delay == null) {
-            return this._delay;
-        }
-        else {
-            this._delay = delay;
-            return this;
-        }
-    };
-    BaseAnimator.prototype.easing = function (easing) {
-        if (easing == null) {
-            return this._easing;
-        }
-        else {
-            this._easing = easing;
-            return this;
-        }
-    };
-    return BaseAnimator;
-}());
-/**
- * The default duration of the animation in milliseconds
- */
-BaseAnimator.DEFAULT_DURATION_MILLISECONDS = 300;
-/**
- * The default easing of the animation
- */
-BaseAnimator.DEFAULT_EASING = d3.easeExpOut;
-exports.BaseAnimator = BaseAnimator;
-//# sourceMappingURL=baseAnimator.js.map
-
-/***/ }),
+/* 29 */,
 /* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5466,18 +5335,18 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 __export(__webpack_require__(27));
-__export(__webpack_require__(55));
-__export(__webpack_require__(56));
-__export(__webpack_require__(33));
-__export(__webpack_require__(34));
-__export(__webpack_require__(57));
 __export(__webpack_require__(58));
 __export(__webpack_require__(59));
+__export(__webpack_require__(33));
+__export(__webpack_require__(34));
 __export(__webpack_require__(60));
-__export(__webpack_require__(35));
 __export(__webpack_require__(61));
 __export(__webpack_require__(62));
 __export(__webpack_require__(63));
+__export(__webpack_require__(35));
+__export(__webpack_require__(64));
+__export(__webpack_require__(65));
+__export(__webpack_require__(66));
 var Alignment = (function () {
     function Alignment() {
     }
@@ -5561,9 +5430,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Dispatchers = __webpack_require__(13);
+var Dispatchers = __webpack_require__(12);
 var Utils = __webpack_require__(0);
-var interaction_1 = __webpack_require__(15);
+var interaction_1 = __webpack_require__(14);
 var Key = (function (_super) {
     __extends(Key, _super);
     function Key() {
@@ -6180,7 +6049,7 @@ var d3 = __webpack_require__(1);
 var Drawers = __webpack_require__(9);
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var Plots = __webpack_require__(17);
+var Plots = __webpack_require__(16);
 var linePlot_1 = __webpack_require__(38);
 var plot_1 = __webpack_require__(2);
 var Area = (function (_super) {
@@ -6393,9 +6262,9 @@ var Drawers = __webpack_require__(9);
 var Scales = __webpack_require__(3);
 var quantitativeScale_1 = __webpack_require__(10);
 var Utils = __webpack_require__(0);
-var Plots = __webpack_require__(17);
+var Plots = __webpack_require__(16);
 var plot_1 = __webpack_require__(2);
-var xyPlot_1 = __webpack_require__(16);
+var xyPlot_1 = __webpack_require__(15);
 var CURVE_NAME_MAPPING = {
     "linear": d3.curveLinear,
     "linearClosed": d3.curveLinearClosed,
@@ -6870,9 +6739,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var Interactions = __webpack_require__(14);
+var Interactions = __webpack_require__(13);
 var Utils = __webpack_require__(0);
-var scale_1 = __webpack_require__(18);
+var scale_1 = __webpack_require__(17);
 var TRANSFORMATION_SPACE = [0, 1];
 var Category = (function (_super) {
     __extends(Category, _super);
@@ -7376,444 +7245,15 @@ exports.Set = Set;
 
 
 /***/ }),
-/* 42 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-
-var utils_1 = __webpack_require__(12);
-;
-var AbstractMeasurer = (function () {
-    function AbstractMeasurer(area, className) {
-        this.textMeasurer = this.getTextMeasurer(area, className);
-    }
-    AbstractMeasurer.prototype.measure = function (text) {
-        if (text === void 0) { text = AbstractMeasurer.HEIGHT_TEXT; }
-        return this.textMeasurer(text);
-    };
-    AbstractMeasurer.prototype.checkSelectionIsText = function (d) {
-        return d.node().tagName === "text" || !d.select("text").empty();
-    };
-    AbstractMeasurer.prototype.getTextMeasurer = function (area, className) {
-        var _this = this;
-        if (!this.checkSelectionIsText(area)) {
-            var textElement_1 = area.append("text");
-            if (className) {
-                textElement_1.classed(className, true);
-            }
-            textElement_1.remove();
-            return function (text) {
-                area.node().appendChild(textElement_1.node());
-                var areaDimension = _this.measureBBox(textElement_1, text);
-                textElement_1.remove();
-                return areaDimension;
-            };
-        }
-        else {
-            var parentNode_1 = area.node().parentNode;
-            var textSelection_1;
-            if (area.node().tagName === "text") {
-                textSelection_1 = area;
-            }
-            else {
-                textSelection_1 = area.select("text");
-            }
-            area.remove();
-            return function (text) {
-                parentNode_1.appendChild(area.node());
-                var areaDimension = _this.measureBBox(textSelection_1, text);
-                area.remove();
-                return areaDimension;
-            };
-        }
-    };
-    AbstractMeasurer.prototype.measureBBox = function (d, text) {
-        d.text(text);
-        var bb = utils_1.DOM.getBBox(d);
-        return { width: bb.width, height: bb.height };
-    };
-    return AbstractMeasurer;
-}());
-AbstractMeasurer.HEIGHT_TEXT = "bqpdl";
-exports.AbstractMeasurer = AbstractMeasurer;
-//# sourceMappingURL=abstractMeasurer.js.map
-
-/***/ }),
-/* 43 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var utils_1 = __webpack_require__(12);
-var characterMeasurer_1 = __webpack_require__(44);
-var CacheCharacterMeasurer = (function (_super) {
-    __extends(CacheCharacterMeasurer, _super);
-    function CacheCharacterMeasurer(area, className, useGuards) {
-        var _this = _super.call(this, area, className, useGuards) || this;
-        _this.cache = new utils_1.Cache(function (c) {
-            return _this._measureCharacterNotFromCache(c);
-        });
-        return _this;
-    }
-    CacheCharacterMeasurer.prototype._measureCharacterNotFromCache = function (c) {
-        return _super.prototype._measureCharacter.call(this, c);
-    };
-    CacheCharacterMeasurer.prototype._measureCharacter = function (c) {
-        return this.cache.get(c);
-    };
-    CacheCharacterMeasurer.prototype.reset = function () {
-        this.cache.clear();
-    };
-    return CacheCharacterMeasurer;
-}(characterMeasurer_1.CharacterMeasurer));
-exports.CacheCharacterMeasurer = CacheCharacterMeasurer;
-//# sourceMappingURL=cacheCharacterMeasurer.js.map
-
-/***/ }),
-/* 44 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var d3 = __webpack_require__(1);
-var measurer_1 = __webpack_require__(45);
-var CharacterMeasurer = (function (_super) {
-    __extends(CharacterMeasurer, _super);
-    function CharacterMeasurer() {
-        return _super.apply(this, arguments) || this;
-    }
-    CharacterMeasurer.prototype._measureCharacter = function (c) {
-        return _super.prototype._measureLine.call(this, c);
-    };
-    CharacterMeasurer.prototype._measureLine = function (line) {
-        var _this = this;
-        var charactersDimensions = line.split("").map(function (c) { return _this._measureCharacter(c); });
-        return {
-            height: d3.max(charactersDimensions, function (dim) { return dim.height; }),
-            width: d3.sum(charactersDimensions, function (dim) { return dim.width; }),
-        };
-    };
-    return CharacterMeasurer;
-}(measurer_1.Measurer));
-exports.CharacterMeasurer = CharacterMeasurer;
-//# sourceMappingURL=characterMeasurer.js.map
-
-/***/ }),
-/* 45 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var d3 = __webpack_require__(1);
-var abstractMeasurer_1 = __webpack_require__(42);
-var Measurer = (function (_super) {
-    __extends(Measurer, _super);
-    function Measurer(area, className, useGuards) {
-        if (className === void 0) { className = null; }
-        if (useGuards === void 0) { useGuards = false; }
-        var _this = _super.call(this, area, className) || this;
-        _this.useGuards = useGuards;
-        return _this;
-    }
-    // Guards assures same line height and width of whitespaces on both ends.
-    Measurer.prototype._addGuards = function (text) {
-        return abstractMeasurer_1.AbstractMeasurer.HEIGHT_TEXT + text + abstractMeasurer_1.AbstractMeasurer.HEIGHT_TEXT;
-    };
-    Measurer.prototype._measureLine = function (line, forceGuards) {
-        if (forceGuards === void 0) { forceGuards = false; }
-        var useGuards = this.useGuards || forceGuards || /^[\t ]$/.test(line);
-        var measuredLine = useGuards ? this._addGuards(line) : line;
-        var measuredLineDimensions = _super.prototype.measure.call(this, measuredLine);
-        measuredLineDimensions.width -= useGuards ? (2 * this.getGuardWidth()) : 0;
-        return measuredLineDimensions;
-    };
-    Measurer.prototype.measure = function (text) {
-        var _this = this;
-        if (text === void 0) { text = abstractMeasurer_1.AbstractMeasurer.HEIGHT_TEXT; }
-        if (text.trim() === "") {
-            return { width: 0, height: 0 };
-        }
-        var linesDimensions = text.trim().split("\n").map(function (line) { return _this._measureLine(line); });
-        return {
-            height: d3.sum(linesDimensions, function (dim) { return dim.height; }),
-            width: d3.max(linesDimensions, function (dim) { return dim.width; }),
-        };
-    };
-    Measurer.prototype.getGuardWidth = function () {
-        if (this.guardWidth == null) {
-            this.guardWidth = _super.prototype.measure.call(this).width;
-        }
-        return this.guardWidth;
-    };
-    return Measurer;
-}(abstractMeasurer_1.AbstractMeasurer));
-exports.Measurer = Measurer;
-//# sourceMappingURL=measurer.js.map
-
-/***/ }),
-/* 46 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-
-var Utils = __webpack_require__(12);
-var Wrapper = (function () {
-    function Wrapper() {
-        this.maxLines(Infinity);
-        this.textTrimming("ellipsis");
-        this.allowBreakingWords(true);
-        this._tokenizer = new Utils.Tokenizer();
-        this._breakingCharacter = "-";
-    }
-    Wrapper.prototype.maxLines = function (noLines) {
-        if (noLines == null) {
-            return this._maxLines;
-        }
-        else {
-            this._maxLines = noLines;
-            return this;
-        }
-    };
-    Wrapper.prototype.textTrimming = function (option) {
-        if (option == null) {
-            return this._textTrimming;
-        }
-        else {
-            if (option !== "ellipsis" && option !== "none") {
-                throw new Error(option + " - unsupported text trimming option.");
-            }
-            this._textTrimming = option;
-            return this;
-        }
-    };
-    Wrapper.prototype.allowBreakingWords = function (allow) {
-        if (allow == null) {
-            return this._allowBreakingWords;
-        }
-        else {
-            this._allowBreakingWords = allow;
-            return this;
-        }
-    };
-    Wrapper.prototype.wrap = function (text, measurer, width, height) {
-        var _this = this;
-        if (height === void 0) { height = Infinity; }
-        var initialWrappingResult = {
-            noBrokeWords: 0,
-            noLines: 0,
-            originalText: text,
-            truncatedText: "",
-            wrappedText: "",
-        };
-        var state = {
-            availableLines: Math.min(Math.floor(height / measurer.measure().height), this._maxLines),
-            availableWidth: width,
-            canFitText: true,
-            currentLine: "",
-            wrapping: initialWrappingResult,
-        };
-        var lines = text.split("\n");
-        return lines.reduce(function (s, line, i) {
-            return _this.breakLineToFitWidth(s, line, i !== lines.length - 1, measurer);
-        }, state).wrapping;
-    };
-    Wrapper.prototype.breakLineToFitWidth = function (state, line, hasNextLine, measurer) {
-        var _this = this;
-        if (!state.canFitText && state.wrapping.truncatedText !== "") {
-            state.wrapping.truncatedText += "\n";
-        }
-        var tokens = this._tokenizer.tokenize(line);
-        state = tokens.reduce(function (s, token) {
-            return _this.wrapNextToken(token, s, measurer);
-        }, state);
-        var wrappedText = Utils.StringMethods.trimEnd(state.currentLine);
-        state.wrapping.noLines += +(wrappedText !== "");
-        if (state.wrapping.noLines === state.availableLines && this._textTrimming !== "none" && hasNextLine) {
-            // Note: no need to add more ellipses, they were added in `wrapNextToken`
-            state.canFitText = false;
-        }
-        else {
-            state.wrapping.wrappedText += wrappedText;
-        }
-        state.currentLine = "\n";
-        return state;
-    };
-    Wrapper.prototype.canFitToken = function (token, width, measurer) {
-        var _this = this;
-        var possibleBreaks = this._allowBreakingWords ?
-            token.split("").map(function (c, i) { return (i !== token.length - 1) ? c + _this._breakingCharacter : c; })
-            : [token];
-        return (measurer.measure(token).width <= width) || possibleBreaks.every(function (c) { return measurer.measure(c).width <= width; });
-    };
-    Wrapper.prototype.addEllipsis = function (line, width, measurer) {
-        if (this._textTrimming === "none") {
-            return {
-                remainingToken: "",
-                wrappedToken: line,
-            };
-        }
-        var truncatedLine = line.substring(0).trim();
-        var lineWidth = measurer.measure(truncatedLine).width;
-        var ellipsesWidth = measurer.measure("...").width;
-        var prefix = (line.length > 0 && line[0] === "\n") ? "\n" : "";
-        if (width <= ellipsesWidth) {
-            var periodWidth = ellipsesWidth / 3;
-            var numPeriodsThatFit = Math.floor(width / periodWidth);
-            return {
-                remainingToken: line,
-                wrappedToken: prefix + "...".substr(0, numPeriodsThatFit),
-            };
-        }
-        while (lineWidth + ellipsesWidth > width) {
-            truncatedLine = Utils.StringMethods.trimEnd(truncatedLine.substr(0, truncatedLine.length - 1));
-            lineWidth = measurer.measure(truncatedLine).width;
-        }
-        return {
-            remainingToken: Utils.StringMethods.trimEnd(line.substring(truncatedLine.length), "-").trim(),
-            wrappedToken: prefix + truncatedLine + "...",
-        };
-    };
-    Wrapper.prototype.wrapNextToken = function (token, state, measurer) {
-        if (!state.canFitText ||
-            state.availableLines === state.wrapping.noLines ||
-            !this.canFitToken(token, state.availableWidth, measurer)) {
-            return this.finishWrapping(token, state, measurer);
-        }
-        var remainingToken = token;
-        while (remainingToken) {
-            var result = this.breakTokenToFitInWidth(remainingToken, state.currentLine, state.availableWidth, measurer);
-            state.currentLine = result.line;
-            remainingToken = result.remainingToken;
-            if (remainingToken != null) {
-                state.wrapping.noBrokeWords += +result.breakWord;
-                ++state.wrapping.noLines;
-                if (state.availableLines === state.wrapping.noLines) {
-                    var ellipsisResult = this.addEllipsis(state.currentLine, state.availableWidth, measurer);
-                    state.wrapping.wrappedText += ellipsisResult.wrappedToken;
-                    state.wrapping.truncatedText += ellipsisResult.remainingToken + remainingToken;
-                    state.currentLine = "\n";
-                    return state;
-                }
-                else {
-                    state.wrapping.wrappedText += Utils.StringMethods.trimEnd(state.currentLine);
-                    state.currentLine = "\n";
-                }
-            }
-        }
-        return state;
-    };
-    Wrapper.prototype.finishWrapping = function (token, state, measurer) {
-        // Token is really long, but we have a space to put part of the word.
-        if (state.canFitText &&
-            state.availableLines !== state.wrapping.noLines &&
-            this._allowBreakingWords &&
-            this._textTrimming !== "none") {
-            var res = this.addEllipsis(state.currentLine + token, state.availableWidth, measurer);
-            state.wrapping.wrappedText += res.wrappedToken;
-            state.wrapping.truncatedText += res.remainingToken;
-            state.wrapping.noBrokeWords += +(res.remainingToken.length < token.length);
-            state.wrapping.noLines += +(res.wrappedToken.length > 0);
-            state.currentLine = "";
-        }
-        else {
-            state.wrapping.truncatedText += token;
-        }
-        state.canFitText = false;
-        return state;
-    };
-    /**
-     * Breaks single token to fit current line.
-     * If token contains only whitespaces then they will not be populated to next line.
-     */
-    Wrapper.prototype.breakTokenToFitInWidth = function (token, line, availableWidth, measurer, breakingCharacter) {
-        if (breakingCharacter === void 0) { breakingCharacter = this._breakingCharacter; }
-        if (measurer.measure(line + token).width <= availableWidth) {
-            return {
-                breakWord: false,
-                line: line + token,
-                remainingToken: null,
-            };
-        }
-        if (token.trim() === "") {
-            return {
-                breakWord: false,
-                line: line,
-                remainingToken: "",
-            };
-        }
-        if (!this._allowBreakingWords) {
-            return {
-                breakWord: false,
-                line: line,
-                remainingToken: token,
-            };
-        }
-        var fitTokenLength = 0;
-        while (fitTokenLength < token.length) {
-            if (measurer.measure(line + token.substring(0, fitTokenLength + 1) + breakingCharacter).width <= availableWidth) {
-                ++fitTokenLength;
-            }
-            else {
-                break;
-            }
-        }
-        var suffix = "";
-        if (fitTokenLength > 0) {
-            suffix = breakingCharacter;
-        }
-        return {
-            breakWord: fitTokenLength > 0,
-            line: line + token.substring(0, fitTokenLength) + suffix,
-            remainingToken: token.substring(fitTokenLength),
-        };
-    };
-    return Wrapper;
-}());
-exports.Wrapper = Wrapper;
-//# sourceMappingURL=wrapper.js.map
-
-/***/ }),
-/* 47 */
+/* 42 */,
+/* 43 */,
+/* 44 */,
+/* 45 */,
+/* 46 */,
+/* 47 */,
+/* 48 */,
+/* 49 */,
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7825,13 +7265,13 @@ exports.Wrapper = Wrapper;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(53));
-__export(__webpack_require__(54));
+__export(__webpack_require__(56));
+__export(__webpack_require__(57));
 __export(__webpack_require__(23));
 
 
 /***/ }),
-/* 48 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7903,7 +7343,7 @@ exports.Dataset = Dataset;
 
 
 /***/ }),
-/* 49 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7921,7 +7361,7 @@ exports.version = "3.0.0-beta.2";
 
 
 /***/ }),
-/* 50 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8020,7 +7460,7 @@ d3Transition.transition.prototype.styles = transition_styles;
 
 
 /***/ }),
-/* 51 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8029,7 +7469,7 @@ d3Transition.transition.prototype.styles = transition_styles;
  * @license MIT
  */
 
-var d3Ease = __webpack_require__(100);
+var d3Ease = __webpack_require__(103);
 var coerceD3_1 = __webpack_require__(11);
 var EASE_NAME_MAPPING = {
     "linear": d3Ease.easeLinear,
@@ -8197,7 +7637,7 @@ exports.Easing = Easing;
 
 
 /***/ }),
-/* 52 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8227,7 +7667,7 @@ exports.Null = Null;
 
 
 /***/ }),
-/* 53 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8242,7 +7682,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var SVGTypewriter = __webpack_require__(4);
+var SVGTypewriter = __webpack_require__(125);
 var axis_1 = __webpack_require__(19);
 var Utils = __webpack_require__(0);
 var Category = (function (_super) {
@@ -8598,7 +8038,7 @@ exports.Category = Category;
 
 
 /***/ }),
-/* 54 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8613,7 +8053,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var SVGTypewriter = __webpack_require__(4);
+var SVGTypewriter = __webpack_require__(125);
 var axis_1 = __webpack_require__(19);
 var Formatters = __webpack_require__(8);
 var Utils = __webpack_require__(0);
@@ -8892,7 +8332,7 @@ exports.Numeric = Numeric;
 
 
 /***/ }),
-/* 55 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8907,7 +8347,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var guideLineLayer_1 = __webpack_require__(34);
-var Interactions = __webpack_require__(14);
+var Interactions = __webpack_require__(13);
 var Utils = __webpack_require__(0);
 var DragLineLayer = (function (_super) {
     __extends(DragLineLayer, _super);
@@ -9081,7 +8521,7 @@ exports.DragLineLayer = DragLineLayer;
 
 
 /***/ }),
-/* 56 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9191,7 +8631,7 @@ exports.Gridlines = Gridlines;
 
 
 /***/ }),
-/* 57 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9205,7 +8645,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var SVGTypewriter = __webpack_require__(4);
+var SVGTypewriter = __webpack_require__(125);
 var Configs = __webpack_require__(20);
 var Formatters = __webpack_require__(8);
 var Utils = __webpack_require__(0);
@@ -9452,7 +8892,7 @@ exports.InterpolatedColorLegend = InterpolatedColorLegend;
 
 
 /***/ }),
-/* 58 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9466,7 +8906,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var SVGTypewriter = __webpack_require__(4);
+var SVGTypewriter = __webpack_require__(125);
 var component_1 = __webpack_require__(5);
 var Label = (function (_super) {
     __extends(Label, _super);
@@ -9618,7 +9058,7 @@ exports.AxisLabel = AxisLabel;
 
 
 /***/ }),
-/* 59 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9633,7 +9073,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var SVGTypewriter = __webpack_require__(4);
+var SVGTypewriter = __webpack_require__(125);
 var Configs = __webpack_require__(20);
 var Formatters = __webpack_require__(8);
 var SymbolFactories = __webpack_require__(26);
@@ -10129,7 +9569,7 @@ exports.Legend = Legend;
 
 
 /***/ }),
-/* 60 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10186,7 +9626,7 @@ exports.PlotGroup = PlotGroup;
 
 
 /***/ }),
-/* 61 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10585,7 +10025,7 @@ exports.Table = Table;
 
 
 /***/ }),
-/* 62 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10651,7 +10091,7 @@ exports.XDragBoxLayer = XDragBoxLayer;
 
 
 /***/ }),
-/* 63 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10717,7 +10157,7 @@ exports.YDragBoxLayer = YDragBoxLayer;
 
 
 /***/ }),
-/* 64 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10813,7 +10253,7 @@ exports.Key = Key;
 
 
 /***/ }),
-/* 65 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11013,7 +10453,7 @@ exports.Mouse = Mouse;
 
 
 /***/ }),
-/* 66 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11189,7 +10629,7 @@ exports.Touch = Touch;
 
 
 /***/ }),
-/* 67 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11221,7 +10661,7 @@ exports.Arc = Arc;
 
 
 /***/ }),
-/* 68 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11253,7 +10693,7 @@ exports.ArcOutline = ArcOutline;
 
 
 /***/ }),
-/* 69 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11289,7 +10729,7 @@ exports.Area = Area;
 
 
 /***/ }),
-/* 70 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11325,7 +10765,7 @@ exports.Line = Line;
 
 
 /***/ }),
-/* 71 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11352,7 +10792,7 @@ exports.Rectangle = Rectangle;
 
 
 /***/ }),
-/* 72 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11379,7 +10819,7 @@ exports.Segment = Segment;
 
 
 /***/ }),
-/* 73 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11407,7 +10847,7 @@ exports.Symbol = Symbol;
 
 
 /***/ }),
-/* 74 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11421,9 +10861,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Dispatchers = __webpack_require__(13);
+var Dispatchers = __webpack_require__(12);
 var Utils = __webpack_require__(0);
-var interaction_1 = __webpack_require__(15);
+var interaction_1 = __webpack_require__(14);
 var Click = (function (_super) {
     __extends(Click, _super);
     function Click() {
@@ -11541,7 +10981,7 @@ exports.Click = Click;
 
 
 /***/ }),
-/* 75 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11555,9 +10995,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Dispatchers = __webpack_require__(13);
+var Dispatchers = __webpack_require__(12);
 var Utils = __webpack_require__(0);
-var interaction_1 = __webpack_require__(15);
+var interaction_1 = __webpack_require__(14);
 var Drag = (function (_super) {
     __extends(Drag, _super);
     function Drag() {
@@ -11706,7 +11146,7 @@ exports.Drag = Drag;
 
 
 /***/ }),
-/* 76 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11721,11 +11161,11 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var Dispatchers = __webpack_require__(13);
+var Dispatchers = __webpack_require__(12);
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var interaction_1 = __webpack_require__(15);
-var Interactions = __webpack_require__(14);
+var interaction_1 = __webpack_require__(14);
+var Interactions = __webpack_require__(13);
 /**
  * Performs a zoom transformation of the `value` argument scaled by the
  * `zoom` argument about the point defined by the `center` argument.
@@ -12264,7 +11704,7 @@ exports.PanZoom = PanZoom;
 
 
 /***/ }),
-/* 77 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12278,9 +11718,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Dispatchers = __webpack_require__(13);
+var Dispatchers = __webpack_require__(12);
 var Utils = __webpack_require__(0);
-var interaction_1 = __webpack_require__(15);
+var interaction_1 = __webpack_require__(14);
 var Pointer = (function (_super) {
     __extends(Pointer, _super);
     function Pointer() {
@@ -12395,7 +11835,7 @@ exports.Pointer = Pointer;
 
 
 /***/ }),
-/* 78 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12468,7 +11908,7 @@ exports.ClusteredBar = ClusteredBar;
 
 
 /***/ }),
-/* 79 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12483,7 +11923,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var SVGTypewriter = __webpack_require__(4);
+var SVGTypewriter = __webpack_require__(125);
 var Animators = __webpack_require__(6);
 var Drawers = __webpack_require__(9);
 var Formatters = __webpack_require__(8);
@@ -12965,7 +12405,7 @@ exports.Pie = Pie;
 
 
 /***/ }),
-/* 80 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12980,13 +12420,13 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var SVGTypewriter = __webpack_require__(4);
+var SVGTypewriter = __webpack_require__(125);
 var Animators = __webpack_require__(6);
 var Drawers = __webpack_require__(9);
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
 var plot_1 = __webpack_require__(2);
-var xyPlot_1 = __webpack_require__(16);
+var xyPlot_1 = __webpack_require__(15);
 var Rectangle = (function (_super) {
     __extends(Rectangle, _super);
     /**
@@ -13331,7 +12771,7 @@ exports.Rectangle = Rectangle;
 
 
 /***/ }),
-/* 81 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13350,9 +12790,9 @@ var SymbolFactories = __webpack_require__(26);
 var Drawers = __webpack_require__(9);
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var Plots = __webpack_require__(17);
+var Plots = __webpack_require__(16);
 var plot_1 = __webpack_require__(2);
-var xyPlot_1 = __webpack_require__(16);
+var xyPlot_1 = __webpack_require__(15);
 var Scatter = (function (_super) {
     __extends(Scatter, _super);
     /**
@@ -13379,7 +12819,7 @@ var Scatter = (function (_super) {
         var lightweightPlotEntities = _super.prototype._buildLightweightPlotEntities.call(this, datasets);
         return lightweightPlotEntities.map(function (lightweightPlotEntity) {
             var diameter = plot_1.Plot._scaledAccessor(_this.size())(lightweightPlotEntity.datum, lightweightPlotEntity.index, lightweightPlotEntity.dataset);
-            lightweightPlotEntity.diameter = { x: diameter, y: diameter };
+            lightweightPlotEntity.diameter = diameter;
             return lightweightPlotEntity;
         });
     };
@@ -13420,10 +12860,10 @@ var Scatter = (function (_super) {
         var xRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
         var yRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
         var translatedBbox = {
-            x: entity.position.x - entity.diameter.x,
-            y: entity.position.y - entity.diameter.y,
-            width: entity.diameter.x,
-            height: entity.diameter.y,
+            x: entity.position.x - entity.diameter,
+            y: entity.position.y - entity.diameter,
+            width: entity.diameter,
+            height: entity.diameter,
         };
         return Utils.DOM.intersectsBBox(xRange, yRange, translatedBbox);
     };
@@ -13492,7 +12932,7 @@ exports.Scatter = Scatter;
 
 
 /***/ }),
-/* 82 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13510,7 +12950,7 @@ var Animators = __webpack_require__(6);
 var Drawers = __webpack_require__(9);
 var Scales = __webpack_require__(3);
 var plot_1 = __webpack_require__(2);
-var xyPlot_1 = __webpack_require__(16);
+var xyPlot_1 = __webpack_require__(15);
 var Segment = (function (_super) {
     __extends(Segment, _super);
     /**
@@ -13690,7 +13130,7 @@ exports.Segment = Segment;
 
 
 /***/ }),
-/* 83 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13893,7 +13333,7 @@ exports.StackedArea = StackedArea;
 
 
 /***/ }),
-/* 84 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13907,7 +13347,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var SVGTypewriter = __webpack_require__(4);
+var SVGTypewriter = __webpack_require__(125);
 var Utils = __webpack_require__(0);
 var barPlot_1 = __webpack_require__(22);
 var StackedBar = (function (_super) {
@@ -14112,7 +13552,7 @@ exports.StackedBar = StackedBar;
 
 
 /***/ }),
-/* 85 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14323,7 +13763,7 @@ exports.Waterfall = Waterfall;
 
 
 /***/ }),
-/* 86 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14339,7 +13779,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Utils = __webpack_require__(0);
-var scale_1 = __webpack_require__(18);
+var scale_1 = __webpack_require__(17);
 var Color = (function (_super) {
     __extends(Color, _super);
     /**
@@ -14454,7 +13894,7 @@ exports.Color = Color;
 
 
 /***/ }),
-/* 87 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14470,7 +13910,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Utils = __webpack_require__(0);
-var scale_1 = __webpack_require__(18);
+var scale_1 = __webpack_require__(17);
 var InterpolatedColor = (function (_super) {
     __extends(InterpolatedColor, _super);
     /**
@@ -14620,7 +14060,7 @@ exports.InterpolatedColor = InterpolatedColor;
 
 
 /***/ }),
-/* 88 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14699,7 +14139,7 @@ exports.Linear = Linear;
 
 
 /***/ }),
-/* 89 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14923,7 +14363,7 @@ exports.ModifiedLog = ModifiedLog;
 
 
 /***/ }),
-/* 90 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14973,7 +14413,7 @@ exports.integerTickGenerator = integerTickGenerator;
 
 
 /***/ }),
-/* 91 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15109,7 +14549,7 @@ exports.Time = Time;
 
 
 /***/ }),
-/* 92 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15179,7 +14619,7 @@ exports.createFilledArray = createFilledArray;
 
 
 /***/ }),
-/* 93 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15221,7 +14661,7 @@ exports.CallbackSet = CallbackSet;
 
 
 /***/ }),
-/* 94 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15300,7 +14740,7 @@ exports.ClientToSVGTranslator = ClientToSVGTranslator;
 
 
 /***/ }),
-/* 95 */
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15383,7 +14823,7 @@ function luminance(color) {
 
 
 /***/ }),
-/* 96 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15437,7 +14877,7 @@ exports.EntityArray = EntityArray;
 
 
 /***/ }),
-/* 97 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15528,7 +14968,7 @@ exports.Map = Map;
 
 
 /***/ }),
-/* 98 */
+/* 101 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15653,7 +15093,7 @@ exports.normalizeKey = normalizeKey;
 
 
 /***/ }),
-/* 99 */
+/* 102 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15725,54 +15165,54 @@ exports.deprecated = deprecated;
 
 
 /***/ }),
-/* 100 */
+/* 103 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_linear__ = __webpack_require__(107);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_linear__ = __webpack_require__(110);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeLinear", function() { return __WEBPACK_IMPORTED_MODULE_0__src_linear__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__src_quad__ = __webpack_require__(109);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__src_quad__ = __webpack_require__(112);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeQuad", function() { return __WEBPACK_IMPORTED_MODULE_1__src_quad__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeQuadIn", function() { return __WEBPACK_IMPORTED_MODULE_1__src_quad__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeQuadOut", function() { return __WEBPACK_IMPORTED_MODULE_1__src_quad__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeQuadInOut", function() { return __WEBPACK_IMPORTED_MODULE_1__src_quad__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__src_cubic__ = __webpack_require__(104);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__src_cubic__ = __webpack_require__(107);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCubic", function() { return __WEBPACK_IMPORTED_MODULE_2__src_cubic__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCubicIn", function() { return __WEBPACK_IMPORTED_MODULE_2__src_cubic__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCubicOut", function() { return __WEBPACK_IMPORTED_MODULE_2__src_cubic__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCubicInOut", function() { return __WEBPACK_IMPORTED_MODULE_2__src_cubic__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__src_poly__ = __webpack_require__(108);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__src_poly__ = __webpack_require__(111);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easePoly", function() { return __WEBPACK_IMPORTED_MODULE_3__src_poly__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easePolyIn", function() { return __WEBPACK_IMPORTED_MODULE_3__src_poly__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easePolyOut", function() { return __WEBPACK_IMPORTED_MODULE_3__src_poly__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easePolyInOut", function() { return __WEBPACK_IMPORTED_MODULE_3__src_poly__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__src_sin__ = __webpack_require__(110);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__src_sin__ = __webpack_require__(113);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeSin", function() { return __WEBPACK_IMPORTED_MODULE_4__src_sin__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeSinIn", function() { return __WEBPACK_IMPORTED_MODULE_4__src_sin__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeSinOut", function() { return __WEBPACK_IMPORTED_MODULE_4__src_sin__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeSinInOut", function() { return __WEBPACK_IMPORTED_MODULE_4__src_sin__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__src_exp__ = __webpack_require__(106);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__src_exp__ = __webpack_require__(109);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeExp", function() { return __WEBPACK_IMPORTED_MODULE_5__src_exp__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeExpIn", function() { return __WEBPACK_IMPORTED_MODULE_5__src_exp__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeExpOut", function() { return __WEBPACK_IMPORTED_MODULE_5__src_exp__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeExpInOut", function() { return __WEBPACK_IMPORTED_MODULE_5__src_exp__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__src_circle__ = __webpack_require__(103);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__src_circle__ = __webpack_require__(106);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCircle", function() { return __WEBPACK_IMPORTED_MODULE_6__src_circle__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCircleIn", function() { return __WEBPACK_IMPORTED_MODULE_6__src_circle__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCircleOut", function() { return __WEBPACK_IMPORTED_MODULE_6__src_circle__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCircleInOut", function() { return __WEBPACK_IMPORTED_MODULE_6__src_circle__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__src_bounce__ = __webpack_require__(102);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__src_bounce__ = __webpack_require__(105);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBounce", function() { return __WEBPACK_IMPORTED_MODULE_7__src_bounce__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBounceIn", function() { return __WEBPACK_IMPORTED_MODULE_7__src_bounce__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBounceOut", function() { return __WEBPACK_IMPORTED_MODULE_7__src_bounce__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBounceInOut", function() { return __WEBPACK_IMPORTED_MODULE_7__src_bounce__["c"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__src_back__ = __webpack_require__(101);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__src_back__ = __webpack_require__(104);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBack", function() { return __WEBPACK_IMPORTED_MODULE_8__src_back__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBackIn", function() { return __WEBPACK_IMPORTED_MODULE_8__src_back__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBackOut", function() { return __WEBPACK_IMPORTED_MODULE_8__src_back__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBackInOut", function() { return __WEBPACK_IMPORTED_MODULE_8__src_back__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__src_elastic__ = __webpack_require__(105);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__src_elastic__ = __webpack_require__(108);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeElastic", function() { return __WEBPACK_IMPORTED_MODULE_9__src_elastic__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeElasticIn", function() { return __WEBPACK_IMPORTED_MODULE_9__src_elastic__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeElasticOut", function() { return __WEBPACK_IMPORTED_MODULE_9__src_elastic__["a"]; });
@@ -15799,7 +15239,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /***/ }),
-/* 101 */
+/* 104 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -15846,7 +15286,7 @@ var backInOut = (function custom(s) {
 
 
 /***/ }),
-/* 102 */
+/* 105 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -15878,7 +15318,7 @@ function bounceInOut(t) {
 
 
 /***/ }),
-/* 103 */
+/* 106 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -15899,7 +15339,7 @@ function circleInOut(t) {
 
 
 /***/ }),
-/* 104 */
+/* 107 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -15920,7 +15360,7 @@ function cubicInOut(t) {
 
 
 /***/ }),
-/* 105 */
+/* 108 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -15974,7 +15414,7 @@ var elasticInOut = (function custom(a, p) {
 
 
 /***/ }),
-/* 106 */
+/* 109 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -15995,7 +15435,7 @@ function expInOut(t) {
 
 
 /***/ }),
-/* 107 */
+/* 110 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16006,7 +15446,7 @@ function linear(t) {
 
 
 /***/ }),
-/* 108 */
+/* 111 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16053,7 +15493,7 @@ var polyInOut = (function custom(e) {
 
 
 /***/ }),
-/* 109 */
+/* 112 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16074,7 +15514,7 @@ function quadInOut(t) {
 
 
 /***/ }),
-/* 110 */
+/* 113 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16098,7 +15538,76 @@ function sinInOut(t) {
 
 
 /***/ }),
-/* 111 */
+/* 114 */,
+/* 115 */,
+/* 116 */,
+/* 117 */,
+/* 118 */,
+/* 119 */,
+/* 120 */,
+/* 121 */,
+/* 122 */,
+/* 123 */,
+/* 124 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+// HACKHACK d3-selection-multi doesn't play well with default "d3" package in a
+// bundler environment (e.g. webpack) - see https://github.com/d3/d3-selection-multi/issues/11
+// we add it manually to the default "d3" bundle
+__webpack_require__(53);
+var Animators = __webpack_require__(6);
+exports.Animators = Animators;
+var Axes = __webpack_require__(50);
+exports.Axes = Axes;
+var Components = __webpack_require__(30);
+exports.Components = Components;
+var Configs = __webpack_require__(20);
+exports.Configs = Configs;
+var Formatters = __webpack_require__(8);
+exports.Formatters = Formatters;
+var RenderController = __webpack_require__(25);
+exports.RenderController = RenderController;
+var RenderPolicies = __webpack_require__(31);
+exports.RenderPolicies = RenderPolicies;
+var SymbolFactories = __webpack_require__(26);
+exports.SymbolFactories = SymbolFactories;
+var Dispatchers = __webpack_require__(12);
+exports.Dispatchers = Dispatchers;
+var Drawers = __webpack_require__(9);
+exports.Drawers = Drawers;
+var Interactions = __webpack_require__(13);
+exports.Interactions = Interactions;
+var Plots = __webpack_require__(16);
+exports.Plots = Plots;
+var Scales = __webpack_require__(3);
+exports.Scales = Scales;
+var Utils = __webpack_require__(0);
+exports.Utils = Utils;
+__export(__webpack_require__(19));
+var timeAxis_1 = __webpack_require__(23);
+exports.TimeInterval = timeAxis_1.TimeInterval;
+__export(__webpack_require__(5));
+__export(__webpack_require__(24));
+__export(__webpack_require__(51));
+var version_1 = __webpack_require__(52);
+exports.version = version_1.version;
+__export(__webpack_require__(21));
+__export(__webpack_require__(7));
+__export(__webpack_require__(14));
+__export(__webpack_require__(32));
+__export(__webpack_require__(15));
+__export(__webpack_require__(2));
+__export(__webpack_require__(10));
+__export(__webpack_require__(17));
+
+
+/***/ }),
+/* 125 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16111,13 +15620,196 @@ function sinInOut(t) {
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(29));
-__export(__webpack_require__(112));
-__export(__webpack_require__(113));
+__export(__webpack_require__(133));
+__export(__webpack_require__(137));
+__export(__webpack_require__(126));
+__export(__webpack_require__(143));
+__export(__webpack_require__(145));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 112 */
+/* 126 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may obtain a copy of the
+ * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
+ */
+
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+__export(__webpack_require__(138));
+__export(__webpack_require__(139));
+__export(__webpack_require__(140));
+__export(__webpack_require__(141));
+__export(__webpack_require__(142));
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+/* 127 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may obtain a copy of the
+ * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
+ */
+
+var d3 = __webpack_require__(1);
+var utils_1 = __webpack_require__(126);
+var BaseAnimator = (function () {
+    function BaseAnimator() {
+        this.duration(BaseAnimator.DEFAULT_DURATION_MILLISECONDS);
+        this.delay(0);
+        this.easing(BaseAnimator.DEFAULT_EASING);
+        this.moveX(0);
+        this.moveY(0);
+    }
+    BaseAnimator.prototype.animate = function (selection) {
+        utils_1.DOM.transform(selection, this.moveX(), this.moveY());
+        var initialTranslate = "translate(0, 0)";
+        return this._animate(selection, { transform: initialTranslate });
+    };
+    BaseAnimator.prototype._animate = function (selection, attr) {
+        var transition = selection.transition()
+            .ease(this.easing())
+            .duration(this.duration())
+            .delay(this.delay());
+        utils_1.DOM.applyAttrs(transition, attr);
+        return transition;
+    };
+    BaseAnimator.prototype.duration = function (duration) {
+        if (duration == null) {
+            return this._duration;
+        }
+        else {
+            this._duration = duration;
+            return this;
+        }
+    };
+    BaseAnimator.prototype.moveX = function (shift) {
+        if (shift == null) {
+            return this._moveX;
+        }
+        else {
+            this._moveX = shift;
+            return this;
+        }
+    };
+    BaseAnimator.prototype.moveY = function (shift) {
+        if (shift == null) {
+            return this._moveY;
+        }
+        else {
+            this._moveY = shift;
+            return this;
+        }
+    };
+    BaseAnimator.prototype.delay = function (delay) {
+        if (delay == null) {
+            return this._delay;
+        }
+        else {
+            this._delay = delay;
+            return this;
+        }
+    };
+    BaseAnimator.prototype.easing = function (easing) {
+        if (easing == null) {
+            return this._easing;
+        }
+        else {
+            this._easing = easing;
+            return this;
+        }
+    };
+    return BaseAnimator;
+}());
+/**
+ * The default duration of the animation in milliseconds
+ */
+BaseAnimator.DEFAULT_DURATION_MILLISECONDS = 300;
+/**
+ * The default easing of the animation
+ */
+BaseAnimator.DEFAULT_EASING = d3.easeExpOut;
+exports.BaseAnimator = BaseAnimator;
+//# sourceMappingURL=baseAnimator.js.map
+
+/***/ }),
+/* 128 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may obtain a copy of the
+ * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
+ */
+
+var utils_1 = __webpack_require__(126);
+;
+var AbstractMeasurer = (function () {
+    function AbstractMeasurer(area, className) {
+        this.textMeasurer = this.getTextMeasurer(area, className);
+    }
+    AbstractMeasurer.prototype.measure = function (text) {
+        if (text === void 0) { text = AbstractMeasurer.HEIGHT_TEXT; }
+        return this.textMeasurer(text);
+    };
+    AbstractMeasurer.prototype.checkSelectionIsText = function (d) {
+        return d.node().tagName === "text" || !d.select("text").empty();
+    };
+    AbstractMeasurer.prototype.getTextMeasurer = function (area, className) {
+        var _this = this;
+        if (!this.checkSelectionIsText(area)) {
+            var textElement_1 = area.append("text");
+            if (className) {
+                textElement_1.classed(className, true);
+            }
+            textElement_1.remove();
+            return function (text) {
+                area.node().appendChild(textElement_1.node());
+                var areaDimension = _this.measureBBox(textElement_1, text);
+                textElement_1.remove();
+                return areaDimension;
+            };
+        }
+        else {
+            var parentNode_1 = area.node().parentNode;
+            var textSelection_1;
+            if (area.node().tagName === "text") {
+                textSelection_1 = area;
+            }
+            else {
+                textSelection_1 = area.select("text");
+            }
+            area.remove();
+            return function (text) {
+                parentNode_1.appendChild(area.node());
+                var areaDimension = _this.measureBBox(textSelection_1, text);
+                area.remove();
+                return areaDimension;
+            };
+        }
+    };
+    AbstractMeasurer.prototype.measureBBox = function (d, text) {
+        d.text(text);
+        var bb = utils_1.DOM.getBBox(d);
+        return { width: bb.width, height: bb.height };
+    };
+    return AbstractMeasurer;
+}());
+AbstractMeasurer.HEIGHT_TEXT = "bqpdl";
+exports.AbstractMeasurer = AbstractMeasurer;
+//# sourceMappingURL=abstractMeasurer.js.map
+
+/***/ }),
+/* 129 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16132,7 +15824,395 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var baseAnimator_1 = __webpack_require__(29);
+var utils_1 = __webpack_require__(126);
+var characterMeasurer_1 = __webpack_require__(130);
+var CacheCharacterMeasurer = (function (_super) {
+    __extends(CacheCharacterMeasurer, _super);
+    function CacheCharacterMeasurer(area, className, useGuards) {
+        var _this = _super.call(this, area, className, useGuards) || this;
+        _this.cache = new utils_1.Cache(function (c) {
+            return _this._measureCharacterNotFromCache(c);
+        });
+        return _this;
+    }
+    CacheCharacterMeasurer.prototype._measureCharacterNotFromCache = function (c) {
+        return _super.prototype._measureCharacter.call(this, c);
+    };
+    CacheCharacterMeasurer.prototype._measureCharacter = function (c) {
+        return this.cache.get(c);
+    };
+    CacheCharacterMeasurer.prototype.reset = function () {
+        this.cache.clear();
+    };
+    return CacheCharacterMeasurer;
+}(characterMeasurer_1.CharacterMeasurer));
+exports.CacheCharacterMeasurer = CacheCharacterMeasurer;
+//# sourceMappingURL=cacheCharacterMeasurer.js.map
+
+/***/ }),
+/* 130 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may obtain a copy of the
+ * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
+ */
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var d3 = __webpack_require__(1);
+var measurer_1 = __webpack_require__(131);
+var CharacterMeasurer = (function (_super) {
+    __extends(CharacterMeasurer, _super);
+    function CharacterMeasurer() {
+        return _super.apply(this, arguments) || this;
+    }
+    CharacterMeasurer.prototype._measureCharacter = function (c) {
+        return _super.prototype._measureLine.call(this, c);
+    };
+    CharacterMeasurer.prototype._measureLine = function (line) {
+        var _this = this;
+        var charactersDimensions = line.split("").map(function (c) { return _this._measureCharacter(c); });
+        return {
+            height: d3.max(charactersDimensions, function (dim) { return dim.height; }),
+            width: d3.sum(charactersDimensions, function (dim) { return dim.width; }),
+        };
+    };
+    return CharacterMeasurer;
+}(measurer_1.Measurer));
+exports.CharacterMeasurer = CharacterMeasurer;
+//# sourceMappingURL=characterMeasurer.js.map
+
+/***/ }),
+/* 131 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may obtain a copy of the
+ * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
+ */
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var d3 = __webpack_require__(1);
+var abstractMeasurer_1 = __webpack_require__(128);
+var Measurer = (function (_super) {
+    __extends(Measurer, _super);
+    function Measurer(area, className, useGuards) {
+        if (className === void 0) { className = null; }
+        if (useGuards === void 0) { useGuards = false; }
+        var _this = _super.call(this, area, className) || this;
+        _this.useGuards = useGuards;
+        return _this;
+    }
+    // Guards assures same line height and width of whitespaces on both ends.
+    Measurer.prototype._addGuards = function (text) {
+        return abstractMeasurer_1.AbstractMeasurer.HEIGHT_TEXT + text + abstractMeasurer_1.AbstractMeasurer.HEIGHT_TEXT;
+    };
+    Measurer.prototype._measureLine = function (line, forceGuards) {
+        if (forceGuards === void 0) { forceGuards = false; }
+        var useGuards = this.useGuards || forceGuards || /^[\t ]$/.test(line);
+        var measuredLine = useGuards ? this._addGuards(line) : line;
+        var measuredLineDimensions = _super.prototype.measure.call(this, measuredLine);
+        measuredLineDimensions.width -= useGuards ? (2 * this.getGuardWidth()) : 0;
+        return measuredLineDimensions;
+    };
+    Measurer.prototype.measure = function (text) {
+        var _this = this;
+        if (text === void 0) { text = abstractMeasurer_1.AbstractMeasurer.HEIGHT_TEXT; }
+        if (text.trim() === "") {
+            return { width: 0, height: 0 };
+        }
+        var linesDimensions = text.trim().split("\n").map(function (line) { return _this._measureLine(line); });
+        return {
+            height: d3.sum(linesDimensions, function (dim) { return dim.height; }),
+            width: d3.max(linesDimensions, function (dim) { return dim.width; }),
+        };
+    };
+    Measurer.prototype.getGuardWidth = function () {
+        if (this.guardWidth == null) {
+            this.guardWidth = _super.prototype.measure.call(this).width;
+        }
+        return this.guardWidth;
+    };
+    return Measurer;
+}(abstractMeasurer_1.AbstractMeasurer));
+exports.Measurer = Measurer;
+//# sourceMappingURL=measurer.js.map
+
+/***/ }),
+/* 132 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may obtain a copy of the
+ * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
+ */
+
+var Utils = __webpack_require__(126);
+var Wrapper = (function () {
+    function Wrapper() {
+        this.maxLines(Infinity);
+        this.textTrimming("ellipsis");
+        this.allowBreakingWords(true);
+        this._tokenizer = new Utils.Tokenizer();
+        this._breakingCharacter = "-";
+    }
+    Wrapper.prototype.maxLines = function (noLines) {
+        if (noLines == null) {
+            return this._maxLines;
+        }
+        else {
+            this._maxLines = noLines;
+            return this;
+        }
+    };
+    Wrapper.prototype.textTrimming = function (option) {
+        if (option == null) {
+            return this._textTrimming;
+        }
+        else {
+            if (option !== "ellipsis" && option !== "none") {
+                throw new Error(option + " - unsupported text trimming option.");
+            }
+            this._textTrimming = option;
+            return this;
+        }
+    };
+    Wrapper.prototype.allowBreakingWords = function (allow) {
+        if (allow == null) {
+            return this._allowBreakingWords;
+        }
+        else {
+            this._allowBreakingWords = allow;
+            return this;
+        }
+    };
+    Wrapper.prototype.wrap = function (text, measurer, width, height) {
+        var _this = this;
+        if (height === void 0) { height = Infinity; }
+        var initialWrappingResult = {
+            noBrokeWords: 0,
+            noLines: 0,
+            originalText: text,
+            truncatedText: "",
+            wrappedText: "",
+        };
+        var state = {
+            availableLines: Math.min(Math.floor(height / measurer.measure().height), this._maxLines),
+            availableWidth: width,
+            canFitText: true,
+            currentLine: "",
+            wrapping: initialWrappingResult,
+        };
+        var lines = text.split("\n");
+        return lines.reduce(function (s, line, i) {
+            return _this.breakLineToFitWidth(s, line, i !== lines.length - 1, measurer);
+        }, state).wrapping;
+    };
+    Wrapper.prototype.breakLineToFitWidth = function (state, line, hasNextLine, measurer) {
+        var _this = this;
+        if (!state.canFitText && state.wrapping.truncatedText !== "") {
+            state.wrapping.truncatedText += "\n";
+        }
+        var tokens = this._tokenizer.tokenize(line);
+        state = tokens.reduce(function (s, token) {
+            return _this.wrapNextToken(token, s, measurer);
+        }, state);
+        var wrappedText = Utils.StringMethods.trimEnd(state.currentLine);
+        state.wrapping.noLines += +(wrappedText !== "");
+        if (state.wrapping.noLines === state.availableLines && this._textTrimming !== "none" && hasNextLine) {
+            // Note: no need to add more ellipses, they were added in `wrapNextToken`
+            state.canFitText = false;
+        }
+        else {
+            state.wrapping.wrappedText += wrappedText;
+        }
+        state.currentLine = "\n";
+        return state;
+    };
+    Wrapper.prototype.canFitToken = function (token, width, measurer) {
+        var _this = this;
+        var possibleBreaks = this._allowBreakingWords ?
+            token.split("").map(function (c, i) { return (i !== token.length - 1) ? c + _this._breakingCharacter : c; })
+            : [token];
+        return (measurer.measure(token).width <= width) || possibleBreaks.every(function (c) { return measurer.measure(c).width <= width; });
+    };
+    Wrapper.prototype.addEllipsis = function (line, width, measurer) {
+        if (this._textTrimming === "none") {
+            return {
+                remainingToken: "",
+                wrappedToken: line,
+            };
+        }
+        var truncatedLine = line.substring(0).trim();
+        var lineWidth = measurer.measure(truncatedLine).width;
+        var ellipsesWidth = measurer.measure("...").width;
+        var prefix = (line.length > 0 && line[0] === "\n") ? "\n" : "";
+        if (width <= ellipsesWidth) {
+            var periodWidth = ellipsesWidth / 3;
+            var numPeriodsThatFit = Math.floor(width / periodWidth);
+            return {
+                remainingToken: line,
+                wrappedToken: prefix + "...".substr(0, numPeriodsThatFit),
+            };
+        }
+        while (lineWidth + ellipsesWidth > width) {
+            truncatedLine = Utils.StringMethods.trimEnd(truncatedLine.substr(0, truncatedLine.length - 1));
+            lineWidth = measurer.measure(truncatedLine).width;
+        }
+        return {
+            remainingToken: Utils.StringMethods.trimEnd(line.substring(truncatedLine.length), "-").trim(),
+            wrappedToken: prefix + truncatedLine + "...",
+        };
+    };
+    Wrapper.prototype.wrapNextToken = function (token, state, measurer) {
+        if (!state.canFitText ||
+            state.availableLines === state.wrapping.noLines ||
+            !this.canFitToken(token, state.availableWidth, measurer)) {
+            return this.finishWrapping(token, state, measurer);
+        }
+        var remainingToken = token;
+        while (remainingToken) {
+            var result = this.breakTokenToFitInWidth(remainingToken, state.currentLine, state.availableWidth, measurer);
+            state.currentLine = result.line;
+            remainingToken = result.remainingToken;
+            if (remainingToken != null) {
+                state.wrapping.noBrokeWords += +result.breakWord;
+                ++state.wrapping.noLines;
+                if (state.availableLines === state.wrapping.noLines) {
+                    var ellipsisResult = this.addEllipsis(state.currentLine, state.availableWidth, measurer);
+                    state.wrapping.wrappedText += ellipsisResult.wrappedToken;
+                    state.wrapping.truncatedText += ellipsisResult.remainingToken + remainingToken;
+                    state.currentLine = "\n";
+                    return state;
+                }
+                else {
+                    state.wrapping.wrappedText += Utils.StringMethods.trimEnd(state.currentLine);
+                    state.currentLine = "\n";
+                }
+            }
+        }
+        return state;
+    };
+    Wrapper.prototype.finishWrapping = function (token, state, measurer) {
+        // Token is really long, but we have a space to put part of the word.
+        if (state.canFitText &&
+            state.availableLines !== state.wrapping.noLines &&
+            this._allowBreakingWords &&
+            this._textTrimming !== "none") {
+            var res = this.addEllipsis(state.currentLine + token, state.availableWidth, measurer);
+            state.wrapping.wrappedText += res.wrappedToken;
+            state.wrapping.truncatedText += res.remainingToken;
+            state.wrapping.noBrokeWords += +(res.remainingToken.length < token.length);
+            state.wrapping.noLines += +(res.wrappedToken.length > 0);
+            state.currentLine = "";
+        }
+        else {
+            state.wrapping.truncatedText += token;
+        }
+        state.canFitText = false;
+        return state;
+    };
+    /**
+     * Breaks single token to fit current line.
+     * If token contains only whitespaces then they will not be populated to next line.
+     */
+    Wrapper.prototype.breakTokenToFitInWidth = function (token, line, availableWidth, measurer, breakingCharacter) {
+        if (breakingCharacter === void 0) { breakingCharacter = this._breakingCharacter; }
+        if (measurer.measure(line + token).width <= availableWidth) {
+            return {
+                breakWord: false,
+                line: line + token,
+                remainingToken: null,
+            };
+        }
+        if (token.trim() === "") {
+            return {
+                breakWord: false,
+                line: line,
+                remainingToken: "",
+            };
+        }
+        if (!this._allowBreakingWords) {
+            return {
+                breakWord: false,
+                line: line,
+                remainingToken: token,
+            };
+        }
+        var fitTokenLength = 0;
+        while (fitTokenLength < token.length) {
+            if (measurer.measure(line + token.substring(0, fitTokenLength + 1) + breakingCharacter).width <= availableWidth) {
+                ++fitTokenLength;
+            }
+            else {
+                break;
+            }
+        }
+        var suffix = "";
+        if (fitTokenLength > 0) {
+            suffix = breakingCharacter;
+        }
+        return {
+            breakWord: fitTokenLength > 0,
+            line: line + token.substring(0, fitTokenLength) + suffix,
+            remainingToken: token.substring(fitTokenLength),
+        };
+    };
+    return Wrapper;
+}());
+exports.Wrapper = Wrapper;
+//# sourceMappingURL=wrapper.js.map
+
+/***/ }),
+/* 133 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may obtain a copy of the
+ * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
+ */
+
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+__export(__webpack_require__(127));
+__export(__webpack_require__(134));
+__export(__webpack_require__(135));
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+/* 134 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may obtain a copy of the
+ * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
+ */
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var baseAnimator_1 = __webpack_require__(127);
 var OpacityAnimator = (function (_super) {
     __extends(OpacityAnimator, _super);
     function OpacityAnimator() {
@@ -16153,7 +16233,7 @@ exports.OpacityAnimator = OpacityAnimator;
 //# sourceMappingURL=opacityAnimator.js.map
 
 /***/ }),
-/* 113 */
+/* 135 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16168,8 +16248,8 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Utils = __webpack_require__(12);
-var baseAnimator_1 = __webpack_require__(29);
+var Utils = __webpack_require__(126);
+var baseAnimator_1 = __webpack_require__(127);
 var UnveilAnimator = (function (_super) {
     __extends(UnveilAnimator, _super);
     function UnveilAnimator() {
@@ -16228,7 +16308,7 @@ exports.UnveilAnimator = UnveilAnimator;
 //# sourceMappingURL=unveilAnimator.js.map
 
 /***/ }),
-/* 114 */
+/* 136 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16243,8 +16323,8 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var utils_1 = __webpack_require__(12);
-var cacheCharacterMeasurer_1 = __webpack_require__(43);
+var utils_1 = __webpack_require__(126);
+var cacheCharacterMeasurer_1 = __webpack_require__(129);
 var CacheMeasurer = (function (_super) {
     __extends(CacheMeasurer, _super);
     function CacheMeasurer(area, className) {
@@ -16270,7 +16350,7 @@ exports.CacheMeasurer = CacheMeasurer;
 //# sourceMappingURL=cacheMeasurer.js.map
 
 /***/ }),
-/* 115 */
+/* 137 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16283,15 +16363,15 @@ exports.CacheMeasurer = CacheMeasurer;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(42));
-__export(__webpack_require__(43));
-__export(__webpack_require__(114));
-__export(__webpack_require__(44));
-__export(__webpack_require__(45));
+__export(__webpack_require__(128));
+__export(__webpack_require__(129));
+__export(__webpack_require__(136));
+__export(__webpack_require__(130));
+__export(__webpack_require__(131));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 116 */
+/* 138 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16340,7 +16420,7 @@ exports.Cache = Cache;
 //# sourceMappingURL=cache.js.map
 
 /***/ }),
-/* 117 */
+/* 139 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16389,7 +16469,7 @@ exports.DOM = DOM;
 //# sourceMappingURL=dom.js.map
 
 /***/ }),
-/* 118 */
+/* 140 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16447,7 +16527,7 @@ exports.Methods = Methods;
 //# sourceMappingURL=methods.js.map
 
 /***/ }),
-/* 119 */
+/* 141 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16494,7 +16574,7 @@ exports.StringMethods = StringMethods;
 //# sourceMappingURL=stringMethods.js.map
 
 /***/ }),
-/* 120 */
+/* 142 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16542,7 +16622,7 @@ exports.Tokenizer = Tokenizer;
 //# sourceMappingURL=tokenizer.js.map
 
 /***/ }),
-/* 121 */
+/* 143 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16555,12 +16635,12 @@ exports.Tokenizer = Tokenizer;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(122));
-__export(__webpack_require__(46));
+__export(__webpack_require__(144));
+__export(__webpack_require__(132));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 122 */
+/* 144 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16575,7 +16655,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var wrapper_1 = __webpack_require__(46);
+var wrapper_1 = __webpack_require__(132);
 var SingleLineWrapper = (function (_super) {
     __extends(SingleLineWrapper, _super);
     function SingleLineWrapper() {
@@ -16618,7 +16698,7 @@ exports.SingleLineWrapper = SingleLineWrapper;
 //# sourceMappingURL=singleLineWrapper.js.map
 
 /***/ }),
-/* 123 */
+/* 145 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16631,11 +16711,11 @@ exports.SingleLineWrapper = SingleLineWrapper;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(124));
+__export(__webpack_require__(146));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 124 */
+/* 146 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16645,7 +16725,7 @@ __export(__webpack_require__(124));
  * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
  */
 
-var utils_1 = __webpack_require__(12);
+var utils_1 = __webpack_require__(126);
 var Writer = (function () {
     function Writer(measurer, wrapper) {
         this._writerID = Writer.nextID++;
@@ -16789,65 +16869,6 @@ Writer.YOffsetFactor = {
 };
 exports.Writer = Writer;
 //# sourceMappingURL=writer.js.map
-
-/***/ }),
-/* 125 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
-// HACKHACK d3-selection-multi doesn't play well with default "d3" package in a
-// bundler environment (e.g. webpack) - see https://github.com/d3/d3-selection-multi/issues/11
-// we add it manually to the default "d3" bundle
-__webpack_require__(50);
-var Animators = __webpack_require__(6);
-exports.Animators = Animators;
-var Axes = __webpack_require__(47);
-exports.Axes = Axes;
-var Components = __webpack_require__(30);
-exports.Components = Components;
-var Configs = __webpack_require__(20);
-exports.Configs = Configs;
-var Formatters = __webpack_require__(8);
-exports.Formatters = Formatters;
-var RenderController = __webpack_require__(25);
-exports.RenderController = RenderController;
-var RenderPolicies = __webpack_require__(31);
-exports.RenderPolicies = RenderPolicies;
-var SymbolFactories = __webpack_require__(26);
-exports.SymbolFactories = SymbolFactories;
-var Dispatchers = __webpack_require__(13);
-exports.Dispatchers = Dispatchers;
-var Drawers = __webpack_require__(9);
-exports.Drawers = Drawers;
-var Interactions = __webpack_require__(14);
-exports.Interactions = Interactions;
-var Plots = __webpack_require__(17);
-exports.Plots = Plots;
-var Scales = __webpack_require__(3);
-exports.Scales = Scales;
-var Utils = __webpack_require__(0);
-exports.Utils = Utils;
-__export(__webpack_require__(19));
-var timeAxis_1 = __webpack_require__(23);
-exports.TimeInterval = timeAxis_1.TimeInterval;
-__export(__webpack_require__(5));
-__export(__webpack_require__(24));
-__export(__webpack_require__(48));
-var version_1 = __webpack_require__(49);
-exports.version = version_1.version;
-__export(__webpack_require__(21));
-__export(__webpack_require__(7));
-__export(__webpack_require__(15));
-__export(__webpack_require__(32));
-__export(__webpack_require__(16));
-__export(__webpack_require__(2));
-__export(__webpack_require__(10));
-__export(__webpack_require__(18));
-
 
 /***/ })
 /******/ ]);
