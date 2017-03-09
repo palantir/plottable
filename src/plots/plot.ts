@@ -140,6 +140,8 @@ export class Plot extends Component {
 
   protected _setup() {
     super._setup();
+
+    // TODO, let the drawer context create their own elements
     if (this._canvas != null) {
       this.element().node().appendChild(this._canvas.node());
     }
@@ -147,10 +149,10 @@ export class Plot extends Component {
     this.datasets().forEach((dataset) => this._createNodesForDataset(dataset));
   }
 
-
   public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
     super.computeLayout(origin, availableWidth, availableHeight);
     if (this._canvas != null) {
+      // TODO, move to drawer context
       // update canvas width/height; this will also clear the canvas of any drawn elements so we should
       // be sure not to computeLayout() without a render() in the future.
       this._canvas.attr("width", this.width());
@@ -167,10 +169,11 @@ export class Plot extends Component {
 
   protected _createNodesForDataset(dataset: Dataset) {
     let drawer = this._datasetToDrawer.get(dataset);
+    // TODO, let the drawer context create their own elements
     if (this.renderer() === "svg") {
-      drawer.renderArea(this._renderArea.append("g"));
+      drawer.setContext("svg", this._renderArea.append("g"));
     } else {
-      drawer.canvas(this._canvas);
+      drawer.setContext("canvas", this._canvas);
     }
     return drawer;
   }
@@ -448,25 +451,28 @@ export class Plot extends Component {
     if (renderer === undefined) {
       return this._canvas == null ? "svg" : "canvas";
     } else {
-      if (this._canvas == null && renderer === "canvas") {
-        // construct the canvas, remove drawer's renderAreas, set drawer's canvas
+      if (renderer === "canvas") {
+
+        // TODO, let the drawer context create their own elements
+
+        // construct the canvas, remove drawer's ss, set drawer's canvas
         this._canvas = d3.select(document.createElement("canvas")).classed("plot-canvas", true);
         if (this.element() != null) {
           this.element().node().appendChild(this._canvas.node());
         }
+
         this._datasetToDrawer.forEach((drawer) => {
-          if (drawer.renderArea() != null) {
-            drawer.renderArea().remove();
-          }
-          drawer.canvas(this._canvas);
+          drawer.remove();
+          drawer.setContext(renderer, this._canvas);
         });
         this.render();
-      } else if (this._canvas != null && renderer == "svg") {
-        this._canvas.remove();
-        this._canvas = null;
+      } else {
+
         this._datasetToDrawer.forEach((drawer) => {
-          drawer.renderArea(this._renderArea.append("g"));
-        })
+          drawer.remove();
+          const drawArea = this._renderArea.append("g");
+          drawer.setContext(renderer, drawArea);
+        });
         this.render();
       }
       return this;
@@ -616,7 +622,7 @@ export class Plot extends Component {
       if (drawer == null) {
         return;
       }
-      drawer.renderArea().selectAll(drawer.selector()).each(function () {
+      drawer.selection().each(function () {
         selections.push(this);
       });
     });

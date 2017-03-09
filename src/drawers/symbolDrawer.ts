@@ -4,15 +4,14 @@
  */
 
 import { Dataset } from "../core/dataset";
-
 import { Drawer } from "./drawer";
+import { IDrawerContext, SvgDrawerContext } from "./contexts";
+
+export class SymbolSvg extends SvgDrawerContext {
+  protected _className = "symbol";
+  protected _svgElementName = "path";
+}
 
 export class Symbol extends Drawer {
-
-  constructor(dataset: Dataset) {
-    super(dataset);
-    this._svgElementName = "path";
-    this._className = "symbol";
-  }
-
+  protected _svgDrawerContext = SymbolSvg;
 }

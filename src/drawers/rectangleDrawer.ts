@@ -6,19 +6,17 @@
 import * as d3 from "d3";
 
 import { Dataset } from "../core/dataset";
-
 import { Drawer } from "./drawer";
+import { CanvasDrawerContext, IDrawerContext, SvgDrawerContext } from "./contexts";
 import { AppliedDrawStep } from "./index";
 
-export class Rectangle extends Drawer {
+export class RectangleSvg extends SvgDrawerContext {
+    protected _svgElementName = "rect";
+}
 
-  constructor(dataset: Dataset) {
-    super(dataset);
-    this._svgElementName = "rect";
-  }
-
-  protected _drawStepCanvas(data: any[], step: AppliedDrawStep) {
-    const context = this.canvas().node().getContext("2d");
+export class RectangleCanvas extends CanvasDrawerContext {
+  public drawStep(data: any[], step: AppliedDrawStep) {
+    const context = this._canvas.node().getContext("2d");
 
     const attrToAppliedProjector = step.attrToAppliedProjector;
     context.save();
@@ -53,4 +51,9 @@ export class Rectangle extends Drawer {
     });
     context.restore();
   }
+}
+
+export class Rectangle extends Drawer {
+  protected _svgContextType = RectangleSvg;
+  protected _canvasContextType = RectangleCanvas;
 }
