@@ -54,7 +54,7 @@ export class Pie extends Plot {
 
   protected _setup() {
     super._setup();
-    this._strokeDrawers.forEach((d) => d.renderArea(this._renderArea.append("g")));
+    this._strokeDrawers.forEach((d) => d.setContext("svg", this._renderArea.append("g")));
   }
 
   public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
@@ -87,7 +87,7 @@ export class Pie extends Plot {
     this._updatePieAngles();
     let strokeDrawer = new Drawers.ArcOutline(dataset);
     if (this._isSetup) {
-      strokeDrawer.renderArea(this._renderArea.append("g"));
+      strokeDrawer.setContext("svg", this._renderArea.append("g"));
     }
     this._strokeDrawers.set(dataset, strokeDrawer);
     super._addDataset(dataset);
@@ -118,7 +118,7 @@ export class Pie extends Plot {
       if (drawer == null) {
         return;
       }
-      drawer.renderArea().selectAll(drawer.selector()).each(function () {
+      drawer.selection().each(function () {
         allSelections.push(this);
       });
     });

@@ -1,9 +1,10 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
+import * as sinon from "sinon";
 
 import { assert } from "chai";
 
 import * as Plottable from "../../src";
+import { SimpleSelection } from "../../src/core/interfaces";
 
 import * as TestMethods from "../testMethods";
 
@@ -20,12 +21,12 @@ describe("Drawers", () => {
       }
     }
 
-   let drawer: MockDrawer;
-   let dataset: Plottable.Dataset;
-   beforeEach(() => {
-     dataset = new Plottable.Dataset();
-     drawer = new MockDrawer(dataset);
-   });
+    let drawer: MockDrawer;
+    let dataset: Plottable.Dataset;
+    beforeEach(() => {
+      dataset = new Plottable.Dataset();
+      drawer = new MockDrawer(dataset);
+    });
 
     it("returns its element name as a selector", () => {
       assert.strictEqual(drawer.selector(), MockDrawer.ELEMENT_NAME);
@@ -101,6 +102,49 @@ describe("Drawers", () => {
           const selectionForIndex = drawer.selectionForIndex(index);
           assert.strictEqual(selectionForIndex.node(), selection.nodes()[index], `retrieves the correct selection for index ${index}`);
         });
+      });
+    });
+
+    describe("canvas drawing", () => {
+      it("setting the renderArea/canvas clears the other one", () => {
+        const svg = TestMethods.generateSVG();
+        const canvas = d3.select(document.createElement("canvas"));
+        drawer.renderArea(svg);
+        drawer.canvas(canvas);
+
+        assert.isNull(drawer.renderArea(), "setting canvas clears renderArea");
+        assert.strictEqual(drawer.canvas(), canvas, "can get canvas after setting");
+
+        drawer.renderArea(svg);
+
+        assert.isNull(drawer.canvas(), "setting renderArea clears canvas");
+        assert.strictEqual(drawer.renderArea(), svg, "can get renderArea after setting");
+
+        svg.remove();
+      });
+
+      it("draw() calls _drawStepCanvas", () => {
+        const canvas = d3.select(document.createElement("canvas"));
+        drawer.canvas(canvas);
+        const drawStep: Plottable.Drawers.DrawStep = {
+          animator: new Plottable.Animators.Null(),
+          attrToProjector: {}
+        };
+
+        const drawStepCanvasStub = sinon.stub(drawer, "_drawStepCanvas", () => {});
+        const data: any[] = [];
+        drawer.draw(data, [drawStep]);
+        assert.strictEqual(drawStepCanvasStub.args[0][0], data, "_drawStepCanvas is called");
+
+        drawStepCanvasStub.reset();
+
+        const svg = TestMethods.generateSVG();
+        drawer.renderArea(svg);
+        drawer.draw(data, [drawStep]);
+
+        assert.isFalse(drawStepCanvasStub.called, "_drawStepCanvas isn't called in svg land");
+
+        svg.remove();
       });
     });
 

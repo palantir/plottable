@@ -4,12 +4,13 @@
  */
 
 import { Dataset } from "../core/dataset";
-
 import { Drawer } from "./drawer";
+import { IDrawerContext, SvgDrawerContext } from "./contexts";
+
+export class SegmentSvg extends SvgDrawerContext {
+  protected _svgElementName = "line";
+}
 
 export class Segment extends Drawer {
-  constructor(dataset: Dataset) {
-    super(dataset);
-    this._svgElementName = "line";
-  }
+  protected _svgDrawerContext = SegmentSvg;
 }

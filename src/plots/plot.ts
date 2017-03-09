@@ -19,6 +19,8 @@ import * as Utils from "../utils";
 import * as Plots from "./commons";
 import { coerceExternalD3 } from "../utils/coerceD3";
 
+export type Renderer = "svg" | "canvas";
+
 export class Plot extends Component {
   protected static _ANIMATION_MAX_DURATION = 600;
 
@@ -28,22 +30,82 @@ export class Plot extends Component {
    * to access the entity store.
    */
   private _cachedEntityStore: Utils.EntityStore<Plots.LightweightPlotEntity>;
+  /**
+   * Whether the backing datasets have changed since this plot's last render.
+   */
   private _dataChanged = false;
+  /**
+   * Stores the Drawer for each dataset attached to this plot.
+   */
   private _datasetToDrawer: Utils.Map<Dataset, Drawer>;
 
+  /**
+   * The _renderArea is the main SVG drawing area upon which this plot should draw to.
+   */
   protected _renderArea: SimpleSelection<void>;
+  /**
+   * Mapping from attribute names to the AccessorScale that defines that attribute.
+   */
   private _attrBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
+  /**
+   * Mapping from attribute names to the extents ([min, max]) values that that attribute takes on.
+   */
   private _attrExtents: d3.Map<any[]>;
+  /**
+   * Callback that we register onto Scales that get bound to this Plot.
+   *
+   * TODO make this an arrow method instead of re-defining it in constructor()
+   */
   private _includedValuesProvider: Scales.IncludedValuesProvider<any>;
 
   private _animate = false;
+  /**
+   * The Animators for this plot. Each plot exposes a set of "animator key" strings that
+   * define how different parts of that particular Plot animates. For instance, Rectangle
+   * Plots have a "rectangles" animator key which controls how the <rect>s are animated.
+   * @see animator()
+   *
+   * There are two common animators that most Plots respect: "main" and "reset". In general,
+   * Plots draw in two steps: first they "reset" their visual elements (e.g. scatter plots set
+   * all the dots to size 0), and then they do the "main" animation into the correct visualization
+   * (e.g. scatter plot dots grow to their specified size).
+   */
   private _animators: {[animator: string]: Animator} = {};
 
+  /**
+   * Callback that triggers when any scale that's bound to this plot Updates.
+   *
+   * TODO make this an arrow method instead of re-defining it in constructor()
+   */
   protected _renderCallback: ScaleCallback<Scale<any, any>>;
+  /**
+   * Callback that triggers when any Dataset that's bound to this plot Updates.
+   *
+   * TODO make this an arrow method insteade of re-defining it in constructor()
+   */
   private _onDatasetUpdateCallback: DatasetCallback;
 
-  protected _propertyExtents: d3.Map<any[]>;
+  /**
+   * Mapping from property names to the AccessorScale that defines that property.
+   *
+   * e.g. Line may register an "x" -> binding and a "y" -> binding;
+   * Rectangle would register "x", "y", "x2", and "y2"
+   *
+   * Only subclasses control how they register properties, while attrs can be registered by the user.
+   * By default, only attrs are passed to the _generateDrawStep's attrToProjector; properties are not.
+   */
   protected _propertyBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
+  /**
+   * Mapping from property names to the extents ([min, max]) values that that property takes on.
+   */
+  protected _propertyExtents: d3.Map<any[]>;
+
+  /**
+   * The canvas element that this Plot will render to if using the canvas renderer, or null if not using the SVG
+   * renderer. The node may be parent-less (which means that the plot isn't setup yet but is still using the canvas
+   * renderer).
+   */
+  private _canvas: d3.Selection<HTMLCanvasElement, any, any, any>;
 
   /**
    * A Plot draws some visualization of the inputted Datasets.
@@ -78,8 +140,25 @@ export class Plot extends Component {
 
   protected _setup() {
     super._setup();
+
+    // TODO, let the drawer context create their own elements
+    if (this._canvas != null) {
+      this.element().node().appendChild(this._canvas.node());
+    }
     this._renderArea = this.content().append("g").classed("render-area", true);
     this.datasets().forEach((dataset) => this._createNodesForDataset(dataset));
+  }
+
+  public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
+    super.computeLayout(origin, availableWidth, availableHeight);
+    if (this._canvas != null) {
+      // TODO, move to drawer context
+      // update canvas width/height; this will also clear the canvas of any drawn elements so we should
+      // be sure not to computeLayout() without a render() in the future.
+      this._canvas.attr("width", this.width());
+      this._canvas.attr("height", this.height());
+    }
+    return this;
   }
 
   public destroy() {
@@ -90,7 +169,12 @@ export class Plot extends Component {
 
   protected _createNodesForDataset(dataset: Dataset) {
     let drawer = this._datasetToDrawer.get(dataset);
-    drawer.renderArea(this._renderArea.append("g"));
+    // TODO, let the drawer context create their own elements
+    if (this.renderer() === "svg") {
+      drawer.setContext("svg", this._renderArea.append("g"));
+    } else {
+      drawer.setContext("canvas", this._canvas);
+    }
     return drawer;
   }
 
@@ -355,6 +439,47 @@ export class Plot extends Component {
   }
 
   /**
+   * Get the renderer for this Plot, either "svg" or "canvas".
+   */
+  public renderer(): Renderer;
+  /**
+   * Set the Renderer to be either "svg" or "canvas" on this Plot.
+   * @param renderer
+   */
+  public renderer(renderer: Renderer): this;
+  public renderer(renderer?: Renderer): Renderer | this {
+    if (renderer === undefined) {
+      return this._canvas == null ? "svg" : "canvas";
+    } else {
+      if (renderer === "canvas") {
+
+        // TODO, let the drawer context create their own elements
+
+        // construct the canvas, remove drawer's ss, set drawer's canvas
+        this._canvas = d3.select(document.createElement("canvas")).classed("plot-canvas", true);
+        if (this.element() != null) {
+          this.element().node().appendChild(this._canvas.node());
+        }
+
+        this._datasetToDrawer.forEach((drawer) => {
+          drawer.remove();
+          drawer.setContext(renderer, this._canvas);
+        });
+        this.render();
+      } else {
+
+        this._datasetToDrawer.forEach((drawer) => {
+          drawer.remove();
+          const drawArea = this._renderArea.append("g");
+          drawer.setContext(renderer, drawArea);
+        });
+        this.render();
+      }
+      return this;
+    }
+  }
+
+  /**
    * Adds a Dataset to the Plot.
    *
    * @param {Dataset} dataset
@@ -422,10 +547,6 @@ export class Plot extends Component {
     return this;
   }
 
-  protected _getDrawersInOrder(): Drawer[] {
-    return this.datasets().map((dataset) => this._datasetToDrawer.get(dataset));
-  }
-
   protected _generateDrawSteps(): Drawers.DrawStep[] {
     return [{ attrToProjector: this._generateAttrToProjector(), animator: new Animators.Null() }];
   }
@@ -481,7 +602,7 @@ export class Plot extends Component {
   private _paint() {
     let drawSteps = this._generateDrawSteps();
     let dataToDraw = this._getDataToDraw();
-    let drawers = this._getDrawersInOrder();
+    let drawers = this.datasets().map((dataset) => this._datasetToDrawer.get(dataset));
 
     this.datasets().forEach((ds, i) => drawers[i].draw(dataToDraw.get(ds), drawSteps));
 
@@ -505,7 +626,7 @@ export class Plot extends Component {
       if (drawer == null) {
         return;
       }
-      drawer.renderArea().selectAll(drawer.selector()).each(function () {
+      drawer.selection().each(function () {
         selections.push(this);
       });
     });

@@ -259,7 +259,10 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
 
   protected _createNodesForDataset(dataset: Dataset): Drawer {
     const drawer = super._createNodesForDataset(dataset);
-    drawer.renderArea().classed(Bar._BAR_AREA_CLASS, true);
+    // TODO i think this needs to be sent to the drawer's context
+    if (this._renderArea != null) {
+      this._renderArea.classed(Bar._BAR_AREA_CLASS, true);
+    }
     const labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
     const context = new Typesetter.SvgContext(labelArea.node() as SVGElement);
     const measurer = new Typesetter.CacheMeasurer(context);
