@@ -776,7 +776,7 @@ var Component = (function () {
         /**
          * Origin of this Component relative to its parent.
          */
-        this._origin = { x: 0, y: 0 };
+        this._origin = { "x": 0, "y": 0 };
         this._xAlignment = "left";
         this._yAlignment = "top";
         this._isSetup = false;
@@ -896,8 +896,8 @@ var Component = (function () {
      */
     Component.prototype.requestedSpace = function (availableWidth, availableHeight) {
         return {
-            minWidth: 0,
-            minHeight: 0,
+            "minWidth": 0,
+            "minHeight": 0,
         };
     };
     /**
@@ -918,7 +918,7 @@ var Component = (function () {
             }
             else if (this._rootElement != null) {
                 // retrieve height/width from rootElement
-                origin = { x: 0, y: 0 };
+                origin = { "x": 0, "y": 0 };
                 var elem = this._rootElement.node();
                 availableWidth = Utils.DOM.elementWidth(elem);
                 availableHeight = Utils.DOM.elementHeight(elem);
@@ -933,14 +933,14 @@ var Component = (function () {
         var xAlignProportion = Component._xAlignToProportion[this._xAlignment];
         var yAlignProportion = Component._yAlignToProportion[this._yAlignment];
         this._origin = {
-            x: origin.x + (availableWidth - this.width()) * xAlignProportion,
-            y: origin.y + (availableHeight - this.height()) * yAlignProportion,
+            "x": origin.x + (availableWidth - this.width()) * xAlignProportion,
+            "y": origin.y + (availableHeight - this.height()) * yAlignProportion,
         };
         this._element.styles({
-            left: this._origin.x + "px",
-            height: this.height() + "px",
-            top: this._origin.y + "px",
-            width: this.width() + "px",
+            "left": this._origin.x + "px",
+            "height": this.height() + "px",
+            "top": this._origin.y + "px",
+            "width": this.width() + "px",
         });
         this._boxes.forEach(function (b) { return b.attr("width", _this.width()).attr("height", _this.height()); });
         if (this._resizeHandler != null) {
@@ -951,8 +951,8 @@ var Component = (function () {
     Component.prototype._sizeFromOffer = function (availableWidth, availableHeight) {
         var requestedSpace = this.requestedSpace(availableWidth, availableHeight);
         return {
-            width: this.fixedWidth() ? Math.min(availableWidth, requestedSpace.minWidth) : availableWidth,
-            height: this.fixedHeight() ? Math.min(availableHeight, requestedSpace.minHeight) : availableHeight,
+            "width": this.fixedWidth() ? Math.min(availableWidth, requestedSpace.minWidth) : availableWidth,
+            "height": this.fixedHeight() ? Math.min(availableHeight, requestedSpace.minHeight) : availableHeight,
         };
     };
     /**
@@ -1212,9 +1212,9 @@ var Component = (function () {
         var topLeft = this.origin();
         return {
             topLeft: topLeft,
-            bottomRight: {
-                x: topLeft.x + this.width(),
-                y: topLeft.y + this.height(),
+            "bottomRight": {
+                "x": topLeft.x + this.width(),
+                "y": topLeft.y + this.height(),
             },
         };
     };
@@ -1244,8 +1244,8 @@ var Component = (function () {
      */
     Component.prototype.origin = function () {
         return {
-            x: this._origin.x,
-            y: this._origin.y,
+            "x": this._origin.x,
+            "y": this._origin.y,
         };
     };
     /**
@@ -2876,8 +2876,8 @@ var Axis = (function (_super) {
             }
         }
         return {
-            minWidth: requestedWidth,
-            minHeight: requestedHeight,
+            "minWidth": requestedWidth,
+            "minHeight": requestedHeight,
         };
     };
     Axis.prototype.fixedHeight = function () {
@@ -2994,8 +2994,8 @@ var Axis = (function (_super) {
         annotatedTicks.forEach(function (annotatedTick) {
             var measurement = _this._annotationMeasurer.measure(_this.annotationFormatter()(annotatedTick));
             var paddedMeasurement = {
-                width: measurement.width + 2 * labelPadding,
-                height: measurement.height + 2 * labelPadding,
+                "width": measurement.width + 2 * labelPadding,
+                "height": measurement.height + 2 * labelPadding,
             };
             measurements.set(annotatedTick, paddedMeasurement);
         });
@@ -3048,17 +3048,17 @@ var Axis = (function (_super) {
         var isHorizontal = this.isHorizontal();
         bindElements(this._annotationContainer.select(".annotation-line-container"), "line", Axis.ANNOTATION_LINE_CLASS)
             .attrs({
-            x1: isHorizontal ? positionF : secondaryPosition,
-            x2: isHorizontal ? positionF : offsetF,
-            y1: isHorizontal ? secondaryPosition : positionF,
-            y2: isHorizontal ? offsetF : positionF,
-            visibility: visibilityF,
+            "x1": isHorizontal ? positionF : secondaryPosition,
+            "x2": isHorizontal ? positionF : offsetF,
+            "y1": isHorizontal ? secondaryPosition : positionF,
+            "y2": isHorizontal ? offsetF : positionF,
+            "visibility": visibilityF,
         });
         bindElements(this._annotationContainer.select(".annotation-circle-container"), "circle", Axis.ANNOTATION_CIRCLE_CLASS)
             .attrs({
-            cx: isHorizontal ? positionF : secondaryPosition,
-            cy: isHorizontal ? secondaryPosition : positionF,
-            r: 3,
+            "cx": isHorizontal ? positionF : secondaryPosition,
+            "cy": isHorizontal ? secondaryPosition : positionF,
+            "r": 3,
         });
         var rectangleOffsetF = function (d) {
             switch (_this.orientation()) {
@@ -3072,29 +3072,29 @@ var Axis = (function (_super) {
         };
         bindElements(this._annotationContainer.select(".annotation-rect-container"), "rect", Axis.ANNOTATION_RECT_CLASS)
             .attrs({
-            x: isHorizontal ? positionF : rectangleOffsetF,
-            y: isHorizontal ? rectangleOffsetF : positionF,
-            width: isHorizontal ? function (d) { return measurements.get(d).width; } : function (d) { return measurements.get(d).height; },
-            height: isHorizontal ? function (d) { return measurements.get(d).height; } : function (d) { return measurements.get(d).width; },
-            visibility: visibilityF,
+            "x": isHorizontal ? positionF : rectangleOffsetF,
+            "y": isHorizontal ? rectangleOffsetF : positionF,
+            "width": isHorizontal ? function (d) { return measurements.get(d).width; } : function (d) { return measurements.get(d).height; },
+            "height": isHorizontal ? function (d) { return measurements.get(d).height; } : function (d) { return measurements.get(d).width; },
+            "visibility": visibilityF,
         });
         var annotationWriter = this._annotationWriter;
         var annotationFormatter = this.annotationFormatter();
         var annotationLabels = bindElements(this._annotationContainer.select(".annotation-label-container"), "g", Axis.ANNOTATION_LABEL_CLASS);
         annotationLabels.selectAll(".text-container").remove();
         annotationLabels.attrs({
-            transform: function (d) {
+            "transform": function (d) {
                 var xTranslate = isHorizontal ? positionF(d) : rectangleOffsetF(d);
                 var yTranslate = isHorizontal ? rectangleOffsetF(d) : positionF(d);
                 return "translate(" + xTranslate + "," + yTranslate + ")";
             },
-            visibility: visibilityF,
+            "visibility": visibilityF,
         })
             .each(function (annotationLabel) {
             annotationWriter.write(annotationFormatter(annotationLabel), isHorizontal ? measurements.get(annotationLabel).width : measurements.get(annotationLabel).height, isHorizontal ? measurements.get(annotationLabel).height : measurements.get(annotationLabel).width, {
-                xAlign: "center",
-                yAlign: "center",
-                textRotation: isHorizontal ? 0 : 90,
+                "xAlign": "center",
+                "yAlign": "center",
+                "textRotation": isHorizontal ? 0 : 90,
             }, d3.select(this).node());
         });
     };
@@ -3158,10 +3158,10 @@ var Axis = (function (_super) {
     };
     Axis.prototype._generateBaselineAttrHash = function () {
         var baselineAttrHash = {
-            x1: 0,
-            y1: 0,
-            x2: 0,
-            y2: 0,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
         };
         switch (this._orientation) {
             case "bottom":
@@ -3187,10 +3187,10 @@ var Axis = (function (_super) {
         var _this = this;
         if (isEndTickMark === void 0) { isEndTickMark = false; }
         var tickMarkAttrHash = {
-            x1: 0,
-            y1: 0,
-            x2: 0,
-            y2: 0,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
         };
         var scalingFunction = function (d) { return _this._scale.scale(d); };
         if (this.isHorizontal()) {
@@ -8150,8 +8150,8 @@ var Category = (function (_super) {
         var heightRequiredByTicks = this.isHorizontal() ? this._tickSpaceRequired() + this.margin() : 0;
         if (this._scale.domain().length === 0) {
             return {
-                minWidth: 0,
-                minHeight: 0,
+                "minWidth": 0,
+                "minHeight": 0,
             };
         }
         if (this.annotationsEnabled()) {
@@ -8165,8 +8165,8 @@ var Category = (function (_super) {
         }
         var measureResult = this._measureTickLabels(offeredWidth, offeredHeight);
         return {
-            minWidth: measureResult.usedWidth + widthRequiredByTicks,
-            minHeight: measureResult.usedHeight + heightRequiredByTicks,
+            "minWidth": measureResult.usedWidth + widthRequiredByTicks,
+            "minHeight": measureResult.usedHeight + heightRequiredByTicks,
         };
     };
     Category.prototype._coreSize = function () {
@@ -8196,8 +8196,8 @@ var Category = (function (_super) {
         var shearedMinimumWidth = Category._MINIMUM_WIDTH_PER_LABEL_PX * shearFactor;
         var downsampleRatio = Math.ceil(shearedMinimumWidth / scale.stepWidth());
         return {
-            domain: domain.filter(function (d, i) { return i % downsampleRatio === 0; }),
-            stepWidth: downsampleRatio * scale.stepWidth(),
+            "domain": domain.filter(function (d, i) { return i % downsampleRatio === 0; }),
+            "stepWidth": downsampleRatio * scale.stepWidth(),
         };
     };
     Category.prototype.tickLabelAngle = function (angle) {
@@ -8277,16 +8277,16 @@ var Category = (function (_super) {
         var yAlign;
         switch (this.tickLabelAngle()) {
             case 0:
-                xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
-                yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
+                xAlign = { "left": "right", "right": "left", "top": "center", "bottom": "center" };
+                yAlign = { "left": "center", "right": "center", "top": "bottom", "bottom": "top" };
                 break;
             case 90:
-                xAlign = { left: "center", right: "center", top: "right", bottom: "left" };
-                yAlign = { left: "top", right: "bottom", top: "center", bottom: "center" };
+                xAlign = { "left": "center", "right": "center", "top": "right", "bottom": "left" };
+                yAlign = { "left": "top", "right": "bottom", "top": "center", "bottom": "center" };
                 break;
             case -90:
-                xAlign = { left: "center", right: "center", top: "left", bottom: "right" };
-                yAlign = { left: "bottom", right: "top", top: "center", bottom: "center" };
+                xAlign = { "left": "center", "right": "center", "top": "left", "bottom": "right" };
+                yAlign = { "left": "bottom", "right": "top", "top": "center", "bottom": "center" };
                 break;
         }
         ticks.each(function (d) {
@@ -8294,10 +8294,10 @@ var Category = (function (_super) {
             var width = self.isHorizontal() ? stepWidth : self.width() - self._tickSpaceRequired();
             var height = self.isHorizontal() ? self.height() - self._tickSpaceRequired() : stepWidth;
             var writeOptions = {
-                xAlign: xAlign[self.orientation()],
-                yAlign: yAlign[self.orientation()],
-                textRotation: self.tickLabelAngle(),
-                textShear: self.tickLabelShearAngle(),
+                "xAlign": xAlign[self.orientation()],
+                "yAlign": yAlign[self.orientation()],
+                "textRotation": self.tickLabelAngle(),
+                "textShear": self.tickLabelShearAngle(),
             };
             if (self._tickLabelMaxWidth != null) {
                 // for left-oriented axes, we must move the ticks by the amount we've cut off in order to keep the text
@@ -8366,8 +8366,8 @@ var Category = (function (_super) {
             _b = [usedHeight, usedWidth], usedWidth = _b[0], usedHeight = _b[1];
         }
         return {
-            usedWidth: usedWidth,
-            usedHeight: usedHeight,
+            "usedWidth": usedWidth,
+            "usedHeight": usedHeight,
         };
         var _b;
     };
@@ -9524,10 +9524,10 @@ var LegendRow = (function () {
             columnXOffset += this.columns[i].width;
         }
         return {
-            topLeft: { x: columnXOffset, y: 0 },
-            bottomRight: {
-                x: columnXOffset + column.width,
-                y: column.height,
+            "topLeft": { "x": columnXOffset, "y": 0 },
+            "bottomRight": {
+                "x": columnXOffset + column.width,
+                "y": column.height,
             },
         };
     };
@@ -9611,10 +9611,10 @@ var LegendTable = (function () {
             rowYOffset += this.rows[i].getHeight();
         }
         var rowBounds = {
-            topLeft: { x: rowXOffset, y: rowYOffset },
-            bottomRight: {
-                x: rowXOffset + this.rows[rowIndex].getWidth(),
-                y: rowYOffset + this.rows[rowIndex].getHeight(),
+            "topLeft": { "x": rowXOffset, "y": rowYOffset },
+            "bottomRight": {
+                "x": rowXOffset + this.rows[rowIndex].getWidth(),
+                "y": rowYOffset + this.rows[rowIndex].getHeight(),
             },
         };
         return rowBounds;
@@ -9773,7 +9773,7 @@ var Legend = (function (_super) {
                 row.bottomPadding = _this._rowBottomPadding;
                 table.addRow(row);
             }
-            var symbolColumn = { width: textHeight, height: textHeight, data: { name: name, type: "symbol" } };
+            var symbolColumn = { "width": textHeight, "height": textHeight, "data": { name: name, "type": "symbol" } };
             row.addColumn(symbolColumn);
             // the space consumed by the name field is the minimum of the space available in the table
             // and the actual width consumed by the name
@@ -9782,7 +9782,7 @@ var Legend = (function (_super) {
             _this._wrapper.maxLines(_this.maxLinesPerEntry());
             var numberOfRows = _this._wrapper.wrap(formattedName, _this._measurer, usedNameWidth).noLines;
             var nameColumnHeight = numberOfRows * textHeight;
-            var nameColumn = { width: usedNameWidth, height: nameColumnHeight, data: { name: name, type: "text" } };
+            var nameColumn = { "width": usedNameWidth, "height": nameColumnHeight, "data": { name: name, "type": "text" } };
             row.addColumn(nameColumn);
         });
         return table;
@@ -9792,8 +9792,8 @@ var Legend = (function (_super) {
         // if max width is not set, the table will be as wide as the longest untruncated row
         var table = this._buildLegendTable(Utils.Math.min([this.maxWidth(), offeredWidth], offeredWidth), offeredHeight);
         return {
-            minHeight: table.getHeight(),
-            minWidth: table.getWidth(),
+            "minHeight": table.getHeight(),
+            "minWidth": table.getWidth(),
         };
     };
     /**
@@ -9834,13 +9834,13 @@ var Legend = (function (_super) {
                     var rowTranslate = Utils.DOM.getTranslateValues(d3.select(rowElement));
                     var symbolTranslate = Utils.DOM.getTranslateValues(symbolElement);
                     return [{
-                            datum: column.data.name,
-                            position: {
-                                x: rowTranslate[0] + symbolTranslate[0],
-                                y: rowTranslate[1] + symbolTranslate[1],
+                            "datum": column.data.name,
+                            "position": {
+                                "x": rowTranslate[0] + symbolTranslate[0],
+                                "y": rowTranslate[1] + symbolTranslate[1],
                             },
-                            selection: d3.select(entryElement),
-                            component: _this,
+                            "selection": d3.select(entryElement),
+                            "component": _this,
                         }];
                 }
                 return entity;
@@ -9902,9 +9902,9 @@ var Legend = (function (_super) {
                 var textContainer = d3.select(this);
                 var column = symbolEntryPair[1];
                 var writeOptions = {
-                    xAlign: "left",
-                    yAlign: "top",
-                    textRotation: 0,
+                    "xAlign": "left",
+                    "yAlign": "top",
+                    "textRotation": 0,
                 };
                 self._writer.write(self._formatter(column.data.name), column.width, self.height(), writeOptions, textContainer.node());
             });
@@ -10670,7 +10670,7 @@ var Mouse = (function (_super) {
         var _this = this;
         _super.call(this);
         this._translator = Utils.getTranslator(component);
-        this._lastMousePosition = { x: -1, y: -1 };
+        this._lastMousePosition = { "x": -1, "y": -1 };
         var processMoveCallback = function (e) { return _this._measureAndDispatch(component, e, Mouse._MOUSEMOVE_EVENT_NAME, "page"); };
         this._eventToProcessingFunction[Mouse._MOUSEOVER_EVENT_NAME] = processMoveCallback;
         this._eventToProcessingFunction[Mouse._MOUSEMOVE_EVENT_NAME] = processMoveCallback;
