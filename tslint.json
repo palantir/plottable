@@ -9,6 +9,7 @@
     "no-string-throw": true,
     "align": [true, "parameters", "statements"],
     "arrow-parens": true,
-    "no-boolean-literal-compare": true
+    "no-boolean-literal-compare": true,
+    "no-consecutive-blank-lines": true
   }
 }

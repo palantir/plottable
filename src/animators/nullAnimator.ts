@@ -3,8 +3,6 @@
  * @license MIT
  */
 
-
-
 import { AttributeToAppliedProjector, SimpleSelection } from "../core/interfaces";
 import { coerceExternalD3 } from "../utils/coerceD3";
 import { Animator } from "./animator";
@@ -22,4 +20,3 @@ export class Null implements Animator {
     return selection.attrs(attrToAppliedProjector);
   }
 }
-

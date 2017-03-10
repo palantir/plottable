@@ -3,7 +3,6 @@
  * @license MIT
  */
 
-
 import * as Utils from "../utils";
 import * as Scales from "./";
 

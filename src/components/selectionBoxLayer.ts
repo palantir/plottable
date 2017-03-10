@@ -3,8 +3,6 @@
  * @license MIT
  */
 
-
-
 import { Bounds, Point, SimpleSelection } from "../core/interfaces";
 import { QuantitativeScale } from "../scales/quantitativeScale";
 import { ScaleCallback } from "../scales/scale";

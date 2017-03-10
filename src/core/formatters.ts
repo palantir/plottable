@@ -242,4 +242,3 @@ function verifyPrecision(precision: number) {
     throw new RangeError("Formatter precision must be an integer");
   }
 }
-

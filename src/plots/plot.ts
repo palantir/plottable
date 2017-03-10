@@ -147,7 +147,6 @@ export class Plot extends Component {
     this.datasets().forEach((dataset) => this._createNodesForDataset(dataset));
   }
 
-
   public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
     super.computeLayout(origin, availableWidth, availableHeight);
     if (this._canvas != null) {

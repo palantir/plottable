@@ -3,8 +3,6 @@
  * @license MIT
  */
 
-
-
 import { Dataset } from "../core/dataset";
 
 import { SimpleSelection } from "../core/interfaces";

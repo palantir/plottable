@@ -61,4 +61,3 @@ export namespace Animator {
   export let MAIN = "main";
   export let RESET = "reset";
 }
-

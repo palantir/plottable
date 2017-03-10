@@ -123,4 +123,3 @@ export function within(p: Point, bounds: Bounds) {
     && bounds.topLeft.y <= p.y
     && bounds.bottomRight.y >= p.y;
 }
-

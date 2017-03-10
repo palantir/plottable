@@ -12,7 +12,6 @@ import { Interaction } from "./interaction";
 
 export type DragCallback = (start: Point, end: Point) => void;
 
-
 export class Drag extends Interaction {
   private _dragging = false;
   private _constrainedToComponent = true;

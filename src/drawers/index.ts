@@ -31,4 +31,3 @@ export type AppliedDrawStep = {
   attrToAppliedProjector: AttributeToAppliedProjector;
   animator: Animator;
 };
-

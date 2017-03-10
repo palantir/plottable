@@ -93,4 +93,3 @@ export class Translator {
     return Utils.DOM.contains(component.root().rootElement().node() as Element, e.target as Element);
   }
 }
-

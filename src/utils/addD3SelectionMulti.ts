@@ -97,4 +97,3 @@ d3Selection.selection.prototype.styles = selection_styles;
 d3Selection.selection.prototype.properties = selection_properties;
 d3Transition.transition.prototype.attrs = transition_attrs;
 d3Transition.transition.prototype.styles = transition_styles;
-

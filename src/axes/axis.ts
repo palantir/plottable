@@ -3,7 +3,6 @@
  * @license MIT
  */
 
-
 import * as d3 from "d3";
 import * as Typesetter from "typesettable";
 
@@ -592,7 +591,6 @@ export class Axis<D> extends Component {
   public getScale() {
     return this._scale;
   }
-
 
   /**
    * Gets the Formatter on the Axis. Tick values are passed through the

@@ -28,4 +28,3 @@ export interface Animator {
    */
   totalTime(numberOfIterations: number): number;
 }
-

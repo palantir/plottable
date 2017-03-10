@@ -90,7 +90,6 @@ export function stack(
   return datasetToKeyToStackedDatum;
 }
 
-
 /**
  * Computes the maximum and minimum extents of each stack individually.
  *
@@ -162,4 +161,3 @@ export function stackedExtent(stackingResult: StackingResult, keyAccessor: Acces
 export function normalizeKey(key: any) {
   return String(key);
 }
-
