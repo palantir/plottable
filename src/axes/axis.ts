@@ -8,10 +8,10 @@ import * as d3 from "d3";
 import * as Typesetter from "typesettable";
 
 import { Component } from "../components/component";
-import { Scale, ScaleCallback } from "../scales/scale";
 import { Formatter } from "../core/formatters";
 import * as Formatters from "../core/formatters";
-import { SpaceRequest, Point, SimpleSelection } from "../core/interfaces";
+import { Point, SimpleSelection, SpaceRequest } from "../core/interfaces";
+import { Scale, ScaleCallback } from "../scales/scale";
 import * as Utils from "../utils";
 
 export type AxisOrientation =  "bottom" | "left" | "right" | "top";

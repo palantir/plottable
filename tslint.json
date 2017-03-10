@@ -1,6 +1,5 @@
 {
-  "extends": "tslint:latest",
   "rules": {
-    "no-namespace": false
+    "ordered-imports": true
   }
 }

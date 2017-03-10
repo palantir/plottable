@@ -140,8 +140,8 @@ var Animators = __webpack_require__(6);
 var component_1 = __webpack_require__(5);
 var drawer_1 = __webpack_require__(7);
 var Utils = __webpack_require__(0);
-var Plots = __webpack_require__(37);
 var coerceD3_1 = __webpack_require__(11);
+var Plots = __webpack_require__(37);
 var Plot = (function (_super) {
     __extends(Plot, _super);
     /**
@@ -4733,8 +4733,8 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var component_1 = __webpack_require__(5);
 var coerceD3_1 = __webpack_require__(11);
+var component_1 = __webpack_require__(5);
 /*
  * ComponentContainer class encapsulates Table and ComponentGroup's shared functionality.
  * It will not do anything if instantiated directly.
@@ -5008,9 +5008,9 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Interactions = __webpack_require__(13);
 var Utils = __webpack_require__(0);
+var coerceD3_1 = __webpack_require__(11);
 var _1 = __webpack_require__(30);
 var selectionBoxLayer_1 = __webpack_require__(35);
-var coerceD3_1 = __webpack_require__(11);
 var DragBoxLayer = (function (_super) {
     __extends(DragBoxLayer, _super);
     /**
@@ -8074,8 +8074,8 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Typesetter = __webpack_require__(4);
-var axis_1 = __webpack_require__(19);
 var Utils = __webpack_require__(0);
+var axis_1 = __webpack_require__(19);
 var Category = (function (_super) {
     __extends(Category, _super);
     /**
@@ -8446,9 +8446,9 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Typesetter = __webpack_require__(4);
-var axis_1 = __webpack_require__(19);
 var Formatters = __webpack_require__(8);
 var Utils = __webpack_require__(0);
+var axis_1 = __webpack_require__(19);
 var Numeric = (function (_super) {
     __extends(Numeric, _super);
     /**

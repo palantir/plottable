@@ -12,8 +12,8 @@ import * as Scales from "../scales";
 import { TransformableScale } from "../scales/scale";
 import * as Utils from "../utils";
 
-import { Interaction } from "./interaction";
 import * as Interactions from "./";
+import { Interaction } from "./interaction";
 
 export type PanCallback = () => void;
 export type ZoomCallback = () => void;

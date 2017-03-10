@@ -5,8 +5,8 @@
 
 import * as d3 from "d3";
 
-import { Accessor, AttributeToProjector, Projector, SimpleSelection } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
+import { Accessor, AttributeToProjector, Projector, SimpleSelection } from "../core/interfaces";
 import * as Drawers from "../drawers";
 import * as Scales from "../scales";
 import { QuantitativeScale } from "../scales/quantitativeScale";

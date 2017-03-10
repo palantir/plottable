@@ -7,12 +7,12 @@ import * as d3 from "d3";
 import * as Typesetter from "typesettable";
 
 import * as Animators from "../animators";
-import { Accessor, Point, Bounds, Range, SimpleSelection } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
-import { Drawer } from "../drawers/drawer";
-import * as Drawers from "../drawers";
 import { Formatter } from "../core/formatters";
 import * as Formatters from "../core/formatters";
+import { Accessor, Bounds, Point, Range, SimpleSelection } from "../core/interfaces";
+import * as Drawers from "../drawers";
+import { Drawer } from "../drawers/drawer";
 import * as Scales from "../scales";
 import { QuantitativeScale } from "../scales/quantitativeScale";
 import { Scale } from "../scales/scale";
@@ -20,9 +20,9 @@ import * as Utils from "../utils";
 
 import * as Plots from "./";
 import { PlotEntity } from "./";
+import { LightweightPlotEntity } from "./commons";
 import { Plot } from "./plot";
 import { XYPlot } from "./xyPlot";
-import { LightweightPlotEntity } from "./commons";
 
 type LabelConfig = {
   labelArea: SimpleSelection<void>;

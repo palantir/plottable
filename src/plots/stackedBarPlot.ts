@@ -5,8 +5,8 @@
 
 import * as Typesetter from "typesettable";
 
-import { Accessor, Point, SimpleSelection } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
+import { Accessor, Point, SimpleSelection } from "../core/interfaces";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
 

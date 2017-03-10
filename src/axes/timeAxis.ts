@@ -11,8 +11,8 @@ import * as Formatters from "../core/formatters";
 import * as Scales from "../scales";
 import * as Utils from "../utils";
 
-import { Axis } from "./axis";
 import { SimpleSelection } from "../core/interfaces";
+import { Axis } from "./axis";
 
 export namespace TimeInterval {
   export var second = "second";

@@ -8,8 +8,8 @@ import { Point } from "../core/interfaces";
 import * as Dispatchers from "../dispatchers";
 import * as Utils from "../utils";
 
-import { Interaction } from "./interaction";
 import * as Interactions from "./";
+import { Interaction } from "./interaction";
 
 export type PointerCallback = (point: Point) => void;
 

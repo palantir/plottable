@@ -5,9 +5,9 @@
 
 import * as d3 from "d3";
 
-import { Animator } from "./animator";
 import { AttributeToAppliedProjector, SimpleSelection } from "../core/interfaces";
 import { coerceExternalD3 } from "../utils/coerceD3";
+import { Animator } from "./animator";
 /**
  * An animator implementation with no animation. The attributes are
  * immediately set on the selection.

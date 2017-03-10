@@ -9,9 +9,9 @@ import { Bounds, Point, SimpleSelection } from "../core/interfaces";
 import * as Interactions from "../interactions";
 import * as Utils from "../utils";
 
+import { coerceExternalD3 } from "../utils/coerceD3";
 import { PropertyMode } from "./";
 import { SelectionBoxLayer } from "./selectionBoxLayer";
-import { coerceExternalD3 } from "../utils/coerceD3";
 
 export type DragBoxCallback = (bounds: Bounds) => void;
 

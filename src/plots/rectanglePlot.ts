@@ -7,8 +7,8 @@ import * as d3 from "d3";
 import * as Typesetter from "typesettable";
 
 import * as Animators from "../animators";
-import { Accessor, Point, Bounds, Range, AttributeToProjector } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
+import { Accessor, AttributeToProjector, Bounds, Point, Range } from "../core/interfaces";
 import * as Drawers from "../drawers";
 import * as Scales from "../scales";
 import { Scale } from "../scales/scale";

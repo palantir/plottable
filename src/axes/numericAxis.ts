@@ -6,10 +6,10 @@
 import * as d3 from "d3";
 import * as Typesetter from "typesettable";
 
-import { Axis, AxisOrientation } from "./axis";
 import * as Formatters from "../core/formatters";
 import { QuantitativeScale } from "../scales/quantitativeScale";
 import * as Utils from "../utils";
+import { Axis, AxisOrientation } from "./axis";
 
 export class Numeric extends Axis<number> {
 

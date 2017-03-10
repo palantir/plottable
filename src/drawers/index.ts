@@ -4,7 +4,7 @@
  */
 
 import { Animator } from "../animators/animator";
-import { AttributeToProjector, AttributeToAppliedProjector } from "../core/interfaces";
+import { AttributeToAppliedProjector, AttributeToProjector } from "../core/interfaces";
 
 export * from "./arcDrawer";
 export * from "./arcOutlineDrawer";

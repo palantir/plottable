@@ -8,10 +8,10 @@ import * as d3 from "d3";
 import * as Utils from "../utils";
 
 import { Dataset } from "../core/dataset";
-import { AttributeToProjector, AttributeToAppliedProjector, SimpleSelection } from "../core/interfaces";
+import { AttributeToAppliedProjector, AttributeToProjector, SimpleSelection } from "../core/interfaces";
 
-import * as Drawers from "./";
 import { coerceExternalD3 } from "../utils/coerceD3";
+import * as Drawers from "./";
 
 /**
  * A Drawer is responsible for actually committing the DrawSteps to the DOM. You first pass a renderArea

@@ -7,16 +7,16 @@ import * as d3 from "d3";
 import * as Typesetter from "typesettable";
 
 import * as Animators from "../animators";
-import { Accessor, Point, AttributeToProjector, SimpleSelection } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
-import * as Drawers from "../drawers";
 import { Formatter } from "../core/formatters";
 import * as Formatters from "../core/formatters";
+import { Accessor, AttributeToProjector, Point, SimpleSelection } from "../core/interfaces";
+import * as Drawers from "../drawers";
 import * as Scales from "../scales";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
 
-import { PlotEntity, AccessorScaleBinding } from "./";
+import { AccessorScaleBinding, PlotEntity } from "./";
 import { Plot } from "./plot";
 
 export interface PiePlotEntity extends PlotEntity {

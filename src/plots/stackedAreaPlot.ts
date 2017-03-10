@@ -7,10 +7,10 @@ import * as d3 from "d3";
 
 import * as Animators from "../animators";
 import { Animator } from "../animators/animator";
-import { Accessor, Point, AttributeToProjector, SimpleSelection } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
-import { Scale } from "../scales/scale";
+import { Accessor, AttributeToProjector, Point, SimpleSelection } from "../core/interfaces";
 import { QuantitativeScale } from "../scales/quantitativeScale";
+import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
 
 import * as Plots from "./";

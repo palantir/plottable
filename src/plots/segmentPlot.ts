@@ -4,14 +4,14 @@
  */
 
 import * as Animators from "../animators";
-import { Accessor, Point, Bounds, Range, AttributeToProjector } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
+import { Accessor, AttributeToProjector, Bounds, Point, Range } from "../core/interfaces";
 import * as Drawers from "../drawers";
 import * as Scales from "../scales";
 import { Scale } from "../scales/scale";
 
 import * as Plots from "./";
-import { PlotEntity, TransformableAccessorScaleBinding, AccessorScaleBinding } from "./";
+import { AccessorScaleBinding, PlotEntity, TransformableAccessorScaleBinding } from "./";
 import { Plot } from "./plot";
 import { XYPlot } from "./xyPlot";
 

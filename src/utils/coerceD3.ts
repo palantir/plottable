@@ -1,6 +1,6 @@
 
-import { SimpleSelection } from "../core/interfaces";
 import * as d3 from "d3";
+import { SimpleSelection } from "../core/interfaces";
 
 /**
  * Coerce possibly external d3 instance into our own instance of d3 so we can use d3-selection-multi.

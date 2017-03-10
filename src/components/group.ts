@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import { SpaceRequest, Point } from "../core/interfaces";
+import { Point, SpaceRequest } from "../core/interfaces";
 import * as Utils from "../utils";
 
 import { Component } from "./component";

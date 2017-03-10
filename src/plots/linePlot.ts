@@ -6,8 +6,8 @@
 import * as d3 from "d3";
 
 import * as Animators from "../animators";
-import { Accessor, AttributeToProjector, Projector, Point, Bounds, Range } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
+import { Accessor, AttributeToProjector, Bounds, Point, Projector, Range } from "../core/interfaces";
 import * as Drawers from "../drawers";
 import { Drawer } from "../drawers/drawer";
 import * as Scales from "../scales";

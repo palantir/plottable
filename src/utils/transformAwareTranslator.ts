@@ -3,8 +3,8 @@ import * as d3 from "d3";
 import * as Utils from "../utils";
 
 import { Point } from "../";
-import { SimpleSelection } from "../core/interfaces";
 import { Component } from "../components/component";
+import { SimpleSelection } from "../core/interfaces";
 
 const _TRANSLATOR_KEY = "__Plottable_ClientTranslator";
 

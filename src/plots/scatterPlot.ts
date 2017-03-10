@@ -4,8 +4,8 @@
  */
 
 import * as Animators from "../animators";
-import { Accessor, Point, Bounds, Range, AttributeToProjector } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
+import { Accessor, AttributeToProjector, Bounds, Point, Range } from "../core/interfaces";
 import * as SymbolFactories from "../core/symbolFactories";
 import { SymbolFactory } from "../core/symbolFactories";
 import * as Drawers from "../drawers";
@@ -14,7 +14,7 @@ import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
 
 import * as Plots from "./";
-import { PlotEntity, LightweightPlotEntity, TransformableAccessorScaleBinding, AccessorScaleBinding } from "./";
+import { AccessorScaleBinding, LightweightPlotEntity, PlotEntity, TransformableAccessorScaleBinding } from "./";
 import { Plot } from "./plot";
 import { XYPlot } from "./xyPlot";
 

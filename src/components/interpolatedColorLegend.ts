@@ -8,9 +8,9 @@ import * as Typesetter from "typesettable";
 import * as Configs from "../core/config";
 import { Formatter } from "../core/formatters";
 import * as Formatters from "../core/formatters";
+import { Point, SimpleSelection, SpaceRequest } from "../core/interfaces";
 import * as Scales from "../scales";
 import { ScaleCallback } from "../scales/scale";
-import { SpaceRequest, Point, SimpleSelection } from "../core/interfaces";
 import * as Utils from "../utils";
 
 import { Component } from "./component";

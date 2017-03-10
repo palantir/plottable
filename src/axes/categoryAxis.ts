@@ -6,10 +6,10 @@
 import * as d3 from "d3";
 import * as Typesetter from "typesettable";
 
-import { Axis, AxisOrientation } from "./axis";
-import { SpaceRequest, Point, SimpleSelection } from "../core/interfaces";
+import { Point, SimpleSelection, SpaceRequest } from "../core/interfaces";
 import * as Scales from "../scales";
 import * as Utils from "../utils";
+import { Axis, AxisOrientation } from "./axis";
 
 export interface DownsampleInfo {
   domain: string[];

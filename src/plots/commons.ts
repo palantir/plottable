@@ -4,7 +4,7 @@
  */
 
 import { Dataset } from "../core/dataset";
-import { Point, Entity, Accessor } from "../core/interfaces";
+import { Accessor, Entity, Point } from "../core/interfaces";
 import { Drawer } from "../drawers/drawer";
 import { Plot } from "../plots/plot";
 import { Scale, TransformableScale } from "../scales/scale";

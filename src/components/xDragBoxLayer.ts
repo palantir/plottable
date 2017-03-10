@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import { Point, Bounds } from "../core/interfaces";
+import { Bounds, Point } from "../core/interfaces";
 import { QuantitativeScale } from "../scales/quantitativeScale";
 
 import { DragBoxLayer } from "./dragBoxLayer";

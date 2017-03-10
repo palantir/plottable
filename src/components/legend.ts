@@ -9,11 +9,11 @@ import * as Typesetter from "typesettable";
 import * as Configs from "../core/config";
 import * as Formatters from "../core/formatters";
 import { Formatter } from "../core/formatters";
-import { SpaceRequest, Point, Entity } from "../core/interfaces";
+import { Entity, Point, SpaceRequest } from "../core/interfaces";
 import * as SymbolFactories from "../core/symbolFactories";
 import { SymbolFactory } from "../core/symbolFactories";
-import { ScaleCallback } from "../scales/scale";
 import * as Scales from "../scales";
+import { ScaleCallback } from "../scales/scale";
 import * as Utils from "../utils";
 
 import { Component } from "./component";

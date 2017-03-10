@@ -5,7 +5,7 @@
 
 import * as Typesetter from "typesettable";
 
-import { SpaceRequest, SimpleSelection } from "../core/interfaces";
+import { SimpleSelection, SpaceRequest } from "../core/interfaces";
 
 import { Component } from "./component";
 

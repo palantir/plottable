@@ -7,8 +7,8 @@ import * as d3 from "d3";
 
 import { Dataset } from "../core/dataset";
 
-import { Drawer } from "./drawer";
 import { SimpleSelection } from "../core/interfaces";
+import { Drawer } from "./drawer";
 
 export class ArcOutline extends Drawer {
 
