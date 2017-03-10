@@ -97,8 +97,8 @@ export class Interaction {
   protected _translateToComponentSpace(p: Point): Point {
     const origin = this._componentAttachedTo.originToRoot();
     return {
-      "x": p.x - origin.x,
-      "y": p.y - origin.y,
+      x: p.x - origin.x,
+      y: p.y - origin.y,
     };
   }
 

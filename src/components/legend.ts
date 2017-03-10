@@ -88,10 +88,10 @@ class LegendRow {
     }
 
     return {
-      "topLeft": { "x": columnXOffset, "y": 0 },
-      "bottomRight": {
-        "x": columnXOffset + column.width,
-        "y": column.height,
+      topLeft: { x: columnXOffset, y: 0 },
+      bottomRight: {
+        x: columnXOffset + column.width,
+        y: column.height,
       },
     };
   }
@@ -177,10 +177,10 @@ class LegendTable {
     }
 
     const rowBounds = {
-      "topLeft": { "x": rowXOffset, "y": rowYOffset },
-      "bottomRight": {
-        "x": rowXOffset + this.rows[rowIndex].getWidth(),
-        "y": rowYOffset + this.rows[rowIndex].getHeight(),
+      topLeft: { x: rowXOffset, y: rowYOffset },
+      bottomRight: {
+        x: rowXOffset + this.rows[rowIndex].getWidth(),
+        y: rowYOffset + this.rows[rowIndex].getHeight(),
       },
     };
 
@@ -461,7 +461,7 @@ export class Legend extends Component {
         table.addRow(row);
       }
 
-      const symbolColumn = { "width": textHeight, "height": textHeight, "data": { name, "type": "symbol" } };
+      const symbolColumn = { width: textHeight, height: textHeight, data: { name, type: "symbol" } };
       row.addColumn(symbolColumn);
 
       // the space consumed by the name field is the minimum of the space available in the table
@@ -473,7 +473,7 @@ export class Legend extends Component {
       const numberOfRows = this._wrapper.wrap(formattedName, this._measurer, usedNameWidth).noLines;
 
       const nameColumnHeight = numberOfRows * textHeight;
-      const nameColumn = { "width": usedNameWidth, "height": nameColumnHeight, "data": { name, "type": "text" } };
+      const nameColumn = { width: usedNameWidth, height: nameColumnHeight, data: { name, type: "text" } };
       row.addColumn(nameColumn);
     });
 
@@ -489,8 +489,8 @@ export class Legend extends Component {
     );
 
     return {
-      "minHeight": table.getHeight(),
-      "minWidth": table.getWidth(),
+      minHeight: table.getHeight(),
+      minWidth: table.getWidth(),
     };
   }
 
@@ -538,13 +538,13 @@ export class Legend extends Component {
           const symbolTranslate = Utils.DOM.getTranslateValues(symbolElement);
 
           return [{
-            "datum": column.data.name,
-            "position": {
-              "x": rowTranslate[0] + symbolTranslate[0],
-              "y": rowTranslate[1] + symbolTranslate[1],
+            datum: column.data.name,
+            position: {
+              x: rowTranslate[0] + symbolTranslate[0],
+              y: rowTranslate[1] + symbolTranslate[1],
             },
-            "selection": d3.select(entryElement),
-            "component": this,
+            selection: d3.select(entryElement),
+            component: this,
           }];
         }
 
@@ -620,9 +620,9 @@ export class Legend extends Component {
           const column = symbolEntryPair[1];
 
           const writeOptions = {
-            "xAlign": "left",
-            "yAlign": "top",
-            "textRotation": 0,
+            xAlign: "left",
+            yAlign: "top",
+            textRotation: 0,
           } as Typesetter.IWriteOptions;
 
           self._writer.write(self._formatter(column.data.name), column.width, self.height(), writeOptions, textContainer.node());

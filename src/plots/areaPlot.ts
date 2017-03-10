@@ -125,11 +125,11 @@ export class Area<X> extends Line<X> {
     if (this._animateOnNextRender()) {
       const attrToProjector = this._generateLineAttrToProjector();
       attrToProjector["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), this._getResetYFunction());
-      drawSteps.push({ "attrToProjector": attrToProjector, "animator": this._getAnimator(Plots.Animator.RESET) });
+      drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
     }
     drawSteps.push({
-      "attrToProjector": this._generateLineAttrToProjector(),
-      "animator": this._getAnimator(Plots.Animator.MAIN),
+      attrToProjector: this._generateLineAttrToProjector(),
+      animator: this._getAnimator(Plots.Animator.MAIN),
     });
     return drawSteps;
   }
@@ -151,12 +151,12 @@ export class Area<X> extends Line<X> {
       attrToProjector["d"] = this._constructAreaProjector(Plot._scaledAccessor(this.x()),
         this._getResetYFunction(),
         Plot._scaledAccessor(this.y0()));
-      drawSteps.push({ "attrToProjector": attrToProjector, "animator": this._getAnimator(Plots.Animator.RESET) });
+      drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
     }
 
     drawSteps.push({
-      "attrToProjector": this._generateAttrToProjector(),
-      "animator": this._getAnimator(Plots.Animator.MAIN),
+      attrToProjector: this._generateAttrToProjector(),
+      animator: this._getAnimator(Plots.Animator.MAIN),
     });
 
     return drawSteps;

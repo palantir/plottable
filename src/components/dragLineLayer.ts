@@ -83,8 +83,8 @@ export class DragLineLayer<D> extends GuideLineLayer<D> {
   protected _setup() {
     super._setup();
     this._detectionEdge = this.content().append("line").styles({
-      "opacity": 0,
-      "stroke": "pink",
+      opacity: 0,
+      stroke: "pink",
       "pointer-events": "visibleStroke",
     }).classed("drag-edge", true);
   }

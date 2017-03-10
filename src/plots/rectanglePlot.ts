@@ -86,7 +86,7 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
   }
 
   protected _generateDrawSteps(): Drawers.DrawStep[] {
-    return [{ "attrToProjector": this._generateAttrToProjector(), "animator": this._getAnimator("rectangles") }];
+    return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("rectangles") }];
   }
 
   protected _updateExtentsForProperty(property: string) {
@@ -291,8 +291,8 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
     let dataYRange: Range;
     if (yRange == null) {
       const bounds = (<Bounds> xRangeOrBounds);
-      dataXRange = { "min": bounds.topLeft.x, "max": bounds.bottomRight.x };
-      dataYRange = { "min": bounds.topLeft.y, "max": bounds.bottomRight.y };
+      dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
+      dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
     } else {
       dataXRange = (<Range> xRangeOrBounds);
       dataYRange = yRange;
@@ -302,10 +302,10 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
 
   private _entityBBox(datum: any, index: number, dataset: Dataset, attrToProjector: AttributeToProjector): SVGRect {
     return {
-      "x": attrToProjector["x"](datum, index, dataset),
-      "y": attrToProjector["y"](datum, index, dataset),
-      "width": attrToProjector["width"](datum, index, dataset),
-      "height": attrToProjector["height"](datum, index, dataset),
+      x: attrToProjector["x"](datum, index, dataset),
+      y: attrToProjector["y"](datum, index, dataset),
+      width: attrToProjector["width"](datum, index, dataset),
+      height: attrToProjector["height"](datum, index, dataset),
     };
   }
 
@@ -387,7 +387,7 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
     const rectHeight = attrToProjector["height"](datum, index, dataset);
     const x = rectX + rectWidth / 2;
     const y = rectY + rectHeight / 2;
-    return { "x": x, "y": y };
+    return { x: x, y: y };
   }
 
   private _rectangleWidth(scale: Scale<any, number>) {
@@ -461,8 +461,8 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
         x += horizontalOffset;
         y += verticalOffset;
 
-        const xLabelRange = { "min": x, "max": x + measurement.width };
-        const yLabelRange = { "min": y, "max": y + measurement.height };
+        const xLabelRange = { min: x, max: x + measurement.width };
+        const yLabelRange = { min: y, max: y + measurement.height };
         if (xLabelRange.min < xMin || xLabelRange.max > xMax || yLabelRange.min < yMin || yLabelRange.max > yMax) {
           return;
         }
@@ -477,8 +477,8 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
         g.classed(className, true);
 
         writer.write(label, measurement.width, measurement.height, {
-          "xAlign": "center",
-          "yAlign": "center",
+          xAlign: "center",
+          yAlign: "center",
         }, g.node());
       }
     });

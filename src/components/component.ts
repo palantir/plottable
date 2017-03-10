@@ -53,7 +53,7 @@ export class Component {
   /**
    * Origin of this Component relative to its parent.
    */
-  private _origin: Point = { "x": 0, "y": 0 };
+  private _origin: Point = { x: 0, y: 0 };
 
   /**
    * The ComponentContainer that holds this Component in its children, or null, if this
@@ -62,15 +62,15 @@ export class Component {
   private _parent: ComponentContainer;
   private _xAlignment: string = "left";
   private static _xAlignToProportion: { [alignment: string]: number } = {
-    "left": 0,
-    "center": 0.5,
-    "right": 1,
+    left: 0,
+    center: 0.5,
+    right: 1,
   };
   private _yAlignment: string = "top";
   private static _yAlignToProportion: { [alignment: string]: number } = {
-    "top": 0,
-    "center": 0.5,
-    "bottom": 1,
+    top: 0,
+    center: 0.5,
+    bottom: 1,
   };
   protected _isSetup = false;
   protected _isAnchored = false;
@@ -217,8 +217,8 @@ export class Component {
    */
   public requestedSpace(availableWidth: number, availableHeight: number): SpaceRequest {
     return {
-      "minWidth": 0,
-      "minHeight": 0,
+      minWidth: 0,
+      minHeight: 0,
     };
   }
 
@@ -238,7 +238,7 @@ export class Component {
         throw new Error("anchor() must be called before computeLayout()");
       } else if (this._rootElement != null) {
         // retrieve height/width from rootElement
-        origin = { "x": 0, "y": 0 };
+        origin = { x: 0, y: 0 };
         const elem = this._rootElement.node();
         availableWidth = Utils.DOM.elementWidth(elem);
         availableHeight = Utils.DOM.elementHeight(elem);
@@ -254,14 +254,14 @@ export class Component {
     const xAlignProportion = Component._xAlignToProportion[this._xAlignment];
     const yAlignProportion = Component._yAlignToProportion[this._yAlignment];
     this._origin = {
-      "x": origin.x + (availableWidth - this.width()) * xAlignProportion,
-      "y": origin.y + (availableHeight - this.height()) * yAlignProportion,
+      x: origin.x + (availableWidth - this.width()) * xAlignProportion,
+      y: origin.y + (availableHeight - this.height()) * yAlignProportion,
     };
     this._element.styles({
-      "left": `${this._origin.x}px`,
-      "height": `${this.height()}px`,
-      "top": `${this._origin.y}px`,
-      "width": `${this.width()}px`,
+      left: `${this._origin.x}px`,
+      height: `${this.height()}px`,
+      top: `${this._origin.y}px`,
+      width: `${this.width()}px`,
     });
     this._boxes.forEach((b: SimpleSelection<void>) => b.attr("width", this.width()).attr("height", this.height()));
 
@@ -275,8 +275,8 @@ export class Component {
   protected _sizeFromOffer(availableWidth: number, availableHeight: number) {
     const requestedSpace = this.requestedSpace(availableWidth, availableHeight);
     return {
-      "width": this.fixedWidth() ? Math.min(availableWidth, requestedSpace.minWidth) : availableWidth,
-      "height": this.fixedHeight() ? Math.min(availableHeight, requestedSpace.minHeight) : availableHeight,
+      width: this.fixedWidth() ? Math.min(availableWidth, requestedSpace.minWidth) : availableWidth,
+      height: this.fixedHeight() ? Math.min(availableHeight, requestedSpace.minHeight) : availableHeight,
     };
   }
 
@@ -594,9 +594,9 @@ export class Component {
 
     return {
       topLeft,
-      "bottomRight": {
-        "x": topLeft.x + this.width(),
-        "y": topLeft.y + this.height(),
+      bottomRight: {
+        x: topLeft.x + this.width(),
+        y: topLeft.y + this.height(),
       },
     };
   }
@@ -630,8 +630,8 @@ export class Component {
    */
   public origin(): Point {
     return {
-      "x": this._origin.x,
-      "y": this._origin.y,
+      x: this._origin.x,
+      y: this._origin.y,
     };
   }
 

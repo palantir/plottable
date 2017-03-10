@@ -132,8 +132,8 @@ export class Axis<D> extends Component {
     }
 
     return {
-      "minWidth": requestedWidth,
-      "minHeight": requestedHeight,
+      minWidth: requestedWidth,
+      minHeight: requestedHeight,
     };
   }
 
@@ -301,8 +301,8 @@ export class Axis<D> extends Component {
     annotatedTicks.forEach((annotatedTick) => {
       const measurement = this._annotationMeasurer.measure(this.annotationFormatter()(annotatedTick));
       const paddedMeasurement = {
-        "width": measurement.width + 2 * labelPadding,
-        "height": measurement.height + 2 * labelPadding,
+        width: measurement.width + 2 * labelPadding,
+        height: measurement.height + 2 * labelPadding,
       };
       measurements.set(annotatedTick, paddedMeasurement);
     });
@@ -366,14 +366,14 @@ export class Axis<D> extends Component {
         "x2": isHorizontal ? positionF : offsetF,
         "y1": isHorizontal ? secondaryPosition : positionF,
         "y2": isHorizontal ? offsetF : positionF,
-        "visibility": visibilityF,
+        visibility: visibilityF,
       });
 
     bindElements(this._annotationContainer.select(".annotation-circle-container"), "circle", Axis.ANNOTATION_CIRCLE_CLASS)
       .attrs({
-        "cx": isHorizontal ? positionF : secondaryPosition,
-        "cy": isHorizontal ? secondaryPosition : positionF,
-        "r": 3,
+        cx: isHorizontal ? positionF : secondaryPosition,
+        cy: isHorizontal ? secondaryPosition : positionF,
+        r: 3,
       });
 
     const rectangleOffsetF = (d: D) => {
@@ -388,11 +388,11 @@ export class Axis<D> extends Component {
     };
     bindElements(this._annotationContainer.select(".annotation-rect-container"), "rect", Axis.ANNOTATION_RECT_CLASS)
       .attrs({
-        "x": isHorizontal ? positionF : rectangleOffsetF,
-        "y": isHorizontal ? rectangleOffsetF : positionF,
-        "width": isHorizontal ? (d) => measurements.get(d).width : (d) => measurements.get(d).height,
-        "height": isHorizontal ? (d) => measurements.get(d).height : (d) => measurements.get(d).width,
-        "visibility": visibilityF,
+        x: isHorizontal ? positionF : rectangleOffsetF,
+        y: isHorizontal ? rectangleOffsetF : positionF,
+        width: isHorizontal ? (d) => measurements.get(d).width : (d) => measurements.get(d).height,
+        height: isHorizontal ? (d) => measurements.get(d).height : (d) => measurements.get(d).width,
+        visibility: visibilityF,
       });
 
     const annotationWriter = this._annotationWriter;
@@ -400,21 +400,21 @@ export class Axis<D> extends Component {
     const annotationLabels = bindElements(this._annotationContainer.select(".annotation-label-container"), "g", Axis.ANNOTATION_LABEL_CLASS);
     annotationLabels.selectAll(".text-container").remove();
     annotationLabels.attrs({
-      "transform": (d) => {
+      transform: (d) => {
         const xTranslate = isHorizontal ? positionF(d) : rectangleOffsetF(d);
         const yTranslate = isHorizontal ? rectangleOffsetF(d) : positionF(d);
         return `translate(${xTranslate},${yTranslate})`;
       },
-      "visibility": visibilityF,
+      visibility: visibilityF,
     })
       .each(function (annotationLabel) {
         annotationWriter.write(annotationFormatter(annotationLabel),
           isHorizontal ? measurements.get(annotationLabel).width : measurements.get(annotationLabel).height,
           isHorizontal ? measurements.get(annotationLabel).height : measurements.get(annotationLabel).width,
           {
-            "xAlign": "center",
-            "yAlign": "center",
-            "textRotation": isHorizontal ? 0 : 90,
+            xAlign: "center",
+            yAlign: "center",
+            textRotation: isHorizontal ? 0 : 90,
           },
           d3.select(this).node());
       });

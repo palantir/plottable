@@ -50,8 +50,8 @@ export class GuideLineLayer<D> extends Component {
 
   protected _sizeFromOffer(availableWidth: number, availableHeight: number) {
     return {
-      "width": availableWidth,
-      "height": availableHeight,
+      width: availableWidth,
+      height: availableHeight,
     };
   }
 

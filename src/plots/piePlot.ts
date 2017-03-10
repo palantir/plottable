@@ -334,8 +334,8 @@ export class Pie extends Plot {
    * @param {PlotEntity[]}
    */
   public entitiesAt(queryPoint: Point) {
-    const center = { "x": this.width() / 2, "y": this.height() / 2 };
-    const adjustedQueryPoint = { "x": queryPoint.x - center.x, "y": queryPoint.y - center.y };
+    const center = { x: this.width() / 2, y: this.height() / 2 };
+    const adjustedQueryPoint = { x: queryPoint.x - center.x, y: queryPoint.y - center.y };
     const index = this._sliceIndexForPoint(adjustedQueryPoint);
     return index == null ? [] : [this.entities()[index]];
   }
@@ -493,8 +493,8 @@ export class Pie extends Plot {
     }
 
     return {
-      "x": wLeft + wRight == 0 ? 0 : (wLeft / (wLeft + wRight)) * this.width(),
-      "y": hTop + hBottom == 0 ? 0 : (hTop / (hTop + hBottom)) * this.height(),
+      x: wLeft + wRight == 0 ? 0 : (wLeft / (wLeft + wRight)) * this.width(),
+      y: hTop + hBottom == 0 ? 0 : (hTop / (hTop + hBottom)) * this.height(),
     };
   }
 
@@ -518,7 +518,7 @@ export class Pie extends Plot {
   protected _pixelPoint(datum: any, index: number, dataset: Dataset) {
     const scaledValueAccessor = Plot._scaledAccessor(this.sectorValue());
     if (!Pie._isValidData(scaledValueAccessor(datum, index, dataset))) {
-      return { "x": NaN, "y": NaN };
+      return { x: NaN, y: NaN };
     }
 
     const innerRadius = Plot._scaledAccessor(this.innerRadius())(datum, index, dataset);
@@ -534,7 +534,7 @@ export class Pie extends Plot {
     const startAngle = pie[index].startAngle;
     const endAngle = pie[index].endAngle;
     const avgAngle = (startAngle + endAngle) / 2;
-    return { "x": avgRadius * Math.sin(avgAngle), "y": -avgRadius * Math.cos(avgAngle) };
+    return { x: avgRadius * Math.sin(avgAngle), y: -avgRadius * Math.cos(avgAngle) };
   }
 
   protected _additionalPaint(time: number) {
@@ -550,7 +550,7 @@ export class Pie extends Plot {
 
   private _generateStrokeDrawSteps() {
     const attrToProjector = this._generateAttrToProjector();
-    return [{ "attrToProjector": attrToProjector, "animator": new Animators.Null() }];
+    return [{ attrToProjector: attrToProjector, animator: new Animators.Null() }];
   }
 
   private _sliceIndexForPoint(p: Point) {
@@ -610,10 +610,10 @@ export class Pie extends Plot {
       const y = -Math.cos(theta) * labelRadius - measurement.height / 2;
 
       const corners = [
-        { "x": x, "y": y },
-        { "x": x, "y": y + measurement.height },
-        { "x": x + measurement.width, "y": y },
-        { "x": x + measurement.width, "y": y + measurement.height },
+        { x: x, y: y },
+        { x: x, y: y + measurement.height },
+        { x: x + measurement.width, y: y },
+        { x: x + measurement.width, y: y + measurement.height },
       ];
 
       let showLabel = corners.every((corner) => {
@@ -633,8 +633,8 @@ export class Pie extends Plot {
       g.style("visibility", showLabel ? "inherit" : "hidden");
 
       writer.write(value, measurement.width, measurement.height, {
-        "xAlign": "center",
-        "yAlign": "center",
+        xAlign: "center",
+        yAlign: "center",
       }, g.node());
     });
   }

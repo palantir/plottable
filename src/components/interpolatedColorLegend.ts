@@ -195,8 +195,8 @@ export class InterpolatedColorLegend extends Component {
     }
 
     return {
-      "minWidth": desiredWidth,
-      "minHeight": desiredHeight,
+      minWidth: desiredWidth,
+      minHeight: desiredHeight,
     };
   }
 
@@ -217,17 +217,17 @@ export class InterpolatedColorLegend extends Component {
     const textHeight = this._measurer.measure().height;
     const textPadding = this._textPadding;
 
-    const upperLabelShift: Point = { "x": 0, "y": 0 };
-    const lowerLabelShift: Point = { "x": 0, "y": 0 };
+    const upperLabelShift: Point = { x: 0, y: 0 };
+    const lowerLabelShift: Point = { x: 0, y: 0 };
     const lowerWriteOptions = {
-      "xAlign": "center",
-      "yAlign": "center",
-      "textRotation": 0,
+      xAlign: "center",
+      yAlign: "center",
+      textRotation: 0,
     } as Typesetter.IWriteOptions;
     const upperWriteOptions = {
-      "xAlign": "center",
-      "yAlign": "center",
-      "textRotation": 0,
+      xAlign: "center",
+      yAlign: "center",
+      textRotation: 0,
     } as Typesetter.IWriteOptions;
 
     let swatchWidth: number;
@@ -236,10 +236,10 @@ export class InterpolatedColorLegend extends Component {
     let swatchY: (d: any, i: number) => number;
 
     const boundingBoxAttr: { [key: string]: number } = {
-      "x": 0,
-      "y": 0,
-      "width": 0,
-      "height": 0,
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
     };
 
     let padding: number;
@@ -310,11 +310,11 @@ export class InterpolatedColorLegend extends Component {
     const swatches = swatchesUpdate.merge(rects);
     swatchesUpdate.exit().remove();
     swatches.attrs({
-      "fill": (d: any, i: number) => this._scale.scale(d),
-      "width": swatchWidth,
-      "height": swatchHeight,
-      "x": swatchX,
-      "y": swatchY,
+      fill: (d: any, i: number) => this._scale.scale(d),
+      width: swatchWidth,
+      height: swatchHeight,
+      x: swatchX,
+      y: swatchY,
       "shape-rendering": "crispEdges",
     });
     if (Configs.ADD_TITLE_ELEMENTS) {

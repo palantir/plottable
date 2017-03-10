@@ -175,38 +175,38 @@ export function multiTime() {
   // https://github.com/mbostock/d3/wiki/Time-Formatting#format_multi
   const candidateFormats: PredicatedFormat[] = [
     {
-      "specifier": ".%L",
-      "predicate": (d) => d.getMilliseconds() !== 0,
+      specifier: ".%L",
+      predicate: (d) => d.getMilliseconds() !== 0,
     },
 
     {
-      "specifier": ":%S",
-      "predicate": (d) => d.getSeconds() !== 0,
+      specifier: ":%S",
+      predicate: (d) => d.getSeconds() !== 0,
     },
 
     {
-      "specifier": "%I:%M",
-      "predicate": (d) => d.getMinutes() !== 0,
+      specifier: "%I:%M",
+      predicate: (d) => d.getMinutes() !== 0,
     },
 
     {
-      "specifier": "%I %p",
-      "predicate": (d) => d.getHours() !== 0,
+      specifier: "%I %p",
+      predicate: (d) => d.getHours() !== 0,
     },
 
     {
-      "specifier": "%a %d",
-      "predicate": (d) => d.getDay() !== 0 && d.getDate() !== 1,
+      specifier: "%a %d",
+      predicate: (d) => d.getDay() !== 0 && d.getDate() !== 1,
     },
 
     {
-      "specifier": "%b %d",
-      "predicate": (d) => d.getDate() !== 1,
+      specifier: "%b %d",
+      predicate: (d) => d.getDate() !== 1,
     },
 
     {
-      "specifier": "%b",
-      "predicate": (d) => d.getMonth() !== 0,
+      specifier: "%b",
+      predicate: (d) => d.getMonth() !== 0,
     },
   ];
 

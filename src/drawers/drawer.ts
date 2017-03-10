@@ -177,8 +177,8 @@ export class Drawer {
     const appliedDrawSteps: Drawers.AppliedDrawStep[] = drawSteps.map((dr: Drawers.DrawStep) => {
       const attrToAppliedProjector = this._appliedProjectors(dr.attrToProjector);
       return {
-        "attrToAppliedProjector": attrToAppliedProjector,
-        "animator": dr.animator,
+        attrToAppliedProjector: attrToAppliedProjector,
+        animator: dr.animator,
       };
     });
 

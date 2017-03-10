@@ -138,8 +138,8 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
         labelContainer.classed("stacked-bar-label", true);
 
         const writeOptions = {
-          "xAlign": "center",
-          "yAlign": "center",
+          xAlign: "center",
+          yAlign: "center",
         } as Typesetter.IWriteOptions;
         this._writer.write(text, measurement.width, measurement.height, writeOptions, labelContainer.node());
       }

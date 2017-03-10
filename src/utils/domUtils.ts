@@ -32,7 +32,7 @@ export function elementBBox(element: SimpleSelection<any>) {
   try {
     bbox = (<any> element.node()).getBBox();
   } catch (err) {
-    bbox = { "x": 0, "y": 0, "width": 0, "height": 0 };
+    bbox = { x: 0, y: 0, width: 0, height: 0 };
   }
   return bbox;
 }
@@ -168,12 +168,12 @@ export function clientRectsOverlap(clientRectA: ClientRect, clientRectB: ClientR
  */
 export function expandRect(rect: ClientRect, amount: number) {
   return {
-    "left": rect.left - amount,
-    "top": rect.top - amount,
-    "right": rect.right + amount,
-    "bottom": rect.bottom + amount,
-    "width": rect.width + amount * 2,
-    "height": rect.height + amount * 2,
+    left: rect.left - amount,
+    top: rect.top - amount,
+    right: rect.right + amount,
+    bottom: rect.bottom + amount,
+    width: rect.width + amount * 2,
+    height: rect.height + amount * 2,
   };
 }
 
@@ -232,7 +232,7 @@ export function intersectsBBox(xValOrRange: number | Range,
 function _parseRange(input: number | Range): Range {
   if (typeof (input) === "number") {
     const value = <number>input;
-    return { "min": value, "max": value };
+    return { min: value, max: value };
   }
 
   const range = <Range>input;

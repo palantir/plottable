@@ -41,23 +41,23 @@ export class Group extends ComponentContainer {
   public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
     const requests = this._components.map((c: Component) => c.requestedSpace(offeredWidth, offeredHeight));
     return {
-      "minWidth": Utils.Math.max<SpaceRequest, number>(requests, (request) => request.minWidth, 0),
-      "minHeight": Utils.Math.max<SpaceRequest, number>(requests, (request) => request.minHeight, 0),
+      minWidth: Utils.Math.max<SpaceRequest, number>(requests, (request) => request.minWidth, 0),
+      minHeight: Utils.Math.max<SpaceRequest, number>(requests, (request) => request.minHeight, 0),
     };
   }
 
   public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
     super.computeLayout(origin, availableWidth, availableHeight);
     this._forEach((component) => {
-      component.computeLayout({ "x": 0, "y": 0 }, this.width(), this.height());
+      component.computeLayout({ x: 0, y: 0 }, this.width(), this.height());
     });
     return this;
   }
 
   protected _sizeFromOffer(availableWidth: number, availableHeight: number) {
     return {
-      "width": availableWidth,
-      "height": availableHeight,
+      width: availableWidth,
+      height: availableHeight,
     };
   }
 

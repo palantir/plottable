@@ -34,7 +34,7 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
   }
 
   protected _generateDrawSteps(): Drawers.DrawStep[] {
-    return [{ "attrToProjector": this._generateAttrToProjector(), "animator": new Animators.Null() }];
+    return [{ attrToProjector: this._generateAttrToProjector(), animator: new Animators.Null() }];
   }
 
   protected _updateExtentsForProperty(property: string) {
@@ -213,8 +213,8 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
     let dataYRange: Range;
     if (yRange == null) {
       const bounds = (<Bounds> xRangeOrBounds);
-      dataXRange = { "min": bounds.topLeft.x, "max": bounds.bottomRight.x };
-      dataYRange = { "min": bounds.topLeft.y, "max": bounds.bottomRight.y };
+      dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
+      dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
     } else {
       dataXRange = (<Range> xRangeOrBounds);
       dataYRange = yRange;
@@ -245,13 +245,13 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
       return true;
     }
 
-    const startPoint = { "x": x1, "y": y1 };
-    const endPoint = { "x": x2, "y": y2 };
+    const startPoint = { x: x1, y: y1 };
+    const endPoint = { x: x2, y: y2 };
     const corners = [
-      { "x": xRange.min, "y": yRange.min },
-      { "x": xRange.min, "y": yRange.max },
-      { "x": xRange.max, "y": yRange.max },
-      { "x": xRange.max, "y": yRange.min },
+      { x: xRange.min, y: yRange.min },
+      { x: xRange.min, y: yRange.max },
+      { x: xRange.max, y: yRange.max },
+      { x: xRange.max, y: yRange.min },
     ];
     const intersections = corners.filter((point: Point, index: number) => {
       if (index !== 0) {

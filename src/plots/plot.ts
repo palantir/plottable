@@ -541,7 +541,7 @@ export class Plot extends Component {
   }
 
   protected _generateDrawSteps(): Drawers.DrawStep[] {
-    return [{ "attrToProjector": this._generateAttrToProjector(), "animator": new Animators.Null() }];
+    return [{ attrToProjector: this._generateAttrToProjector(), animator: new Animators.Null() }];
   }
 
   protected _additionalPaint(time: number) {
@@ -568,14 +568,14 @@ export class Plot extends Component {
         const plot = this;
         lightweightPlotEntities.push({
           datum,
-          get "position"() {
+          get position() {
             // only calculate position when needing to improve pan zoom performance #3159
             return plot._pixelPoint.call(plot, datum, datumIndex, dataset);
           },
-          "index": datumIndex,
+          index: datumIndex,
           dataset,
           datasetIndex,
-          "component": this,
+          component: this,
           drawer,
           validDatumIndex,
         });
@@ -664,13 +664,13 @@ export class Plot extends Component {
 
   protected _lightweightPlotEntityToPlotEntity(entity: Plots.LightweightPlotEntity) {
     const plotEntity: Plots.PlotEntity = {
-      "datum": entity.datum,
-      "position": entity.position,
-      "dataset": entity.dataset,
-      "datasetIndex": entity.datasetIndex,
-      "index": entity.index,
-      "component": entity.component,
-      "selection": entity.drawer.selectionForIndex(entity.validDatumIndex),
+      datum: entity.datum,
+      position: entity.position,
+      dataset: entity.dataset,
+      datasetIndex: entity.datasetIndex,
+      index: entity.index,
+      component: entity.component,
+      selection: entity.drawer.selectionForIndex(entity.validDatumIndex),
     };
     return plotEntity;
   }
@@ -733,7 +733,7 @@ export class Plot extends Component {
   }
 
   protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point {
-    return { "x": 0, "y": 0 };
+    return { x: 0, y: 0 };
   }
 
   protected _animateOnNextRender() {

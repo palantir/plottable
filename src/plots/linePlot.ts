@@ -28,19 +28,19 @@ type EdgeIntersections = {
 };
 
 const CURVE_NAME_MAPPING: { [name: string]: d3.CurveFactory | d3.CurveFactoryLineOnly } = {
-  "linear": d3.curveLinear,
-  "linearClosed": d3.curveLinearClosed,
-  "step": d3.curveStep,
-  "stepBefore": d3.curveStepBefore,
-  "stepAfter": d3.curveStepAfter,
-  "basis": d3.curveBasis,
-  "basisOpen": d3.curveBasisOpen,
-  "basisClosed": d3.curveBasisClosed,
-  "bundle": d3.curveBundle,
-  "cardinal": d3.curveCardinal,
-  "cardinalOpen": d3.curveCardinalOpen,
-  "cardinalClosed": d3.curveCardinalClosed,
-  "monotone": d3.curveMonotoneX,
+  linear: d3.curveLinear,
+  linearClosed: d3.curveLinearClosed,
+  step: d3.curveStep,
+  stepBefore: d3.curveStepBefore,
+  stepAfter: d3.curveStepAfter,
+  basis: d3.curveBasis,
+  basisOpen: d3.curveBasisOpen,
+  basisClosed: d3.curveBasisClosed,
+  bundle: d3.curveBundle,
+  cardinal: d3.curveCardinal,
+  cardinalOpen: d3.curveCardinalOpen,
+  cardinalClosed: d3.curveCardinalClosed,
+  monotone: d3.curveMonotoneX,
 };
 
 /**
@@ -255,10 +255,10 @@ export class Line<X> extends XYPlot<X, number> {
   private _getEdgeIntersectionPoints(): EdgeIntersections {
     if (!(this.y().scale instanceof QuantitativeScale && this.x().scale instanceof QuantitativeScale)) {
       return {
-        "left": [],
-        "right": [],
-        "top": [],
-        "bottom": [],
+        left: [],
+        right: [],
+        top: [],
+        bottom: [],
       };
     }
 
@@ -266,10 +266,10 @@ export class Line<X> extends XYPlot<X, number> {
     const xScale = <QuantitativeScale<any>>this.x().scale;
 
     const intersectionPoints: EdgeIntersections = {
-      "left": [],
-      "right": [],
-      "top": [],
-      "bottom": [],
+      left: [],
+      right: [],
+      top: [],
+      bottom: [],
     };
     const leftX = xScale.scale(xScale.domain()[0]);
     const rightX = xScale.scale(xScale.domain()[1]);
@@ -296,8 +296,8 @@ export class Line<X> extends XYPlot<X, number> {
           y1 = x1 * y2 / x2;
 
           intersectionPoints.left.push({
-            "x": leftX,
-            "y": yScale.invert(prevY + y1),
+            x: leftX,
+            y: yScale.invert(prevY + y1),
           });
         }
 
@@ -309,8 +309,8 @@ export class Line<X> extends XYPlot<X, number> {
           y1 = x1 * y2 / x2;
 
           intersectionPoints.right.push({
-            "x": rightX,
-            "y": yScale.invert(prevY + y1),
+            x: rightX,
+            y: yScale.invert(prevY + y1),
           });
         }
 
@@ -322,8 +322,8 @@ export class Line<X> extends XYPlot<X, number> {
           x1 = y1 * x2 / y2;
 
           intersectionPoints.top.push({
-            "x": xScale.invert(prevX + x1),
-            "y": topY,
+            x: xScale.invert(prevX + x1),
+            y: topY,
           });
         }
 
@@ -335,8 +335,8 @@ export class Line<X> extends XYPlot<X, number> {
           x1 = y1 * x2 / y2;
 
           intersectionPoints.bottom.push({
-            "x": xScale.invert(prevX + x1),
-            "y": bottomY,
+            x: xScale.invert(prevX + x1),
+            y: bottomY,
           });
         }
       }
@@ -363,12 +363,12 @@ export class Line<X> extends XYPlot<X, number> {
     if (this._animateOnNextRender()) {
       const attrToProjector = this._generateAttrToProjector();
       attrToProjector["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), this._getResetYFunction());
-      drawSteps.push({ "attrToProjector": attrToProjector, "animator": this._getAnimator(Plots.Animator.RESET) });
+      drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
     }
 
     drawSteps.push({
-      "attrToProjector": this._generateAttrToProjector(),
-      "animator": this._getAnimator(Plots.Animator.MAIN),
+      attrToProjector: this._generateAttrToProjector(),
+      animator: this._getAnimator(Plots.Animator.MAIN),
     });
 
     return drawSteps;
@@ -417,8 +417,8 @@ export class Line<X> extends XYPlot<X, number> {
     let dataYRange: Range;
     if (yRange == null) {
       const bounds = (<Bounds> xRangeOrBounds);
-      dataXRange = { "min": bounds.topLeft.x, "max": bounds.bottomRight.x };
-      dataYRange = { "min": bounds.topLeft.y, "max": bounds.bottomRight.y };
+      dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
+      dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
     } else {
       dataXRange = (<Range> xRangeOrBounds);
       dataYRange = yRange;

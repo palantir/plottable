@@ -194,7 +194,7 @@ export class PanZoom extends Interaction {
     let magnifyAmount = oldCornerDistance / newCornerDistance;
 
     const normalizedPointDiffs = points.map((point, i) => {
-      return { "x": (point.x - oldPoints[i].x) / magnifyAmount, "y": (point.y - oldPoints[i].y) / magnifyAmount };
+      return { x: (point.x - oldPoints[i].x) / magnifyAmount, y: (point.y - oldPoints[i].y) / magnifyAmount };
     });
 
     const oldCenterPoint = PanZoom.centerPoint(oldPoints[0], oldPoints[1]);
@@ -215,17 +215,17 @@ export class PanZoom extends Interaction {
 
     const constrainedPoints = oldPoints.map((oldPoint, i) => {
       return {
-        "x": normalizedPointDiffs[i].x * magnifyAmount + oldPoint.x,
-        "y": normalizedPointDiffs[i].y * magnifyAmount + oldPoint.y,
+        x: normalizedPointDiffs[i].x * magnifyAmount + oldPoint.x,
+        y: normalizedPointDiffs[i].y * magnifyAmount + oldPoint.y,
       };
     });
 
     const translateAmount = {
-      "x": centerX - ((constrainedPoints[0].x + constrainedPoints[1].x) / 2),
-      "y": centerY - ((constrainedPoints[0].y + constrainedPoints[1].y) / 2),
+      x: centerX - ((constrainedPoints[0].x + constrainedPoints[1].x) / 2),
+      y: centerY - ((constrainedPoints[0].y + constrainedPoints[1].y) / 2),
     };
 
-    this.zoom(magnifyAmount, { "x": centerX, "y": centerY });
+    this.zoom(magnifyAmount, { x: centerX, y: centerY });
     this.pan(translateAmount);
   }
 
@@ -235,7 +235,7 @@ export class PanZoom extends Interaction {
     const topY = Math.min(point1.y, point2.y);
     const bottomY = Math.max(point1.y, point2.y);
 
-    return { "x": (leftX + rightX) / 2, "y": (bottomY + topY) / 2 };
+    return { x: (leftX + rightX) / 2, y: (bottomY + topY) / 2 };
   }
 
   private static _pointDistance(point1: Point, point2: Point) {
@@ -279,7 +279,7 @@ export class PanZoom extends Interaction {
         zoomAmount = constrained.zoomAmount;
       });
 
-      this.zoom(zoomAmount, { "x": centerX, "y": centerY });
+      this.zoom(zoomAmount, { x: centerX, y: centerY });
       this._zoomEndCallbacks.callCallbacks();
     }
   }
@@ -403,8 +403,8 @@ export class PanZoom extends Interaction {
       }
 
       const translateAmount = {
-        "x": (lastDragPoint == null ? startPoint.x : lastDragPoint.x) - endPoint.x,
-        "y": (lastDragPoint == null ? startPoint.y : lastDragPoint.y) - endPoint.y,
+        x: (lastDragPoint == null ? startPoint.x : lastDragPoint.x) - endPoint.x,
+        y: (lastDragPoint == null ? startPoint.y : lastDragPoint.y) - endPoint.y,
       };
       this.pan(translateAmount);
 

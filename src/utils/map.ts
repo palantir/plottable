@@ -36,7 +36,7 @@ export class Map<K, V> {
         return this;
       }
     }
-    this._keyValuePairs.push({ "key": key, "value": value });
+    this._keyValuePairs.push({ key: key, value: value });
     return this;
   }
 
