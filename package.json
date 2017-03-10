@@ -58,7 +58,7 @@
     "npm-run-all": "4.0.1",
     "requirejs": "2.1.18",
     "sinon": "1.16.1",
-    "tslint": "^4.5.1",
+    "tslint": "4.5.1",
     "typescript": "2.0.6",
     "webpack": "2.2.1",
     "webpack-dev-server": "2.3.0",
