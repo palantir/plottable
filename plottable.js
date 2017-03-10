@@ -13590,7 +13590,7 @@ var StackedArea = (function (_super) {
         if (croppedRendering == null) {
             return _super.prototype.croppedRenderingEnabled.call(this);
         }
-        if (croppedRendering === true) {
+        if (croppedRendering) {
             // HACKHACK #3032: cropped rendering doesn't currently work correctly on StackedArea
             Utils.Window.warn("Warning: Stacked Area Plot does not support cropped rendering.");
             return this;
@@ -15439,7 +15439,7 @@ var EntityArray = (function () {
         var closestDistanceSquared = Infinity;
         var closestPointEntity;
         this._entities.forEach(function (entity) {
-            if (filter !== undefined && filter(entity) === false) {
+            if (filter !== undefined && !filter(entity)) {
                 return;
             }
             var distanceSquared = Math.distanceSquared(entity.position, queryPoint);

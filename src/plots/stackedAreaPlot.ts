@@ -47,7 +47,7 @@ export class StackedArea<X> extends Area<X> {
       return super.croppedRenderingEnabled();
     }
 
-    if (croppedRendering === true) {
+    if (croppedRendering) {
       // HACKHACK #3032: cropped rendering doesn't currently work correctly on StackedArea
       Utils.Window.warn("Warning: Stacked Area Plot does not support cropped rendering.");
       return this;

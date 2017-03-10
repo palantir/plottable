@@ -8,6 +8,7 @@
     "no-inferrable-types": [true, "ignore-params", "ignore-properties"],
     "no-string-throw": true,
     "align": [true, "parameters", "statements"],
-    "arrow-parens": true
+    "arrow-parens": true,
+    "no-boolean-literal-compare": true
   }
 }
