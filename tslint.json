@@ -6,6 +6,7 @@
     "prefer-const": true,
     "trailing-comma": [true, { "multiline": "always", "singleline": "never" }],
     "no-inferrable-types": [true, "ignore-params", "ignore-properties"],
-    "no-string-throw": true
+    "no-string-throw": true,
+    "align": [true, "parameters", "statements"]
   }
 }

@@ -628,7 +628,7 @@ export class Legend extends Component {
           self._writer.write(self._formatter(column.data.name), column.width, self.height(), writeOptions, textContainer.node())
         });
 
-        entriesUpdate.exit().remove();
+      entriesUpdate.exit().remove();
     });
 
     return this;
