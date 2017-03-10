@@ -7771,13 +7771,13 @@ var d3Transition = d3;
 function attrsFunction(selection, map) {
     return selection.each(function () {
         var x = map.apply(this, arguments), s = d3Selection.select(this);
-        for (var name in x)
-            s.attr(name, x[name]);
+        for (var name_1 in x)
+            s.attr(name_1, x[name_1]);
     });
 }
 function attrsObject(selection, map) {
-    for (var name in map)
-        selection.attr(name, map[name]);
+    for (var name_2 in map)
+        selection.attr(name_2, map[name_2]);
     return selection;
 }
 function selection_attrs(map) {
@@ -7786,13 +7786,13 @@ function selection_attrs(map) {
 function stylesFunction(selection, map, priority) {
     return selection.each(function () {
         var x = map.apply(this, arguments), s = d3Selection.select(this);
-        for (var name in x)
-            s.style(name, x[name], priority);
+        for (var name_3 in x)
+            s.style(name_3, x[name_3], priority);
     });
 }
 function stylesObject(selection, map, priority) {
-    for (var name in map)
-        selection.style(name, map[name], priority);
+    for (var name_4 in map)
+        selection.style(name_4, map[name_4], priority);
     return selection;
 }
 function selection_styles(map, priority) {
@@ -7801,13 +7801,13 @@ function selection_styles(map, priority) {
 function propertiesFunction(selection, map) {
     return selection.each(function () {
         var x = map.apply(this, arguments), s = d3Selection.select(this);
-        for (var name in x)
-            s.property(name, x[name]);
+        for (var name_5 in x)
+            s.property(name_5, x[name_5]);
     });
 }
 function propertiesObject(selection, map) {
-    for (var name in map)
-        selection.property(name, map[name]);
+    for (var name_6 in map)
+        selection.property(name_6, map[name_6]);
     return selection;
 }
 function selection_properties(map) {
@@ -7816,13 +7816,13 @@ function selection_properties(map) {
 function attrsFunction$1(transition, map) {
     return transition.each(function () {
         var x = map.apply(this, arguments), t = d3Selection.select(this).transition(transition);
-        for (var name in x)
-            t.attr(name, x[name]);
+        for (var name_7 in x)
+            t.attr(name_7, x[name_7]);
     });
 }
 function attrsObject$1(transition, map) {
-    for (var name in map)
-        transition.attr(name, map[name]);
+    for (var name_8 in map)
+        transition.attr(name_8, map[name_8]);
     return transition;
 }
 function transition_attrs(map) {
@@ -7831,13 +7831,13 @@ function transition_attrs(map) {
 function stylesFunction$1(transition, map, priority) {
     return transition.each(function () {
         var x = map.apply(this, arguments), t = d3Selection.select(this).transition(transition);
-        for (var name in x)
-            t.style(name, x[name], priority);
+        for (var name_9 in x)
+            t.style(name_9, x[name_9], priority);
     });
 }
 function stylesObject$1(transition, map, priority) {
-    for (var name in map)
-        transition.style(name, map[name], priority);
+    for (var name_10 in map)
+        transition.style(name_10, map[name_10], priority);
     return transition;
 }
 function transition_styles(map, priority) {

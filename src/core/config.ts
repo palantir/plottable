@@ -6,9 +6,9 @@
 /**
  * Specifies if Plottable should show warnings.
  */
-export var SHOW_WARNINGS = true;
+export let SHOW_WARNINGS = true;
 
 /**
  * Specifies if Plottable should add <title> elements to text.
  */
-export var ADD_TITLE_ELEMENTS = true;
+export let ADD_TITLE_ELEMENTS = true;

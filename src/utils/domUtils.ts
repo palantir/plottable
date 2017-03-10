@@ -40,7 +40,7 @@ export function elementBBox(element: SimpleSelection<any>) {
 /**
  * Screen refresh rate which is assumed to be 60fps
  */
-export var SCREEN_REFRESH_RATE_MILLISECONDS = 1000 / 60;
+export let SCREEN_REFRESH_RATE_MILLISECONDS = 1000 / 60;
 
 /**
  * Polyfill for `window.requestAnimationFrame`.

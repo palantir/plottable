@@ -15,13 +15,13 @@ import { SimpleSelection } from "../core/interfaces";
 import { Axis } from "./axis";
 
 export namespace TimeInterval {
-  export var second = "second";
-  export var minute = "minute";
-  export var hour = "hour";
-  export var day = "day";
-  export var week = "week";
-  export var month = "month";
-  export var year = "year";
+  export let second = "second";
+  export let minute = "minute";
+  export let hour = "hour";
+  export let day = "day";
+  export let week = "week";
+  export let month = "month";
+  export let year = "year";
 }
 
 /**

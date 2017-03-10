@@ -58,7 +58,7 @@ export interface TransformableAccessorScaleBinding<D, R> {
 }
 
 export namespace Animator {
-  export var MAIN = "main";
-  export var RESET = "reset";
+  export let MAIN = "main";
+  export let RESET = "reset";
 }
 

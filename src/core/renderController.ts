@@ -29,9 +29,9 @@ let _componentsNeedingComputeLayout = new Utils.Set<Component>();
 let _animationRequested = false;
 let _isCurrentlyFlushing = false;
 export namespace Policy {
-  export var IMMEDIATE = "immediate";
-  export var ANIMATION_FRAME = "animationframe";
-  export var TIMEOUT = "timeout";
+  export let IMMEDIATE = "immediate";
+  export let ANIMATION_FRAME = "animationframe";
+  export let TIMEOUT = "timeout";
 }
 let _renderPolicy: RenderPolicies.RenderPolicy = new RenderPolicies.AnimationFrame();
 
