@@ -108,10 +108,10 @@ export class Numeric extends Axis<number> {
     super.renderImmediately();
 
     const tickLabelAttrHash: { [key: string]: number | string | ((d: any) => number) } = {
-      x: <any> 0,
-      y: <any> 0,
-      dx: "0em",
-      dy: "0.3em",
+      "x": <any> 0,
+      "y": <any> 0,
+      "dx": "0em",
+      "dy": "0.3em",
     };
 
     const tickMarkLength = this._maxLabelTickLength();

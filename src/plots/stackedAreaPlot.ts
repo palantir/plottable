@@ -257,7 +257,7 @@ export class StackedArea<X> extends Area<X> {
     const xValue = this.x().accessor(datum, index, dataset);
     const yValue = this.y().accessor(datum, index, dataset);
     const scaledYValue = this.y().scale.scale(+yValue + this._stackingResult.get(dataset).get(Utils.Stacking.normalizeKey(xValue)).offset);
-    return { x: pixelPoint.x, y: scaledYValue };
+    return { "x": pixelPoint.x, "y": scaledYValue };
   }
 
 }

@@ -62,8 +62,8 @@ export class Drag extends Interaction {
     }
 
     return {
-      x: Utils.Math.clamp(translatedP.x, 0, this._componentAttachedTo.width()),
-      y: Utils.Math.clamp(translatedP.y, 0, this._componentAttachedTo.height()),
+      "x": Utils.Math.clamp(translatedP.x, 0, this._componentAttachedTo.width()),
+      "y": Utils.Math.clamp(translatedP.y, 0, this._componentAttachedTo.height()),
     };
   }
 

@@ -390,7 +390,7 @@ export class XYPlot<X, Y> extends Plot {
   protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point {
     const xProjector = Plot._scaledAccessor(this.x());
     const yProjector = Plot._scaledAccessor(this.y());
-    return { x: xProjector(datum, index, dataset), y: yProjector(datum, index, dataset) };
+    return { "x": xProjector(datum, index, dataset), "y": yProjector(datum, index, dataset) };
   }
 
   protected _getDataToDraw(): Utils.Map<Dataset, any[]> {

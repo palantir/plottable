@@ -106,8 +106,8 @@ export class Category extends Axis<string> {
 
     if (this._scale.domain().length === 0) {
       return {
-        minWidth: 0,
-        minHeight: 0,
+        "minWidth": 0,
+        "minHeight": 0,
       };
     }
 
@@ -123,8 +123,8 @@ export class Category extends Axis<string> {
     const measureResult = this._measureTickLabels(offeredWidth, offeredHeight);
 
     return {
-      minWidth: measureResult.usedWidth + widthRequiredByTicks,
-      minHeight: measureResult.usedHeight + heightRequiredByTicks,
+      "minWidth": measureResult.usedWidth + widthRequiredByTicks,
+      "minHeight": measureResult.usedHeight + heightRequiredByTicks,
     };
   }
 
@@ -155,8 +155,8 @@ export class Category extends Axis<string> {
     const shearedMinimumWidth = Category._MINIMUM_WIDTH_PER_LABEL_PX * shearFactor;
     const downsampleRatio = Math.ceil(shearedMinimumWidth / scale.stepWidth());
     return {
-      domain: domain.filter((d, i) => i % downsampleRatio === 0),
-      stepWidth: downsampleRatio * scale.stepWidth(),
+      "domain": domain.filter((d, i) => i % downsampleRatio === 0),
+      "stepWidth": downsampleRatio * scale.stepWidth(),
     };
   }
 
@@ -271,16 +271,16 @@ export class Category extends Axis<string> {
     let yAlign: {[s: string]: Typesetter.IYAlign};
     switch (this.tickLabelAngle()) {
       case 0:
-        xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
-        yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
+        xAlign = { "left": "right", "right": "left", "top": "center", "bottom": "center" };
+        yAlign = { "left": "center", "right": "center", "top": "bottom", "bottom": "top" };
         break;
       case 90:
-        xAlign = { left: "center", right: "center", top: "right", bottom: "left" };
-        yAlign = { left: "top", right: "bottom", top: "center", bottom: "center" };
+        xAlign = { "left": "center", "right": "center", "top": "right", "bottom": "left" };
+        yAlign = { "left": "top", "right": "bottom", "top": "center", "bottom": "center" };
         break;
       case -90:
-        xAlign = { left: "center", right: "center", top: "left", bottom: "right" };
-        yAlign = { left: "bottom", right: "top", top: "center", bottom: "center" };
+        xAlign = { "left": "center", "right": "center", "top": "left", "bottom": "right" };
+        yAlign = { "left": "bottom", "right": "top", "top": "center", "bottom": "center" };
         break;
     }
     ticks.each(function (this: SVGElement, d: string) {
@@ -288,10 +288,10 @@ export class Category extends Axis<string> {
       let width = self.isHorizontal() ? stepWidth : self.width() - self._tickSpaceRequired();
       const height = self.isHorizontal() ? self.height() - self._tickSpaceRequired() : stepWidth;
       const writeOptions = {
-        xAlign: xAlign[self.orientation()],
-        yAlign: yAlign[self.orientation()],
-        textRotation: self.tickLabelAngle(),
-        textShear: self.tickLabelShearAngle(),
+        "xAlign": xAlign[self.orientation()],
+        "yAlign": yAlign[self.orientation()],
+        "textRotation": self.tickLabelAngle(),
+        "textShear": self.tickLabelShearAngle(),
       } as Typesetter.IWriteOptions;
       if (self._tickLabelMaxWidth != null) {
         // for left-oriented axes, we must move the ticks by the amount we've cut off in order to keep the text
@@ -373,8 +373,8 @@ export class Category extends Axis<string> {
     }
 
     return {
-      usedWidth: usedWidth,
-      usedHeight: usedHeight,
+      "usedWidth": usedWidth,
+      "usedHeight": usedHeight,
     };
   }
 

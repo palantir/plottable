@@ -40,8 +40,8 @@ export class Label extends Component {
     const desiredHeight = (this.angle() === 0 ? desiredWH.height : desiredWH.width) + 2 * this.padding();
 
     return {
-      minWidth: desiredWidth,
-      minHeight: desiredHeight,
+      "minWidth": desiredWidth,
+      "minHeight": desiredHeight,
     };
   }
 
@@ -154,9 +154,9 @@ export class Label extends Component {
     const writeWidth = this.width() - 2 * widthPadding;
     const writeHeight = this.height() - 2 * heightPadding;
     const writeOptions = {
-      xAlign: this.xAlignment() as Typesetter.IXAlign,
-      yAlign: this.yAlignment() as Typesetter.IYAlign,
-      textRotation: this.angle(),
+      "xAlign": this.xAlignment() as Typesetter.IXAlign,
+      "yAlign": this.yAlignment() as Typesetter.IYAlign,
+      "textRotation": this.angle(),
     };
     this._writer.write(this._text, writeWidth, writeHeight, writeOptions);
     return this;

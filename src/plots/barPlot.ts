@@ -266,7 +266,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     const context = new Typesetter.SvgContext(labelArea.node() as SVGElement);
     const measurer = new Typesetter.CacheMeasurer(context);
     const writer = new Typesetter.Writer(measurer, context);
-    this._labelConfig.set(dataset, { labelArea: labelArea, measurer: measurer, writer: writer });
+    this._labelConfig.set(dataset, { "labelArea": labelArea, "measurer": measurer, "writer": writer });
     return drawer;
   }
 
@@ -348,18 +348,18 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     const chartWidth = bounds.bottomRight.x - bounds.topLeft.x;
     const chartHeight = bounds.bottomRight.y - bounds.topLeft.y;
 
-    const xRange = { min: 0, max: chartWidth };
-    const yRange = { min: 0, max: chartHeight };
+    const xRange = { "min": 0, "max": chartWidth };
+    const yRange = { "min": 0, "max": chartHeight };
 
     const attrToProjector = this._generateAttrToProjector();
 
     const { datum, index, dataset } = entity;
 
     const barBBox = {
-      x: attrToProjector["x"](datum, index, dataset),
-      y: attrToProjector["y"](datum, index, dataset),
-      width: attrToProjector["width"](datum, index, dataset),
-      height: attrToProjector["height"](datum, index, dataset),
+      "x": attrToProjector["x"](datum, index, dataset),
+      "y": attrToProjector["y"](datum, index, dataset),
+      "width": attrToProjector["width"](datum, index, dataset),
+      "height": attrToProjector["height"](datum, index, dataset),
     };
 
     return Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
@@ -395,8 +395,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     let dataYRange: Range;
     if (yRange == null) {
       const bounds = (<Bounds> xRangeOrBounds);
-      dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
-      dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
+      dataXRange = { "min": bounds.topLeft.x, "max": bounds.bottomRight.x };
+      dataYRange = { "min": bounds.topLeft.y, "max": bounds.bottomRight.y };
     } else {
       dataXRange = (<Range> xRangeOrBounds);
       dataYRange = yRange;
@@ -509,15 +509,15 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       let xAlignment = "center";
       let yAlignment = "center";
       const labelContainerOrigin = {
-        x: attrToProjector["x"](d, i, dataset),
-        y: attrToProjector["y"](d, i, dataset),
+        "x": attrToProjector["x"](d, i, dataset),
+        "y": attrToProjector["y"](d, i, dataset),
       };
       let containerWidth = barWidth;
       let containerHeight = barHeight;
 
       const labelOrigin = {
-        x: labelContainerOrigin.x,
-        y: labelContainerOrigin.y,
+        "x": labelContainerOrigin.x,
+        "y": labelContainerOrigin.y,
       };
 
       let showLabelOnBar: boolean;
@@ -610,8 +610,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       labelContainer.style("visibility", hideLabel ? "hidden" : "inherit");
 
       const writeOptions = {
-        xAlign: xAlignment as Typesetter.IXAlign,
-        yAlign: yAlignment as Typesetter.IYAlign,
+        "xAlign": xAlignment as Typesetter.IXAlign,
+        "yAlign": yAlignment as Typesetter.IYAlign,
       };
       writer.write(text, containerWidth, containerHeight, writeOptions, labelContainer.node());
 
@@ -635,11 +635,11 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       const dimensionAttr = this._isVertical ? "height" : "width";
       resetAttrToProjector[positionAttr] = () => scaledBaseline;
       resetAttrToProjector[dimensionAttr] = () => 0;
-      drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
+      drawSteps.push({ "attrToProjector": resetAttrToProjector, "animator": this._getAnimator(Plots.Animator.RESET) });
     }
     drawSteps.push({
-      attrToProjector: this._generateAttrToProjector(),
-      animator: this._getAnimator(Plots.Animator.MAIN),
+      "attrToProjector": this._generateAttrToProjector(),
+      "animator": this._getAnimator(Plots.Animator.MAIN),
     });
     return drawSteps;
   }
@@ -745,7 +745,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       x = originalPosition >= scaledBaseline ? rectX + rectWidth : rectX;
       y = rectY + rectHeight / 2;
     }
-    return { x: x, y: y };
+    return { "x": x, "y": y };
   }
 
   protected _uninstallScaleForKey(scale: Scale<any, number>, key: string) {

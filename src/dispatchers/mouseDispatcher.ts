@@ -52,7 +52,7 @@ export class Mouse extends Dispatcher {
 
     this._translator = Utils.getTranslator(component);
 
-    this._lastMousePosition = { x: -1, y: -1 };
+    this._lastMousePosition = { "x": -1, "y": -1 };
 
     const processMoveCallback = (e: MouseEvent) => this._measureAndDispatch(component, e, Mouse._MOUSEMOVE_EVENT_NAME, "page");
     this._eventToProcessingFunction[Mouse._MOUSEOVER_EVENT_NAME] = processMoveCallback;

@@ -80,9 +80,9 @@ export function stack(
         offsetMap.set(key, value);
       }
       keyToStackedDatum.set(key, {
-        offset: offset,
-        value: value,
-        axisValue: keyAccessor(datum, index, dataset),
+        "offset": offset,
+        "value": value,
+        "axisValue": keyAccessor(datum, index, dataset),
       });
     });
     datasetToKeyToStackedDatum.set(dataset, keyToStackedDatum);
@@ -111,15 +111,15 @@ export function stackedExtents<D>(stackingResult: GenericStackingResult<D>): {
       const minimalValue = Utils.Math.min([datum.offset + datum.value, datum.offset], datum.offset);
 
       if (!maximumExtents.has(key)) {
-        maximumExtents.set(key, { extent: maximalValue, axisValue: datum.axisValue });
+        maximumExtents.set(key, { "extent": maximalValue, "axisValue": datum.axisValue });
       } else if (maximumExtents.get(key).extent < maximalValue) {
-        maximumExtents.set(key, { extent: maximalValue, axisValue: datum.axisValue });
+        maximumExtents.set(key, { "extent": maximalValue, "axisValue": datum.axisValue });
       }
 
       if (!minimumExtents.has(key)) {
-        minimumExtents.set(key, { extent: minimalValue, axisValue: datum.axisValue });
+        minimumExtents.set(key, { "extent": minimalValue, "axisValue": datum.axisValue });
       } else if (minimumExtents.get(key).extent > (minimalValue)) {
-        minimumExtents.set(key, { extent: minimalValue, axisValue: datum.axisValue });
+        minimumExtents.set(key, { "extent": minimalValue, "axisValue": datum.axisValue });
       }
     });
   });

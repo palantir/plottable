@@ -92,10 +92,10 @@ export class DragLineLayer<D> extends GuideLineLayer<D> {
   public renderImmediately() {
     super.renderImmediately();
     this._detectionEdge.attrs({
-      x1: this._isVertical() ? this.pixelPosition() : 0,
-      y1: this._isVertical() ? 0 : this.pixelPosition(),
-      x2: this._isVertical() ? this.pixelPosition() : this.width(),
-      y2: this._isVertical() ? this.height() : this.pixelPosition(),
+      "x1": this._isVertical() ? this.pixelPosition() : 0,
+      "y1": this._isVertical() ? 0 : this.pixelPosition(),
+      "x2": this._isVertical() ? this.pixelPosition() : this.width(),
+      "y2": this._isVertical() ? this.height() : this.pixelPosition(),
       "stroke-width": this._detectionRadius * 2,
     });
 

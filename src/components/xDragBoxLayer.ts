@@ -30,8 +30,8 @@ export class XDragBoxLayer extends DragBoxLayer {
 
   protected _setBounds(newBounds: Bounds) {
     super._setBounds({
-      topLeft: { x: newBounds.topLeft.x, y: 0 },
-      bottomRight: { x: newBounds.bottomRight.x, y: this.height() },
+      "topLeft": { "x": newBounds.topLeft.x, "y": 0 },
+      "bottomRight": { "x": newBounds.bottomRight.x, "y": this.height() },
     });
   }
 

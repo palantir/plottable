@@ -72,9 +72,9 @@ export class DragBoxLayer extends SelectionBoxLayer {
     let lastEndPoint: Point;
 
     const DRAG_MODES = {
-      newBox: 0,
-      resize: 1,
-      move: 2,
+      "newBox": 0,
+      "resize": 1,
+      "move": 2,
     };
     let mode = DRAG_MODES.newBox;
 
@@ -92,8 +92,8 @@ export class DragBoxLayer extends SelectionBoxLayer {
       } else {
         mode = DRAG_MODES.newBox;
         this._setBounds({
-          topLeft: startPoint,
-          bottomRight: startPoint,
+          "topLeft": startPoint,
+          "bottomRight": startPoint,
         });
         if (this._xBoundsMode === PropertyMode.VALUE && this.xScale() != null) {
           this._setXExtent([this.xScale().invert(startPoint.x), this.xScale().invert(startPoint.x)]);
@@ -107,8 +107,8 @@ export class DragBoxLayer extends SelectionBoxLayer {
       this.boxVisible(true);
       bounds = this.bounds();
       // copy points so changes to topLeft and bottomRight don't mutate bounds
-      topLeft = { x: bounds.topLeft.x, y: bounds.topLeft.y };
-      bottomRight = { x: bounds.bottomRight.x, y: bounds.bottomRight.y };
+      topLeft = { "x": bounds.topLeft.x, "y": bounds.topLeft.y };
+      bottomRight = { "x": bounds.bottomRight.x, "y": bounds.bottomRight.y };
       lastEndPoint = startPoint;
       this._dragStartCallbacks.callCallbacks(bounds);
     };
@@ -144,8 +144,8 @@ export class DragBoxLayer extends SelectionBoxLayer {
       }
 
       this._setBounds({
-        topLeft: topLeft,
-        bottomRight: bottomRight,
+        "topLeft": topLeft,
+        "bottomRight": bottomRight,
       });
       if (this._xBoundsMode === PropertyMode.VALUE && this.xScale() != null) {
         this._setXExtent([this.xScale().invert(topLeft.x), this.xScale().invert(bottomRight.x)]);
@@ -207,10 +207,10 @@ export class DragBoxLayer extends SelectionBoxLayer {
 
   private _getResizingEdges(p: Point) {
     const edges = {
-      top: false,
-      bottom: false,
-      left: false,
-      right: false,
+      "top": false,
+      "bottom": false,
+      "left": false,
+      "right": false,
     };
 
     if (!this.resizable()) {
@@ -247,27 +247,27 @@ export class DragBoxLayer extends SelectionBoxLayer {
       const r = bounds.bottomRight.x;
 
       this._detectionEdgeT.attrs({
-        x1: l, y1: t, x2: r, y2: t,
+        "x1": l, "y1": t, "x2": r, "y2": t,
         "stroke-width": this._detectionRadius * 2,
       });
       this._detectionEdgeB.attrs({
-        x1: l, y1: b, x2: r, y2: b,
+        "x1": l, "y1": b, "x2": r, "y2": b,
         "stroke-width": this._detectionRadius * 2,
       });
       this._detectionEdgeL.attrs({
-        x1: l, y1: t, x2: l, y2: b,
+        "x1": l, "y1": t, "x2": l, "y2": b,
         "stroke-width": this._detectionRadius * 2,
       });
       this._detectionEdgeR.attrs({
-        x1: r, y1: t, x2: r, y2: b,
+        "x1": r, "y1": t, "x2": r, "y2": b,
         "stroke-width": this._detectionRadius * 2,
       });
 
       if (this._hasCorners) {
-        this._detectionCornerTL.attrs({ cx: l, cy: t, r: this._detectionRadius });
-        this._detectionCornerTR.attrs({ cx: r, cy: t, r: this._detectionRadius });
-        this._detectionCornerBL.attrs({ cx: l, cy: b, r: this._detectionRadius });
-        this._detectionCornerBR.attrs({ cx: r, cy: b, r: this._detectionRadius });
+        this._detectionCornerTL.attrs({ "cx": l, "cy": t, "r": this._detectionRadius });
+        this._detectionCornerTR.attrs({ "cx": r, "cy": t, "r": this._detectionRadius });
+        this._detectionCornerBL.attrs({ "cx": l, "cy": b, "r": this._detectionRadius });
+        this._detectionCornerBR.attrs({ "cx": r, "cy": b, "r": this._detectionRadius });
       }
     }
     return this;
@@ -470,8 +470,8 @@ export class DragBoxLayer extends SelectionBoxLayer {
 
   private _resetState() {
     this.bounds({
-      topLeft: { x: 0, y: 0 },
-      bottomRight: { x: 0, y: 0 },
+      "topLeft": { "x": 0, "y": 0 },
+      "bottomRight": { "x": 0, "y": 0 },
     });
   }
 }

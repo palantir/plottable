@@ -111,7 +111,7 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
     if (symbol == null) {
       return this._propertyBindings.get(Scatter._SYMBOL_KEY);
     }
-    this._propertyBindings.set(Scatter._SYMBOL_KEY, { accessor: symbol });
+    this._propertyBindings.set(Scatter._SYMBOL_KEY, { "accessor": symbol });
     this.render();
     return this;
   }
@@ -123,25 +123,25 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
 
       const symbolProjector = Plot._scaledAccessor(this.symbol());
       resetAttrToProjector["d"] = (datum: any, index: number, dataset: Dataset) => symbolProjector(datum, index, dataset)(0);
-      drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
+      drawSteps.push({ "attrToProjector": resetAttrToProjector, "animator": this._getAnimator(Plots.Animator.RESET) });
     }
 
     drawSteps.push({
-      attrToProjector: this._generateAttrToProjector(),
-      animator: this._getAnimator(Plots.Animator.MAIN),
+      "attrToProjector": this._generateAttrToProjector(),
+      "animator": this._getAnimator(Plots.Animator.MAIN),
     });
     return drawSteps;
   }
 
   protected _entityVisibleOnPlot(entity: LightweightScatterPlotEntity, bounds: Bounds) {
-    const xRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
-    const yRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
+    const xRange = { "min": bounds.topLeft.x, "max": bounds.bottomRight.x };
+    const yRange = { "min": bounds.topLeft.y, "max": bounds.bottomRight.y };
 
     const translatedBbox = {
-      x: entity.position.x - entity.diameter,
-      y: entity.position.y - entity.diameter,
-      width: entity.diameter,
-      height: entity.diameter,
+      "x": entity.position.x - entity.diameter,
+      "y": entity.position.y - entity.diameter,
+      "width": entity.diameter,
+      "height": entity.diameter,
     };
 
     return Utils.DOM.intersectsBBox(xRange, yRange, translatedBbox);
@@ -185,8 +185,8 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
     let dataYRange: Range;
     if (yRange == null) {
       const bounds = (<Bounds> xRangeOrBounds);
-      dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
-      dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
+      dataXRange = { "min": bounds.topLeft.x, "max": bounds.bottomRight.x };
+      dataYRange = { "min": bounds.topLeft.y, "max": bounds.bottomRight.y };
     } else {
       dataXRange = (<Range> xRangeOrBounds);
       dataYRange = yRange;

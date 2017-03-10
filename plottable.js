@@ -502,7 +502,7 @@ var Plot = (function (_super) {
         return this;
     };
     Plot.prototype._generateDrawSteps = function () {
-        return [{ attrToProjector: this._generateAttrToProjector(), animator: new Animators.Null() }];
+        return [{ "attrToProjector": this._generateAttrToProjector(), "animator": new Animators.Null() }];
     };
     Plot.prototype._additionalPaint = function (time) {
         // no-op
@@ -526,14 +526,14 @@ var Plot = (function (_super) {
                 var plot = _this;
                 lightweightPlotEntities.push({
                     datum: datum,
-                    get position() {
+                    get "position"() {
                         // only calculate position when needing to improve pan zoom performance #3159
                         return plot._pixelPoint.call(plot, datum, datumIndex, dataset);
                     },
-                    index: datumIndex,
+                    "index": datumIndex,
                     dataset: dataset,
                     datasetIndex: datasetIndex,
-                    component: _this,
+                    "component": _this,
                     drawer: drawer,
                     validDatumIndex: validDatumIndex,
                 });
@@ -615,13 +615,13 @@ var Plot = (function (_super) {
     };
     Plot.prototype._lightweightPlotEntityToPlotEntity = function (entity) {
         var plotEntity = {
-            datum: entity.datum,
-            position: entity.position,
-            dataset: entity.dataset,
-            datasetIndex: entity.datasetIndex,
-            index: entity.index,
-            component: entity.component,
-            selection: entity.drawer.selectionForIndex(entity.validDatumIndex),
+            "datum": entity.datum,
+            "position": entity.position,
+            "dataset": entity.dataset,
+            "datasetIndex": entity.datasetIndex,
+            "index": entity.index,
+            "component": entity.component,
+            "selection": entity.drawer.selectionForIndex(entity.validDatumIndex),
         };
         return plotEntity;
     };
@@ -677,7 +677,7 @@ var Plot = (function (_super) {
             function (d, i, ds) { return binding.scale.scale(binding.accessor(d, i, ds)); };
     };
     Plot.prototype._pixelPoint = function (datum, index, dataset) {
-        return { x: 0, y: 0 };
+        return { "x": 0, "y": 0 };
     };
     Plot.prototype._animateOnNextRender = function () {
         return this._animate && this._dataChanged;
@@ -1490,8 +1490,8 @@ var Drawer = (function () {
         var appliedDrawSteps = drawSteps.map(function (dr) {
             var attrToAppliedProjector = _this._appliedProjectors(dr.attrToProjector);
             return {
-                attrToAppliedProjector: attrToAppliedProjector,
-                animator: dr.animator,
+                "attrToAppliedProjector": attrToAppliedProjector,
+                "animator": dr.animator,
             };
         });
         if (this._renderArea != null) {
@@ -1740,32 +1740,32 @@ function multiTime() {
     // https://github.com/mbostock/d3/wiki/Time-Formatting#format_multi
     var candidateFormats = [
         {
-            specifier: ".%L",
-            predicate: function (d) { return d.getMilliseconds() !== 0; },
+            "specifier": ".%L",
+            "predicate": function (d) { return d.getMilliseconds() !== 0; },
         },
         {
-            specifier: ":%S",
-            predicate: function (d) { return d.getSeconds() !== 0; },
+            "specifier": ":%S",
+            "predicate": function (d) { return d.getSeconds() !== 0; },
         },
         {
-            specifier: "%I:%M",
-            predicate: function (d) { return d.getMinutes() !== 0; },
+            "specifier": "%I:%M",
+            "predicate": function (d) { return d.getMinutes() !== 0; },
         },
         {
-            specifier: "%I %p",
-            predicate: function (d) { return d.getHours() !== 0; },
+            "specifier": "%I %p",
+            "predicate": function (d) { return d.getHours() !== 0; },
         },
         {
-            specifier: "%a %d",
-            predicate: function (d) { return d.getDay() !== 0 && d.getDate() !== 1; },
+            "specifier": "%a %d",
+            "predicate": function (d) { return d.getDay() !== 0 && d.getDate() !== 1; },
         },
         {
-            specifier: "%b %d",
-            predicate: function (d) { return d.getDate() !== 1; },
+            "specifier": "%b %d",
+            "predicate": function (d) { return d.getDate() !== 1; },
         },
         {
-            specifier: "%b",
-            predicate: function (d) { return d.getMonth() !== 0; },
+            "specifier": "%b",
+            "predicate": function (d) { return d.getMonth() !== 0; },
         },
     ];
     return function (d) {
@@ -2248,8 +2248,8 @@ var Interaction = (function () {
     Interaction.prototype._translateToComponentSpace = function (p) {
         var origin = this._componentAttachedTo.originToRoot();
         return {
-            x: p.x - origin.x,
-            y: p.y - origin.y,
+            "x": p.x - origin.x,
+            "y": p.y - origin.y,
         };
     };
     /**
@@ -2560,7 +2560,7 @@ var XYPlot = (function (_super) {
     XYPlot.prototype._pixelPoint = function (datum, index, dataset) {
         var xProjector = plot_1.Plot._scaledAccessor(this.x());
         var yProjector = plot_1.Plot._scaledAccessor(this.y());
-        return { x: xProjector(datum, index, dataset), y: yProjector(datum, index, dataset) };
+        return { "x": xProjector(datum, index, dataset), "y": yProjector(datum, index, dataset) };
     };
     XYPlot.prototype._getDataToDraw = function () {
         var _this = this;
@@ -3710,7 +3710,7 @@ var Bar = (function (_super) {
         var context = new Typesetter.SvgContext(labelArea.node());
         var measurer = new Typesetter.CacheMeasurer(context);
         var writer = new Typesetter.Writer(measurer, context);
-        this._labelConfig.set(dataset, { labelArea: labelArea, measurer: measurer, writer: writer });
+        this._labelConfig.set(dataset, { "labelArea": labelArea, "measurer": measurer, "writer": writer });
         return drawer;
     };
     Bar.prototype._removeDatasetNodes = function (dataset) {
@@ -3785,15 +3785,15 @@ var Bar = (function (_super) {
     Bar.prototype._entityVisibleOnPlot = function (entity, bounds) {
         var chartWidth = bounds.bottomRight.x - bounds.topLeft.x;
         var chartHeight = bounds.bottomRight.y - bounds.topLeft.y;
-        var xRange = { min: 0, max: chartWidth };
-        var yRange = { min: 0, max: chartHeight };
+        var xRange = { "min": 0, "max": chartWidth };
+        var yRange = { "min": 0, "max": chartHeight };
         var attrToProjector = this._generateAttrToProjector();
         var datum = entity.datum, index = entity.index, dataset = entity.dataset;
         var barBBox = {
-            x: attrToProjector["x"](datum, index, dataset),
-            y: attrToProjector["y"](datum, index, dataset),
-            width: attrToProjector["width"](datum, index, dataset),
-            height: attrToProjector["height"](datum, index, dataset),
+            "x": attrToProjector["x"](datum, index, dataset),
+            "y": attrToProjector["y"](datum, index, dataset),
+            "width": attrToProjector["width"](datum, index, dataset),
+            "height": attrToProjector["height"](datum, index, dataset),
         };
         return Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
     };
@@ -3811,8 +3811,8 @@ var Bar = (function (_super) {
         var dataYRange;
         if (yRange == null) {
             var bounds = xRangeOrBounds;
-            dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
-            dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
+            dataXRange = { "min": bounds.topLeft.x, "max": bounds.bottomRight.x };
+            dataYRange = { "min": bounds.topLeft.y, "max": bounds.bottomRight.y };
         }
         else {
             dataXRange = xRangeOrBounds;
@@ -3916,14 +3916,14 @@ var Bar = (function (_super) {
             var xAlignment = "center";
             var yAlignment = "center";
             var labelContainerOrigin = {
-                x: attrToProjector["x"](d, i, dataset),
-                y: attrToProjector["y"](d, i, dataset),
+                "x": attrToProjector["x"](d, i, dataset),
+                "y": attrToProjector["y"](d, i, dataset),
             };
             var containerWidth = barWidth;
             var containerHeight = barHeight;
             var labelOrigin = {
-                x: labelContainerOrigin.x,
-                y: labelContainerOrigin.y,
+                "x": labelContainerOrigin.x,
+                "y": labelContainerOrigin.y,
             };
             var showLabelOnBar;
             if (_this._isVertical) {
@@ -4016,8 +4016,8 @@ var Bar = (function (_super) {
                 labelOrigin.y + measurement.height > _this.height();
             labelContainer.style("visibility", hideLabel ? "hidden" : "inherit");
             var writeOptions = {
-                xAlign: xAlignment,
-                yAlign: yAlignment,
+                "xAlign": xAlignment,
+                "yAlign": yAlignment,
             };
             writer.write(text, containerWidth, containerHeight, writeOptions, labelContainer.node());
             var tooWide = _this._isVertical
@@ -4038,11 +4038,11 @@ var Bar = (function (_super) {
             var dimensionAttr = this._isVertical ? "height" : "width";
             resetAttrToProjector[positionAttr] = function () { return scaledBaseline_1; };
             resetAttrToProjector[dimensionAttr] = function () { return 0; };
-            drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
+            drawSteps.push({ "attrToProjector": resetAttrToProjector, "animator": this._getAnimator(Plots.Animator.RESET) });
         }
         drawSteps.push({
-            attrToProjector: this._generateAttrToProjector(),
-            animator: this._getAnimator(Plots.Animator.MAIN),
+            "attrToProjector": this._generateAttrToProjector(),
+            "animator": this._getAnimator(Plots.Animator.MAIN),
         });
         return drawSteps;
     };
@@ -4137,7 +4137,7 @@ var Bar = (function (_super) {
             x = originalPosition >= scaledBaseline ? rectX + rectWidth : rectX;
             y = rectY + rectHeight / 2;
         }
-        return { x: x, y: y };
+        return { "x": x, "y": y };
     };
     Bar.prototype._uninstallScaleForKey = function (scale, key) {
         scale.offUpdate(this._updateBarPixelWidthCallback);
@@ -4604,111 +4604,111 @@ var Time = (function (_super) {
     );
     Time._DEFAULT_TIME_AXIS_CONFIGURATIONS = [
         [
-            { interval: TimeInterval.second, step: 1, formatter: Formatters.time("%I:%M:%S %p") },
-            { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+            { "interval": TimeInterval.second, "step": 1, "formatter": Formatters.time("%I:%M:%S %p") },
+            { "interval": TimeInterval.day, "step": 1, "formatter": Formatters.time("%B %e, %Y") },
         ],
         [
-            { interval: TimeInterval.second, step: 5, formatter: Formatters.time("%I:%M:%S %p") },
-            { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+            { "interval": TimeInterval.second, "step": 5, "formatter": Formatters.time("%I:%M:%S %p") },
+            { "interval": TimeInterval.day, "step": 1, "formatter": Formatters.time("%B %e, %Y") },
         ],
         [
-            { interval: TimeInterval.second, step: 10, formatter: Formatters.time("%I:%M:%S %p") },
-            { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+            { "interval": TimeInterval.second, "step": 10, "formatter": Formatters.time("%I:%M:%S %p") },
+            { "interval": TimeInterval.day, "step": 1, "formatter": Formatters.time("%B %e, %Y") },
         ],
         [
-            { interval: TimeInterval.second, step: 15, formatter: Formatters.time("%I:%M:%S %p") },
-            { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+            { "interval": TimeInterval.second, "step": 15, "formatter": Formatters.time("%I:%M:%S %p") },
+            { "interval": TimeInterval.day, "step": 1, "formatter": Formatters.time("%B %e, %Y") },
         ],
         [
-            { interval: TimeInterval.second, step: 30, formatter: Formatters.time("%I:%M:%S %p") },
-            { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+            { "interval": TimeInterval.second, "step": 30, "formatter": Formatters.time("%I:%M:%S %p") },
+            { "interval": TimeInterval.day, "step": 1, "formatter": Formatters.time("%B %e, %Y") },
         ],
         [
-            { interval: TimeInterval.minute, step: 1, formatter: Formatters.time("%I:%M %p") },
-            { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+            { "interval": TimeInterval.minute, "step": 1, "formatter": Formatters.time("%I:%M %p") },
+            { "interval": TimeInterval.day, "step": 1, "formatter": Formatters.time("%B %e, %Y") },
         ],
         [
-            { interval: TimeInterval.minute, step: 5, formatter: Formatters.time("%I:%M %p") },
-            { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+            { "interval": TimeInterval.minute, "step": 5, "formatter": Formatters.time("%I:%M %p") },
+            { "interval": TimeInterval.day, "step": 1, "formatter": Formatters.time("%B %e, %Y") },
         ],
         [
-            { interval: TimeInterval.minute, step: 10, formatter: Formatters.time("%I:%M %p") },
-            { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+            { "interval": TimeInterval.minute, "step": 10, "formatter": Formatters.time("%I:%M %p") },
+            { "interval": TimeInterval.day, "step": 1, "formatter": Formatters.time("%B %e, %Y") },
         ],
         [
-            { interval: TimeInterval.minute, step: 15, formatter: Formatters.time("%I:%M %p") },
-            { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+            { "interval": TimeInterval.minute, "step": 15, "formatter": Formatters.time("%I:%M %p") },
+            { "interval": TimeInterval.day, "step": 1, "formatter": Formatters.time("%B %e, %Y") },
         ],
         [
-            { interval: TimeInterval.minute, step: 30, formatter: Formatters.time("%I:%M %p") },
-            { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+            { "interval": TimeInterval.minute, "step": 30, "formatter": Formatters.time("%I:%M %p") },
+            { "interval": TimeInterval.day, "step": 1, "formatter": Formatters.time("%B %e, %Y") },
         ],
         [
-            { interval: TimeInterval.hour, step: 1, formatter: Formatters.time("%I %p") },
-            { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+            { "interval": TimeInterval.hour, "step": 1, "formatter": Formatters.time("%I %p") },
+            { "interval": TimeInterval.day, "step": 1, "formatter": Formatters.time("%B %e, %Y") },
         ],
         [
-            { interval: TimeInterval.hour, step: 3, formatter: Formatters.time("%I %p") },
-            { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+            { "interval": TimeInterval.hour, "step": 3, "formatter": Formatters.time("%I %p") },
+            { "interval": TimeInterval.day, "step": 1, "formatter": Formatters.time("%B %e, %Y") },
         ],
         [
-            { interval: TimeInterval.hour, step: 6, formatter: Formatters.time("%I %p") },
-            { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+            { "interval": TimeInterval.hour, "step": 6, "formatter": Formatters.time("%I %p") },
+            { "interval": TimeInterval.day, "step": 1, "formatter": Formatters.time("%B %e, %Y") },
         ],
         [
-            { interval: TimeInterval.hour, step: 12, formatter: Formatters.time("%I %p") },
-            { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+            { "interval": TimeInterval.hour, "step": 12, "formatter": Formatters.time("%I %p") },
+            { "interval": TimeInterval.day, "step": 1, "formatter": Formatters.time("%B %e, %Y") },
         ],
         [
-            { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%a %e") },
-            { interval: TimeInterval.month, step: 1, formatter: Formatters.time("%B %Y") },
+            { "interval": TimeInterval.day, "step": 1, "formatter": Formatters.time("%a %e") },
+            { "interval": TimeInterval.month, "step": 1, "formatter": Formatters.time("%B %Y") },
         ],
         [
-            { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%e") },
-            { interval: TimeInterval.month, step: 1, formatter: Formatters.time("%B %Y") },
+            { "interval": TimeInterval.day, "step": 1, "formatter": Formatters.time("%e") },
+            { "interval": TimeInterval.month, "step": 1, "formatter": Formatters.time("%B %Y") },
         ],
         [
-            { interval: TimeInterval.month, step: 1, formatter: Formatters.time("%B") },
-            { interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y") },
+            { "interval": TimeInterval.month, "step": 1, "formatter": Formatters.time("%B") },
+            { "interval": TimeInterval.year, "step": 1, "formatter": Formatters.time("%Y") },
         ],
         [
-            { interval: TimeInterval.month, step: 1, formatter: Formatters.time("%b") },
-            { interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y") },
+            { "interval": TimeInterval.month, "step": 1, "formatter": Formatters.time("%b") },
+            { "interval": TimeInterval.year, "step": 1, "formatter": Formatters.time("%Y") },
         ],
         [
-            { interval: TimeInterval.month, step: 3, formatter: Formatters.time("%b") },
-            { interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y") },
+            { "interval": TimeInterval.month, "step": 3, "formatter": Formatters.time("%b") },
+            { "interval": TimeInterval.year, "step": 1, "formatter": Formatters.time("%Y") },
         ],
         [
-            { interval: TimeInterval.month, step: 6, formatter: Formatters.time("%b") },
-            { interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y") },
+            { "interval": TimeInterval.month, "step": 6, "formatter": Formatters.time("%b") },
+            { "interval": TimeInterval.year, "step": 1, "formatter": Formatters.time("%Y") },
         ],
         [
-            { interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y") },
+            { "interval": TimeInterval.year, "step": 1, "formatter": Formatters.time("%Y") },
         ],
         [
-            { interval: TimeInterval.year, step: 1, formatter: Formatters.time("%y") },
+            { "interval": TimeInterval.year, "step": 1, "formatter": Formatters.time("%y") },
         ],
         [
-            { interval: TimeInterval.year, step: 5, formatter: Formatters.time("%Y") },
+            { "interval": TimeInterval.year, "step": 5, "formatter": Formatters.time("%Y") },
         ],
         [
-            { interval: TimeInterval.year, step: 25, formatter: Formatters.time("%Y") },
+            { "interval": TimeInterval.year, "step": 25, "formatter": Formatters.time("%Y") },
         ],
         [
-            { interval: TimeInterval.year, step: 50, formatter: Formatters.time("%Y") },
+            { "interval": TimeInterval.year, "step": 50, "formatter": Formatters.time("%Y") },
         ],
         [
-            { interval: TimeInterval.year, step: 100, formatter: Formatters.time("%Y") },
+            { "interval": TimeInterval.year, "step": 100, "formatter": Formatters.time("%Y") },
         ],
         [
-            { interval: TimeInterval.year, step: 200, formatter: Formatters.time("%Y") },
+            { "interval": TimeInterval.year, "step": 200, "formatter": Formatters.time("%Y") },
         ],
         [
-            { interval: TimeInterval.year, step: 500, formatter: Formatters.time("%Y") },
+            { "interval": TimeInterval.year, "step": 500, "formatter": Formatters.time("%Y") },
         ],
         [
-            { interval: TimeInterval.year, step: 1000, formatter: Formatters.time("%Y") },
+            { "interval": TimeInterval.year, "step": 1000, "formatter": Formatters.time("%Y") },
         ],
     ];
     Time._LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
@@ -5043,9 +5043,9 @@ var DragBoxLayer = (function (_super) {
         var bottomRight;
         var lastEndPoint;
         var DRAG_MODES = {
-            newBox: 0,
-            resize: 1,
-            move: 2,
+            "newBox": 0,
+            "resize": 1,
+            "move": 2,
         };
         var mode = DRAG_MODES.newBox;
         var onDragStartCallback = function (startPoint) {
@@ -5062,8 +5062,8 @@ var DragBoxLayer = (function (_super) {
             else {
                 mode = DRAG_MODES.newBox;
                 _this._setBounds({
-                    topLeft: startPoint,
-                    bottomRight: startPoint,
+                    "topLeft": startPoint,
+                    "bottomRight": startPoint,
                 });
                 if (_this._xBoundsMode === _1.PropertyMode.VALUE && _this.xScale() != null) {
                     _this._setXExtent([_this.xScale().invert(startPoint.x), _this.xScale().invert(startPoint.x)]);
@@ -5076,8 +5076,8 @@ var DragBoxLayer = (function (_super) {
             _this.boxVisible(true);
             bounds = _this.bounds();
             // copy points so changes to topLeft and bottomRight don't mutate bounds
-            topLeft = { x: bounds.topLeft.x, y: bounds.topLeft.y };
-            bottomRight = { x: bounds.bottomRight.x, y: bounds.bottomRight.y };
+            topLeft = { "x": bounds.topLeft.x, "y": bounds.topLeft.y };
+            bottomRight = { "x": bounds.bottomRight.x, "y": bounds.bottomRight.y };
             lastEndPoint = startPoint;
             _this._dragStartCallbacks.callCallbacks(bounds);
         };
@@ -5112,8 +5112,8 @@ var DragBoxLayer = (function (_super) {
                     break;
             }
             _this._setBounds({
-                topLeft: topLeft,
-                bottomRight: bottomRight,
+                "topLeft": topLeft,
+                "bottomRight": bottomRight,
             });
             if (_this._xBoundsMode === _1.PropertyMode.VALUE && _this.xScale() != null) {
                 _this._setXExtent([_this.xScale().invert(topLeft.x), _this.xScale().invert(bottomRight.x)]);
@@ -5167,10 +5167,10 @@ var DragBoxLayer = (function (_super) {
     };
     DragBoxLayer.prototype._getResizingEdges = function (p) {
         var edges = {
-            top: false,
-            bottom: false,
-            left: false,
-            right: false,
+            "top": false,
+            "bottom": false,
+            "left": false,
+            "right": false,
         };
         if (!this.resizable()) {
             return edges;
@@ -5200,26 +5200,26 @@ var DragBoxLayer = (function (_super) {
             var l = bounds.topLeft.x;
             var r = bounds.bottomRight.x;
             this._detectionEdgeT.attrs({
-                x1: l, y1: t, x2: r, y2: t,
+                "x1": l, "y1": t, "x2": r, "y2": t,
                 "stroke-width": this._detectionRadius * 2,
             });
             this._detectionEdgeB.attrs({
-                x1: l, y1: b, x2: r, y2: b,
+                "x1": l, "y1": b, "x2": r, "y2": b,
                 "stroke-width": this._detectionRadius * 2,
             });
             this._detectionEdgeL.attrs({
-                x1: l, y1: t, x2: l, y2: b,
+                "x1": l, "y1": t, "x2": l, "y2": b,
                 "stroke-width": this._detectionRadius * 2,
             });
             this._detectionEdgeR.attrs({
-                x1: r, y1: t, x2: r, y2: b,
+                "x1": r, "y1": t, "x2": r, "y2": b,
                 "stroke-width": this._detectionRadius * 2,
             });
             if (this._hasCorners) {
-                this._detectionCornerTL.attrs({ cx: l, cy: t, r: this._detectionRadius });
-                this._detectionCornerTR.attrs({ cx: r, cy: t, r: this._detectionRadius });
-                this._detectionCornerBL.attrs({ cx: l, cy: b, r: this._detectionRadius });
-                this._detectionCornerBR.attrs({ cx: r, cy: b, r: this._detectionRadius });
+                this._detectionCornerTL.attrs({ "cx": l, "cy": t, "r": this._detectionRadius });
+                this._detectionCornerTR.attrs({ "cx": r, "cy": t, "r": this._detectionRadius });
+                this._detectionCornerBL.attrs({ "cx": l, "cy": b, "r": this._detectionRadius });
+                this._detectionCornerBR.attrs({ "cx": r, "cy": b, "r": this._detectionRadius });
             }
         }
         return this;
@@ -5367,8 +5367,8 @@ var DragBoxLayer = (function (_super) {
     };
     DragBoxLayer.prototype._resetState = function () {
         this.bounds({
-            topLeft: { x: 0, y: 0 },
-            bottomRight: { x: 0, y: 0 },
+            "topLeft": { "x": 0, "y": 0 },
+            "bottomRight": { "x": 0, "y": 0 },
         });
     };
     return DragBoxLayer;
@@ -5798,22 +5798,22 @@ var Group = (function (_super) {
     Group.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
         var requests = this._components.map(function (c) { return c.requestedSpace(offeredWidth, offeredHeight); });
         return {
-            minWidth: Utils.Math.max(requests, function (request) { return request.minWidth; }, 0),
-            minHeight: Utils.Math.max(requests, function (request) { return request.minHeight; }, 0),
+            "minWidth": Utils.Math.max(requests, function (request) { return request.minWidth; }, 0),
+            "minHeight": Utils.Math.max(requests, function (request) { return request.minHeight; }, 0),
         };
     };
     Group.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
         var _this = this;
         _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
         this._forEach(function (component) {
-            component.computeLayout({ x: 0, y: 0 }, _this.width(), _this.height());
+            component.computeLayout({ "x": 0, "y": 0 }, _this.width(), _this.height());
         });
         return this;
     };
     Group.prototype._sizeFromOffer = function (availableWidth, availableHeight) {
         return {
-            width: availableWidth,
-            height: availableHeight,
+            "width": availableWidth,
+            "height": availableHeight,
         };
     };
     Group.prototype.fixedWidth = function () {
@@ -5905,8 +5905,8 @@ var GuideLineLayer = (function (_super) {
     };
     GuideLineLayer.prototype._sizeFromOffer = function (availableWidth, availableHeight) {
         return {
-            width: availableWidth,
-            height: availableHeight,
+            "width": availableWidth,
+            "height": availableHeight,
         };
     };
     GuideLineLayer.prototype._isVertical = function () {
@@ -5934,10 +5934,10 @@ var GuideLineLayer = (function (_super) {
         _super.prototype.renderImmediately.call(this);
         this._syncPixelPositionAndValue();
         this._guideLine.attrs({
-            x1: this._isVertical() ? this.pixelPosition() : 0,
-            y1: this._isVertical() ? 0 : this.pixelPosition(),
-            x2: this._isVertical() ? this.pixelPosition() : this.width(),
-            y2: this._isVertical() ? this.height() : this.pixelPosition(),
+            "x1": this._isVertical() ? this.pixelPosition() : 0,
+            "y1": this._isVertical() ? 0 : this.pixelPosition(),
+            "x2": this._isVertical() ? this.pixelPosition() : this.width(),
+            "y2": this._isVertical() ? this.height() : this.pixelPosition(),
         });
         return this;
     };
@@ -6039,8 +6039,8 @@ var SelectionBoxLayer = (function (_super) {
         _super.call(this);
         this._boxVisible = false;
         this._boxBounds = {
-            topLeft: { x: 0, y: 0 },
-            bottomRight: { x: 0, y: 0 },
+            "topLeft": { "x": 0, "y": 0 },
+            "bottomRight": { "x": 0, "y": 0 },
         };
         this._xBoundsMode = PropertyMode.PIXEL;
         this._yBoundsMode = PropertyMode.PIXEL;
@@ -6059,8 +6059,8 @@ var SelectionBoxLayer = (function (_super) {
     };
     SelectionBoxLayer.prototype._sizeFromOffer = function (availableWidth, availableHeight) {
         return {
-            width: availableWidth,
-            height: availableHeight,
+            "width": availableWidth,
+            "height": availableHeight,
         };
     };
     SelectionBoxLayer.prototype.bounds = function (newBounds) {
@@ -6075,39 +6075,39 @@ var SelectionBoxLayer = (function (_super) {
     };
     SelectionBoxLayer.prototype._setBounds = function (newBounds) {
         var topLeft = {
-            x: Math.min(newBounds.topLeft.x, newBounds.bottomRight.x),
-            y: Math.min(newBounds.topLeft.y, newBounds.bottomRight.y),
+            "x": Math.min(newBounds.topLeft.x, newBounds.bottomRight.x),
+            "y": Math.min(newBounds.topLeft.y, newBounds.bottomRight.y),
         };
         var bottomRight = {
-            x: Math.max(newBounds.topLeft.x, newBounds.bottomRight.x),
-            y: Math.max(newBounds.topLeft.y, newBounds.bottomRight.y),
+            "x": Math.max(newBounds.topLeft.x, newBounds.bottomRight.x),
+            "y": Math.max(newBounds.topLeft.y, newBounds.bottomRight.y),
         };
         this._boxBounds = {
-            topLeft: topLeft,
-            bottomRight: bottomRight,
+            "topLeft": topLeft,
+            "bottomRight": bottomRight,
         };
     };
     SelectionBoxLayer.prototype._getBounds = function () {
         return {
-            topLeft: {
-                x: this._xBoundsMode === PropertyMode.PIXEL ?
+            "topLeft": {
+                "x": this._xBoundsMode === PropertyMode.PIXEL ?
                     this._boxBounds.topLeft.x :
                     (this._xScale == null ?
                         0 :
                         Math.min(this.xScale().scale(this.xExtent()[0]), this.xScale().scale(this.xExtent()[1]))),
-                y: this._yBoundsMode === PropertyMode.PIXEL ?
+                "y": this._yBoundsMode === PropertyMode.PIXEL ?
                     this._boxBounds.topLeft.y :
                     (this._yScale == null ?
                         0 :
                         Math.min(this.yScale().scale(this.yExtent()[0]), this.yScale().scale(this.yExtent()[1]))),
             },
-            bottomRight: {
-                x: this._xBoundsMode === PropertyMode.PIXEL ?
+            "bottomRight": {
+                "x": this._xBoundsMode === PropertyMode.PIXEL ?
                     this._boxBounds.bottomRight.x :
                     (this._xScale == null ?
                         0 :
                         Math.max(this.xScale().scale(this.xExtent()[0]), this.xScale().scale(this.xExtent()[1]))),
-                y: this._yBoundsMode === PropertyMode.PIXEL ?
+                "y": this._yBoundsMode === PropertyMode.PIXEL ?
                     this._boxBounds.bottomRight.y :
                     (this._yScale == null ?
                         0 :
@@ -6130,7 +6130,7 @@ var SelectionBoxLayer = (function (_super) {
                 throw new Error("bounds have not been properly set");
             }
             this._boxArea.attrs({
-                x: l, y: t, width: r - l, height: b - t,
+                "x": l, "y": t, "width": r - l, "height": b - t,
             });
             this.content().node().appendChild(this._box.node());
         }
@@ -6343,11 +6343,11 @@ var Area = (function (_super) {
         if (this._animateOnNextRender()) {
             var attrToProjector = this._generateLineAttrToProjector();
             attrToProjector["d"] = this._constructLineProjector(plot_1.Plot._scaledAccessor(this.x()), this._getResetYFunction());
-            drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
+            drawSteps.push({ "attrToProjector": attrToProjector, "animator": this._getAnimator(Plots.Animator.RESET) });
         }
         drawSteps.push({
-            attrToProjector: this._generateLineAttrToProjector(),
-            animator: this._getAnimator(Plots.Animator.MAIN),
+            "attrToProjector": this._generateLineAttrToProjector(),
+            "animator": this._getAnimator(Plots.Animator.MAIN),
         });
         return drawSteps;
     };
@@ -6364,11 +6364,11 @@ var Area = (function (_super) {
         if (this._animateOnNextRender()) {
             var attrToProjector = this._generateAttrToProjector();
             attrToProjector["d"] = this._constructAreaProjector(plot_1.Plot._scaledAccessor(this.x()), this._getResetYFunction(), plot_1.Plot._scaledAccessor(this.y0()));
-            drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
+            drawSteps.push({ "attrToProjector": attrToProjector, "animator": this._getAnimator(Plots.Animator.RESET) });
         }
         drawSteps.push({
-            attrToProjector: this._generateAttrToProjector(),
-            animator: this._getAnimator(Plots.Animator.MAIN),
+            "attrToProjector": this._generateAttrToProjector(),
+            "animator": this._getAnimator(Plots.Animator.MAIN),
         });
         return drawSteps;
     };
@@ -6611,19 +6611,19 @@ var Line = (function (_super) {
         var _this = this;
         if (!(this.y().scale instanceof quantitativeScale_1.QuantitativeScale && this.x().scale instanceof quantitativeScale_1.QuantitativeScale)) {
             return {
-                left: [],
-                right: [],
-                top: [],
-                bottom: [],
+                "left": [],
+                "right": [],
+                "top": [],
+                "bottom": [],
             };
         }
         var yScale = this.y().scale;
         var xScale = this.x().scale;
         var intersectionPoints = {
-            left: [],
-            right: [],
-            top: [],
-            bottom: [],
+            "left": [],
+            "right": [],
+            "top": [],
+            "bottom": [],
         };
         var leftX = xScale.scale(xScale.domain()[0]);
         var rightX = xScale.scale(xScale.domain()[1]);
@@ -6645,8 +6645,8 @@ var Line = (function (_super) {
                     y2 = currY - prevY;
                     y1 = x1 * y2 / x2;
                     intersectionPoints.left.push({
-                        x: leftX,
-                        y: yScale.invert(prevY + y1),
+                        "x": leftX,
+                        "y": yScale.invert(prevY + y1),
                     });
                 }
                 // If values crossed right edge
@@ -6656,8 +6656,8 @@ var Line = (function (_super) {
                     y2 = currY - prevY;
                     y1 = x1 * y2 / x2;
                     intersectionPoints.right.push({
-                        x: rightX,
-                        y: yScale.invert(prevY + y1),
+                        "x": rightX,
+                        "y": yScale.invert(prevY + y1),
                     });
                 }
                 // If values crossed upper edge
@@ -6667,8 +6667,8 @@ var Line = (function (_super) {
                     y2 = currY - prevY;
                     x1 = y1 * x2 / y2;
                     intersectionPoints.top.push({
-                        x: xScale.invert(prevX + x1),
-                        y: topY,
+                        "x": xScale.invert(prevX + x1),
+                        "y": topY,
                     });
                 }
                 // If values crossed lower edge
@@ -6678,8 +6678,8 @@ var Line = (function (_super) {
                     y2 = currY - prevY;
                     x1 = y1 * x2 / y2;
                     intersectionPoints.bottom.push({
-                        x: xScale.invert(prevX + x1),
-                        y: bottomY,
+                        "x": xScale.invert(prevX + x1),
+                        "y": bottomY,
                     });
                 }
             }
@@ -6703,11 +6703,11 @@ var Line = (function (_super) {
         if (this._animateOnNextRender()) {
             var attrToProjector = this._generateAttrToProjector();
             attrToProjector["d"] = this._constructLineProjector(plot_1.Plot._scaledAccessor(this.x()), this._getResetYFunction());
-            drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
+            drawSteps.push({ "attrToProjector": attrToProjector, "animator": this._getAnimator(Plots.Animator.RESET) });
         }
         drawSteps.push({
-            attrToProjector: this._generateAttrToProjector(),
-            animator: this._getAnimator(Plots.Animator.MAIN),
+            "attrToProjector": this._generateAttrToProjector(),
+            "animator": this._getAnimator(Plots.Animator.MAIN),
         });
         return drawSteps;
     };
@@ -6738,8 +6738,8 @@ var Line = (function (_super) {
         var dataYRange;
         if (yRange == null) {
             var bounds = xRangeOrBounds;
-            dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
-            dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
+            dataXRange = { "min": bounds.topLeft.x, "max": bounds.bottomRight.x };
+            dataYRange = { "min": bounds.topLeft.y, "max": bounds.bottomRight.y };
         }
         else {
             dataXRange = xRangeOrBounds;
@@ -8533,10 +8533,10 @@ var Numeric = (function (_super) {
         var _this = this;
         _super.prototype.renderImmediately.call(this);
         var tickLabelAttrHash = {
-            x: 0,
-            y: 0,
-            dx: "0em",
-            dy: "0.3em",
+            "x": 0,
+            "y": 0,
+            "dx": "0em",
+            "dy": "0.3em",
         };
         var tickMarkLength = this._maxLabelTickLength();
         var tickLabelPadding = this.tickLabelPadding();
@@ -8804,10 +8804,10 @@ var DragLineLayer = (function (_super) {
     DragLineLayer.prototype.renderImmediately = function () {
         _super.prototype.renderImmediately.call(this);
         this._detectionEdge.attrs({
-            x1: this._isVertical() ? this.pixelPosition() : 0,
-            y1: this._isVertical() ? 0 : this.pixelPosition(),
-            x2: this._isVertical() ? this.pixelPosition() : this.width(),
-            y2: this._isVertical() ? this.height() : this.pixelPosition(),
+            "x1": this._isVertical() ? this.pixelPosition() : 0,
+            "y1": this._isVertical() ? 0 : this.pixelPosition(),
+            "x2": this._isVertical() ? this.pixelPosition() : this.width(),
+            "y2": this._isVertical() ? this.height() : this.pixelPosition(),
             "stroke-width": this._detectionRadius * 2,
         });
         return this;
@@ -9160,8 +9160,8 @@ var InterpolatedColorLegend = (function (_super) {
                 + labelWidths[1] + this._textPadding;
         }
         return {
-            minWidth: desiredWidth,
-            minHeight: desiredHeight,
+            "minWidth": desiredWidth,
+            "minHeight": desiredHeight,
         };
     };
     InterpolatedColorLegend.prototype._isVertical = function () {
@@ -9177,27 +9177,27 @@ var InterpolatedColorLegend = (function (_super) {
         var text1Width = this._measurer.measure(text1).width;
         var textHeight = this._measurer.measure().height;
         var textPadding = this._textPadding;
-        var upperLabelShift = { x: 0, y: 0 };
-        var lowerLabelShift = { x: 0, y: 0 };
+        var upperLabelShift = { "x": 0, "y": 0 };
+        var lowerLabelShift = { "x": 0, "y": 0 };
         var lowerWriteOptions = {
-            xAlign: "center",
-            yAlign: "center",
-            textRotation: 0,
+            "xAlign": "center",
+            "yAlign": "center",
+            "textRotation": 0,
         };
         var upperWriteOptions = {
-            xAlign: "center",
-            yAlign: "center",
-            textRotation: 0,
+            "xAlign": "center",
+            "yAlign": "center",
+            "textRotation": 0,
         };
         var swatchWidth;
         var swatchHeight;
         var swatchX;
         var swatchY;
         var boundingBoxAttr = {
-            x: 0,
-            y: 0,
-            width: 0,
-            height: 0,
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
         };
         var padding;
         var numSwatches;
@@ -9324,8 +9324,8 @@ var Label = (function (_super) {
         var desiredWidth = (this.angle() === 0 ? desiredWH.width : desiredWH.height) + 2 * this.padding();
         var desiredHeight = (this.angle() === 0 ? desiredWH.height : desiredWH.width) + 2 * this.padding();
         return {
-            minWidth: desiredWidth,
-            minHeight: desiredHeight,
+            "minWidth": desiredWidth,
+            "minHeight": desiredHeight,
         };
     };
     Label.prototype._setup = function () {
@@ -9403,9 +9403,9 @@ var Label = (function (_super) {
         var writeWidth = this.width() - 2 * widthPadding;
         var writeHeight = this.height() - 2 * heightPadding;
         var writeOptions = {
-            xAlign: this.xAlignment(),
-            yAlign: this.yAlignment(),
-            textRotation: this.angle(),
+            "xAlign": this.xAlignment(),
+            "yAlign": this.yAlignment(),
+            "textRotation": this.angle(),
         };
         this._writer.write(this._text, writeWidth, writeHeight, writeOptions);
         return this;
@@ -10238,12 +10238,12 @@ var Table = (function (_super) {
         colProportionalSpace = Table._calcProportionalSpace(colWeights, freeWidth);
         rowProportionalSpace = Table._calcProportionalSpace(rowWeights, freeHeight);
         return {
-            colProportionalSpace: colProportionalSpace,
-            rowProportionalSpace: rowProportionalSpace,
-            guaranteedWidths: guarantees.guaranteedWidths,
-            guaranteedHeights: guarantees.guaranteedHeights,
-            wantsWidth: wantsWidth,
-            wantsHeight: wantsHeight,
+            "colProportionalSpace": colProportionalSpace,
+            "rowProportionalSpace": rowProportionalSpace,
+            "guaranteedWidths": guarantees.guaranteedWidths,
+            "guaranteedHeights": guarantees.guaranteedHeights,
+            "wantsWidth": wantsWidth,
+            "wantsHeight": wantsHeight,
         };
     };
     Table.prototype._determineGuarantees = function (offeredWidths, offeredHeights, isFinalOffer) {
@@ -10260,8 +10260,8 @@ var Table = (function (_super) {
                 }
                 else {
                     spaceRequest = {
-                        minWidth: 0,
-                        minHeight: 0,
+                        "minWidth": 0,
+                        "minHeight": 0,
                     };
                 }
                 var columnWidth = isFinalOffer ? Math.min(spaceRequest.minWidth, offeredWidths[colIndex]) : spaceRequest.minWidth;
@@ -10275,17 +10275,17 @@ var Table = (function (_super) {
             });
         });
         return {
-            guaranteedWidths: requestedWidths,
-            guaranteedHeights: requestedHeights,
-            wantsWidthArr: columnNeedsWidth,
-            wantsHeightArr: rowNeedsHeight,
+            "guaranteedWidths": requestedWidths,
+            "guaranteedHeights": requestedHeights,
+            "wantsWidthArr": columnNeedsWidth,
+            "wantsHeightArr": rowNeedsHeight,
         };
     };
     Table.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
         this._calculatedLayout = this._iterateLayout(offeredWidth, offeredHeight);
         return {
-            minWidth: d3.sum(this._calculatedLayout.guaranteedWidths),
-            minHeight: d3.sum(this._calculatedLayout.guaranteedHeights),
+            "minWidth": d3.sum(this._calculatedLayout.guaranteedWidths),
+            "minHeight": d3.sum(this._calculatedLayout.guaranteedHeights),
         };
     };
     Table.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
@@ -10305,7 +10305,7 @@ var Table = (function (_super) {
             row.forEach(function (component, colIndex) {
                 // recursively compute layout
                 if (component != null) {
-                    component.computeLayout({ x: childXOrigin, y: childYOrigin }, colWidths[colIndex], rowHeights[rowIndex]);
+                    component.computeLayout({ "x": childXOrigin, "y": childYOrigin }, colWidths[colIndex], rowHeights[rowIndex]);
                 }
                 childXOrigin += colWidths[colIndex] + _this._columnPadding;
             });
@@ -10451,8 +10451,8 @@ var XDragBoxLayer = (function (_super) {
     };
     XDragBoxLayer.prototype._setBounds = function (newBounds) {
         _super.prototype._setBounds.call(this, {
-            topLeft: { x: newBounds.topLeft.x, y: 0 },
-            bottomRight: { x: newBounds.bottomRight.x, y: this.height() },
+            "topLeft": { "x": newBounds.topLeft.x, "y": 0 },
+            "bottomRight": { "x": newBounds.bottomRight.x, "y": this.height() },
         });
     };
     XDragBoxLayer.prototype._setResizableClasses = function (canResize) {
@@ -10517,8 +10517,8 @@ var YDragBoxLayer = (function (_super) {
     };
     YDragBoxLayer.prototype._setBounds = function (newBounds) {
         _super.prototype._setBounds.call(this, {
-            topLeft: { x: 0, y: newBounds.topLeft.y },
-            bottomRight: { x: this.width(), y: newBounds.bottomRight.y },
+            "topLeft": { "x": 0, "y": newBounds.topLeft.y },
+            "bottomRight": { "x": this.width(), "y": newBounds.bottomRight.y },
         });
     };
     YDragBoxLayer.prototype._setResizableClasses = function (canResize) {
@@ -11465,8 +11465,8 @@ var Drag = (function (_super) {
             return translatedP;
         }
         return {
-            x: Utils.Math.clamp(translatedP.x, 0, this._componentAttachedTo.width()),
-            y: Utils.Math.clamp(translatedP.y, 0, this._componentAttachedTo.height()),
+            "x": Utils.Math.clamp(translatedP.x, 0, this._componentAttachedTo.width()),
+            "y": Utils.Math.clamp(translatedP.y, 0, this._componentAttachedTo.height()),
         };
     };
     Drag.prototype._startDrag = function (point, event) {
@@ -11724,7 +11724,7 @@ var PanZoom = (function (_super) {
         }
         var magnifyAmount = oldCornerDistance / newCornerDistance;
         var normalizedPointDiffs = points.map(function (point, i) {
-            return { x: (point.x - oldPoints[i].x) / magnifyAmount, y: (point.y - oldPoints[i].y) / magnifyAmount };
+            return { "x": (point.x - oldPoints[i].x) / magnifyAmount, "y": (point.y - oldPoints[i].y) / magnifyAmount };
         });
         var oldCenterPoint = PanZoom.centerPoint(oldPoints[0], oldPoints[1]);
         var centerX = oldCenterPoint.x;
@@ -11741,15 +11741,15 @@ var PanZoom = (function (_super) {
         });
         var constrainedPoints = oldPoints.map(function (oldPoint, i) {
             return {
-                x: normalizedPointDiffs[i].x * magnifyAmount + oldPoint.x,
-                y: normalizedPointDiffs[i].y * magnifyAmount + oldPoint.y,
+                "x": normalizedPointDiffs[i].x * magnifyAmount + oldPoint.x,
+                "y": normalizedPointDiffs[i].y * magnifyAmount + oldPoint.y,
             };
         });
         var translateAmount = {
-            x: centerX - ((constrainedPoints[0].x + constrainedPoints[1].x) / 2),
-            y: centerY - ((constrainedPoints[0].y + constrainedPoints[1].y) / 2),
+            "x": centerX - ((constrainedPoints[0].x + constrainedPoints[1].x) / 2),
+            "y": centerY - ((constrainedPoints[0].y + constrainedPoints[1].y) / 2),
         };
-        this.zoom(magnifyAmount, { x: centerX, y: centerY });
+        this.zoom(magnifyAmount, { "x": centerX, "y": centerY });
         this.pan(translateAmount);
     };
     PanZoom.centerPoint = function (point1, point2) {
@@ -11757,7 +11757,7 @@ var PanZoom = (function (_super) {
         var rightX = Math.max(point1.x, point2.x);
         var topY = Math.min(point1.y, point2.y);
         var bottomY = Math.max(point1.y, point2.y);
-        return { x: (leftX + rightX) / 2, y: (bottomY + topY) / 2 };
+        return { "x": (leftX + rightX) / 2, "y": (bottomY + topY) / 2 };
     };
     PanZoom._pointDistance = function (point1, point2) {
         var leftX = Math.min(point1.x, point2.x);
@@ -11794,7 +11794,7 @@ var PanZoom = (function (_super) {
                 centerY_1 = constrained.centerPoint;
                 zoomAmount_1 = constrained.zoomAmount;
             });
-            this.zoom(zoomAmount_1, { x: centerX_1, y: centerY_1 });
+            this.zoom(zoomAmount_1, { "x": centerX_1, "y": centerY_1 });
             this._zoomEndCallbacks.callCallbacks();
         }
     };
@@ -11899,8 +11899,8 @@ var PanZoom = (function (_super) {
                 return;
             }
             var translateAmount = {
-                x: (lastDragPoint == null ? startPoint.x : lastDragPoint.x) - endPoint.x,
-                y: (lastDragPoint == null ? startPoint.y : lastDragPoint.y) - endPoint.y,
+                "x": (lastDragPoint == null ? startPoint.x : lastDragPoint.x) - endPoint.x,
+                "y": (lastDragPoint == null ? startPoint.y : lastDragPoint.y) - endPoint.y,
             };
             _this.pan(translateAmount);
             lastDragPoint = endPoint;
@@ -12533,8 +12533,8 @@ var Pie = (function (_super) {
      * @param {PlotEntity[]}
      */
     Pie.prototype.entitiesAt = function (queryPoint) {
-        var center = { x: this.width() / 2, y: this.height() / 2 };
-        var adjustedQueryPoint = { x: queryPoint.x - center.x, y: queryPoint.y - center.y };
+        var center = { "x": this.width() / 2, "y": this.height() / 2 };
+        var adjustedQueryPoint = { "x": queryPoint.x - center.x, "y": queryPoint.y - center.y };
         var index = this._sliceIndexForPoint(adjustedQueryPoint);
         return index == null ? [] : [this.entities()[index]];
     };
@@ -12688,8 +12688,8 @@ var Pie = (function (_super) {
             }
         }
         return {
-            x: wLeft + wRight == 0 ? 0 : (wLeft / (wLeft + wRight)) * this.width(),
-            y: hTop + hBottom == 0 ? 0 : (hTop / (hTop + hBottom)) * this.height(),
+            "x": wLeft + wRight == 0 ? 0 : (wLeft / (wLeft + wRight)) * this.width(),
+            "y": hTop + hBottom == 0 ? 0 : (hTop / (hTop + hBottom)) * this.height(),
         };
     };
     Pie.prototype._getDataToDraw = function () {
@@ -12710,7 +12710,7 @@ var Pie = (function (_super) {
     Pie.prototype._pixelPoint = function (datum, index, dataset) {
         var scaledValueAccessor = plot_1.Plot._scaledAccessor(this.sectorValue());
         if (!Pie._isValidData(scaledValueAccessor(datum, index, dataset))) {
-            return { x: NaN, y: NaN };
+            return { "x": NaN, "y": NaN };
         }
         var innerRadius = plot_1.Plot._scaledAccessor(this.innerRadius())(datum, index, dataset);
         var outerRadius = plot_1.Plot._scaledAccessor(this.outerRadius())(datum, index, dataset);
@@ -12724,7 +12724,7 @@ var Pie = (function (_super) {
         var startAngle = pie[index].startAngle;
         var endAngle = pie[index].endAngle;
         var avgAngle = (startAngle + endAngle) / 2;
-        return { x: avgRadius * Math.sin(avgAngle), y: -avgRadius * Math.cos(avgAngle) };
+        return { "x": avgRadius * Math.sin(avgAngle), "y": -avgRadius * Math.cos(avgAngle) };
     };
     Pie.prototype._additionalPaint = function (time) {
         var _this = this;
@@ -12738,7 +12738,7 @@ var Pie = (function (_super) {
     };
     Pie.prototype._generateStrokeDrawSteps = function () {
         var attrToProjector = this._generateAttrToProjector();
-        return [{ attrToProjector: attrToProjector, animator: new Animators.Null() }];
+        return [{ "attrToProjector": attrToProjector, "animator": new Animators.Null() }];
     };
     Pie.prototype._sliceIndexForPoint = function (p) {
         var pointRadius = Math.sqrt(Math.pow(p.x, 2) + Math.pow(p.y, 2));
@@ -12793,10 +12793,10 @@ var Pie = (function (_super) {
             var x = Math.sin(theta) * labelRadius - measurement.width / 2;
             var y = -Math.cos(theta) * labelRadius - measurement.height / 2;
             var corners = [
-                { x: x, y: y },
-                { x: x, y: y + measurement.height },
-                { x: x + measurement.width, y: y },
-                { x: x + measurement.width, y: y + measurement.height },
+                { "x": x, "y": y },
+                { "x": x, "y": y + measurement.height },
+                { "x": x + measurement.width, "y": y },
+                { "x": x + measurement.width, "y": y + measurement.height },
             ];
             var showLabel = corners.every(function (corner) {
                 return Math.abs(corner.x) <= _this.width() / 2 && Math.abs(corner.y) <= _this.height() / 2;
@@ -12812,8 +12812,8 @@ var Pie = (function (_super) {
             g.classed(className, true);
             g.style("visibility", showLabel ? "inherit" : "hidden");
             writer.write(value, measurement.width, measurement.height, {
-                xAlign: "center",
-                yAlign: "center",
+                "xAlign": "center",
+                "yAlign": "center",
             }, g.node());
         });
     };
@@ -12906,7 +12906,7 @@ var Rectangle = (function (_super) {
         return attrToProjector;
     };
     Rectangle.prototype._generateDrawSteps = function () {
-        return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("rectangles") }];
+        return [{ "attrToProjector": this._generateAttrToProjector(), "animator": this._getAnimator("rectangles") }];
     };
     Rectangle.prototype._updateExtentsForProperty = function (property) {
         _super.prototype._updateExtentsForProperty.call(this, property);
@@ -13016,8 +13016,8 @@ var Rectangle = (function (_super) {
         var dataYRange;
         if (yRange == null) {
             var bounds = xRangeOrBounds;
-            dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
-            dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
+            dataXRange = { "min": bounds.topLeft.x, "max": bounds.bottomRight.x };
+            dataYRange = { "min": bounds.topLeft.y, "max": bounds.bottomRight.y };
         }
         else {
             dataXRange = xRangeOrBounds;
@@ -13027,10 +13027,10 @@ var Rectangle = (function (_super) {
     };
     Rectangle.prototype._entityBBox = function (datum, index, dataset, attrToProjector) {
         return {
-            x: attrToProjector["x"](datum, index, dataset),
-            y: attrToProjector["y"](datum, index, dataset),
-            width: attrToProjector["width"](datum, index, dataset),
-            height: attrToProjector["height"](datum, index, dataset),
+            "x": attrToProjector["x"](datum, index, dataset),
+            "y": attrToProjector["y"](datum, index, dataset),
+            "width": attrToProjector["width"](datum, index, dataset),
+            "height": attrToProjector["height"](datum, index, dataset),
         };
     };
     Rectangle.prototype._entitiesIntersecting = function (xValOrRange, yValOrRange) {
@@ -13080,7 +13080,7 @@ var Rectangle = (function (_super) {
         var rectHeight = attrToProjector["height"](datum, index, dataset);
         var x = rectX + rectWidth / 2;
         var y = rectY + rectHeight / 2;
-        return { x: x, y: y };
+        return { "x": x, "y": y };
     };
     Rectangle.prototype._rectangleWidth = function (scale) {
         if (scale instanceof Scales.Category) {
@@ -13149,8 +13149,8 @@ var Rectangle = (function (_super) {
                 var verticalOffset = (height - measurement.height) / 2;
                 x += horizontalOffset;
                 y += verticalOffset;
-                var xLabelRange = { min: x, max: x + measurement.width };
-                var yLabelRange = { min: y, max: y + measurement.height };
+                var xLabelRange = { "min": x, "max": x + measurement.width };
+                var yLabelRange = { "min": y, "max": y + measurement.height };
                 if (xLabelRange.min < xMin || xLabelRange.max > xMax || yLabelRange.min < yMin || yLabelRange.max > yMax) {
                     return;
                 }
@@ -13163,8 +13163,8 @@ var Rectangle = (function (_super) {
                 var className = dark ? "dark-label" : "light-label";
                 g.classed(className, true);
                 writer.write(label, measurement.width, measurement.height, {
-                    xAlign: "center",
-                    yAlign: "center",
+                    "xAlign": "center",
+                    "yAlign": "center",
                 }, g.node());
             }
         });
@@ -13258,7 +13258,7 @@ var Scatter = (function (_super) {
         if (symbol == null) {
             return this._propertyBindings.get(Scatter._SYMBOL_KEY);
         }
-        this._propertyBindings.set(Scatter._SYMBOL_KEY, { accessor: symbol });
+        this._propertyBindings.set(Scatter._SYMBOL_KEY, { "accessor": symbol });
         this.render();
         return this;
     };
@@ -13268,22 +13268,22 @@ var Scatter = (function (_super) {
             var resetAttrToProjector = this._generateAttrToProjector();
             var symbolProjector_1 = plot_1.Plot._scaledAccessor(this.symbol());
             resetAttrToProjector["d"] = function (datum, index, dataset) { return symbolProjector_1(datum, index, dataset)(0); };
-            drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
+            drawSteps.push({ "attrToProjector": resetAttrToProjector, "animator": this._getAnimator(Plots.Animator.RESET) });
         }
         drawSteps.push({
-            attrToProjector: this._generateAttrToProjector(),
-            animator: this._getAnimator(Plots.Animator.MAIN),
+            "attrToProjector": this._generateAttrToProjector(),
+            "animator": this._getAnimator(Plots.Animator.MAIN),
         });
         return drawSteps;
     };
     Scatter.prototype._entityVisibleOnPlot = function (entity, bounds) {
-        var xRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
-        var yRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
+        var xRange = { "min": bounds.topLeft.x, "max": bounds.bottomRight.x };
+        var yRange = { "min": bounds.topLeft.y, "max": bounds.bottomRight.y };
         var translatedBbox = {
-            x: entity.position.x - entity.diameter,
-            y: entity.position.y - entity.diameter,
-            width: entity.diameter,
-            height: entity.diameter,
+            "x": entity.position.x - entity.diameter,
+            "y": entity.position.y - entity.diameter,
+            "width": entity.diameter,
+            "height": entity.diameter,
         };
         return Utils.DOM.intersectsBBox(xRange, yRange, translatedBbox);
     };
@@ -13306,8 +13306,8 @@ var Scatter = (function (_super) {
         var dataYRange;
         if (yRange == null) {
             var bounds = xRangeOrBounds;
-            dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
-            dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
+            dataXRange = { "min": bounds.topLeft.x, "max": bounds.bottomRight.x };
+            dataYRange = { "min": bounds.topLeft.y, "max": bounds.bottomRight.y };
         }
         else {
             dataXRange = xRangeOrBounds;
@@ -13388,7 +13388,7 @@ var Segment = (function (_super) {
         return new Drawers.Segment(dataset);
     };
     Segment.prototype._generateDrawSteps = function () {
-        return [{ attrToProjector: this._generateAttrToProjector(), animator: new Animators.Null() }];
+        return [{ "attrToProjector": this._generateAttrToProjector(), "animator": new Animators.Null() }];
     };
     Segment.prototype._updateExtentsForProperty = function (property) {
         _super.prototype._updateExtentsForProperty.call(this, property);
@@ -13484,8 +13484,8 @@ var Segment = (function (_super) {
         var dataYRange;
         if (yRange == null) {
             var bounds = xRangeOrBounds;
-            dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
-            dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
+            dataXRange = { "min": bounds.topLeft.x, "max": bounds.bottomRight.x };
+            dataYRange = { "min": bounds.topLeft.y, "max": bounds.bottomRight.y };
         }
         else {
             dataXRange = xRangeOrBounds;
@@ -13515,13 +13515,13 @@ var Segment = (function (_super) {
             (xRange.min <= x2 && x2 <= xRange.max && yRange.min <= y2 && y2 <= yRange.max)) {
             return true;
         }
-        var startPoint = { x: x1, y: y1 };
-        var endPoint = { x: x2, y: y2 };
+        var startPoint = { "x": x1, "y": y1 };
+        var endPoint = { "x": x2, "y": y2 };
         var corners = [
-            { x: xRange.min, y: yRange.min },
-            { x: xRange.min, y: yRange.max },
-            { x: xRange.max, y: yRange.max },
-            { x: xRange.max, y: yRange.min },
+            { "x": xRange.min, "y": yRange.min },
+            { "x": xRange.min, "y": yRange.max },
+            { "x": xRange.max, "y": yRange.max },
+            { "x": xRange.max, "y": yRange.min },
         ];
         var intersections = corners.filter(function (point, index) {
             if (index !== 0) {
@@ -13745,7 +13745,7 @@ var StackedArea = (function (_super) {
         var xValue = this.x().accessor(datum, index, dataset);
         var yValue = this.y().accessor(datum, index, dataset);
         var scaledYValue = this.y().scale.scale(+yValue + this._stackingResult.get(dataset).get(Utils.Stacking.normalizeKey(xValue)).offset);
-        return { x: pixelPoint.x, y: scaledYValue };
+        return { "x": pixelPoint.x, "y": scaledYValue };
     };
     return StackedArea;
 }(areaPlot_1.Area));
@@ -13857,8 +13857,8 @@ var StackedBar = (function (_super) {
                 var labelContainer = _this._labelArea.append("g").attr("transform", "translate(" + x + ", " + y + ")");
                 labelContainer.classed("stacked-bar-label", true);
                 var writeOptions = {
-                    xAlign: "center",
-                    yAlign: "center",
+                    "xAlign": "center",
+                    "yAlign": "center",
                 };
                 _this._writer.write(text, measurement.width, measurement.height, writeOptions, labelContainer.node());
             }
@@ -15197,7 +15197,7 @@ function elementBBox(element) {
         bbox = element.node().getBBox();
     }
     catch (err) {
-        bbox = { x: 0, y: 0, width: 0, height: 0 };
+        bbox = { "x": 0, "y": 0, "width": 0, "height": 0 };
     }
     return bbox;
 }
@@ -15336,12 +15336,12 @@ exports.clientRectsOverlap = clientRectsOverlap;
  */
 function expandRect(rect, amount) {
     return {
-        left: rect.left - amount,
-        top: rect.top - amount,
-        right: rect.right + amount,
-        bottom: rect.bottom + amount,
-        width: rect.width + amount * 2,
-        height: rect.height + amount * 2,
+        "left": rect.left - amount,
+        "top": rect.top - amount,
+        "right": rect.right + amount,
+        "bottom": rect.bottom + amount,
+        "width": rect.width + amount * 2,
+        "height": rect.height + amount * 2,
     };
 }
 exports.expandRect = expandRect;
@@ -15395,7 +15395,7 @@ exports.intersectsBBox = intersectsBBox;
 function _parseRange(input) {
     if (typeof (input) === "number") {
         var value = input;
-        return { min: value, max: value };
+        return { "min": value, "max": value };
     }
     var range = input;
     if (range instanceof Object && "min" in range && "max" in range) {
@@ -15502,7 +15502,7 @@ var Map = (function () {
                 return this;
             }
         }
-        this._keyValuePairs.push({ key: key, value: value });
+        this._keyValuePairs.push({ "key": key, "value": value });
         return this;
     };
     Map.prototype.get = function (key) {
@@ -15602,9 +15602,9 @@ function stack(datasets, keyAccessor, valueAccessor, stackingOrder) {
                 offsetMap.set(key, value);
             }
             keyToStackedDatum.set(key, {
-                offset: offset,
-                value: value,
-                axisValue: keyAccessor(datum, index, dataset),
+                "offset": offset,
+                "value": value,
+                "axisValue": keyAccessor(datum, index, dataset),
             });
         });
         datasetToKeyToStackedDatum.set(dataset, keyToStackedDatum);
@@ -15628,16 +15628,16 @@ function stackedExtents(stackingResult) {
             var maximalValue = Utils.Math.max([datum.offset + datum.value, datum.offset], datum.offset);
             var minimalValue = Utils.Math.min([datum.offset + datum.value, datum.offset], datum.offset);
             if (!maximumExtents.has(key)) {
-                maximumExtents.set(key, { extent: maximalValue, axisValue: datum.axisValue });
+                maximumExtents.set(key, { "extent": maximalValue, "axisValue": datum.axisValue });
             }
             else if (maximumExtents.get(key).extent < maximalValue) {
-                maximumExtents.set(key, { extent: maximalValue, axisValue: datum.axisValue });
+                maximumExtents.set(key, { "extent": maximalValue, "axisValue": datum.axisValue });
             }
             if (!minimumExtents.has(key)) {
-                minimumExtents.set(key, { extent: minimalValue, axisValue: datum.axisValue });
+                minimumExtents.set(key, { "extent": minimalValue, "axisValue": datum.axisValue });
             }
             else if (minimumExtents.get(key).extent > (minimalValue)) {
-                minimumExtents.set(key, { extent: minimalValue, axisValue: datum.axisValue });
+                minimumExtents.set(key, { "extent": minimalValue, "axisValue": datum.axisValue });
             }
         });
     });
@@ -15729,11 +15729,11 @@ var Translator = (function () {
         // get the origin
         move(this._measurementElement, 0, 0);
         var mrBCR = this._measurementElement.node().getBoundingClientRect();
-        var origin = { x: mrBCR.left, y: mrBCR.top };
+        var origin = { "x": mrBCR.left, "y": mrBCR.top };
         // calculate the scale
         move(this._measurementElement, Translator.SAMPLE_DISTANCE, Translator.SAMPLE_DISTANCE);
         mrBCR = this._measurementElement.node().getBoundingClientRect();
-        var testPoint = { x: mrBCR.left, y: mrBCR.top };
+        var testPoint = { "x": mrBCR.left, "y": mrBCR.top };
         // invalid measurements -- SVG might not be in the DOM
         if (origin.x === testPoint.x || origin.y === testPoint.y) {
             return null;
@@ -15743,10 +15743,10 @@ var Translator = (function () {
         // get the true cursor position
         move(this._measurementElement, ((clientX - origin.x) / scaleX), ((clientY - origin.y) / scaleY));
         mrBCR = this._measurementElement.node().getBoundingClientRect();
-        var trueCursorPosition = { x: mrBCR.left, y: mrBCR.top };
+        var trueCursorPosition = { "x": mrBCR.left, "y": mrBCR.top };
         var scaledPosition = {
-            x: (trueCursorPosition.x - origin.x) / scaleX,
-            y: (trueCursorPosition.y - origin.y) / scaleY,
+            "x": (trueCursorPosition.x - origin.x) / scaleX,
+            "y": (trueCursorPosition.y - origin.y) / scaleY,
         };
         return scaledPosition;
     };

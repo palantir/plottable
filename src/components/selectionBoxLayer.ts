@@ -17,8 +17,8 @@ export class SelectionBoxLayer extends Component {
   private _boxArea: SimpleSelection<void>;
   private _boxVisible = false;
   private _boxBounds: Bounds = {
-    topLeft: { x: 0, y: 0 },
-    bottomRight: { x: 0, y: 0 },
+    "topLeft": { "x": 0, "y": 0 },
+    "bottomRight": { "x": 0, "y": 0 },
   };
   private _xExtent: (number | { valueOf(): number })[];
   private _yExtent: (number | { valueOf(): number })[];
@@ -48,8 +48,8 @@ export class SelectionBoxLayer extends Component {
 
   protected _sizeFromOffer(availableWidth: number, availableHeight: number) {
     return {
-      width: availableWidth,
-      height: availableHeight,
+      "width": availableWidth,
+      "height": availableHeight,
     };
   }
 
@@ -78,40 +78,40 @@ export class SelectionBoxLayer extends Component {
 
   protected _setBounds(newBounds: Bounds) {
     const topLeft: Point = {
-      x: Math.min(newBounds.topLeft.x, newBounds.bottomRight.x),
-      y: Math.min(newBounds.topLeft.y, newBounds.bottomRight.y),
+      "x": Math.min(newBounds.topLeft.x, newBounds.bottomRight.x),
+      "y": Math.min(newBounds.topLeft.y, newBounds.bottomRight.y),
     };
     const bottomRight: Point = {
-      x: Math.max(newBounds.topLeft.x, newBounds.bottomRight.x),
-      y: Math.max(newBounds.topLeft.y, newBounds.bottomRight.y),
+      "x": Math.max(newBounds.topLeft.x, newBounds.bottomRight.x),
+      "y": Math.max(newBounds.topLeft.y, newBounds.bottomRight.y),
     };
     this._boxBounds = {
-      topLeft: topLeft,
-      bottomRight: bottomRight,
+      "topLeft": topLeft,
+      "bottomRight": bottomRight,
     };
   }
 
   private _getBounds(): Bounds {
     return {
-      topLeft: {
-        x: this._xBoundsMode === PropertyMode.PIXEL ?
+      "topLeft": {
+        "x": this._xBoundsMode === PropertyMode.PIXEL ?
           this._boxBounds.topLeft.x :
           (this._xScale == null ?
             0 :
             Math.min(this.xScale().scale(this.xExtent()[0]), this.xScale().scale(this.xExtent()[1]))),
-        y: this._yBoundsMode === PropertyMode.PIXEL ?
+        "y": this._yBoundsMode === PropertyMode.PIXEL ?
           this._boxBounds.topLeft.y :
           (this._yScale == null ?
             0 :
             Math.min(this.yScale().scale(this.yExtent()[0]), this.yScale().scale(this.yExtent()[1]))),
       },
-      bottomRight: {
-        x: this._xBoundsMode === PropertyMode.PIXEL ?
+      "bottomRight": {
+        "x": this._xBoundsMode === PropertyMode.PIXEL ?
           this._boxBounds.bottomRight.x :
           (this._xScale == null ?
             0 :
             Math.max(this.xScale().scale(this.xExtent()[0]), this.xScale().scale(this.xExtent()[1]))),
-        y: this._yBoundsMode === PropertyMode.PIXEL ?
+        "y": this._yBoundsMode === PropertyMode.PIXEL ?
           this._boxBounds.bottomRight.y :
           (this._yScale == null ?
             0 :
@@ -137,7 +137,7 @@ export class SelectionBoxLayer extends Component {
       }
 
       this._boxArea.attrs({
-        x: l, y: t, width: r - l, height: b - t,
+        "x": l, "y": t, "width": r - l, "height": b - t,
       });
       (<Node> this.content().node()).appendChild(<Node> this._box.node());
     } else {

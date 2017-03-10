@@ -253,12 +253,12 @@ export class Table extends ComponentContainer {
     rowProportionalSpace = Table._calcProportionalSpace(rowWeights, freeHeight);
 
     return {
-      colProportionalSpace: colProportionalSpace,
-      rowProportionalSpace: rowProportionalSpace,
-      guaranteedWidths: guarantees.guaranteedWidths,
-      guaranteedHeights: guarantees.guaranteedHeights,
-      wantsWidth: wantsWidth,
-      wantsHeight: wantsHeight,
+      "colProportionalSpace": colProportionalSpace,
+      "rowProportionalSpace": rowProportionalSpace,
+      "guaranteedWidths": guarantees.guaranteedWidths,
+      "guaranteedHeights": guarantees.guaranteedHeights,
+      "wantsWidth": wantsWidth,
+      "wantsHeight": wantsHeight,
     };
   }
 
@@ -275,8 +275,8 @@ export class Table extends ComponentContainer {
           spaceRequest = component.requestedSpace(offeredWidths[colIndex], offeredHeights[rowIndex]);
         } else {
           spaceRequest = {
-            minWidth: 0,
-            minHeight: 0,
+            "minWidth": 0,
+            "minHeight": 0,
           };
         }
 
@@ -295,18 +295,18 @@ export class Table extends ComponentContainer {
     });
 
     return {
-      guaranteedWidths: requestedWidths,
-      guaranteedHeights: requestedHeights,
-      wantsWidthArr: columnNeedsWidth,
-      wantsHeightArr: rowNeedsHeight,
+      "guaranteedWidths": requestedWidths,
+      "guaranteedHeights": requestedHeights,
+      "wantsWidthArr": columnNeedsWidth,
+      "wantsHeightArr": rowNeedsHeight,
     };
   }
 
   public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
     this._calculatedLayout = this._iterateLayout(offeredWidth, offeredHeight);
     return {
-      minWidth: d3.sum(this._calculatedLayout.guaranteedWidths),
-      minHeight: d3.sum(this._calculatedLayout.guaranteedHeights),
+      "minWidth": d3.sum(this._calculatedLayout.guaranteedWidths),
+      "minHeight": d3.sum(this._calculatedLayout.guaranteedHeights),
     };
   }
 
@@ -327,7 +327,7 @@ export class Table extends ComponentContainer {
       row.forEach((component: Component, colIndex: number) => {
         // recursively compute layout
         if (component != null) {
-          component.computeLayout({ x: childXOrigin, y: childYOrigin }, colWidths[colIndex], rowHeights[rowIndex]);
+          component.computeLayout({ "x": childXOrigin, "y": childYOrigin }, colWidths[colIndex], rowHeights[rowIndex]);
         }
         childXOrigin += colWidths[colIndex] + this._columnPadding;
       });

@@ -50,8 +50,8 @@ export class GuideLineLayer<D> extends Component {
 
   protected _sizeFromOffer(availableWidth: number, availableHeight: number) {
     return {
-      width: availableWidth,
-      height: availableHeight,
+      "width": availableWidth,
+      "height": availableHeight,
     };
   }
 
@@ -83,10 +83,10 @@ export class GuideLineLayer<D> extends Component {
     super.renderImmediately();
     this._syncPixelPositionAndValue();
     this._guideLine.attrs({
-      x1: this._isVertical() ? this.pixelPosition() : 0,
-      y1: this._isVertical() ? 0 : this.pixelPosition(),
-      x2: this._isVertical() ? this.pixelPosition() : this.width(),
-      y2: this._isVertical() ? this.height() : this.pixelPosition(),
+      "x1": this._isVertical() ? this.pixelPosition() : 0,
+      "y1": this._isVertical() ? 0 : this.pixelPosition(),
+      "x2": this._isVertical() ? this.pixelPosition() : this.width(),
+      "y2": this._isVertical() ? this.height() : this.pixelPosition(),
     });
     return this;
   }
