@@ -14,6 +14,7 @@
     "no-trailing-whitespace": true,
     "object-literal-key-quotes": true,
     "quotemark": [true, "double"],
-    "semicolon": true
+    "semicolon": true,
+    "whitespace": true
   }
 }
