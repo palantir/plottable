@@ -10,6 +10,7 @@
     "align": [true, "parameters", "statements"],
     "arrow-parens": true,
     "no-boolean-literal-compare": true,
-    "no-consecutive-blank-lines": true
+    "no-consecutive-blank-lines": true,
+    "no-trailing-whitespace": true
   }
 }
