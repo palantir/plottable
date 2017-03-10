@@ -1,5 +1,5 @@
 /*!
- * Plottable 3.0.0-beta.2 (https://github.com/palantir/plottable)
+ * Plottable 3.0.0-beta.3 (https://github.com/palantir/plottable)
  * Copyright 2014-2017 Palantir Technologies
  * Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
  */
@@ -7748,7 +7748,7 @@ exports.Dataset = Dataset;
  * real version number during the dist phase for for npm module publishing. Modifying this line should
  * be accompanied by modifying the "sed-version" task in package.json accordingly.
  */
-exports.version = "3.0.0-beta.2";
+exports.version = "3.0.0-beta.3";
 
 
 /***/ }),
