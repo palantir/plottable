@@ -3545,8 +3545,8 @@ var __extends = (this && this.__extends) || function (d, b) {
 var d3 = __webpack_require__(1);
 var Typesetter = __webpack_require__(4);
 var Animators = __webpack_require__(6);
-var Drawers = __webpack_require__(9);
 var Formatters = __webpack_require__(8);
+var Drawers = __webpack_require__(9);
 var Scales = __webpack_require__(3);
 var quantitativeScale_1 = __webpack_require__(10);
 var Utils = __webpack_require__(0);
@@ -9848,10 +9848,8 @@ var Legend = (function (_super) {
         }, []);
     };
     Legend.prototype.renderImmediately = function () {
-        var _this = this;
         _super.prototype.renderImmediately.call(this);
         var table = this._buildLegendTable(this.width(), this.height());
-        var entryNames = this._colorScale.domain().slice().sort(function (a, b) { return _this._comparator(_this._formatter(a), _this._formatter(b)); });
         // clear content from previous renders
         this.content().selectAll("*").remove();
         var rowsUpdate = this.content().selectAll("g." + Legend.LEGEND_ROW_CLASS).data(table.rows);
@@ -11588,8 +11586,8 @@ var d3 = __webpack_require__(1);
 var Dispatchers = __webpack_require__(12);
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var interaction_1 = __webpack_require__(14);
 var Interactions = __webpack_require__(13);
+var interaction_1 = __webpack_require__(14);
 /**
  * Performs a zoom transformation of the `value` argument scaled by the
  * `zoom` argument about the point defined by the `center` argument.
@@ -12349,8 +12347,8 @@ var __extends = (this && this.__extends) || function (d, b) {
 var d3 = __webpack_require__(1);
 var Typesetter = __webpack_require__(4);
 var Animators = __webpack_require__(6);
-var Drawers = __webpack_require__(9);
 var Formatters = __webpack_require__(8);
+var Drawers = __webpack_require__(9);
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
 var plot_1 = __webpack_require__(2);

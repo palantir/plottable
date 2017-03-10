@@ -4,8 +4,6 @@
  */
 
 import * as d3 from "d3";
-
-import { SimpleSelection } from "../core/interfaces";
 import { coerceExternalD3 } from "../utils/coerceD3";
 import { Component, ComponentCallback } from "./component";
 

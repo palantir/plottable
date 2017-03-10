@@ -9,8 +9,6 @@ import { Accessor, AttributeToProjector, Bounds, Point, Range } from "../core/in
 import * as Drawers from "../drawers";
 import * as Scales from "../scales";
 import { Scale } from "../scales/scale";
-
-import * as Plots from "./";
 import { AccessorScaleBinding, PlotEntity, TransformableAccessorScaleBinding } from "./";
 import { Plot } from "./plot";
 import { XYPlot } from "./xyPlot";

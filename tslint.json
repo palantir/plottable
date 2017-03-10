@@ -1,5 +1,6 @@
 {
   "rules": {
-    "ordered-imports": true
+    "ordered-imports": true,
+    "no-unused-variable": true
   }
 }

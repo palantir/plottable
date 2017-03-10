@@ -558,7 +558,6 @@ export class Legend extends Component {
     super.renderImmediately();
 
     const table = this._buildLegendTable(this.width(), this.height());
-    const entryNames = this._colorScale.domain().slice().sort((a, b) => this._comparator(this._formatter(a), this._formatter(b)));
 
     // clear content from previous renders
     this.content().selectAll("*").remove();

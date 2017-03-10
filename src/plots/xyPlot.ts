@@ -9,7 +9,7 @@ import * as Scales from "../scales";
 import { Scale, ScaleCallback } from "../scales/scale";
 import * as Utils from "../utils";
 
-import { LightweightPlotEntity, PlotEntity, TransformableAccessorScaleBinding } from "./commons";
+import { TransformableAccessorScaleBinding } from "./commons";
 import { Plot } from "./plot";
 
 export class XYPlot<X, Y> extends Plot {

@@ -4,7 +4,7 @@
  */
 
 import { Dataset } from "../core/dataset";
-import { Accessor, AttributeToProjector, Bounds, Point, Range, SimpleSelection } from "../core/interfaces";
+import { Accessor, SimpleSelection } from "../core/interfaces";
 import { Drawer } from "../drawers/drawer";
 import * as Utils from "../utils";
 

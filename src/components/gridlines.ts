@@ -4,7 +4,7 @@
  */
 
 
-import * as d3 from "d3";
+
 
 import { Point, SimpleSelection } from "../core/interfaces";
 import { QuantitativeScale } from "../scales/quantitativeScale";
