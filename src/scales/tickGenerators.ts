@@ -38,7 +38,7 @@ export function intervalTickGenerator(interval: number): TickGenerator<number> {
     const numTicks = Math.floor((high - firstTick) / interval) + 1;
 
     const lowTicks = low % interval === 0 ? [] : [low];
-    const middleTicks = Utils.Math.range(0, numTicks).map(t => firstTick + t * interval);
+    const middleTicks = Utils.Math.range(0, numTicks).map((t) => firstTick + t * interval);
     const highTicks = high % interval === 0 ? [] : [high];
 
     return lowTicks.concat(middleTicks).concat(highTicks);
