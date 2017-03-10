@@ -389,5 +389,55 @@ describe("Plots", () => {
         div.remove();
       });
     });
+
+    describe("canvas renderer", () => {
+      let plot: Plottable.Plot;
+
+      beforeEach(() => {
+        plot = new Plottable.Plot();
+      });
+
+      it("can get/set the .renderer", () => {
+        assert.strictEqual(plot.renderer(), "svg", "defaults to svg");
+        plot.renderer("canvas");
+        assert.strictEqual(plot.renderer(), "canvas", "can change to canvas");
+      });
+
+      it("adds a canvas element to the DOM when rendered", () => {
+        plot.renderer("canvas");
+
+        const div = TestMethods.generateDiv();
+        plot.renderTo(div);
+        assert.isDefined(div.select("canvas").node(), "canvas is in DOM");
+        div.remove();
+      });
+
+      it("removes renderArea from the DOM after anchoring", () => {
+        plot.addDataset(new Plottable.Dataset([]));
+        const div = TestMethods.generateDiv();
+        plot.anchor(div);
+
+        // set to canvas after anchor
+        plot.renderer("canvas");
+        assert.strictEqual(plot.content().select(".render-area").selectAll("g").size(), 0, "no g's in renderArea anymore");
+
+        plot.renderer("svg");
+        assert.strictEqual(plot.content().select(".render-area").selectAll("g").size(), 1, "g's come back");
+        div.remove();
+      });
+
+      it("sets Drawers' canvas when renderer is set", () => {
+        plot.addDataset(new Plottable.Dataset([]));
+        const div = TestMethods.generateDiv();
+        plot.anchor(div);
+
+        plot.renderer("canvas");
+        (<any> plot)._datasetToDrawer.forEach((drawer: Plottable.Drawer) => {
+          assert.strictEqual(drawer.canvas().node(), div.select("canvas").node(), "drawer's canvas is set");
+        });
+
+        div.remove();
+      });
+    });
   });
 });
