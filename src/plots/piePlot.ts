@@ -41,7 +41,7 @@ export class Pie extends Plot {
    */
   constructor() {
     super();
-    this.innerRadius(0)
+    this.innerRadius(0);
     this.outerRadius(() => {
       const pieCenter = this._pieCenter();
       return Math.min(Math.max(this.width() - pieCenter.x, pieCenter.x), Math.max(this.height() - pieCenter.y, pieCenter.y));
@@ -60,7 +60,7 @@ export class Pie extends Plot {
   public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
     super.computeLayout(origin, availableWidth, availableHeight);
 
-    const pieCenter = this._pieCenter()
+    const pieCenter = this._pieCenter();
     this._renderArea.attr("transform", "translate(" + pieCenter.x + "," + pieCenter.y + ")");
 
     const radiusLimit = Math.min(Math.max(this.width() - pieCenter.x, pieCenter.x), Math.max(this.height() - pieCenter.y, pieCenter.y));
@@ -404,7 +404,7 @@ export class Pie extends Plot {
         hTop = cosA;
         hBottom = -cosB;
         wLeft = 0;
-        wRight = sinA
+        wRight = sinA;
       }
       else if (cosA < 0 && cosB >= 0) {
         hTop = 1;
@@ -495,7 +495,7 @@ export class Pie extends Plot {
     return {
       "x": wLeft + wRight == 0 ? 0 : (wLeft / (wLeft + wRight)) * this.width(),
       "y": hTop + hBottom == 0 ? 0 : (hTop / (hTop + hBottom)) * this.height(),
-    }
+    };
   }
 
   protected _getDataToDraw(): Utils.Map<Dataset, any[]> {

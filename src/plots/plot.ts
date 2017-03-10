@@ -465,7 +465,7 @@ export class Plot extends Component {
         this._canvas = null;
         this._datasetToDrawer.forEach((drawer) => {
           drawer.renderArea(this._renderArea.append("g"));
-        })
+        });
         this.render();
       }
       return this;

@@ -13,6 +13,7 @@
     "no-consecutive-blank-lines": true,
     "no-trailing-whitespace": true,
     "object-literal-key-quotes": true,
-    "quotemark": [true, "double"]
+    "quotemark": [true, "double"],
+    "semicolon": true
   }
 }

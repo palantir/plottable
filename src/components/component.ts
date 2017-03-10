@@ -598,7 +598,7 @@ export class Component {
         "x": topLeft.x + this.width(),
         "y": topLeft.y + this.height(),
       },
-    }
+    };
   }
 
   /**

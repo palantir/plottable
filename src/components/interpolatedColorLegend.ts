@@ -168,7 +168,7 @@ export class InterpolatedColorLegend extends Component {
     this._lowerLabel = this.content().append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
     this._upperLabel = this.content().append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
 
-    const context = new Typesetter.SvgContext(this.content().node() as SVGElement)
+    const context = new Typesetter.SvgContext(this.content().node() as SVGElement);
     this._measurer = new Typesetter.Measurer(context);
     this._wrapper = new Typesetter.Wrapper();
     this._writer = new Typesetter.Writer(this._measurer, context, this._wrapper);

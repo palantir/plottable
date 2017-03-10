@@ -14,9 +14,9 @@ export type GenericStackedDatum<D> = {
   value: number;
   offset: number;
   axisValue: D;
-}
+};
 
-export type StackExtent<D> = { extent: number, axisValue: D }
+export type StackExtent<D> = { extent: number, axisValue: D };
 
 export type StackedDatum = GenericStackedDatum<string>;
 /**

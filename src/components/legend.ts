@@ -551,7 +551,7 @@ export class Legend extends Component {
         return entity;
       }, entity);
 
-    }, [] as Entity<Legend>[])
+    }, [] as Entity<Legend>[]);
   }
 
   public renderImmediately() {
@@ -613,7 +613,7 @@ export class Legend extends Component {
           const entry = symbolEntryPair[1];
           const columnIndex = table.rows[rowIndex].columns.indexOf(entry);
           const columnBounds = table.getColumnBounds(rowIndex, columnIndex);
-          return "translate(" + columnBounds.topLeft.x + ", 0)"
+          return "translate(" + columnBounds.topLeft.x + ", 0)";
         })
         .each(function (symbolEntryPair, i, rowIndex) {
           const textContainer = d3.select(this);
@@ -625,7 +625,7 @@ export class Legend extends Component {
             "textRotation": 0,
           } as Typesetter.IWriteOptions;
 
-          self._writer.write(self._formatter(column.data.name), column.width, self.height(), writeOptions, textContainer.node())
+          self._writer.write(self._formatter(column.data.name), column.width, self.height(), writeOptions, textContainer.node());
         });
 
       entriesUpdate.exit().remove();

@@ -217,7 +217,7 @@ export class Category extends Scale<string, number> implements TransformableScal
   public pan(translateAmount: number) {
     const translateTransform = (rangeValue: number) => {
       return this._d3TransformationScale.invert(rangeValue + translateAmount);
-    }
+    };
     this._d3TransformationScale.domain(this._d3TransformationScale.range().map(translateTransform));
     this._dispatchUpdate();
   }

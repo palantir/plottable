@@ -52,7 +52,7 @@ export class Category extends Axis<string> {
   private get _wrapper() {
     const wrapper = new Typesetter.Wrapper();
     if (this._tickLabelMaxLines != null) {
-      wrapper.maxLines(this._tickLabelMaxLines)
+      wrapper.maxLines(this._tickLabelMaxLines);
     }
     return wrapper;
   }
