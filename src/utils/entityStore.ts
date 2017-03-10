@@ -73,7 +73,7 @@ export class EntityArray<T extends PositionedEntity> implements EntityStore<T> {
         return;
       }
 
-      let distanceSquared = Math.distanceSquared(entity.position, queryPoint);
+      const distanceSquared = Math.distanceSquared(entity.position, queryPoint);
       if (distanceSquared < closestDistanceSquared) {
         closestDistanceSquared = distanceSquared;
         closestPointEntity = entity;

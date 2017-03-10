@@ -95,7 +95,7 @@ export class Interaction {
    * @return {Point} The same location in Component-space coordinates.
    */
   protected _translateToComponentSpace(p: Point): Point {
-    let origin = this._componentAttachedTo.originToRoot();
+    const origin = this._componentAttachedTo.originToRoot();
     return {
       x: p.x - origin.x,
       y: p.y - origin.y,

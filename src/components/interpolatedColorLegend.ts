@@ -148,12 +148,12 @@ export class InterpolatedColorLegend extends Component {
   }
 
   private _generateTicks(numSwatches = InterpolatedColorLegend._DEFAULT_NUM_SWATCHES) {
-    let domain = this._scale.domain();
+    const domain = this._scale.domain();
     if (numSwatches === 1) {
       return [domain[0]];
     }
-    let slope = (domain[1] - domain[0]) / (numSwatches - 1);
-    let ticks: number[] = [];
+    const slope = (domain[1] - domain[0]) / (numSwatches - 1);
+    const ticks: number[] = [];
     for (let i = 0; i < numSwatches; i++) {
       ticks.push(domain[0] + slope * i);
     }
@@ -175,17 +175,17 @@ export class InterpolatedColorLegend extends Component {
   }
 
   public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
-    let textHeight = this._measurer.measure().height;
-    let padding = textHeight;
+    const textHeight = this._measurer.measure().height;
+    const padding = textHeight;
 
-    let domain = this._scale.domain();
-    let labelWidths = domain.map((d: number) => this._measurer.measure(this._formatter(d)).width);
+    const domain = this._scale.domain();
+    const labelWidths = domain.map((d: number) => this._measurer.measure(this._formatter(d)).width);
 
     let desiredHeight: number;
     let desiredWidth: number;
-    let numSwatches = InterpolatedColorLegend._DEFAULT_NUM_SWATCHES;
+    const numSwatches = InterpolatedColorLegend._DEFAULT_NUM_SWATCHES;
     if (this._isVertical()) {
-      let longestWidth = Utils.Math.max(labelWidths, 0);
+      const longestWidth = Utils.Math.max(labelWidths, 0);
       desiredWidth = padding + textHeight + this._textPadding + longestWidth + this._textPadding;
       desiredHeight = numSwatches * textHeight;
     } else {
@@ -207,24 +207,24 @@ export class InterpolatedColorLegend extends Component {
   public renderImmediately() {
     super.renderImmediately();
 
-    let domain = this._scale.domain();
+    const domain = this._scale.domain();
 
-    let text0 = this._formatter(domain[0]);
-    let text0Width = this._measurer.measure(text0).width;
-    let text1 = this._formatter(domain[1]);
-    let text1Width = this._measurer.measure(text1).width;
+    const text0 = this._formatter(domain[0]);
+    const text0Width = this._measurer.measure(text0).width;
+    const text1 = this._formatter(domain[1]);
+    const text1Width = this._measurer.measure(text1).width;
 
-    let textHeight = this._measurer.measure().height;
-    let textPadding = this._textPadding;
+    const textHeight = this._measurer.measure().height;
+    const textPadding = this._textPadding;
 
-    let upperLabelShift: Point = { x: 0, y: 0 };
-    let lowerLabelShift: Point = { x: 0, y: 0 };
-    let lowerWriteOptions = {
+    const upperLabelShift: Point = { x: 0, y: 0 };
+    const lowerLabelShift: Point = { x: 0, y: 0 };
+    const lowerWriteOptions = {
       xAlign: "center",
       yAlign: "center",
       textRotation: 0,
     } as Typesetter.IWriteOptions;
-    let upperWriteOptions = {
+    const upperWriteOptions = {
       xAlign: "center",
       yAlign: "center",
       textRotation: 0,
@@ -235,7 +235,7 @@ export class InterpolatedColorLegend extends Component {
     let swatchX: (d: any, i: number) => number;
     let swatchY: (d: any, i: number) => number;
 
-    let boundingBoxAttr: { [key: string]: number } = {
+    const boundingBoxAttr: { [key: string]: number } = {
       x: 0,
       y: 0,
       width: 0,
@@ -247,7 +247,7 @@ export class InterpolatedColorLegend extends Component {
 
     if (this._isVertical()) {
       numSwatches = Math.floor(this.height());
-      let longestTextWidth = Math.max(text0Width, text1Width);
+      const longestTextWidth = Math.max(text0Width, text1Width);
       padding = (this.width() - longestTextWidth - 2 * this._textPadding) / 2;
       swatchWidth = Math.max(this.width() - padding - 2 * textPadding - longestTextWidth, 0);
       swatchHeight = 1;
@@ -294,19 +294,19 @@ export class InterpolatedColorLegend extends Component {
 
     this._upperLabel.text(""); // clear the upper label
     this._writer.write(text1, this.width(), this.height(), upperWriteOptions, this._upperLabel.node());
-    let upperTranslateString = "translate(" + upperLabelShift.x + ", " + upperLabelShift.y + ")";
+    const upperTranslateString = "translate(" + upperLabelShift.x + ", " + upperLabelShift.y + ")";
     this._upperLabel.attr("transform", upperTranslateString);
 
     this._lowerLabel.text(""); // clear the lower label
     this._writer.write(text0, this.width(), this.height(), lowerWriteOptions, this._lowerLabel.node());
-    let lowerTranslateString = "translate(" + lowerLabelShift.x + ", " + lowerLabelShift.y + ")";
+    const lowerTranslateString = "translate(" + lowerLabelShift.x + ", " + lowerLabelShift.y + ")";
     this._lowerLabel.attr("transform", lowerTranslateString);
 
     this._swatchBoundingBox.attrs(boundingBoxAttr);
 
-    let ticks = this._generateTicks(numSwatches);
-    let swatchesUpdate = this._swatchContainer.selectAll("rect.swatch").data(ticks);
-    let rects = swatchesUpdate.enter().append("rect").classed("swatch", true);;
+    const ticks = this._generateTicks(numSwatches);
+    const swatchesUpdate = this._swatchContainer.selectAll("rect.swatch").data(ticks);
+    const rects = swatchesUpdate.enter().append("rect").classed("swatch", true);;
     const swatches = swatchesUpdate.merge(rects);
     swatchesUpdate.exit().remove();
     swatches.attrs({

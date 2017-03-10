@@ -42,18 +42,18 @@ export class Pointer extends Interaction {
   }
 
   private _handleMouseEvent(p: Point, e: MouseEvent) {
-    let insideSVG = this._mouseDispatcher.eventInside(this._componentAttachedTo, e);
+    const insideSVG = this._mouseDispatcher.eventInside(this._componentAttachedTo, e);
     this._handlePointerEvent(p, insideSVG);
   }
 
   private _handleTouchEvent(p: Point, e: TouchEvent) {
-    let insideSVG = this._touchDispatcher.eventInside(this._componentAttachedTo, e);
+    const insideSVG = this._touchDispatcher.eventInside(this._componentAttachedTo, e);
     this._handlePointerEvent(p, insideSVG);
   }
 
   private _handlePointerEvent(p: Point, insideSVG: boolean) {
-    let translatedP = this._translateToComponentSpace(p);
-    let overComponent = this._isInsideComponent(translatedP);
+    const translatedP = this._translateToComponentSpace(p);
+    const overComponent = this._isInsideComponent(translatedP);
 
     if (overComponent && insideSVG) {
       if (!this._overComponent) {

@@ -7,7 +7,7 @@ import * as d3 from "d3";
 
 import { Bounds, Point } from "../core/interfaces";
 
-let nativeMath: Math = (<any>window).Math;
+const nativeMath: Math = (<any>window).Math;
 
 /**
  * Checks if x is between a and b.
@@ -40,10 +40,10 @@ export function clamp(x: number, min: number, max: number) {
 export function max<C>(array: C[], defaultValue: C): C;
 export function max<T, C>(array: T[], accessor: (t?: T, i?: number) => C, defaultValue: C): C;
 export function max(array: any[], firstArg: any, secondArg?: any): any {
-  let accessor = typeof(firstArg) === "function" ? firstArg : null;
-  let defaultValue = accessor == null ? firstArg : secondArg;
+  const accessor = typeof(firstArg) === "function" ? firstArg : null;
+  const defaultValue = accessor == null ? firstArg : secondArg;
   /* tslint:disable:ban */
-  let maxValue = accessor == null ? d3.max(array) : d3.max(array, accessor);
+  const maxValue = accessor == null ? d3.max(array) : d3.max(array, accessor);
   /* tslint:enable:ban */
   return maxValue !== undefined ? maxValue : defaultValue;
 }
@@ -55,10 +55,10 @@ export function max(array: any[], firstArg: any, secondArg?: any): any {
 export function min<C>(array: C[], defaultValue: C): C;
 export function min<T, C>(array: T[], accessor: (t?: T, i?: number) => C, defaultValue: C): C;
 export function min(array: any[], firstArg: any, secondArg?: any): any {
-  let accessor = typeof(firstArg) === "function" ? firstArg : null;
-  let defaultValue = accessor == null ? firstArg : secondArg;
+  const accessor = typeof(firstArg) === "function" ? firstArg : null;
+  const defaultValue = accessor == null ? firstArg : secondArg;
   /* tslint:disable:ban */
-  let minValue = accessor == null ? d3.min(array) : d3.min(array, accessor);
+  const minValue = accessor == null ? d3.min(array) : d3.min(array, accessor);
   /* tslint:enable:ban */
   return minValue !== undefined ? minValue : defaultValue;
 }
@@ -86,8 +86,8 @@ export function range(start: number, stop: number, step = 1): number[] {
   if (step === 0) {
     throw new Error("step cannot be 0");
   }
-  let length = nativeMath.max(nativeMath.ceil((stop - start) / step), 0);
-  let range: number[] = [];
+  const length = nativeMath.max(nativeMath.ceil((stop - start) / step), 0);
+  const range: number[] = [];
 
   for (let i = 0; i < length; ++i) {
     range[i] = start + step * i;

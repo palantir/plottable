@@ -31,15 +31,15 @@ export function intervalTickGenerator(interval: number): TickGenerator<number> {
   }
 
   return function (s: QuantitativeScale<number>) {
-    let domain = s.domain();
-    let low = Math.min(domain[0], domain[1]);
-    let high = Math.max(domain[0], domain[1]);
-    let firstTick = Math.ceil(low / interval) * interval;
-    let numTicks = Math.floor((high - firstTick) / interval) + 1;
+    const domain = s.domain();
+    const low = Math.min(domain[0], domain[1]);
+    const high = Math.max(domain[0], domain[1]);
+    const firstTick = Math.ceil(low / interval) * interval;
+    const numTicks = Math.floor((high - firstTick) / interval) + 1;
 
-    let lowTicks = low % interval === 0 ? [] : [low];
-    let middleTicks = Utils.Math.range(0, numTicks).map(t => firstTick + t * interval);
-    let highTicks = high % interval === 0 ? [] : [high];
+    const lowTicks = low % interval === 0 ? [] : [low];
+    const middleTicks = Utils.Math.range(0, numTicks).map(t => firstTick + t * interval);
+    const highTicks = high % interval === 0 ? [] : [high];
 
     return lowTicks.concat(middleTicks).concat(highTicks);
   };
@@ -52,7 +52,7 @@ export function intervalTickGenerator(interval: number): TickGenerator<number> {
  */
 export function integerTickGenerator(): TickGenerator<number> {
   return function (s: QuantitativeScale<number>) {
-    let defaultTicks = s.defaultTicks();
+    const defaultTicks = s.defaultTicks();
     return defaultTicks.filter((tick, i) => (tick % 1 === 0) || (i === 0) || (i === defaultTicks.length - 1));
   };
 }

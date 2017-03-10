@@ -50,7 +50,7 @@ export class Category extends Scale<string, number> implements TransformableScal
     this._d3TransformationScale = d3.scaleLinear<number, number>();
     this._d3TransformationScale.domain(TRANSFORMATION_SPACE);
 
-    let d3InnerPadding = 0.3;
+    const d3InnerPadding = 0.3;
     this._innerPadding = Category._convertToPlottableInnerPadding(d3InnerPadding);
     this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
   }
@@ -116,8 +116,8 @@ export class Category extends Scale<string, number> implements TransformableScal
   }
 
   private _setBands() {
-    let d3InnerPadding = 1 - 1 / (1 + this.innerPadding());
-    let d3OuterPadding = this.outerPadding() / (1 + this.innerPadding());
+    const d3InnerPadding = 1 - 1 / (1 + this.innerPadding());
+    const d3OuterPadding = this.outerPadding() / (1 + this.innerPadding());
     this._d3Scale.paddingInner(d3InnerPadding);
     this._d3Scale.paddingOuter(d3OuterPadding);
   }
@@ -201,13 +201,13 @@ export class Category extends Scale<string, number> implements TransformableScal
 
   public scale(value: string): number {
     // Determine the middle of the range band for the value
-    let untransformed = this._d3Scale(value) + this._d3Scale.bandwidth() / 2;
+    const untransformed = this._d3Scale(value) + this._d3Scale.bandwidth() / 2;
     // Convert to screen space
     return this._d3TransformationScale(untransformed);
   }
 
   public zoom(magnifyAmount: number, centerValue: number) {
-    let magnifyTransform = (rangeValue: number) => {
+    const magnifyTransform = (rangeValue: number) => {
       return this._d3TransformationScale.invert(Interactions.zoomAt(rangeValue, magnifyAmount, centerValue));
     };
     this._d3TransformationScale.domain(this._d3TransformationScale.range().map(magnifyTransform));
@@ -215,7 +215,7 @@ export class Category extends Scale<string, number> implements TransformableScal
   }
 
   public pan(translateAmount: number) {
-    let translateTransform = (rangeValue: number) => {
+    const translateTransform = (rangeValue: number) => {
       return this._d3TransformationScale.invert(rangeValue + translateAmount);
     }
     this._d3TransformationScale.domain(this._d3TransformationScale.range().map(translateTransform));

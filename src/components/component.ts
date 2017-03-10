@@ -247,12 +247,12 @@ export class Component {
       }
     }
 
-    let size = this._sizeFromOffer(availableWidth, availableHeight);
+    const size = this._sizeFromOffer(availableWidth, availableHeight);
     this._width = size.width;
     this._height = size.height;
 
-    let xAlignProportion = Component._xAlignToProportion[this._xAlignment];
-    let yAlignProportion = Component._yAlignToProportion[this._yAlignment];
+    const xAlignProportion = Component._xAlignToProportion[this._xAlignment];
+    const yAlignProportion = Component._yAlignToProportion[this._yAlignment];
     this._origin = {
       x: origin.x + (availableWidth - this.width()) * xAlignProportion,
       y: origin.y + (availableHeight - this.height()) * yAlignProportion,
@@ -273,7 +273,7 @@ export class Component {
   }
 
   protected _sizeFromOffer(availableWidth: number, availableHeight: number) {
-    let requestedSpace = this.requestedSpace(availableWidth, availableHeight);
+    const requestedSpace = this.requestedSpace(availableWidth, availableHeight);
     return {
       width: this.fixedWidth() ? Math.min(availableWidth, requestedSpace.minWidth) : availableWidth,
       height: this.fixedHeight() ? Math.min(availableHeight, requestedSpace.minHeight) : availableHeight,
@@ -434,7 +434,7 @@ export class Component {
       throw new Error("Adding boxes before anchoring is currently disallowed");
     }
     parentElement = parentElement == null ? this._boxContainer : parentElement;
-    let box = parentElement.append("rect");
+    const box = parentElement.append("rect");
     if (className != null) {
       box.classed(className, true);
     }
@@ -641,10 +641,10 @@ export class Component {
    * @return {Point}
    */
   public originToRoot(): Point {
-    let origin = this.origin();
+    const origin = this.origin();
     let ancestor = this.parent();
     while (ancestor != null) {
-      let ancestorOrigin = ancestor.origin();
+      const ancestorOrigin = ancestor.origin();
       origin.x += ancestorOrigin.x;
       origin.y += ancestorOrigin.y;
       ancestor = ancestor.parent();

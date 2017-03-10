@@ -14,13 +14,13 @@ const d3Transition = d3;
 
 function attrsFunction(selection: any, map: any) {
   return selection.each(function() {
-    let x = map.apply(this, arguments), s = d3Selection.select(this);
-    for (let name in x) s.attr(name, x[name]);
+    const x = map.apply(this, arguments), s = d3Selection.select(this);
+    for (const name in x) s.attr(name, x[name]);
   });
 }
 
 function attrsObject(selection: any, map: any) {
-  for (let name in map) selection.attr(name, map[name]);
+  for (const name in map) selection.attr(name, map[name]);
   return selection;
 }
 
@@ -30,13 +30,13 @@ function selection_attrs(map: any) {
 
 function stylesFunction(selection: any, map: any, priority: any) {
   return selection.each(function() {
-    let x = map.apply(this, arguments), s = d3Selection.select(this);
-    for (let name in x) s.style(name, x[name], priority);
+    const x = map.apply(this, arguments), s = d3Selection.select(this);
+    for (const name in x) s.style(name, x[name], priority);
   });
 }
 
 function stylesObject(selection: any, map: any, priority: any) {
-  for (let name in map) selection.style(name, map[name], priority);
+  for (const name in map) selection.style(name, map[name], priority);
   return selection;
 }
 
@@ -46,13 +46,13 @@ function selection_styles(map: any, priority: any) {
 
 function propertiesFunction(selection: any, map: any) {
   return selection.each(function() {
-    let x = map.apply(this, arguments), s = d3Selection.select(this);
-    for (let name in x) s.property(name, x[name]);
+    const x = map.apply(this, arguments), s = d3Selection.select(this);
+    for (const name in x) s.property(name, x[name]);
   });
 }
 
 function propertiesObject(selection: any, map: any) {
-  for (let name in map) selection.property(name, map[name]);
+  for (const name in map) selection.property(name, map[name]);
   return selection;
 }
 
@@ -62,13 +62,13 @@ function selection_properties(map: any) {
 
 function attrsFunction$1(transition: any, map: any) {
   return transition.each(function() {
-    let x = map.apply(this, arguments), t = d3Selection.select(this).transition(transition);
-    for (let name in x) t.attr(name, x[name]);
+    const x = map.apply(this, arguments), t = d3Selection.select(this).transition(transition);
+    for (const name in x) t.attr(name, x[name]);
   });
 }
 
 function attrsObject$1(transition: any, map: any) {
-  for (let name in map) transition.attr(name, map[name]);
+  for (const name in map) transition.attr(name, map[name]);
   return transition;
 }
 
@@ -78,13 +78,13 @@ function transition_attrs(map: any) {
 
 function stylesFunction$1(transition: any, map: any, priority: any) {
   return transition.each(function() {
-    let x = map.apply(this, arguments), t = d3Selection.select(this).transition(transition);
-    for (let name in x) t.style(name, x[name], priority);
+    const x = map.apply(this, arguments), t = d3Selection.select(this).transition(transition);
+    for (const name in x) t.style(name, x[name], priority);
   });
 }
 
 function stylesObject$1(transition: any, map: any, priority: any) {
-  for (let name in map) transition.style(name, map[name], priority);
+  for (const name in map) transition.style(name, map[name], priority);
   return transition;
 }
 

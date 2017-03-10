@@ -263,7 +263,7 @@ export class Legend extends Component {
     this.maxLinesPerEntry(1);
     this.xAlignment("right").yAlignment("top");
     this.comparator((a: string, b: string) => {
-      let formattedText = this._colorScale.domain().slice().map((d: string) => this._formatter(d));
+      const formattedText = this._colorScale.domain().slice().map((d: string) => this._formatter(d));
       return formattedText.indexOf(a) - formattedText.indexOf(b);
     });
     this._symbolFactoryAccessor = () => SymbolFactories.circle();
@@ -272,8 +272,8 @@ export class Legend extends Component {
 
   protected _setup() {
     super._setup();
-    let fakeLegendRow = this.content().append("g").classed(Legend.LEGEND_ROW_CLASS, true);
-    let fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
+    const fakeLegendRow = this.content().append("g").classed(Legend.LEGEND_ROW_CLASS, true);
+    const fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
     fakeLegendEntry.append("text");
     const context = new Typesetter.SvgContext(fakeLegendRow.node() as SVGElement, null, Configs.ADD_TITLE_ELEMENTS);
     this._measurer = new Typesetter.Measurer(context);
@@ -427,7 +427,7 @@ export class Legend extends Component {
   }
 
   private _buildLegendTable(width: number, height: number) {
-    let textHeight = this._measurer.measure().height;
+    const textHeight = this._measurer.measure().height;
 
     const table = new LegendTable(width, height, this._padding);
     const entryNames = this._colorScale.domain().slice().sort((a, b) => this._comparator(this._formatter(a), this._formatter(b)));
@@ -470,9 +470,9 @@ export class Legend extends Component {
       const usedNameWidth = Math.min(availableWidth, unwrappedNameWidth);
 
       this._wrapper.maxLines(this.maxLinesPerEntry());
-      let numberOfRows = this._wrapper.wrap(formattedName, this._measurer, usedNameWidth).noLines;
+      const numberOfRows = this._wrapper.wrap(formattedName, this._measurer, usedNameWidth).noLines;
 
-      let nameColumnHeight = numberOfRows * textHeight;
+      const nameColumnHeight = numberOfRows * textHeight;
       const nameColumn = { width: usedNameWidth, height: nameColumnHeight, data: { name, type: "text" } };
       row.addColumn(nameColumn);
     });

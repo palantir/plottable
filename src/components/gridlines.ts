@@ -82,9 +82,9 @@ export class Gridlines extends Component {
 
   private _redrawXLines() {
     if (this._xScale) {
-      let xTicks = this._xScale.ticks();
-      let getScaledXValue = (tickVal: number) => this._xScale.scale(tickVal);
-      let xLinesUpdate = this._xLinesContainer.selectAll("line").data(xTicks);
+      const xTicks = this._xScale.ticks();
+      const getScaledXValue = (tickVal: number) => this._xScale.scale(tickVal);
+      const xLinesUpdate = this._xLinesContainer.selectAll("line").data(xTicks);
       const xLines = xLinesUpdate.enter().append("line").merge(xLinesUpdate);
       xLines.attr("x1", getScaledXValue)
         .attr("y1", 0)
@@ -97,9 +97,9 @@ export class Gridlines extends Component {
 
   private _redrawYLines() {
     if (this._yScale) {
-      let yTicks = this._yScale.ticks();
-      let getScaledYValue = (tickVal: number) => this._yScale.scale(tickVal);
-      let yLinesUpdate = this._yLinesContainer.selectAll("line").data(yTicks);
+      const yTicks = this._yScale.ticks();
+      const getScaledYValue = (tickVal: number) => this._yScale.scale(tickVal);
+      const yLinesUpdate = this._yLinesContainer.selectAll("line").data(yTicks);
       const yLines = yLinesUpdate.enter().append("line").merge(yLinesUpdate);
       yLines.attr("x1", 0)
         .attr("y1", getScaledYValue)

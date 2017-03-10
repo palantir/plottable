@@ -35,7 +35,7 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
   constructor() {
     super();
     this.addClass("scatter-plot");
-    let animator = new Animators.Easing();
+    const animator = new Animators.Easing();
     animator.startDelay(5);
     animator.stepDuration(250);
     animator.maxTotalDuration(Plot._ANIMATION_MAX_DURATION);
@@ -43,7 +43,7 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
     this.attr("opacity", 0.6);
     this.attr("fill", new Scales.Color().range()[0]);
     this.size(6);
-    let circleSymbolFactory = SymbolFactories.circle();
+    const circleSymbolFactory = SymbolFactories.circle();
     this.symbol(() => circleSymbolFactory);
   }
 
@@ -117,11 +117,11 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
   }
 
   protected _generateDrawSteps(): Drawers.DrawStep[] {
-    let drawSteps: Drawers.DrawStep[] = [];
+    const drawSteps: Drawers.DrawStep[] = [];
     if (this._animateOnNextRender()) {
-      let resetAttrToProjector = this._generateAttrToProjector();
+      const resetAttrToProjector = this._generateAttrToProjector();
 
-      let symbolProjector = Plot._scaledAccessor(this.symbol());
+      const symbolProjector = Plot._scaledAccessor(this.symbol());
       resetAttrToProjector["d"] = (datum: any, index: number, dataset: Dataset) => symbolProjector(datum, index, dataset)(0);
       drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
     }
@@ -148,17 +148,17 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
   }
 
   protected _propertyProjectors(): AttributeToProjector {
-    let propertyToProjectors = super._propertyProjectors();
+    const propertyToProjectors = super._propertyProjectors();
 
-    let xProjector = Plot._scaledAccessor(this.x());
-    let yProjector = Plot._scaledAccessor(this.y());
+    const xProjector = Plot._scaledAccessor(this.x());
+    const yProjector = Plot._scaledAccessor(this.y());
 
-    let sizeProjector = Plot._scaledAccessor(this.size());
+    const sizeProjector = Plot._scaledAccessor(this.size());
 
     propertyToProjectors["transform"] = (datum: any, index: number, dataset: Dataset) =>
     "translate(" + xProjector(datum, index, dataset) + "," + yProjector(datum, index, dataset) + ")";
 
-    let symbolProjector = Plot._scaledAccessor(this.symbol());
+    const symbolProjector = Plot._scaledAccessor(this.symbol());
 
     propertyToProjectors["d"] = (datum: any, index: number, dataset: Dataset) =>
       symbolProjector(datum, index, dataset)(sizeProjector(datum, index, dataset));
@@ -184,21 +184,21 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
     let dataXRange: Range;
     let dataYRange: Range;
     if (yRange == null) {
-      let bounds = (<Bounds> xRangeOrBounds);
+      const bounds = (<Bounds> xRangeOrBounds);
       dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
       dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
     } else {
       dataXRange = (<Range> xRangeOrBounds);
       dataYRange = yRange;
     }
-    let xProjector = Plot._scaledAccessor(this.x());
-    let yProjector = Plot._scaledAccessor(this.y());
+    const xProjector = Plot._scaledAccessor(this.x());
+    const yProjector = Plot._scaledAccessor(this.y());
     return this.entities().filter((entity) => {
-      let datum = entity.datum;
-      let index = entity.index;
-      let dataset = entity.dataset;
-      let x = xProjector(datum, index, dataset);
-      let y = yProjector(datum, index, dataset);
+      const datum = entity.datum;
+      const index = entity.index;
+      const dataset = entity.dataset;
+      const x = xProjector(datum, index, dataset);
+      const y = yProjector(datum, index, dataset);
       return dataXRange.min <= x && x <= dataXRange.max && dataYRange.min <= y && y <= dataYRange.max;
     });
   }
@@ -210,16 +210,16 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
    * @returns {PlotEntity[]}
    */
   public entitiesAt(p: Point) {
-    let xProjector = Plot._scaledAccessor(this.x());
-    let yProjector = Plot._scaledAccessor(this.y());
-    let sizeProjector = Plot._scaledAccessor(this.size());
+    const xProjector = Plot._scaledAccessor(this.x());
+    const yProjector = Plot._scaledAccessor(this.y());
+    const sizeProjector = Plot._scaledAccessor(this.size());
     return this.entities().filter((entity) => {
-      let datum = entity.datum;
-      let index = entity.index;
-      let dataset = entity.dataset;
-      let x = xProjector(datum, index, dataset);
-      let y = yProjector(datum, index, dataset);
-      let size = sizeProjector(datum, index, dataset);
+      const datum = entity.datum;
+      const index = entity.index;
+      const dataset = entity.dataset;
+      const x = xProjector(datum, index, dataset);
+      const y = yProjector(datum, index, dataset);
+      const size = sizeProjector(datum, index, dataset);
       return x - size / 2 <= p.x && p.x <= x + size / 2 && y - size / 2 <= p.y && p.y <= y + size / 2;
     });
   }

@@ -139,14 +139,14 @@ export class Easing implements Animator {
   }
 
   public totalTime(numberOfSteps: number) {
-    let adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
+    const adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
     return this.startDelay() + adjustedIterativeDelay * (Math.max(numberOfSteps - 1, 0)) + this.stepDuration();
   }
 
   public animate(selection: SimpleSelection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Transition<any, any, any, any> {
     selection = coerceExternalD3(selection);
-    let numberOfSteps = selection.size();
-    let adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
+    const numberOfSteps = selection.size();
+    const adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
 
     return selection.transition()
       .ease(this._getEaseFactory())
@@ -294,7 +294,7 @@ export class Easing implements Animator {
   private _getAdjustedIterativeDelay(numberOfSteps: number) {
     let stepStartTimeInterval = this.maxTotalDuration() - this.stepDuration();
     stepStartTimeInterval = Math.max(stepStartTimeInterval, 0);
-    let maxPossibleIterativeDelay = stepStartTimeInterval / Math.max(numberOfSteps - 1, 1);
+    const maxPossibleIterativeDelay = stepStartTimeInterval / Math.max(numberOfSteps - 1, 1);
     return Math.min(this.stepDelay(), maxPossibleIterativeDelay);
   }
 }

@@ -113,7 +113,7 @@ export function flush() {
     _componentsNeedingRender.forEach((component: Component) => component.render());
 
     _isCurrentlyFlushing = true;
-    let failed = new Utils.Set<Component>();
+    const failed = new Utils.Set<Component>();
     _componentsNeedingRender.forEach((component: Component) => {
       try {
         component.renderImmediately();

@@ -121,13 +121,13 @@ export class Axis<D> extends Component {
     if (this.isHorizontal()) {
       requestedHeight = this._computeHeight() + this._margin;
       if (this.annotationsEnabled()) {
-        let tierHeight = this._annotationMeasurer.measure().height + 2 * Axis._ANNOTATION_LABEL_PADDING;
+        const tierHeight = this._annotationMeasurer.measure().height + 2 * Axis._ANNOTATION_LABEL_PADDING;
         requestedHeight += tierHeight * this.annotationTierCount();
       }
     } else { // vertical
       requestedWidth = this._computeWidth() + this._margin;
       if (this.annotationsEnabled()) {
-        let tierHeight = this._annotationMeasurer.measure().height + 2 * Axis._ANNOTATION_LABEL_PADDING;
+        const tierHeight = this._annotationMeasurer.measure().height + 2 * Axis._ANNOTATION_LABEL_PADDING;
         requestedWidth += tierHeight * this.annotationTierCount();
       }
     }
@@ -192,8 +192,8 @@ export class Axis<D> extends Component {
    * other relevant aspects of this Axis.
    */
   public renderImmediately() {
-    let tickMarkValues = this._getTickValues();
-    let tickMarksUpdate = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickMarkValues);
+    const tickMarkValues = this._getTickValues();
+    const tickMarksUpdate = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickMarkValues);
     const tickMarks =
       tickMarksUpdate
         .enter()
@@ -296,34 +296,34 @@ export class Axis<D> extends Component {
   }
 
   protected _drawAnnotations() {
-    let labelPadding = Axis._ANNOTATION_LABEL_PADDING;
-    let measurements = new Utils.Map<D, Typesetter.IDimensions>();
-    let annotatedTicks = this._annotatedTicksToRender();
+    const labelPadding = Axis._ANNOTATION_LABEL_PADDING;
+    const measurements = new Utils.Map<D, Typesetter.IDimensions>();
+    const annotatedTicks = this._annotatedTicksToRender();
     annotatedTicks.forEach((annotatedTick) => {
-      let measurement = this._annotationMeasurer.measure(this.annotationFormatter()(annotatedTick));
-      let paddedMeasurement = {
+      const measurement = this._annotationMeasurer.measure(this.annotationFormatter()(annotatedTick));
+      const paddedMeasurement = {
         width: measurement.width + 2 * labelPadding,
         height: measurement.height + 2 * labelPadding
       };
       measurements.set(annotatedTick, paddedMeasurement);
     });
 
-    let tierHeight = this._annotationMeasurer.measure().height + 2 * labelPadding;
+    const tierHeight = this._annotationMeasurer.measure().height + 2 * labelPadding;
 
-    let annotationToTier = this._annotationToTier(measurements);
+    const annotationToTier = this._annotationToTier(measurements);
 
-    let hiddenAnnotations = new Utils.Set<any>();
-    let axisHeight = this.isHorizontal() ? this.height() : this.width();
-    let axisHeightWithoutMarginAndAnnotations = this._coreSize();
-    let numTiers = Math.min(this.annotationTierCount(), Math.floor((axisHeight - axisHeightWithoutMarginAndAnnotations) / tierHeight));
+    const hiddenAnnotations = new Utils.Set<any>();
+    const axisHeight = this.isHorizontal() ? this.height() : this.width();
+    const axisHeightWithoutMarginAndAnnotations = this._coreSize();
+    const numTiers = Math.min(this.annotationTierCount(), Math.floor((axisHeight - axisHeightWithoutMarginAndAnnotations) / tierHeight));
     annotationToTier.forEach((tier, annotation) => {
       if (tier === -1 || tier >= numTiers) {
         hiddenAnnotations.add(annotation);
       }
     });
 
-    let bindElements = (selection: SimpleSelection<any>, elementName: string, className: string) => {
-      let elementsUpdate = selection.selectAll(`.${className}`).data(annotatedTicks);
+    const bindElements = (selection: SimpleSelection<any>, elementName: string, className: string) => {
+      const elementsUpdate = selection.selectAll(`.${className}`).data(annotatedTicks);
       const elements =
         elementsUpdate
           .enter()
@@ -333,7 +333,7 @@ export class Axis<D> extends Component {
       elementsUpdate.exit().remove();
       return elements;
     };
-    let offsetF = (d: D) => {
+    const offsetF = (d: D) => {
       switch (this.orientation()) {
         case "bottom":
         case "right":
@@ -343,8 +343,8 @@ export class Axis<D> extends Component {
           return axisHeight - axisHeightWithoutMarginAndAnnotations - annotationToTier.get(d) * tierHeight;
       }
     };
-    let positionF = (d: D) => this._scale.scale(d);
-    let visibilityF = (d: D) => hiddenAnnotations.has(d) ? "hidden" : "visible";
+    const positionF = (d: D) => this._scale.scale(d);
+    const visibilityF = (d: D) => hiddenAnnotations.has(d) ? "hidden" : "visible";
 
     let secondaryPosition: number;
     switch (this.orientation()) {
@@ -360,7 +360,7 @@ export class Axis<D> extends Component {
         break;
     }
 
-    let isHorizontal = this.isHorizontal();
+    const isHorizontal = this.isHorizontal();
     bindElements(this._annotationContainer.select(".annotation-line-container"), "line", Axis.ANNOTATION_LINE_CLASS)
       .attrs({
         x1: isHorizontal ? positionF : secondaryPosition,
@@ -377,7 +377,7 @@ export class Axis<D> extends Component {
         r: 3,
       });
 
-    let rectangleOffsetF = (d: D) => {
+    const rectangleOffsetF = (d: D) => {
       switch (this.orientation()) {
         case "bottom":
         case "right":
@@ -396,14 +396,14 @@ export class Axis<D> extends Component {
         visibility: visibilityF,
       });
 
-    let annotationWriter = this._annotationWriter;
-    let annotationFormatter = this.annotationFormatter();
-    let annotationLabels = bindElements(this._annotationContainer.select(".annotation-label-container"), "g", Axis.ANNOTATION_LABEL_CLASS);
+    const annotationWriter = this._annotationWriter;
+    const annotationFormatter = this.annotationFormatter();
+    const annotationLabels = bindElements(this._annotationContainer.select(".annotation-label-container"), "g", Axis.ANNOTATION_LABEL_CLASS);
     annotationLabels.selectAll(".text-container").remove();
     annotationLabels.attrs({
       transform: (d) => {
-        let xTranslate = isHorizontal ? positionF(d) : rectangleOffsetF(d);
-        let yTranslate = isHorizontal ? rectangleOffsetF(d) : positionF(d);
+        const xTranslate = isHorizontal ? positionF(d) : rectangleOffsetF(d);
+        const yTranslate = isHorizontal ? rectangleOffsetF(d) : positionF(d);
         return `translate(${xTranslate},${yTranslate})`;
       },
       visibility: visibilityF,
@@ -422,7 +422,7 @@ export class Axis<D> extends Component {
   }
 
   private _annotatedTicksToRender() {
-    let scaleRange = this._scale.range();
+    const scaleRange = this._scale.range();
     return Utils.Array.uniq(this.annotatedTicks().filter((tick) => {
       if (tick == null) {
         return false;
@@ -437,8 +437,8 @@ export class Axis<D> extends Component {
    * The core pieces include the labels, the end tick marks, the inner tick marks, and the tick label padding.
    */
   protected _coreSize() {
-    let relevantDimension = this.isHorizontal() ? this.height() : this.width();
-    let axisHeightWithoutMargin = this.isHorizontal() ? this._computeHeight() : this._computeWidth();
+    const relevantDimension = this.isHorizontal() ? this.height() : this.width();
+    const axisHeightWithoutMargin = this.isHorizontal() ? this._computeHeight() : this._computeWidth();
     return Math.min(axisHeightWithoutMargin, relevantDimension);
   }
 
@@ -447,19 +447,19 @@ export class Axis<D> extends Component {
   }
 
   private _annotationToTier(measurements: Utils.Map<D, Typesetter.IDimensions>) {
-    let annotationTiers: D[][] = [[]];
-    let annotationToTier = new Utils.Map<D, number>();
-    let dimension = this.isHorizontal() ? this.width() : this.height();
+    const annotationTiers: D[][] = [[]];
+    const annotationToTier = new Utils.Map<D, number>();
+    const dimension = this.isHorizontal() ? this.width() : this.height();
     this._annotatedTicksToRender().forEach((annotatedTick) => {
-      let position = this._scale.scale(annotatedTick);
-      let length = measurements.get(annotatedTick).width;
+      const position = this._scale.scale(annotatedTick);
+      const length = measurements.get(annotatedTick).width;
       if (position < 0 || position + length > dimension) {
         annotationToTier.set(annotatedTick, -1);
         return;
       }
-      let tierHasCollision = (testTier: number) => annotationTiers[testTier].some((testTick) => {
-        let testPosition = this._scale.scale(testTick);
-        let testLength = measurements.get(testTick).width;
+      const tierHasCollision = (testTier: number) => annotationTiers[testTier].some((testTick) => {
+        const testPosition = this._scale.scale(testTick);
+        const testLength = measurements.get(testTick).width;
         return position + length >= testPosition && position <= testPosition + testLength;
       });
       let tier = 0;
@@ -483,7 +483,7 @@ export class Axis<D> extends Component {
   }
 
   protected _generateBaselineAttrHash() {
-    let baselineAttrHash: { [key: string]: number } = {
+    const baselineAttrHash: { [key: string]: number } = {
       x1: 0,
       y1: 0,
       x2: 0,
@@ -516,14 +516,14 @@ export class Axis<D> extends Component {
   }
 
   protected _generateTickMarkAttrHash(isEndTickMark = false) {
-    let tickMarkAttrHash: { [key: string]: number | ((d: any) => number) } = {
+    const tickMarkAttrHash: { [key: string]: number | ((d: any) => number) } = {
       x1: 0,
       y1: 0,
       x2: 0,
       y2: 0,
     };
 
-    let scalingFunction = (d: any) => this._scale.scale(d);
+    const scalingFunction = (d: any) => this._scale.scale(d);
     if (this.isHorizontal()) {
       tickMarkAttrHash["x1"] = scalingFunction;
       tickMarkAttrHash["x2"] = scalingFunction;
@@ -532,7 +532,7 @@ export class Axis<D> extends Component {
       tickMarkAttrHash["y2"] = scalingFunction;
     }
 
-    let tickLength = isEndTickMark ? this._endTickLength : this._innerTickLength;
+    const tickLength = isEndTickMark ? this._endTickLength : this._innerTickLength;
 
     switch (this._orientation) {
       case "bottom":
@@ -744,7 +744,7 @@ export class Axis<D> extends Component {
       return this._orientation;
     } else {
       // ensure backwards compatibility for older versions that supply orientation in different cases
-      let newOrientationLC = orientation.toLowerCase() as AxisOrientation;
+      const newOrientationLC = orientation.toLowerCase() as AxisOrientation;
       if (newOrientationLC !== "top" &&
         newOrientationLC !== "bottom" &&
         newOrientationLC !== "left" &&
@@ -796,8 +796,8 @@ export class Axis<D> extends Component {
    * container.
    */
   protected _hideOverflowingTickLabels() {
-    let boundingBox = (<Element> this._boundingBox.node()).getBoundingClientRect();
-    let tickLabels = this._tickLabelContainer.selectAll<SVGGElement, any>("." + Axis.TICK_LABEL_CLASS);
+    const boundingBox = (<Element> this._boundingBox.node()).getBoundingClientRect();
+    const tickLabels = this._tickLabelContainer.selectAll<SVGGElement, any>("." + Axis.TICK_LABEL_CLASS);
     if (tickLabels.empty()) {
       return;
     }
@@ -812,15 +812,15 @@ export class Axis<D> extends Component {
    * Hides the Tick Marks which have no corresponding Tick Labels
    */
   protected _hideTickMarksWithoutLabel() {
-    let visibleTickMarks = this._tickMarkContainer.selectAll<SVGLineElement, D>("." + Axis.TICK_MARK_CLASS);
-    let visibleTickLabels = this._tickLabelContainer
+    const visibleTickMarks = this._tickMarkContainer.selectAll<SVGLineElement, D>("." + Axis.TICK_MARK_CLASS);
+    const visibleTickLabels = this._tickLabelContainer
       .selectAll<SVGGElement, D>("." + Axis.TICK_LABEL_CLASS)
       .filter(function (d: any, i: number) {
-        let visibility = d3.select(this).style("visibility");
+        const visibility = d3.select(this).style("visibility");
         return (visibility === "inherit") || (visibility === "visible");
       });
 
-    let labelNumbersShown = visibleTickLabels.data();
+    const labelNumbersShown = visibleTickLabels.data();
 
     visibleTickMarks.each(function (e, i) {
       if (labelNumbersShown.indexOf(e) === -1) {

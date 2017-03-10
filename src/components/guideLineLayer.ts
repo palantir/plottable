@@ -130,7 +130,7 @@ export class GuideLineLayer<D> extends Component {
     if (scale == null) {
       return this._scale;
     }
-    let previousScale = this._scale;
+    const previousScale = this._scale;
     if (previousScale != null) {
       previousScale.offUpdate(this._scaleUpdateCallback);
     }

@@ -7,7 +7,7 @@ import * as d3 from "d3";
 
 import { Range, SimpleSelection } from "../core/interfaces";
 
-let nativeMath: Math = (<any>window).Math;
+const nativeMath: Math = (<any>window).Math;
 
 /**
  * Returns whether the child is in fact a child of the parent
@@ -68,7 +68,7 @@ export function elementWidth(elementOrSelection: Element | d3.Selection<Element,
   const element = elementOrSelection instanceof d3.selection
     ? (elementOrSelection as d3.Selection<HTMLElement, any, any, any>).node()
     : (elementOrSelection as Element);
-  let style = window.getComputedStyle(element);
+  const style = window.getComputedStyle(element);
   return _parseStyleValue(style, "width")
     + _parseStyleValue(style, "padding-left")
     + _parseStyleValue(style, "padding-right")
@@ -87,7 +87,7 @@ export function elementHeight(elementOrSelection: Element | d3.Selection<Element
   const element = elementOrSelection instanceof d3.selection
     ? (elementOrSelection as d3.Selection<HTMLElement, any, any, any>).node()
     : (elementOrSelection as Element);
-  let style = window.getComputedStyle(element);
+  const style = window.getComputedStyle(element);
   return _parseStyleValue(style, "height")
     + _parseStyleValue(style, "padding-top")
     + _parseStyleValue(style, "padding-bottom")
@@ -209,8 +209,8 @@ export function intersectsBBox(xValOrRange: number | Range,
                                yValOrRange: number | Range,
                                bbox: SVGRect,
                                tolerance = 0.5) {
-  let xRange = _parseRange(xValOrRange);
-  let yRange = _parseRange(yValOrRange);
+  const xRange = _parseRange(xValOrRange);
+  const yRange = _parseRange(yValOrRange);
 
   // SVGRects are positioned with sub-pixel accuracy (the default unit
   // for the x, y, height & width attributes), but user selections (e.g. via
@@ -231,11 +231,11 @@ export function intersectsBBox(xValOrRange: number | Range,
  */
 function _parseRange(input: number | Range): Range {
   if (typeof (input) === "number") {
-    let value = <number>input;
+    const value = <number>input;
     return { min: value, max: value };
   }
 
-  let range = <Range>input;
+  const range = <Range>input;
   if (range instanceof Object && "min" in range && "max" in range) {
     return range;
   }
@@ -244,7 +244,7 @@ function _parseRange(input: number | Range): Range {
 }
 
 function _parseStyleValue(style: CSSStyleDeclaration, property: string): number {
-  let value = style.getPropertyValue(property);
-  let parsedValue = parseFloat(value);
+  const value = style.getPropertyValue(property);
+  const parsedValue = parseFloat(value);
   return parsedValue || 0;
 }

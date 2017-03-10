@@ -49,16 +49,16 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
   }
 
   protected _generateAttrToProjector() {
-    let attrToProjector = super._generateAttrToProjector();
+    const attrToProjector = super._generateAttrToProjector();
 
     // Copy each of the different projectors.
-    let xAttr = Plot._scaledAccessor(this.x());
-    let x2Attr = attrToProjector[Rectangle._X2_KEY];
-    let yAttr = Plot._scaledAccessor(this.y());
-    let y2Attr = attrToProjector[Rectangle._Y2_KEY];
+    const xAttr = Plot._scaledAccessor(this.x());
+    const x2Attr = attrToProjector[Rectangle._X2_KEY];
+    const yAttr = Plot._scaledAccessor(this.y());
+    const y2Attr = attrToProjector[Rectangle._Y2_KEY];
 
-    let xScale = this.x().scale;
-    let yScale = this.y().scale;
+    const xScale = this.x().scale;
+    const yScale = this.y().scale;
 
     if (x2Attr != null) {
       attrToProjector["width"] = (d, i, dataset) => Math.abs(x2Attr(d, i, dataset) - xAttr(d, i, dataset));
@@ -139,8 +139,8 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
     }
 
     if (xScale != null) {
-      let x2Binding = this.x2();
-      let x2 = x2Binding && x2Binding.accessor;
+      const x2Binding = this.x2();
+      const x2 = x2Binding && x2Binding.accessor;
       if (x2 != null) {
         this._bindProperty(Rectangle._X2_KEY, x2, xScale);
       }
@@ -171,8 +171,8 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
       return this._propertyBindings.get(Rectangle._X2_KEY);
     }
 
-    let xBinding = this.x();
-    let xScale = xBinding && xBinding.scale;
+    const xBinding = this.x();
+    const xScale = xBinding && xBinding.scale;
     this._bindProperty(Rectangle._X2_KEY, x2, xScale);
 
     this.render();
@@ -211,8 +211,8 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
     }
 
     if (yScale != null) {
-      let y2Binding = this.y2();
-      let y2 = y2Binding && y2Binding.accessor;
+      const y2Binding = this.y2();
+      const y2 = y2Binding && y2Binding.accessor;
       if (y2 != null) {
         this._bindProperty(Rectangle._Y2_KEY, y2, yScale);
       }
@@ -243,8 +243,8 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
       return this._propertyBindings.get(Rectangle._Y2_KEY);
     }
 
-    let yBinding = this.y();
-    let yScale = yBinding && yBinding.scale;
+    const yBinding = this.y();
+    const yScale = yBinding && yBinding.scale;
     this._bindProperty(Rectangle._Y2_KEY, y2, yScale);
 
     this.render();
@@ -258,15 +258,15 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
    * @returns {PlotEntity[]} The PlotEntities at the particular point
    */
   public entitiesAt(point: Point) {
-    let attrToProjector = this._generateAttrToProjector();
+    const attrToProjector = this._generateAttrToProjector();
     return this.entities().filter((entity) => {
-      let datum = entity.datum;
-      let index = entity.index;
-      let dataset = entity.dataset;
-      let x = attrToProjector["x"](datum, index, dataset);
-      let y = attrToProjector["y"](datum, index, dataset);
-      let width = attrToProjector["width"](datum, index, dataset);
-      let height = attrToProjector["height"](datum, index, dataset);
+      const datum = entity.datum;
+      const index = entity.index;
+      const dataset = entity.dataset;
+      const x = attrToProjector["x"](datum, index, dataset);
+      const y = attrToProjector["y"](datum, index, dataset);
+      const width = attrToProjector["width"](datum, index, dataset);
+      const height = attrToProjector["height"](datum, index, dataset);
       return x <= point.x && point.x <= x + width && y <= point.y && point.y <= y + height;
     });
   }
@@ -290,7 +290,7 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
     let dataXRange: Range;
     let dataYRange: Range;
     if (yRange == null) {
-      let bounds = (<Bounds> xRangeOrBounds);
+      const bounds = (<Bounds> xRangeOrBounds);
       dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
       dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
     } else {
@@ -310,8 +310,8 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
   }
 
   private _entitiesIntersecting(xValOrRange: number | Range, yValOrRange: number | Range): PlotEntity[] {
-    let intersected: PlotEntity[] = [];
-    let attrToProjector = this._generateAttrToProjector();
+    const intersected: PlotEntity[] = [];
+    const attrToProjector = this._generateAttrToProjector();
     this.entities().forEach((entity) => {
       if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange,
           this._entityBBox(entity.datum, entity.index, entity.dataset, attrToProjector))) {
@@ -369,7 +369,7 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
   }
 
   protected _propertyProjectors(): AttributeToProjector {
-    let attrToProjector = super._propertyProjectors();
+    const attrToProjector = super._propertyProjectors();
     if (this.x2() != null) {
       attrToProjector["x2"] = Plot._scaledAccessor(this.x2());
     }
@@ -380,13 +380,13 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
   }
 
   protected _pixelPoint(datum: any, index: number, dataset: Dataset) {
-    let attrToProjector = this._generateAttrToProjector();
-    let rectX = attrToProjector["x"](datum, index, dataset);
-    let rectY = attrToProjector["y"](datum, index, dataset);
-    let rectWidth = attrToProjector["width"](datum, index, dataset);
-    let rectHeight = attrToProjector["height"](datum, index, dataset);
-    let x = rectX + rectWidth / 2;
-    let y = rectY + rectHeight / 2;
+    const attrToProjector = this._generateAttrToProjector();
+    const rectX = attrToProjector["x"](datum, index, dataset);
+    const rectY = attrToProjector["y"](datum, index, dataset);
+    const rectWidth = attrToProjector["width"](datum, index, dataset);
+    const rectHeight = attrToProjector["height"](datum, index, dataset);
+    const x = rectX + rectWidth / 2;
+    const y = rectY + rectHeight / 2;
     return { x: x, y: y };
   }
 
@@ -394,24 +394,24 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
     if (scale instanceof Scales.Category) {
       return (<Scales.Category> scale).rangeBand();
     } else {
-      let accessor = scale === this.x().scale ? this.x().accessor : this.y().accessor;
-      let accessorData = d3.set(Utils.Array.flatten(this.datasets().map((dataset) => {
+      const accessor = scale === this.x().scale ? this.x().accessor : this.y().accessor;
+      const accessorData = d3.set(Utils.Array.flatten(this.datasets().map((dataset) => {
         return dataset.data().map((d, i) => accessor(d, i, dataset).valueOf());
       }))).values().map((value) => +value);
       // Get the absolute difference between min and max
-      let min = Utils.Math.min(accessorData, 0);
-      let max = Utils.Math.max(accessorData, 0);
-      let scaledMin = scale.scale(min);
-      let scaledMax = scale.scale(max);
+      const min = Utils.Math.min(accessorData, 0);
+      const max = Utils.Math.max(accessorData, 0);
+      const scaledMin = scale.scale(min);
+      const scaledMax = scale.scale(max);
       return (scaledMax - scaledMin) / Math.abs(max - min);
     }
   }
 
   protected _getDataToDraw(): Utils.Map<Dataset, any[]> {
-    let dataToDraw = new Utils.Map<Dataset, any[]>();
-    let attrToProjector = this._generateAttrToProjector();
+    const dataToDraw = new Utils.Map<Dataset, any[]>();
+    const attrToProjector = this._generateAttrToProjector();
     this.datasets().forEach((dataset) => {
-      let data = dataset.data().filter((d, i) => Utils.Math.isValidNumber(attrToProjector["x"](d, i, dataset)) &&
+      const data = dataset.data().filter((d, i) => Utils.Math.isValidNumber(attrToProjector["x"](d, i, dataset)) &&
       Utils.Math.isValidNumber(attrToProjector["y"](d, i, dataset)) &&
       Utils.Math.isValidNumber(attrToProjector["width"](d, i, dataset)) &&
       Utils.Math.isValidNumber(attrToProjector["height"](d, i, dataset)));
@@ -428,7 +428,7 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
   }
 
   private _drawLabels() {
-    let dataToDraw = this._getDataToDraw();
+    const dataToDraw = this._getDataToDraw();
     this.datasets().forEach((dataset, i) => this._drawLabel(dataToDraw, dataset, i));
   }
 
@@ -447,22 +447,22 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
     const yMax = Math.max.apply(null, yRange);
     const data = dataToDraw.get(dataset);
     data.forEach((datum, datumIndex) => {
-      let label = "" + this.label()(datum, datumIndex, dataset);
-      let measurement = measurer.measure(label);
+      const label = "" + this.label()(datum, datumIndex, dataset);
+      const measurement = measurer.measure(label);
 
       let x = attrToProjector["x"](datum, datumIndex, dataset);
       let y = attrToProjector["y"](datum, datumIndex, dataset);
-      let width = attrToProjector["width"](datum, datumIndex, dataset);
-      let height = attrToProjector["height"](datum, datumIndex, dataset);
+      const width = attrToProjector["width"](datum, datumIndex, dataset);
+      const height = attrToProjector["height"](datum, datumIndex, dataset);
       if (measurement.height <= height && measurement.width <= width) {
 
-        let horizontalOffset = (width - measurement.width) / 2;
-        let verticalOffset = (height - measurement.height) / 2;
+        const horizontalOffset = (width - measurement.width) / 2;
+        const verticalOffset = (height - measurement.height) / 2;
         x += horizontalOffset;
         y += verticalOffset;
 
-        let xLabelRange = { min: x, max: x + measurement.width };
-        let yLabelRange = { min: y, max: y + measurement.height };
+        const xLabelRange = { min: x, max: x + measurement.width };
+        const yLabelRange = { min: y, max: y + measurement.height };
         if (xLabelRange.min < xMin || xLabelRange.max > xMax || yLabelRange.min < yMin || yLabelRange.max > yMax) {
           return;
         }
@@ -470,10 +470,10 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
           return;
         }
 
-        let color = attrToProjector["fill"](datum, datumIndex, dataset);
-        let dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
-        let g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
-        let className = dark ? "dark-label" : "light-label";
+        const color = attrToProjector["fill"](datum, datumIndex, dataset);
+        const dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
+        const g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
+        const className = dark ? "dark-label" : "light-label";
         g.classed(className, true);
 
         writer.write(label, measurement.width, measurement.height, {
@@ -486,11 +486,11 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
 
   private _overlayLabel(labelXRange: Range, labelYRange: Range, datumIndex: number, datasetIndex: number,
                         dataToDraw: Utils.Map<Dataset, any[]>) {
-    let attrToProjector = this._generateAttrToProjector();
-    let datasets = this.datasets();
+    const attrToProjector = this._generateAttrToProjector();
+    const datasets = this.datasets();
     for (let i = datasetIndex; i < datasets.length; i++) {
-      let dataset = datasets[i];
-      let data = dataToDraw.get(dataset);
+      const dataset = datasets[i];
+      const data = dataToDraw.get(dataset);
       for (let j = (i === datasetIndex ? datumIndex + 1 : 0); j < data.length; j++) {
         if (Utils.DOM.intersectsBBox(labelXRange, labelYRange, this._entityBBox(data[j], j, dataset, attrToProjector))) {
           return true;

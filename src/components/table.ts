@@ -124,7 +124,7 @@ export class Table extends ComponentContainer {
     }
 
     if (!this.has(component)) {
-      let currentComponent = this._rows[row] && this._rows[row][col];
+      const currentComponent = this._rows[row] && this._rows[row][col];
       if (currentComponent != null) {
         throw new Error("cell is occupied");
       }
@@ -174,18 +174,18 @@ export class Table extends ComponentContainer {
      * circumstances this will happen or if it will happen at all. A message will be printed to the console if this occurs.
      *
      */
-    let rows = this._rows;
-    let cols = d3.transpose(this._rows);
-    let availableWidthAfterPadding = availableWidth - this._columnPadding * (this._nCols - 1);
-    let availableHeightAfterPadding = availableHeight - this._rowPadding * (this._nRows - 1);
+    const rows = this._rows;
+    const cols = d3.transpose(this._rows);
+    const availableWidthAfterPadding = availableWidth - this._columnPadding * (this._nCols - 1);
+    const availableHeightAfterPadding = availableHeight - this._rowPadding * (this._nRows - 1);
 
-    let rowWeights = Table._calcComponentWeights(this._rowWeights, rows, (c: Component) => (c == null) || c.fixedHeight());
-    let colWeights = Table._calcComponentWeights(this._columnWeights, cols, (c: Component) => (c == null) || c.fixedWidth());
+    const rowWeights = Table._calcComponentWeights(this._rowWeights, rows, (c: Component) => (c == null) || c.fixedHeight());
+    const colWeights = Table._calcComponentWeights(this._columnWeights, cols, (c: Component) => (c == null) || c.fixedWidth());
 
     // To give the table a good starting position to iterate from, we give the fixed-width components half-weight
     // so that they will get some initial space allocated to work with
-    let heuristicColWeights = colWeights.map((c) => c === 0 ? 0.5 : c);
-    let heuristicRowWeights = rowWeights.map((c) => c === 0 ? 0.5 : c);
+    const heuristicColWeights = colWeights.map((c) => c === 0 ? 0.5 : c);
+    const heuristicRowWeights = rowWeights.map((c) => c === 0 ? 0.5 : c);
 
     let colProportionalSpace = Table._calcProportionalSpace(heuristicColWeights, availableWidthAfterPadding);
     let rowProportionalSpace = Table._calcProportionalSpace(heuristicRowWeights, availableHeightAfterPadding);
@@ -202,16 +202,16 @@ export class Table extends ComponentContainer {
     let wantsWidth: boolean;
     let wantsHeight: boolean;
     while (true) {
-      let offeredHeights = Utils.Array.add(guaranteedHeights, rowProportionalSpace);
-      let offeredWidths = Utils.Array.add(guaranteedWidths, colProportionalSpace);
+      const offeredHeights = Utils.Array.add(guaranteedHeights, rowProportionalSpace);
+      const offeredWidths = Utils.Array.add(guaranteedWidths, colProportionalSpace);
       guarantees = this._determineGuarantees(offeredWidths, offeredHeights, isFinalOffer);
       guaranteedWidths = guarantees.guaranteedWidths;
       guaranteedHeights = guarantees.guaranteedHeights;
       wantsWidth = guarantees.wantsWidthArr .some((x: boolean) => x);
       wantsHeight = guarantees.wantsHeightArr.some((x: boolean) => x);
 
-      let lastFreeWidth = freeWidth;
-      let lastFreeHeight = freeHeight;
+      const lastFreeWidth = freeWidth;
+      const lastFreeHeight = freeHeight;
       freeWidth = availableWidthAfterPadding - d3.sum(guarantees.guaranteedWidths);
       freeHeight = availableHeightAfterPadding - d3.sum(guarantees.guaranteedHeights);
       let xWeights: number[];
@@ -234,8 +234,8 @@ export class Table extends ComponentContainer {
       rowProportionalSpace = Table._calcProportionalSpace(yWeights, freeHeight);
       nIterations++;
 
-      let canImproveWidthAllocation = freeWidth > 0 && freeWidth !== lastFreeWidth;
-      let canImproveHeightAllocation = freeHeight > 0 && freeHeight !== lastFreeHeight;
+      const canImproveWidthAllocation = freeWidth > 0 && freeWidth !== lastFreeWidth;
+      const canImproveHeightAllocation = freeHeight > 0 && freeHeight !== lastFreeHeight;
 
       if (!(canImproveWidthAllocation || canImproveHeightAllocation)) {
         break;
@@ -263,10 +263,10 @@ export class Table extends ComponentContainer {
   }
 
   private _determineGuarantees(offeredWidths: number[], offeredHeights: number[], isFinalOffer = false): _LayoutAllocation {
-    let requestedWidths = Utils.Array.createFilledArray(0, this._nCols);
-    let requestedHeights = Utils.Array.createFilledArray(0, this._nRows);
-    let columnNeedsWidth = Utils.Array.createFilledArray(false, this._nCols);
-    let rowNeedsHeight = Utils.Array.createFilledArray(false, this._nRows);
+    const requestedWidths = Utils.Array.createFilledArray(0, this._nCols);
+    const requestedHeights = Utils.Array.createFilledArray(0, this._nRows);
+    const columnNeedsWidth = Utils.Array.createFilledArray(false, this._nCols);
+    const rowNeedsHeight = Utils.Array.createFilledArray(false, this._nRows);
 
     this._rows.forEach((row: Component[], rowIndex: number) => {
       row.forEach((component: Component, colIndex: number) => {
@@ -280,16 +280,16 @@ export class Table extends ComponentContainer {
           };
         }
 
-        let columnWidth = isFinalOffer ? Math.min(spaceRequest.minWidth, offeredWidths[colIndex]) : spaceRequest.minWidth;
+        const columnWidth = isFinalOffer ? Math.min(spaceRequest.minWidth, offeredWidths[colIndex]) : spaceRequest.minWidth;
         requestedWidths[colIndex] = Math.max(requestedWidths[colIndex], columnWidth);
 
-        let rowHeight = isFinalOffer ? Math.min(spaceRequest.minHeight, offeredHeights[rowIndex]) : spaceRequest.minHeight;
+        const rowHeight = isFinalOffer ? Math.min(spaceRequest.minHeight, offeredHeights[rowIndex]) : spaceRequest.minHeight;
         requestedHeights[rowIndex] = Math.max(requestedHeights[rowIndex], rowHeight);
 
-        let componentNeedsWidth = spaceRequest.minWidth > offeredWidths[colIndex];
+        const componentNeedsWidth = spaceRequest.minWidth > offeredWidths[colIndex];
         columnNeedsWidth[colIndex] = columnNeedsWidth[colIndex] || componentNeedsWidth;
 
-        let componentNeedsHeight = spaceRequest.minHeight > offeredHeights[rowIndex];
+        const componentNeedsHeight = spaceRequest.minHeight > offeredHeights[rowIndex];
         rowNeedsHeight[rowIndex] = rowNeedsHeight[rowIndex] || componentNeedsHeight;
       });
     });
@@ -312,16 +312,16 @@ export class Table extends ComponentContainer {
 
   public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
     super.computeLayout(origin, availableWidth, availableHeight);
-    let lastLayoutWidth = d3.sum(this._calculatedLayout.guaranteedWidths);
-    let lastLayoutHeight = d3.sum(this._calculatedLayout.guaranteedHeights);
+    const lastLayoutWidth = d3.sum(this._calculatedLayout.guaranteedWidths);
+    const lastLayoutHeight = d3.sum(this._calculatedLayout.guaranteedHeights);
     let layout = this._calculatedLayout;
     if (lastLayoutWidth > this.width() || lastLayoutHeight > this.height()) {
       layout = this._iterateLayout(this.width(), this.height(), true);
     }
 
     let childYOrigin = 0;
-    let rowHeights = Utils.Array.add(layout.rowProportionalSpace, layout.guaranteedHeights);
-    let colWidths = Utils.Array.add(layout.colProportionalSpace, layout.guaranteedWidths);
+    const rowHeights = Utils.Array.add(layout.rowProportionalSpace, layout.guaranteedHeights);
+    const colWidths = Utils.Array.add(layout.colProportionalSpace, layout.guaranteedWidths);
     this._rows.forEach((row: Component[], rowIndex: number) => {
       let childXOrigin = 0;
       row.forEach((component: Component, colIndex: number) => {
@@ -456,7 +456,7 @@ export class Table extends ComponentContainer {
   }
 
   public fixedWidth(): boolean {
-    let cols = d3.transpose(this._rows);
+    const cols = d3.transpose(this._rows);
     return Table._fixedSpace(cols, (c: Component) => (c == null) || c.fixedWidth());
   }
 
@@ -493,14 +493,14 @@ export class Table extends ComponentContainer {
       if (w != null) {
         return w;
       }
-      let fixities = componentGroups[i].map(fixityAccessor);
-      let allFixed = fixities.reduce((a, b) => a && b, true);
+      const fixities = componentGroups[i].map(fixityAccessor);
+      const allFixed = fixities.reduce((a, b) => a && b, true);
       return allFixed ? 0 : 1;
     });
   }
 
   private static _calcProportionalSpace(weights: number[], freeSpace: number): number[] {
-    let weightSum = d3.sum(weights);
+    const weightSum = d3.sum(weights);
     if (weightSum === 0) {
       return Utils.Array.createFilledArray(0, weights.length);
     } else {
@@ -509,8 +509,8 @@ export class Table extends ComponentContainer {
   }
 
   private static _fixedSpace(componentGroup: Component[][], fixityAccessor: (c: Component) => boolean) {
-    let all = (bools: boolean[]) => bools.reduce((a, b) => a && b, true);
-    let groupIsFixed = (components: Component[]) => all(components.map(fixityAccessor));
+    const all = (bools: boolean[]) => bools.reduce((a, b) => a && b, true);
+    const groupIsFixed = (components: Component[]) => all(components.map(fixityAccessor));
     return all(componentGroup.map(groupIsFixed));
   }
 }

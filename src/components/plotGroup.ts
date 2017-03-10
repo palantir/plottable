@@ -18,7 +18,7 @@ export class PlotGroup extends Group {
     this.components().forEach((plotComponent: Component) => {
       // we know it's a Plot since .append() throws a runtime error otherwise
       const plot: Plot = <Plot> <any> plotComponent;
-      let candidatePlotEntity = plot.entityNearest(point);
+      const candidatePlotEntity = plot.entityNearest(point);
       if (candidatePlotEntity == null) {
         return;
       }
