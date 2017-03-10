@@ -92,7 +92,7 @@ class LegendRow {
       bottomRight: {
         x: columnXOffset + column.width,
         y: column.height,
-      }
+      },
     };
   }
 
@@ -111,7 +111,7 @@ class LegendRow {
   public getWidth() {
     return Math.min(
       this.columns.reduce((sum, { width }) => sum + width, 0),
-      this.maxWidth
+      this.maxWidth,
     );
   }
 
@@ -181,7 +181,7 @@ class LegendTable {
       bottomRight: {
         x: rowXOffset + this.rows[rowIndex].getWidth(),
         y: rowYOffset + this.rows[rowIndex].getHeight(),
-      }
+      },
     };
 
     return rowBounds;
@@ -195,7 +195,7 @@ class LegendTable {
   public getHeight() {
     return Math.min(
       this.rows.reduce((sum, row) => sum + row.getHeight(), 0) + this.padding * 2,
-      this.maxHeight
+      this.maxHeight,
     );
   }
 
@@ -207,7 +207,7 @@ class LegendTable {
   public getWidth() {
     return Math.min(
       Utils.Math.max(this.rows.map((row) => row.getWidth()), 0) + this.padding * 2,
-      this.maxWidth
+      this.maxWidth,
     );
   }
 }
@@ -485,12 +485,12 @@ export class Legend extends Component {
     // if max width is not set, the table will be as wide as the longest untruncated row
     const table = this._buildLegendTable(
       Utils.Math.min([this.maxWidth(), offeredWidth], offeredWidth),
-      offeredHeight
+      offeredHeight,
     );
 
     return {
       minHeight: table.getHeight(),
-      minWidth: table.getWidth()
+      minWidth: table.getWidth(),
     };
   }
 
@@ -541,7 +541,7 @@ export class Legend extends Component {
             datum: column.data.name,
             position: {
               x: rowTranslate[0] + symbolTranslate[0],
-              y: rowTranslate[1] + symbolTranslate[1]
+              y: rowTranslate[1] + symbolTranslate[1],
             },
             selection: d3.select(entryElement),
             component: this,

@@ -1214,7 +1214,7 @@ var Component = (function () {
             topLeft: topLeft,
             bottomRight: {
                 x: topLeft.x + this.width(),
-                y: topLeft.y + this.height()
+                y: topLeft.y + this.height(),
             },
         };
     };
@@ -2995,7 +2995,7 @@ var Axis = (function (_super) {
             var measurement = _this._annotationMeasurer.measure(_this.annotationFormatter()(annotatedTick));
             var paddedMeasurement = {
                 width: measurement.width + 2 * labelPadding,
-                height: measurement.height + 2 * labelPadding
+                height: measurement.height + 2 * labelPadding,
             };
             measurements.set(annotatedTick, paddedMeasurement);
         });
@@ -4042,7 +4042,7 @@ var Bar = (function (_super) {
         }
         drawSteps.push({
             attrToProjector: this._generateAttrToProjector(),
-            animator: this._getAnimator(Plots.Animator.MAIN)
+            animator: this._getAnimator(Plots.Animator.MAIN),
         });
         return drawSteps;
     };
@@ -6347,7 +6347,7 @@ var Area = (function (_super) {
         }
         drawSteps.push({
             attrToProjector: this._generateLineAttrToProjector(),
-            animator: this._getAnimator(Plots.Animator.MAIN)
+            animator: this._getAnimator(Plots.Animator.MAIN),
         });
         return drawSteps;
     };
@@ -6368,7 +6368,7 @@ var Area = (function (_super) {
         }
         drawSteps.push({
             attrToProjector: this._generateAttrToProjector(),
-            animator: this._getAnimator(Plots.Animator.MAIN)
+            animator: this._getAnimator(Plots.Animator.MAIN),
         });
         return drawSteps;
     };
@@ -6707,7 +6707,7 @@ var Line = (function (_super) {
         }
         drawSteps.push({
             attrToProjector: this._generateAttrToProjector(),
-            animator: this._getAnimator(Plots.Animator.MAIN)
+            animator: this._getAnimator(Plots.Animator.MAIN),
         });
         return drawSteps;
     };
@@ -9528,7 +9528,7 @@ var LegendRow = (function () {
             bottomRight: {
                 x: columnXOffset + column.width,
                 y: column.height,
-            }
+            },
         };
     };
     /**
@@ -9615,7 +9615,7 @@ var LegendTable = (function () {
             bottomRight: {
                 x: rowXOffset + this.rows[rowIndex].getWidth(),
                 y: rowYOffset + this.rows[rowIndex].getHeight(),
-            }
+            },
         };
         return rowBounds;
     };
@@ -9793,7 +9793,7 @@ var Legend = (function (_super) {
         var table = this._buildLegendTable(Utils.Math.min([this.maxWidth(), offeredWidth], offeredWidth), offeredHeight);
         return {
             minHeight: table.getHeight(),
-            minWidth: table.getWidth()
+            minWidth: table.getWidth(),
         };
     };
     /**
@@ -9837,7 +9837,7 @@ var Legend = (function (_super) {
                             datum: column.data.name,
                             position: {
                                 x: rowTranslate[0] + symbolTranslate[0],
-                                y: rowTranslate[1] + symbolTranslate[1]
+                                y: rowTranslate[1] + symbolTranslate[1],
                             },
                             selection: d3.select(entryElement),
                             component: _this,
@@ -11747,7 +11747,7 @@ var PanZoom = (function (_super) {
         });
         var translateAmount = {
             x: centerX - ((constrainedPoints[0].x + constrainedPoints[1].x) / 2),
-            y: centerY - ((constrainedPoints[0].y + constrainedPoints[1].y) / 2)
+            y: centerY - ((constrainedPoints[0].y + constrainedPoints[1].y) / 2),
         };
         this.zoom(magnifyAmount, { x: centerX, y: centerY });
         this.pan(translateAmount);
@@ -11900,7 +11900,7 @@ var PanZoom = (function (_super) {
             }
             var translateAmount = {
                 x: (lastDragPoint == null ? startPoint.x : lastDragPoint.x) - endPoint.x,
-                y: (lastDragPoint == null ? startPoint.y : lastDragPoint.y) - endPoint.y
+                y: (lastDragPoint == null ? startPoint.y : lastDragPoint.y) - endPoint.y,
             };
             _this.pan(translateAmount);
             lastDragPoint = endPoint;
@@ -12689,7 +12689,7 @@ var Pie = (function (_super) {
         }
         return {
             x: wLeft + wRight == 0 ? 0 : (wLeft / (wLeft + wRight)) * this.width(),
-            y: hTop + hBottom == 0 ? 0 : (hTop / (hTop + hBottom)) * this.height()
+            y: hTop + hBottom == 0 ? 0 : (hTop / (hTop + hBottom)) * this.height(),
         };
     };
     Pie.prototype._getDataToDraw = function () {
@@ -13272,7 +13272,7 @@ var Scatter = (function (_super) {
         }
         drawSteps.push({
             attrToProjector: this._generateAttrToProjector(),
-            animator: this._getAnimator(Plots.Animator.MAIN)
+            animator: this._getAnimator(Plots.Animator.MAIN),
         });
         return drawSteps;
     };
@@ -15341,7 +15341,7 @@ function expandRect(rect, amount) {
         right: rect.right + amount,
         bottom: rect.bottom + amount,
         width: rect.width + amount * 2,
-        height: rect.height + amount * 2
+        height: rect.height + amount * 2,
     };
 }
 exports.expandRect = expandRect;

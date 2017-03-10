@@ -173,7 +173,7 @@ export function expandRect(rect: ClientRect, amount: number) {
     right: rect.right + amount,
     bottom: rect.bottom + amount,
     width: rect.width + amount * 2,
-    height: rect.height + amount * 2
+    height: rect.height + amount * 2,
   };
 }
 

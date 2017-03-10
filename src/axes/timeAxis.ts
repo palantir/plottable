@@ -62,7 +62,7 @@ export class Time extends Axis<Date> {
     [TimeInterval.day]: 3,
     [TimeInterval.week]: 4,
     [TimeInterval.month]: 5,
-    [TimeInterval.year]: 6
+    [TimeInterval.year]: 6,
   };
 
   private static _DEFAULT_TIME_AXIS_CONFIGURATIONS: TimeAxisConfiguration[] = [
@@ -426,7 +426,7 @@ export class Time extends Axis<Date> {
   protected _getTickValues() {
     return this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].reduce(
       (ticks: any[], config: TimeAxisTierConfiguration) => ticks.concat(this._getTickIntervalValues(config)),
-      []
+      [],
     );
   }
 
@@ -564,10 +564,10 @@ export class Time extends Axis<Date> {
     this._cleanTiers();
 
     tierConfigs.forEach((config: TimeAxisTierConfiguration, i: number) =>
-      this._renderTierLabels(this._tierLabelContainers[i], config, i)
+      this._renderTierLabels(this._tierLabelContainers[i], config, i),
     );
     const tierTicks = tierConfigs.map((config: TimeAxisTierConfiguration, i: number) =>
-      this._getTickValuesForConfiguration(config)
+      this._getTickValuesForConfiguration(config),
     );
 
     let baselineOffset = 0;

@@ -639,7 +639,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     }
     drawSteps.push({
       attrToProjector: this._generateAttrToProjector(),
-      animator: this._getAnimator(Plots.Animator.MAIN)
+      animator: this._getAnimator(Plots.Animator.MAIN),
     });
     return drawSteps;
   }

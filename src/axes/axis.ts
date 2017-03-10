@@ -303,7 +303,7 @@ export class Axis<D> extends Component {
       const measurement = this._annotationMeasurer.measure(this.annotationFormatter()(annotatedTick));
       const paddedMeasurement = {
         width: measurement.width + 2 * labelPadding,
-        height: measurement.height + 2 * labelPadding
+        height: measurement.height + 2 * labelPadding,
       };
       measurements.set(annotatedTick, paddedMeasurement);
     });

@@ -129,7 +129,7 @@ export class Area<X> extends Line<X> {
     }
     drawSteps.push({
       attrToProjector: this._generateLineAttrToProjector(),
-      animator: this._getAnimator(Plots.Animator.MAIN)
+      animator: this._getAnimator(Plots.Animator.MAIN),
     });
     return drawSteps;
   }
@@ -156,7 +156,7 @@ export class Area<X> extends Line<X> {
 
     drawSteps.push({
       attrToProjector: this._generateAttrToProjector(),
-      animator: this._getAnimator(Plots.Animator.MAIN)
+      animator: this._getAnimator(Plots.Animator.MAIN),
     });
 
     return drawSteps;

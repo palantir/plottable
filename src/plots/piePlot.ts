@@ -494,7 +494,7 @@ export class Pie extends Plot {
 
     return {
       x: wLeft + wRight == 0 ? 0 : (wLeft / (wLeft + wRight)) * this.width(),
-      y: hTop + hBottom == 0 ? 0 : (hTop / (hTop + hBottom)) * this.height()
+      y: hTop + hBottom == 0 ? 0 : (hTop / (hTop + hBottom)) * this.height(),
     }
   }
 

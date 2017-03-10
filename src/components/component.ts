@@ -596,7 +596,7 @@ export class Component {
       topLeft,
       bottomRight: {
         x: topLeft.x + this.width(),
-        y: topLeft.y + this.height()
+        y: topLeft.y + this.height(),
       },
     }
   }

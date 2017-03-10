@@ -222,7 +222,7 @@ export class PanZoom extends Interaction {
 
     const translateAmount = {
       x: centerX - ((constrainedPoints[0].x + constrainedPoints[1].x) / 2),
-      y: centerY - ((constrainedPoints[0].y + constrainedPoints[1].y) / 2)
+      y: centerY - ((constrainedPoints[0].y + constrainedPoints[1].y) / 2),
     };
 
     this.zoom(magnifyAmount, { x: centerX, y: centerY });
@@ -404,7 +404,7 @@ export class PanZoom extends Interaction {
 
       const translateAmount = {
         x: (lastDragPoint == null ? startPoint.x : lastDragPoint.x) - endPoint.x,
-        y: (lastDragPoint == null ? startPoint.y : lastDragPoint.y) - endPoint.y
+        y: (lastDragPoint == null ? startPoint.y : lastDragPoint.y) - endPoint.y,
       };
       this.pan(translateAmount);
 

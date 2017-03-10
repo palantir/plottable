@@ -24,7 +24,7 @@ type EdgeIntersections = {
   left: Point[],
   right: Point[],
   top: Point[],
-  bottom: Point[]
+  bottom: Point[],
 };
 
 const CURVE_NAME_MAPPING: { [name: string]: d3.CurveFactory | d3.CurveFactoryLineOnly } = {
@@ -368,7 +368,7 @@ export class Line<X> extends XYPlot<X, number> {
 
     drawSteps.push({
       attrToProjector: this._generateAttrToProjector(),
-      animator: this._getAnimator(Plots.Animator.MAIN)
+      animator: this._getAnimator(Plots.Animator.MAIN),
     });
 
     return drawSteps;
