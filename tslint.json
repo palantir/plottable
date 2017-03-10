@@ -4,6 +4,8 @@
     "no-unused-variable": true,
     "no-var-keyword": true,
     "prefer-const": true,
-    "trailing-comma": [true, { "multiline": "always", "singleline": "never" }]
+    "trailing-comma": [true, { "multiline": "always", "singleline": "never" }],
+    "no-inferrable-types": [true, "ignore-params", "ignore-properties"],
+    "no-string-throw": true
   }
 }
