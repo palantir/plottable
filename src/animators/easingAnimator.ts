@@ -12,7 +12,7 @@ import { Animator } from "./animator";
 
 export type EaseFn = (normalizedTime: number) => number;
 
-const EASE_NAME_MAPPING: { [name: string]: EaseFn } = {
+const EASE_NAME_MAPPING: { [P in EaseName]: EaseFn } = {
   linear: d3Ease.easeLinear,
   quad: d3Ease.easeQuad,
   quadIn: d3Ease.easeQuadIn,

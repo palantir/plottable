@@ -27,7 +27,7 @@ type EdgeIntersections = {
   bottom: Point[],
 };
 
-const CURVE_NAME_MAPPING: { [name: string]: d3.CurveFactory | d3.CurveFactoryLineOnly } = {
+const CURVE_NAME_MAPPING: { [P in CurveName]: d3.CurveFactory | d3.CurveFactoryLineOnly } = {
   linear: d3.curveLinear,
   linearClosed: d3.curveLinearClosed,
   step: d3.curveStep,
