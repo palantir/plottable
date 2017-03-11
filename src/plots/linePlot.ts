@@ -4,6 +4,7 @@
  */
 
 import * as d3 from "d3";
+import * as d3Shape from "d3-shape";
 
 import * as Animators from "../animators";
 import { Accessor, AttributeToProjector, Projector, Point, Bounds, Range } from "../core/interfaces";
@@ -223,7 +224,7 @@ export class Line<X> extends XYPlot<X, number> {
   }
 
   protected _createDrawer(dataset: Dataset): Drawer {
-    return new Drawers.Line(dataset, this.d3LineFactory);
+    return new Drawers.Line(dataset, this._d3LineFactory);
   }
 
   protected _extentsForProperty(property: string) {
@@ -471,14 +472,23 @@ export class Line<X> extends XYPlot<X, number> {
 
   protected _constructLineProjector(xProjector: Projector, yProjector: Projector) {
     return (datum: any, index: number, dataset: Dataset) => {
-      return this.d3LineFactory(dataset, xProjector, yProjector)(datum);
+      return this._d3LineFactory(dataset, xProjector, yProjector)(datum);
     };
   }
 
-  private d3LineFactory = (
+  /**
+   * Return a d3.Line whose .x, .y, and .defined accessors are hooked up to the xProjector and yProjector
+   * after they've been fed the dataset, and whose curve is configured to this plot's curve.
+   * @param dataset
+   * @param xProjector
+   * @param yProjector
+   * @returns {Line<[number,number]>}
+   * @private
+   */
+  protected _d3LineFactory = (
     dataset: Dataset,
     xProjector = Plot._scaledAccessor(this.x()),
-    yProjector = Plot._scaledAccessor(this.y())): d3.Line<any> => {
+    yProjector = Plot._scaledAccessor(this.y())): d3Shape.Line<any> => {
     const xScaledAccessor = Plot._scaledAccessor(this.x());
     const yScaledAccessor = Plot._scaledAccessor(this.x());
     const definedProjector = (d: any, i: number, dataset: Dataset) => {

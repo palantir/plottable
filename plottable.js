@@ -6322,7 +6322,7 @@ var Area = (function (_super) {
         return this;
     };
     Area.prototype._addDataset = function (dataset) {
-        var lineDrawer = new Drawers.Line(dataset, this);
+        var lineDrawer = new Drawers.Line(dataset, this._d3LineFactory);
         if (this._isSetup) {
             lineDrawer.renderArea(this._renderArea.append("g"));
         }
@@ -6505,7 +6505,16 @@ var Line = (function (_super) {
         this._autorangeSmooth = false;
         this._croppedRenderingEnabled = true;
         this._downsamplingEnabled = false;
-        this.d3LineFactory = function (dataset, xProjector, yProjector) {
+        /**
+         * Return a d3.Line whose .x, .y, and .defined accessors are hooked up to the xProjector and yProjector
+         * after they've been fed the dataset, and whose curve is configured to this plot's curve.
+         * @param dataset
+         * @param xProjector
+         * @param yProjector
+         * @returns {Line<[number,number]>}
+         * @private
+         */
+        this._d3LineFactory = function (dataset, xProjector, yProjector) {
             if (xProjector === void 0) { xProjector = plot_1.Plot._scaledAccessor(_this.x()); }
             if (yProjector === void 0) { yProjector = plot_1.Plot._scaledAccessor(_this.y()); }
             var xScaledAccessor = plot_1.Plot._scaledAccessor(_this.x());
@@ -6604,7 +6613,7 @@ var Line = (function (_super) {
         return this;
     };
     Line.prototype._createDrawer = function (dataset) {
-        return new Drawers.Line(dataset, this.d3LineFactory);
+        return new Drawers.Line(dataset, this._d3LineFactory);
     };
     Line.prototype._extentsForProperty = function (property) {
         var extents = _super.prototype._extentsForProperty.call(this, property);
@@ -6807,7 +6816,7 @@ var Line = (function (_super) {
     Line.prototype._constructLineProjector = function (xProjector, yProjector) {
         var _this = this;
         return function (datum, index, dataset) {
-            return _this.d3LineFactory(dataset, xProjector, yProjector)(datum);
+            return _this._d3LineFactory(dataset, xProjector, yProjector)(datum);
         };
     };
     Line.prototype._getCurveFactory = function () {
