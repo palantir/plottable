@@ -506,8 +506,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       const text = this._labelFormatter(valueAccessor(d, i, dataset));
       const measurement = measurer.measure(text);
 
-      let xAlignment = "center";
-      let yAlignment = "center";
+      let xAlignment: Typesetter.IXAlign = "center";
+      let yAlignment: Typesetter.IYAlign = "center";
       const labelContainerOrigin = {
         x: attrToProjector["x"](d, i, dataset),
         y: attrToProjector["y"](d, i, dataset),
@@ -610,8 +610,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       labelContainer.style("visibility", hideLabel ? "hidden" : "inherit");
 
       const writeOptions = {
-        xAlign: xAlignment as Typesetter.IXAlign,
-        yAlign: yAlignment as Typesetter.IYAlign,
+        xAlign: xAlignment,
+        yAlign: yAlignment,
       };
       writer.write(text, containerWidth, containerHeight, writeOptions, labelContainer.node());
 
