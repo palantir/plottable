@@ -150,13 +150,12 @@ var Plot = (function (_super) {
      * @constructor
      */
     function Plot() {
-        var _this = this;
-        _super.call(this);
+        var _this = _super.call(this) || this;
         /**
          * Whether the backing datasets have changed since this plot's last render.
          */
-        this._dataChanged = false;
-        this._animate = false;
+        _this._dataChanged = false;
+        _this._animate = false;
         /**
          * The Animators for this plot. Each plot exposes a set of "animator key" strings that
          * define how different parts of that particular Plot animates. For instance, Rectangle
@@ -168,20 +167,21 @@ var Plot = (function (_super) {
          * all the dots to size 0), and then they do the "main" animation into the correct visualization
          * (e.g. scatter plot dots grow to their specified size).
          */
-        this._animators = {};
-        this._overflowHidden = true;
-        this.addClass("plot");
-        this._datasetToDrawer = new Utils.Map();
-        this._attrBindings = d3.map();
-        this._attrExtents = d3.map();
-        this._includedValuesProvider = function (scale) { return _this._includedValuesForScale(scale); };
-        this._renderCallback = function (scale) { return _this.render(); };
-        this._onDatasetUpdateCallback = function () { return _this._onDatasetUpdate(); };
-        this._propertyBindings = d3.map();
-        this._propertyExtents = d3.map();
+        _this._animators = {};
+        _this._overflowHidden = true;
+        _this.addClass("plot");
+        _this._datasetToDrawer = new Utils.Map();
+        _this._attrBindings = d3.map();
+        _this._attrExtents = d3.map();
+        _this._includedValuesProvider = function (scale) { return _this._includedValuesForScale(scale); };
+        _this._renderCallback = function (scale) { return _this.render(); };
+        _this._onDatasetUpdateCallback = function () { return _this._onDatasetUpdate(); };
+        _this._propertyBindings = d3.map();
+        _this._propertyExtents = d3.map();
         var mainAnimator = new Animators.Easing().maxTotalDuration(Plot._ANIMATION_MAX_DURATION);
-        this.animator(Plots.Animator.MAIN, mainAnimator);
-        this.animator(Plots.Animator.RESET, new Animators.Null());
+        _this.animator(Plots.Animator.MAIN, mainAnimator);
+        _this.animator(Plots.Animator.RESET, new Animators.Null());
+        return _this;
     }
     Plot.prototype.anchor = function (selection) {
         selection = coerceD3_1.coerceExternalD3(selection);
@@ -682,9 +682,9 @@ var Plot = (function (_super) {
     Plot.prototype._animateOnNextRender = function () {
         return this._animate && this._dataChanged;
     };
-    Plot._ANIMATION_MAX_DURATION = 600;
     return Plot;
 }(component_1.Component));
+Plot._ANIMATION_MAX_DURATION = 600;
 exports.Plot = Plot;
 
 
@@ -710,7 +710,7 @@ __export(__webpack_require__(90));
 __export(__webpack_require__(91));
 __export(__webpack_require__(93));
 // ---------------------------------------------------------
-var categoryScale_2 = __webpack_require__(39);
+var categoryScale_1 = __webpack_require__(39);
 var quantitativeScale_1 = __webpack_require__(10);
 /**
  * Type guarded function to check if the scale implements the
@@ -720,7 +720,7 @@ var quantitativeScale_1 = __webpack_require__(10);
  */
 function isTransformable(scale) {
     return (scale instanceof quantitativeScale_1.QuantitativeScale ||
-        scale instanceof categoryScale_2.Category);
+        scale instanceof categoryScale_1.Category);
 }
 exports.isTransformable = isTransformable;
 
@@ -1320,6 +1320,7 @@ var Component = (function () {
     Component.prototype.background = function () {
         return this._backgroundContainer;
     };
+<<<<<<< Updated upstream
     Component._xAlignToProportion = {
         left: 0,
         center: 0.5,
@@ -1330,8 +1331,20 @@ var Component = (function () {
         center: 0.5,
         bottom: 1,
     };
+=======
+>>>>>>> Stashed changes
     return Component;
 }());
+Component._xAlignToProportion = {
+    "left": 0,
+    "center": 0.5,
+    "right": 1,
+};
+Component._yAlignToProportion = {
+    "top": 0,
+    "center": 0.5,
+    "bottom": 1,
+};
 exports.Component = Component;
 
 
@@ -1850,11 +1863,12 @@ var QuantitativeScale = (function (_super) {
      * @constructor
      */
     function QuantitativeScale() {
-        _super.call(this);
-        this._tickGenerator = function (scale) { return scale.defaultTicks(); };
-        this._padProportion = 0.05;
-        this._snappingDomainEnabled = true;
-        this._paddingExceptionsProviders = new Utils.Set();
+        var _this = _super.call(this) || this;
+        _this._tickGenerator = function (scale) { return scale.defaultTicks(); };
+        _this._padProportion = 0.05;
+        _this._snappingDomainEnabled = true;
+        _this._paddingExceptionsProviders = new Utils.Set();
+        return _this;
     }
     QuantitativeScale.prototype.autoDomain = function () {
         this._domainMin = null;
@@ -2086,9 +2100,9 @@ var QuantitativeScale = (function (_super) {
             return this;
         }
     };
-    QuantitativeScale._DEFAULT_NUM_TICKS = 10;
     return QuantitativeScale;
 }(scale_1.Scale));
+QuantitativeScale._DEFAULT_NUM_TICKS = 10;
 exports.QuantitativeScale = QuantitativeScale;
 
 
@@ -2296,16 +2310,15 @@ var XYPlot = (function (_super) {
      * @param {Scale} yScale The y scale to use.
      */
     function XYPlot() {
-        var _this = this;
-        _super.call(this);
-        this._autoAdjustXScaleDomain = false;
-        this._autoAdjustYScaleDomain = false;
-        this._deferredRendering = false;
-        this._cachedDomainX = [null, null];
-        this._cachedDomainY = [null, null];
-        this.addClass("xy-plot");
-        this._adjustYDomainOnChangeFromXCallback = function (scale) { return _this._adjustYDomainOnChangeFromX(); };
-        this._adjustXDomainOnChangeFromYCallback = function (scale) { return _this._adjustXDomainOnChangeFromY(); };
+        var _this = _super.call(this) || this;
+        _this._autoAdjustXScaleDomain = false;
+        _this._autoAdjustYScaleDomain = false;
+        _this._deferredRendering = false;
+        _this._cachedDomainX = [null, null];
+        _this._cachedDomainY = [null, null];
+        _this.addClass("xy-plot");
+        _this._adjustYDomainOnChangeFromXCallback = function (scale) { return _this._adjustYDomainOnChangeFromX(); };
+        _this._adjustXDomainOnChangeFromYCallback = function (scale) { return _this._adjustXDomainOnChangeFromY(); };
         var _deltaX = 0;
         var _deltaY = 0;
         var _scalingX = 1;
@@ -2352,7 +2365,7 @@ var XYPlot = (function (_super) {
             _deltaY = scale.scale(_this._cachedDomainY[0]) - scale.scale(_lastSeenDomainY[0]) * _scalingY || 0;
             _registerDeferredRendering();
         };
-        this._renderCallback = function (scale) {
+        _this._renderCallback = function (scale) {
             if (_this.deferredRendering() && _this.x() && _this.x().scale === scale) {
                 _lazyDomainChangeCallbackX(scale);
             }
@@ -2363,6 +2376,7 @@ var XYPlot = (function (_super) {
                 _this.render();
             }
         };
+        return _this;
     }
     XYPlot.prototype.deferredRendering = function (deferredRendering) {
         if (deferredRendering == null) {
@@ -2576,10 +2590,10 @@ var XYPlot = (function (_super) {
         });
         return dataToDraw;
     };
-    XYPlot._X_KEY = "x";
-    XYPlot._Y_KEY = "y";
     return XYPlot;
 }(plot_1.Plot));
+XYPlot._X_KEY = "x";
+XYPlot._Y_KEY = "y";
 exports.XYPlot = XYPlot;
 
 
@@ -2818,33 +2832,33 @@ var Axis = (function (_super) {
      * @param {AxisOrientation} orientation Orientation of this Axis.
      */
     function Axis(scale, orientation) {
-        var _this = this;
-        _super.call(this);
-        this._endTickLength = 5;
-        this._innerTickLength = 5;
-        this._tickLabelPadding = 10;
-        this._margin = 15;
-        this._showEndTickLabels = false;
-        this._annotationsEnabled = false;
-        this._annotationTierCount = 1;
+        var _this = _super.call(this) || this;
+        _this._endTickLength = 5;
+        _this._innerTickLength = 5;
+        _this._tickLabelPadding = 10;
+        _this._margin = 15;
+        _this._showEndTickLabels = false;
+        _this._annotationsEnabled = false;
+        _this._annotationTierCount = 1;
         if (scale == null || orientation == null) {
             throw new Error("Axis requires a scale and orientation");
         }
-        this._scale = scale;
-        this.orientation(orientation);
-        this._setDefaultAlignment();
-        this.addClass("axis");
-        if (this.isHorizontal()) {
-            this.addClass("x-axis");
+        _this._scale = scale;
+        _this.orientation(orientation);
+        _this._setDefaultAlignment();
+        _this.addClass("axis");
+        if (_this.isHorizontal()) {
+            _this.addClass("x-axis");
         }
         else {
-            this.addClass("y-axis");
+            _this.addClass("y-axis");
         }
-        this.formatter(Formatters.identity());
-        this._rescaleCallback = function (newScale) { return _this._rescale(); };
-        this._scale.onUpdate(this._rescaleCallback);
-        this._annotatedTicks = [];
-        this._annotationFormatter = Formatters.identity();
+        _this.formatter(Formatters.identity());
+        _this._rescaleCallback = function (newScale) { return _this._rescale(); };
+        _this._scale.onUpdate(_this._rescaleCallback);
+        _this._annotatedTicks = [];
+        _this._annotationFormatter = Formatters.identity();
+        return _this;
     }
     Axis.prototype.destroy = function () {
         _super.prototype.destroy.call(this);
@@ -3398,37 +3412,37 @@ var Axis = (function (_super) {
         _super.prototype.invalidateCache.call(this);
         this._annotationMeasurer.reset();
     };
-    /**
-     * The css class applied to each end tick mark (the line on the end tick).
-     */
-    Axis.END_TICK_MARK_CLASS = "end-tick-mark";
-    /**
-     * The css class applied to each tick mark (the line on the tick).
-     */
-    Axis.TICK_MARK_CLASS = "tick-mark";
-    /**
-     * The css class applied to each tick label (the text associated with the tick).
-     */
-    Axis.TICK_LABEL_CLASS = "tick-label";
-    /**
-     * The css class applied to each annotation line, which extends from the axis to the rect.
-     */
-    Axis.ANNOTATION_LINE_CLASS = "annotation-line";
-    /**
-     * The css class applied to each annotation rect, which surrounds the annotation label.
-     */
-    Axis.ANNOTATION_RECT_CLASS = "annotation-rect";
-    /**
-     * The css class applied to each annotation circle, which denotes which tick is being annotated.
-     */
-    Axis.ANNOTATION_CIRCLE_CLASS = "annotation-circle";
-    /**
-     * The css class applied to each annotation label, which shows the formatted annotation text.
-     */
-    Axis.ANNOTATION_LABEL_CLASS = "annotation-label";
-    Axis._ANNOTATION_LABEL_PADDING = 4;
     return Axis;
 }(component_1.Component));
+/**
+ * The css class applied to each end tick mark (the line on the end tick).
+ */
+Axis.END_TICK_MARK_CLASS = "end-tick-mark";
+/**
+ * The css class applied to each tick mark (the line on the tick).
+ */
+Axis.TICK_MARK_CLASS = "tick-mark";
+/**
+ * The css class applied to each tick label (the text associated with the tick).
+ */
+Axis.TICK_LABEL_CLASS = "tick-label";
+/**
+ * The css class applied to each annotation line, which extends from the axis to the rect.
+ */
+Axis.ANNOTATION_LINE_CLASS = "annotation-line";
+/**
+ * The css class applied to each annotation rect, which surrounds the annotation label.
+ */
+Axis.ANNOTATION_RECT_CLASS = "annotation-rect";
+/**
+ * The css class applied to each annotation circle, which denotes which tick is being annotated.
+ */
+Axis.ANNOTATION_CIRCLE_CLASS = "annotation-circle";
+/**
+ * The css class applied to each annotation label, which shows the formatted annotation text.
+ */
+Axis.ANNOTATION_LABEL_CLASS = "annotation-label";
+Axis._ANNOTATION_LABEL_PADDING = 4;
 exports.Axis = Axis;
 
 
@@ -3562,24 +3576,24 @@ var Bar = (function (_super) {
      * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
      */
     function Bar(orientation) {
-        var _this = this;
         if (orientation === void 0) { orientation = Bar.ORIENTATION_VERTICAL; }
-        _super.call(this);
-        this._labelFormatter = Formatters.identity();
-        this._labelsEnabled = false;
-        this._hideBarsIfAnyAreTooWide = true;
-        this._barPixelWidth = 0;
-        this.addClass("bar-plot");
+        var _this = _super.call(this) || this;
+        _this._labelFormatter = Formatters.identity();
+        _this._labelsEnabled = false;
+        _this._hideBarsIfAnyAreTooWide = true;
+        _this._barPixelWidth = 0;
+        _this.addClass("bar-plot");
         if (orientation !== Bar.ORIENTATION_VERTICAL && orientation !== Bar.ORIENTATION_HORIZONTAL) {
             throw new Error(orientation + " is not a valid orientation for Plots.Bar");
         }
-        this._isVertical = orientation === Bar.ORIENTATION_VERTICAL;
-        this.animator("baseline", new Animators.Null());
-        this.attr("fill", new Scales.Color().range()[0]);
-        this.attr("width", function () { return _this._barPixelWidth; });
-        this._labelConfig = new Utils.Map();
-        this._baselineValueProvider = function () { return [_this.baselineValue()]; };
-        this._updateBarPixelWidthCallback = function () { return _this._updateBarPixelWidth(); };
+        _this._isVertical = orientation === Bar.ORIENTATION_VERTICAL;
+        _this.animator("baseline", new Animators.Null());
+        _this.attr("fill", new Scales.Color().range()[0]);
+        _this.attr("width", function () { return _this._barPixelWidth; });
+        _this._labelConfig = new Utils.Map();
+        _this._baselineValueProvider = function () { return [_this.baselineValue()]; };
+        _this._updateBarPixelWidthCallback = function () { return _this._updateBarPixelWidth(); };
+        return _this;
     }
     Bar.prototype.x = function (x, xScale) {
         if (x == null) {
@@ -4155,15 +4169,15 @@ var Bar = (function (_super) {
         });
         return dataToDraw;
     };
-    Bar.ORIENTATION_VERTICAL = "vertical";
-    Bar.ORIENTATION_HORIZONTAL = "horizontal";
-    Bar._BAR_WIDTH_RATIO = 0.95;
-    Bar._SINGLE_BAR_DIMENSION_RATIO = 0.4;
-    Bar._BAR_AREA_CLASS = "bar-area";
-    Bar._LABEL_AREA_CLASS = "bar-label-text-area";
-    Bar._LABEL_PADDING = 10;
     return Bar;
 }(xyPlot_1.XYPlot));
+Bar.ORIENTATION_VERTICAL = "vertical";
+Bar.ORIENTATION_HORIZONTAL = "horizontal";
+Bar._BAR_WIDTH_RATIO = 0.95;
+Bar._SINGLE_BAR_DIMENSION_RATIO = 0.4;
+Bar._BAR_AREA_CLASS = "bar-area";
+Bar._LABEL_AREA_CLASS = "bar-label-text-area";
+Bar._LABEL_PADDING = 10;
 exports.Bar = Bar;
 
 
@@ -4211,13 +4225,14 @@ var Time = (function (_super) {
      * orientations.
      */
     function Time(scale, orientation) {
-        _super.call(this, scale, orientation);
-        this._maxTimeIntervalPrecision = null;
-        this._tierLabelPositions = [];
-        this.addClass("time-axis");
-        this.tickLabelPadding(5);
-        this.axisConfigurations(Time._DEFAULT_TIME_AXIS_CONFIGURATIONS);
-        this.annotationFormatter(Formatters.time("%a %b %d, %Y"));
+        var _this = _super.call(this, scale, orientation) || this;
+        _this._maxTimeIntervalPrecision = null;
+        _this._tierLabelPositions = [];
+        _this.addClass("time-axis");
+        _this.tickLabelPadding(5);
+        _this.axisConfigurations(Time._DEFAULT_TIME_AXIS_CONFIGURATIONS);
+        _this.annotationFormatter(Formatters.time("%a %b %d, %Y"));
+        return _this;
     }
     Time.prototype.tierLabelPositions = function (newPositions) {
         if (newPositions == null) {
@@ -4588,134 +4603,133 @@ var Time = (function (_super) {
         _super.prototype.invalidateCache.call(this);
         this._measurer.reset();
     };
-    /**
-     * The CSS class applied to each Time Axis tier
-     */
-    Time.TIME_AXIS_TIER_CLASS = "time-axis-tier";
-    Time._SORTED_TIME_INTERVAL_INDEX = (_a = {},
-        _a[TimeInterval.second] = 0,
-        _a[TimeInterval.minute] = 1,
-        _a[TimeInterval.hour] = 2,
-        _a[TimeInterval.day] = 3,
-        _a[TimeInterval.week] = 4,
-        _a[TimeInterval.month] = 5,
-        _a[TimeInterval.year] = 6,
-        _a
-    );
-    Time._DEFAULT_TIME_AXIS_CONFIGURATIONS = [
-        [
-            { interval: TimeInterval.second, step: 1, formatter: Formatters.time("%I:%M:%S %p") },
-            { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
-        ],
-        [
-            { interval: TimeInterval.second, step: 5, formatter: Formatters.time("%I:%M:%S %p") },
-            { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
-        ],
-        [
-            { interval: TimeInterval.second, step: 10, formatter: Formatters.time("%I:%M:%S %p") },
-            { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
-        ],
-        [
-            { interval: TimeInterval.second, step: 15, formatter: Formatters.time("%I:%M:%S %p") },
-            { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
-        ],
-        [
-            { interval: TimeInterval.second, step: 30, formatter: Formatters.time("%I:%M:%S %p") },
-            { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
-        ],
-        [
-            { interval: TimeInterval.minute, step: 1, formatter: Formatters.time("%I:%M %p") },
-            { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
-        ],
-        [
-            { interval: TimeInterval.minute, step: 5, formatter: Formatters.time("%I:%M %p") },
-            { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
-        ],
-        [
-            { interval: TimeInterval.minute, step: 10, formatter: Formatters.time("%I:%M %p") },
-            { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
-        ],
-        [
-            { interval: TimeInterval.minute, step: 15, formatter: Formatters.time("%I:%M %p") },
-            { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
-        ],
-        [
-            { interval: TimeInterval.minute, step: 30, formatter: Formatters.time("%I:%M %p") },
-            { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
-        ],
-        [
-            { interval: TimeInterval.hour, step: 1, formatter: Formatters.time("%I %p") },
-            { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
-        ],
-        [
-            { interval: TimeInterval.hour, step: 3, formatter: Formatters.time("%I %p") },
-            { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
-        ],
-        [
-            { interval: TimeInterval.hour, step: 6, formatter: Formatters.time("%I %p") },
-            { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
-        ],
-        [
-            { interval: TimeInterval.hour, step: 12, formatter: Formatters.time("%I %p") },
-            { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
-        ],
-        [
-            { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%a %e") },
-            { interval: TimeInterval.month, step: 1, formatter: Formatters.time("%B %Y") },
-        ],
-        [
-            { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%e") },
-            { interval: TimeInterval.month, step: 1, formatter: Formatters.time("%B %Y") },
-        ],
-        [
-            { interval: TimeInterval.month, step: 1, formatter: Formatters.time("%B") },
-            { interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y") },
-        ],
-        [
-            { interval: TimeInterval.month, step: 1, formatter: Formatters.time("%b") },
-            { interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y") },
-        ],
-        [
-            { interval: TimeInterval.month, step: 3, formatter: Formatters.time("%b") },
-            { interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y") },
-        ],
-        [
-            { interval: TimeInterval.month, step: 6, formatter: Formatters.time("%b") },
-            { interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y") },
-        ],
-        [
-            { interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y") },
-        ],
-        [
-            { interval: TimeInterval.year, step: 1, formatter: Formatters.time("%y") },
-        ],
-        [
-            { interval: TimeInterval.year, step: 5, formatter: Formatters.time("%Y") },
-        ],
-        [
-            { interval: TimeInterval.year, step: 25, formatter: Formatters.time("%Y") },
-        ],
-        [
-            { interval: TimeInterval.year, step: 50, formatter: Formatters.time("%Y") },
-        ],
-        [
-            { interval: TimeInterval.year, step: 100, formatter: Formatters.time("%Y") },
-        ],
-        [
-            { interval: TimeInterval.year, step: 200, formatter: Formatters.time("%Y") },
-        ],
-        [
-            { interval: TimeInterval.year, step: 500, formatter: Formatters.time("%Y") },
-        ],
-        [
-            { interval: TimeInterval.year, step: 1000, formatter: Formatters.time("%Y") },
-        ],
-    ];
-    Time._LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
     return Time;
-    var _a;
 }(axis_1.Axis));
+/**
+ * The CSS class applied to each Time Axis tier
+ */
+Time.TIME_AXIS_TIER_CLASS = "time-axis-tier";
+Time._SORTED_TIME_INTERVAL_INDEX = (_a = {},
+    _a[TimeInterval.second] = 0,
+    _a[TimeInterval.minute] = 1,
+    _a[TimeInterval.hour] = 2,
+    _a[TimeInterval.day] = 3,
+    _a[TimeInterval.week] = 4,
+    _a[TimeInterval.month] = 5,
+    _a[TimeInterval.year] = 6,
+    _a);
+Time._DEFAULT_TIME_AXIS_CONFIGURATIONS = [
+    [
+        { interval: TimeInterval.second, step: 1, formatter: Formatters.time("%I:%M:%S %p") },
+        { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+    ],
+    [
+        { interval: TimeInterval.second, step: 5, formatter: Formatters.time("%I:%M:%S %p") },
+        { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+    ],
+    [
+        { interval: TimeInterval.second, step: 10, formatter: Formatters.time("%I:%M:%S %p") },
+        { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+    ],
+    [
+        { interval: TimeInterval.second, step: 15, formatter: Formatters.time("%I:%M:%S %p") },
+        { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+    ],
+    [
+        { interval: TimeInterval.second, step: 30, formatter: Formatters.time("%I:%M:%S %p") },
+        { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+    ],
+    [
+        { interval: TimeInterval.minute, step: 1, formatter: Formatters.time("%I:%M %p") },
+        { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+    ],
+    [
+        { interval: TimeInterval.minute, step: 5, formatter: Formatters.time("%I:%M %p") },
+        { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+    ],
+    [
+        { interval: TimeInterval.minute, step: 10, formatter: Formatters.time("%I:%M %p") },
+        { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+    ],
+    [
+        { interval: TimeInterval.minute, step: 15, formatter: Formatters.time("%I:%M %p") },
+        { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+    ],
+    [
+        { interval: TimeInterval.minute, step: 30, formatter: Formatters.time("%I:%M %p") },
+        { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+    ],
+    [
+        { interval: TimeInterval.hour, step: 1, formatter: Formatters.time("%I %p") },
+        { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+    ],
+    [
+        { interval: TimeInterval.hour, step: 3, formatter: Formatters.time("%I %p") },
+        { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+    ],
+    [
+        { interval: TimeInterval.hour, step: 6, formatter: Formatters.time("%I %p") },
+        { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+    ],
+    [
+        { interval: TimeInterval.hour, step: 12, formatter: Formatters.time("%I %p") },
+        { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+    ],
+    [
+        { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%a %e") },
+        { interval: TimeInterval.month, step: 1, formatter: Formatters.time("%B %Y") },
+    ],
+    [
+        { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%e") },
+        { interval: TimeInterval.month, step: 1, formatter: Formatters.time("%B %Y") },
+    ],
+    [
+        { interval: TimeInterval.month, step: 1, formatter: Formatters.time("%B") },
+        { interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y") },
+    ],
+    [
+        { interval: TimeInterval.month, step: 1, formatter: Formatters.time("%b") },
+        { interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y") },
+    ],
+    [
+        { interval: TimeInterval.month, step: 3, formatter: Formatters.time("%b") },
+        { interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y") },
+    ],
+    [
+        { interval: TimeInterval.month, step: 6, formatter: Formatters.time("%b") },
+        { interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y") },
+    ],
+    [
+        { interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y") },
+    ],
+    [
+        { interval: TimeInterval.year, step: 1, formatter: Formatters.time("%y") },
+    ],
+    [
+        { interval: TimeInterval.year, step: 5, formatter: Formatters.time("%Y") },
+    ],
+    [
+        { interval: TimeInterval.year, step: 25, formatter: Formatters.time("%Y") },
+    ],
+    [
+        { interval: TimeInterval.year, step: 50, formatter: Formatters.time("%Y") },
+    ],
+    [
+        { interval: TimeInterval.year, step: 100, formatter: Formatters.time("%Y") },
+    ],
+    [
+        { interval: TimeInterval.year, step: 200, formatter: Formatters.time("%Y") },
+    ],
+    [
+        { interval: TimeInterval.year, step: 500, formatter: Formatters.time("%Y") },
+    ],
+    [
+        { interval: TimeInterval.year, step: 1000, formatter: Formatters.time("%Y") },
+    ],
+];
+Time._LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
 exports.Time = Time;
+var _a;
 
 
 /***/ }),
@@ -4742,9 +4756,9 @@ var component_1 = __webpack_require__(5);
 var ComponentContainer = (function (_super) {
     __extends(ComponentContainer, _super);
     function ComponentContainer() {
-        var _this = this;
-        _super.call(this);
-        this._detachCallback = function (component) { return _this.remove(component); };
+        var _this = _super.call(this) || this;
+        _this._detachCallback = function (component) { return _this.remove(component); };
+        return _this;
     }
     ComponentContainer.prototype.anchor = function (selection) {
         var _this = this;
@@ -5023,18 +5037,19 @@ var DragBoxLayer = (function (_super) {
      * @constructor
      */
     function DragBoxLayer() {
-        _super.call(this);
-        this._detectionRadius = 3;
-        this._resizable = false;
-        this._movable = false;
-        this._hasCorners = true;
-        this.addClass("drag-box-layer");
-        this._dragInteraction = new Interactions.Drag();
-        this._setUpCallbacks();
-        this._dragInteraction.attachTo(this);
-        this._dragStartCallbacks = new Utils.CallbackSet();
-        this._dragCallbacks = new Utils.CallbackSet();
-        this._dragEndCallbacks = new Utils.CallbackSet();
+        var _this = _super.call(this) || this;
+        _this._detectionRadius = 3;
+        _this._resizable = false;
+        _this._movable = false;
+        _this._hasCorners = true;
+        _this.addClass("drag-box-layer");
+        _this._dragInteraction = new Interactions.Drag();
+        _this._setUpCallbacks();
+        _this._dragInteraction.attachTo(_this);
+        _this._dragStartCallbacks = new Utils.CallbackSet();
+        _this._dragCallbacks = new Utils.CallbackSet();
+        _this._dragEndCallbacks = new Utils.CallbackSet();
+        return _this;
     }
     DragBoxLayer.prototype._setUpCallbacks = function () {
         var _this = this;
@@ -5559,13 +5574,13 @@ __export(__webpack_require__(65));
 var Alignment = (function () {
     function Alignment() {
     }
-    Alignment.TOP = "top";
-    Alignment.BOTTOM = "bottom";
-    Alignment.LEFT = "left";
-    Alignment.RIGHT = "right";
-    Alignment.CENTER = "center";
     return Alignment;
 }());
+Alignment.TOP = "top";
+Alignment.BOTTOM = "bottom";
+Alignment.LEFT = "left";
+Alignment.RIGHT = "right";
+Alignment.CENTER = "center";
 exports.Alignment = Alignment;
 
 
@@ -5645,14 +5660,14 @@ var interaction_1 = __webpack_require__(14);
 var Key = (function (_super) {
     __extends(Key, _super);
     function Key() {
-        var _this = this;
-        _super.apply(this, arguments);
-        this._keyPressCallbacks = {};
-        this._keyReleaseCallbacks = {};
-        this._mouseMoveCallback = function (point) { return false; }; // HACKHACK: registering a listener
-        this._downedKeys = new Utils.Set();
-        this._keyDownCallback = function (keyCode, event) { return _this._handleKeyDownEvent(keyCode, event); };
-        this._keyUpCallback = function (keyCode) { return _this._handleKeyUpEvent(keyCode); };
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this._keyPressCallbacks = {};
+        _this._keyReleaseCallbacks = {};
+        _this._mouseMoveCallback = function (point) { return false; }; // HACKHACK: registering a listener
+        _this._downedKeys = new Utils.Set();
+        _this._keyDownCallback = function (keyCode, event) { return _this._handleKeyDownEvent(keyCode, event); };
+        _this._keyUpCallback = function (keyCode) { return _this._handleKeyUpEvent(keyCode); };
+        return _this;
     }
     Key.prototype._anchor = function (component) {
         _super.prototype._anchor.call(this, component);
@@ -5779,12 +5794,12 @@ var Group = (function (_super) {
      * @param {Component[]} [components=[]] Components to be added to the Group.
      */
     function Group(components) {
-        var _this = this;
         if (components === void 0) { components = []; }
-        _super.call(this);
-        this._components = [];
-        this.addClass("component-group");
+        var _this = _super.call(this) || this;
+        _this._components = [];
+        _this.addClass("component-group");
         components.forEach(function (c) { return _this.append(c); });
+        return _this;
     }
     Group.prototype._forEach = function (callback) {
         this.components().forEach(callback);
@@ -5879,25 +5894,25 @@ var PropertyMode;
 var GuideLineLayer = (function (_super) {
     __extends(GuideLineLayer, _super);
     function GuideLineLayer(orientation) {
-        var _this = this;
-        _super.call(this);
-        this._mode = PropertyMode.VALUE;
+        var _this = _super.call(this) || this;
+        _this._mode = PropertyMode.VALUE;
         if (orientation !== GuideLineLayer.ORIENTATION_VERTICAL && orientation !== GuideLineLayer.ORIENTATION_HORIZONTAL) {
             throw new Error(orientation + " is not a valid orientation for GuideLineLayer");
         }
-        this._orientation = orientation;
-        this._overflowHidden = true;
-        this.addClass("guide-line-layer");
-        if (this._isVertical()) {
-            this.addClass("vertical");
+        _this._orientation = orientation;
+        _this._overflowHidden = true;
+        _this.addClass("guide-line-layer");
+        if (_this._isVertical()) {
+            _this.addClass("vertical");
         }
         else {
-            this.addClass("horizontal");
+            _this.addClass("horizontal");
         }
-        this._scaleUpdateCallback = function () {
+        _this._scaleUpdateCallback = function () {
             _this._syncPixelPositionAndValue();
             _this.render();
         };
+        return _this;
     }
     GuideLineLayer.prototype._setup = function () {
         _super.prototype._setup.call(this);
@@ -6003,10 +6018,10 @@ var GuideLineLayer = (function (_super) {
             this.scale().offUpdate(this._scaleUpdateCallback);
         }
     };
-    GuideLineLayer.ORIENTATION_VERTICAL = "vertical";
-    GuideLineLayer.ORIENTATION_HORIZONTAL = "horizontal";
     return GuideLineLayer;
 }(component_1.Component));
+GuideLineLayer.ORIENTATION_VERTICAL = "vertical";
+GuideLineLayer.ORIENTATION_HORIZONTAL = "horizontal";
 exports.GuideLineLayer = GuideLineLayer;
 
 
@@ -6027,30 +6042,30 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Utils = __webpack_require__(0);
 var component_1 = __webpack_require__(5);
+var PropertyMode;
 (function (PropertyMode) {
     PropertyMode[PropertyMode["VALUE"] = 0] = "VALUE";
     PropertyMode[PropertyMode["PIXEL"] = 1] = "PIXEL";
-})(exports.PropertyMode || (exports.PropertyMode = {}));
-var PropertyMode = exports.PropertyMode;
+})(PropertyMode = exports.PropertyMode || (exports.PropertyMode = {}));
 var SelectionBoxLayer = (function (_super) {
     __extends(SelectionBoxLayer, _super);
     function SelectionBoxLayer() {
-        var _this = this;
-        _super.call(this);
-        this._boxVisible = false;
-        this._boxBounds = {
+        var _this = _super.call(this) || this;
+        _this._boxVisible = false;
+        _this._boxBounds = {
             topLeft: { x: 0, y: 0 },
             bottomRight: { x: 0, y: 0 },
         };
-        this._xBoundsMode = PropertyMode.PIXEL;
-        this._yBoundsMode = PropertyMode.PIXEL;
-        this.addClass("selection-box-layer");
-        this._adjustBoundsCallback = function () {
+        _this._xBoundsMode = PropertyMode.PIXEL;
+        _this._yBoundsMode = PropertyMode.PIXEL;
+        _this.addClass("selection-box-layer");
+        _this._adjustBoundsCallback = function () {
             _this.render();
         };
-        this._overflowHidden = true;
-        this._xExtent = [undefined, undefined];
-        this._yExtent = [undefined, undefined];
+        _this._overflowHidden = true;
+        _this._xExtent = [undefined, undefined];
+        _this._yExtent = [undefined, undefined];
+        return _this;
     }
     SelectionBoxLayer.prototype._setup = function () {
         _super.prototype._setup.call(this);
@@ -6269,12 +6284,13 @@ var Area = (function (_super) {
      * @constructor
      */
     function Area() {
-        _super.call(this);
-        this.addClass("area-plot");
-        this.y0(0); // default
-        this.attr("fill-opacity", 0.25);
-        this.attr("fill", new Scales.Color().range()[0]);
-        this._lineDrawers = new Utils.Map();
+        var _this = _super.call(this) || this;
+        _this.addClass("area-plot");
+        _this.y0(0); // default
+        _this.attr("fill-opacity", 0.25);
+        _this.attr("fill", new Scales.Color().range()[0]);
+        _this._lineDrawers = new Utils.Map();
+        return _this;
     }
     Area.prototype._setup = function () {
         var _this = this;
@@ -6427,9 +6443,9 @@ var Area = (function (_super) {
             return areaGenerator(datum);
         };
     };
-    Area._Y0_KEY = "y0";
     return Area;
 }(linePlot_1.Line));
+Area._Y0_KEY = "y0";
 exports.Area = Area;
 
 
@@ -6497,19 +6513,20 @@ var Line = (function (_super) {
      * @constructor
      */
     function Line() {
-        _super.call(this);
-        this._curve = "linear";
-        this._autorangeSmooth = false;
-        this._croppedRenderingEnabled = true;
-        this._downsamplingEnabled = false;
-        this.addClass("line-plot");
+        var _this = _super.call(this) || this;
+        _this._curve = "linear";
+        _this._autorangeSmooth = false;
+        _this._croppedRenderingEnabled = true;
+        _this._downsamplingEnabled = false;
+        _this.addClass("line-plot");
         var animator = new Animators.Easing();
         animator.stepDuration(plot_1.Plot._ANIMATION_MAX_DURATION);
         animator.easingMode("expInOut");
         animator.maxTotalDuration(plot_1.Plot._ANIMATION_MAX_DURATION);
-        this.animator(Plots.Animator.MAIN, animator);
-        this.attr("stroke", new Scales.Color().range()[0]);
-        this.attr("stroke-width", "2px");
+        _this.animator(Plots.Animator.MAIN, animator);
+        _this.attr("stroke", new Scales.Color().range()[0]);
+        _this.attr("stroke-width", "2px");
+        return _this;
     }
     Line.prototype.x = function (x, xScale) {
         if (x == null) {
@@ -6965,15 +6982,16 @@ var Category = (function (_super) {
      * @constructor
      */
     function Category() {
-        _super.call(this);
-        this._range = [0, 1];
-        this._d3Scale = d3.scaleBand();
-        this._d3Scale.range(TRANSFORMATION_SPACE);
-        this._d3TransformationScale = d3.scaleLinear();
-        this._d3TransformationScale.domain(TRANSFORMATION_SPACE);
+        var _this = _super.call(this) || this;
+        _this._range = [0, 1];
+        _this._d3Scale = d3.scaleBand();
+        _this._d3Scale.range(TRANSFORMATION_SPACE);
+        _this._d3TransformationScale = d3.scaleLinear();
+        _this._d3TransformationScale.domain(TRANSFORMATION_SPACE);
         var d3InnerPadding = 0.3;
-        this._innerPadding = Category._convertToPlottableInnerPadding(d3InnerPadding);
-        this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
+        _this._innerPadding = Category._convertToPlottableInnerPadding(d3InnerPadding);
+        _this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
+        return _this;
     }
     /**
      * Return a clone of this category scale that holds the same pan/zoom, padding, domain and range, but
@@ -8002,28 +8020,28 @@ var Easing = (function () {
         var maxPossibleIterativeDelay = stepStartTimeInterval / Math.max(numberOfSteps - 1, 1);
         return Math.min(this.stepDelay(), maxPossibleIterativeDelay);
     };
-    /**
-     * The default starting delay of the animation in milliseconds
-     */
-    Easing._DEFAULT_START_DELAY_MILLISECONDS = 0;
-    /**
-     * The default duration of one animation step in milliseconds
-     */
-    Easing._DEFAULT_STEP_DURATION_MILLISECONDS = 300;
-    /**
-     * The default maximum start delay between each step of an animation
-     */
-    Easing._DEFAULT_ITERATIVE_DELAY_MILLISECONDS = 15;
-    /**
-     * The default maximum total animation duration
-     */
-    Easing._DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS = Infinity;
-    /**
-     * The default easing of the animation
-     */
-    Easing._DEFAULT_EASING_MODE = "expOut";
     return Easing;
 }());
+/**
+ * The default starting delay of the animation in milliseconds
+ */
+Easing._DEFAULT_START_DELAY_MILLISECONDS = 0;
+/**
+ * The default duration of one animation step in milliseconds
+ */
+Easing._DEFAULT_STEP_DURATION_MILLISECONDS = 300;
+/**
+ * The default maximum start delay between each step of an animation
+ */
+Easing._DEFAULT_ITERATIVE_DELAY_MILLISECONDS = 15;
+/**
+ * The default maximum total animation duration
+ */
+Easing._DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS = Infinity;
+/**
+ * The default easing of the animation
+ */
+Easing._DEFAULT_EASING_MODE = "expOut";
 exports.Easing = Easing;
 
 
@@ -8089,16 +8107,17 @@ var Category = (function (_super) {
      */
     function Category(scale, orientation) {
         if (orientation === void 0) { orientation = "bottom"; }
-        _super.call(this, scale, orientation);
+        var _this = _super.call(this, scale, orientation) || this;
         /**
          * The rotation angle of tick label text. Only 0, 90, -90 are supported
          */
-        this._tickLabelAngle = 0;
+        _this._tickLabelAngle = 0;
         /**
          * The shear angle of the tick label text. Only values -80 <= x <= 80 are supported
          */
-        this._tickLabelShearAngle = 0;
-        this.addClass("category-axis");
+        _this._tickLabelShearAngle = 0;
+        _this.addClass("category-axis");
+        return _this;
     }
     Object.defineProperty(Category.prototype, "_wrapper", {
         /**
@@ -8420,12 +8439,12 @@ var Category = (function (_super) {
         _super.prototype.invalidateCache.call(this);
         this._measurer.reset();
     };
-    /**
-     * How many pixels to give labels at minimum before downsampling takes effect.
-     */
-    Category._MINIMUM_WIDTH_PER_LABEL_PX = 15;
     return Category;
 }(axis_1.Axis));
+/**
+ * How many pixels to give labels at minimum before downsampling takes effect.
+ */
+Category._MINIMUM_WIDTH_PER_LABEL_PX = 15;
 exports.Category = Category;
 
 
@@ -8461,10 +8480,11 @@ var Numeric = (function (_super) {
      * @param {AxisOrientation} orientation Orientation of this Numeric Axis.
      */
     function Numeric(scale, orientation) {
-        _super.call(this, scale, orientation);
-        this._tickLabelPositioning = "center";
-        this._usesTextWidthApproximation = false;
-        this.formatter(Formatters.general());
+        var _this = _super.call(this, scale, orientation) || this;
+        _this._tickLabelPositioning = "center";
+        _this._usesTextWidthApproximation = false;
+        _this.formatter(Formatters.general());
+        return _this;
     }
     Numeric.prototype._setup = function () {
         _super.prototype._setup.call(this);
@@ -8745,14 +8765,13 @@ var Utils = __webpack_require__(0);
 var DragLineLayer = (function (_super) {
     __extends(DragLineLayer, _super);
     function DragLineLayer(orientation) {
-        var _this = this;
-        _super.call(this, orientation);
-        this._detectionRadius = 3;
-        this._enabled = true;
-        this.addClass("drag-line-layer");
-        this.addClass("enabled");
-        this._dragInteraction = new Interactions.Drag();
-        this._dragInteraction.attachTo(this);
+        var _this = _super.call(this, orientation) || this;
+        _this._detectionRadius = 3;
+        _this._enabled = true;
+        _this.addClass("drag-line-layer");
+        _this.addClass("enabled");
+        _this._dragInteraction = new Interactions.Drag();
+        _this._dragInteraction.attachTo(_this);
         var onLine = function (p) {
             return (_this._isVertical() &&
                 _this.pixelPosition() - _this.detectionRadius() <= p.x &&
@@ -8768,30 +8787,31 @@ var DragLineLayer = (function (_super) {
                 _this._dragStartCallbacks.callCallbacks(_this);
             }
         };
-        this._dragInteraction.onDragStart(interactionDragStartCallback);
+        _this._dragInteraction.onDragStart(interactionDragStartCallback);
         var interactionDragCallback = function (start, end) {
             if (dragging) {
                 _this._setPixelPositionWithoutChangingMode(_this._isVertical() ? end.x : end.y);
                 _this._dragCallbacks.callCallbacks(_this);
             }
         };
-        this._dragInteraction.onDrag(interactionDragCallback);
+        _this._dragInteraction.onDrag(interactionDragCallback);
         var interactionDragEndCallback = function (start, end) {
             if (dragging) {
                 dragging = false;
                 _this._dragEndCallbacks.callCallbacks(_this);
             }
         };
-        this._dragInteraction.onDragEnd(interactionDragEndCallback);
-        this._disconnectInteraction = function () {
+        _this._dragInteraction.onDragEnd(interactionDragEndCallback);
+        _this._disconnectInteraction = function () {
             _this._dragInteraction.offDragStart(interactionDragStartCallback);
             _this._dragInteraction.offDrag(interactionDragCallback);
             _this._dragInteraction.offDragEnd(interactionDragEndCallback);
             _this._dragInteraction.detachFrom(_this);
         };
-        this._dragStartCallbacks = new Utils.CallbackSet();
-        this._dragCallbacks = new Utils.CallbackSet();
-        this._dragEndCallbacks = new Utils.CallbackSet();
+        _this._dragStartCallbacks = new Utils.CallbackSet();
+        _this._dragCallbacks = new Utils.CallbackSet();
+        _this._dragEndCallbacks = new Utils.CallbackSet();
+        return _this;
     }
     DragLineLayer.prototype._setup = function () {
         _super.prototype._setup.call(this);
@@ -8945,17 +8965,18 @@ var Gridlines = (function (_super) {
         if (yScale != null && !(quantitativeScale_1.QuantitativeScale.prototype.isPrototypeOf(yScale))) {
             throw new Error("yScale needs to inherit from Scale.QuantitativeScale");
         }
-        _super.call(this);
-        this.addClass("gridlines");
-        this._xScale = xScale;
-        this._yScale = yScale;
-        this._renderCallback = function (scale) { return _this.render(); };
-        if (this._xScale) {
-            this._xScale.onUpdate(this._renderCallback);
+        _this = _super.call(this) || this;
+        _this.addClass("gridlines");
+        _this._xScale = xScale;
+        _this._yScale = yScale;
+        _this._renderCallback = function (scale) { return _this.render(); };
+        if (_this._xScale) {
+            _this._xScale.onUpdate(_this._renderCallback);
         }
-        if (this._yScale) {
-            this._yScale.onUpdate(this._renderCallback);
+        if (_this._yScale) {
+            _this._yScale.onUpdate(_this._renderCallback);
         }
+        return _this;
     }
     Gridlines.prototype.destroy = function () {
         _super.prototype.destroy.call(this);
@@ -9056,20 +9077,20 @@ var InterpolatedColorLegend = (function (_super) {
      * @param {Scales.InterpolatedColor} interpolatedColorScale
      */
     function InterpolatedColorLegend(interpolatedColorScale) {
-        var _this = this;
-        _super.call(this);
-        this._textPadding = 5;
+        var _this = _super.call(this) || this;
+        _this._textPadding = 5;
         if (interpolatedColorScale == null) {
             throw new Error("InterpolatedColorLegend requires a interpolatedColorScale");
         }
-        this._scale = interpolatedColorScale;
-        this._redrawCallback = function (scale) { return _this.redraw(); };
-        this._scale.onUpdate(this._redrawCallback);
-        this._formatter = Formatters.general();
-        this._orientation = "horizontal";
-        this._expands = false;
-        this.addClass("legend");
-        this.addClass("interpolated-color-legend");
+        _this._scale = interpolatedColorScale;
+        _this._redrawCallback = function (scale) { return _this.redraw(); };
+        _this._scale.onUpdate(_this._redrawCallback);
+        _this._formatter = Formatters.general();
+        _this._orientation = "horizontal";
+        _this._expands = false;
+        _this.addClass("legend");
+        _this.addClass("interpolated-color-legend");
+        return _this;
     }
     InterpolatedColorLegend.prototype.destroy = function () {
         _super.prototype.destroy.call(this);
@@ -9273,13 +9294,13 @@ var InterpolatedColorLegend = (function (_super) {
         }
         return this;
     };
-    InterpolatedColorLegend._DEFAULT_NUM_SWATCHES = 11;
-    /**
-     * The css class applied to the legend labels.
-     */
-    InterpolatedColorLegend.LEGEND_LABEL_CLASS = "legend-label";
     return InterpolatedColorLegend;
 }(component_1.Component));
+InterpolatedColorLegend._DEFAULT_NUM_SWATCHES = 11;
+/**
+ * The css class applied to the legend labels.
+ */
+InterpolatedColorLegend.LEGEND_LABEL_CLASS = "legend-label";
 exports.InterpolatedColorLegend = InterpolatedColorLegend;
 
 
@@ -9312,12 +9333,13 @@ var Label = (function (_super) {
     function Label(displayText, angle) {
         if (displayText === void 0) { displayText = ""; }
         if (angle === void 0) { angle = 0; }
-        _super.call(this);
-        this.addClass("label");
-        this.text(displayText);
-        this.angle(angle);
-        this.xAlignment("center").yAlignment("center");
-        this._padding = 0;
+        var _this = _super.call(this) || this;
+        _this.addClass("label");
+        _this.text(displayText);
+        _this.angle(angle);
+        _this.xAlignment("center").yAlignment("center");
+        _this._padding = 0;
+        return _this;
     }
     Label.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
         var desiredWH = this._measurer.measure(this._text);
@@ -9425,12 +9447,13 @@ var TitleLabel = (function (_super) {
      * @param {number} [angle] One of -90/0/90. 0 is horizontal.
      */
     function TitleLabel(text, angle) {
-        _super.call(this, text, angle);
-        this.addClass(TitleLabel.TITLE_LABEL_CLASS);
+        var _this = _super.call(this, text, angle) || this;
+        _this.addClass(TitleLabel.TITLE_LABEL_CLASS);
+        return _this;
     }
-    TitleLabel.TITLE_LABEL_CLASS = "title-label";
     return TitleLabel;
 }(Label));
+TitleLabel.TITLE_LABEL_CLASS = "title-label";
 exports.TitleLabel = TitleLabel;
 var AxisLabel = (function (_super) {
     __extends(AxisLabel, _super);
@@ -9440,12 +9463,13 @@ var AxisLabel = (function (_super) {
      * @param {number} [angle] One of -90/0/90. 0 is horizontal.
      */
     function AxisLabel(text, angle) {
-        _super.call(this, text, angle);
-        this.addClass(AxisLabel.AXIS_LABEL_CLASS);
+        var _this = _super.call(this, text, angle) || this;
+        _this.addClass(AxisLabel.AXIS_LABEL_CLASS);
+        return _this;
     }
-    AxisLabel.AXIS_LABEL_CLASS = "axis-label";
     return AxisLabel;
 }(Label));
+AxisLabel.AXIS_LABEL_CLASS = "axis-label";
 exports.AxisLabel = AxisLabel;
 
 
@@ -9646,27 +9670,27 @@ var Legend = (function (_super) {
      * @param {Scale.Color} scale
      */
     function Legend(colorScale) {
-        var _this = this;
-        _super.call(this);
-        this._padding = 5;
-        this._rowBottomPadding = 3;
-        this.addClass("legend");
-        this.maxEntriesPerRow(1);
+        var _this = _super.call(this) || this;
+        _this._padding = 5;
+        _this._rowBottomPadding = 3;
+        _this.addClass("legend");
+        _this.maxEntriesPerRow(1);
         if (colorScale == null) {
             throw new Error("Legend requires a colorScale");
         }
-        this._colorScale = colorScale;
-        this._redrawCallback = function (scale) { return _this.redraw(); };
-        this._colorScale.onUpdate(this._redrawCallback);
-        this._formatter = Formatters.identity();
-        this.maxLinesPerEntry(1);
-        this.xAlignment("right").yAlignment("top");
-        this.comparator(function (a, b) {
+        _this._colorScale = colorScale;
+        _this._redrawCallback = function (scale) { return _this.redraw(); };
+        _this._colorScale.onUpdate(_this._redrawCallback);
+        _this._formatter = Formatters.identity();
+        _this.maxLinesPerEntry(1);
+        _this.xAlignment("right").yAlignment("top");
+        _this.comparator(function (a, b) {
             var formattedText = _this._colorScale.domain().slice().map(function (d) { return _this._formatter(d); });
             return formattedText.indexOf(a) - formattedText.indexOf(b);
         });
-        this._symbolFactoryAccessor = function () { return SymbolFactories.circle(); };
-        this._symbolOpacityAccessor = function () { return 1; };
+        _this._symbolFactoryAccessor = function () { return SymbolFactories.circle(); };
+        _this._symbolOpacityAccessor = function () { return 1; };
+        return _this;
     }
     Legend.prototype._setup = function () {
         _super.prototype._setup.call(this);
@@ -9941,20 +9965,20 @@ var Legend = (function (_super) {
     Legend.prototype.fixedHeight = function () {
         return true;
     };
-    /**
-     * The css class applied to each legend row
-     */
-    Legend.LEGEND_ROW_CLASS = "legend-row";
-    /**
-     * The css class applied to each legend entry
-     */
-    Legend.LEGEND_ENTRY_CLASS = "legend-entry";
-    /**
-     * The css class applied to each legend symbol
-     */
-    Legend.LEGEND_SYMBOL_CLASS = "legend-symbol";
     return Legend;
 }(component_1.Component));
+/**
+ * The css class applied to each legend row
+ */
+Legend.LEGEND_ROW_CLASS = "legend-row";
+/**
+ * The css class applied to each legend entry
+ */
+Legend.LEGEND_ENTRY_CLASS = "legend-entry";
+/**
+ * The css class applied to each legend symbol
+ */
+Legend.LEGEND_SYMBOL_CLASS = "legend-symbol";
 exports.Legend = Legend;
 
 
@@ -9979,7 +10003,7 @@ var group_1 = __webpack_require__(33);
 var PlotGroup = (function (_super) {
     __extends(PlotGroup, _super);
     function PlotGroup() {
-        _super.apply(this, arguments);
+        return _super !== null && _super.apply(this, arguments) || this;
     }
     PlotGroup.prototype.entityNearest = function (point) {
         var closestPlotEntity;
@@ -10048,18 +10072,17 @@ var Table = (function (_super) {
      *   null can be used if a cell is empty.
      */
     function Table(rows) {
-        var _this = this;
         if (rows === void 0) { rows = []; }
-        _super.call(this);
-        this._rowPadding = 0;
-        this._columnPadding = 0;
-        this._rows = [];
-        this._rowWeights = [];
-        this._columnWeights = [];
-        this._nRows = 0;
-        this._nCols = 0;
-        this._calculatedLayout = null;
-        this.addClass("table");
+        var _this = _super.call(this) || this;
+        _this._rowPadding = 0;
+        _this._columnPadding = 0;
+        _this._rows = [];
+        _this._rowWeights = [];
+        _this._columnWeights = [];
+        _this._nRows = 0;
+        _this._nCols = 0;
+        _this._calculatedLayout = null;
+        _this.addClass("table");
         rows.forEach(function (row, rowIndex) {
             row.forEach(function (component, colIndex) {
                 if (component != null) {
@@ -10067,6 +10090,7 @@ var Table = (function (_super) {
                 }
             });
         });
+        return _this;
     }
     Table.prototype._forEach = function (callback) {
         for (var r = 0; r < this._nRows; r++) {
@@ -10439,9 +10463,10 @@ var XDragBoxLayer = (function (_super) {
      * @constructor
      */
     function XDragBoxLayer() {
-        _super.call(this);
-        this.addClass("x-drag-box-layer");
-        this._hasCorners = false;
+        var _this = _super.call(this) || this;
+        _this.addClass("x-drag-box-layer");
+        _this._hasCorners = false;
+        return _this;
     }
     XDragBoxLayer.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
         _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
@@ -10505,9 +10530,10 @@ var YDragBoxLayer = (function (_super) {
      * @constructor
      */
     function YDragBoxLayer() {
-        _super.call(this);
-        this.addClass("y-drag-box-layer");
-        this._hasCorners = false;
+        var _this = _super.call(this) || this;
+        _this.addClass("y-drag-box-layer");
+        _this._hasCorners = false;
+        return _this;
     }
     YDragBoxLayer.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
         _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
@@ -10570,10 +10596,10 @@ var Key = (function (_super) {
      * @constructor
      */
     function Key() {
-        var _this = this;
-        _super.call(this);
-        this._eventToProcessingFunction[Key._KEYDOWN_EVENT_NAME] = function (e) { return _this._processKeydown(e); };
-        this._eventToProcessingFunction[Key._KEYUP_EVENT_NAME] = function (e) { return _this._processKeyup(e); };
+        var _this = _super.call(this) || this;
+        _this._eventToProcessingFunction[Key._KEYDOWN_EVENT_NAME] = function (e) { return _this._processKeydown(e); };
+        _this._eventToProcessingFunction[Key._KEYUP_EVENT_NAME] = function (e) { return _this._processKeyup(e); };
+        return _this;
     }
     /**
      * Gets a Key Dispatcher. If one already exists it will be returned;
@@ -10634,11 +10660,11 @@ var Key = (function (_super) {
         this._removeCallbackForEvent(Key._KEYUP_EVENT_NAME, callback);
         return this;
     };
-    Key._DISPATCHER_KEY = "__Plottable_Dispatcher_Key";
-    Key._KEYDOWN_EVENT_NAME = "keydown";
-    Key._KEYUP_EVENT_NAME = "keyup";
     return Key;
 }(dispatcher_1.Dispatcher));
+Key._DISPATCHER_KEY = "__Plottable_Dispatcher_Key";
+Key._KEYDOWN_EVENT_NAME = "keydown";
+Key._KEYUP_EVENT_NAME = "keyup";
 exports.Key = Key;
 
 
@@ -10667,22 +10693,22 @@ var Mouse = (function (_super) {
      * @constructor
      */
     function Mouse(component) {
-        var _this = this;
-        _super.call(this);
-        this._translator = Utils.getTranslator(component);
-        this._lastMousePosition = { x: -1, y: -1 };
+        var _this = _super.call(this) || this;
+        _this._translator = Utils.getTranslator(component);
+        _this._lastMousePosition = { x: -1, y: -1 };
         var processMoveCallback = function (e) { return _this._measureAndDispatch(component, e, Mouse._MOUSEMOVE_EVENT_NAME, "page"); };
-        this._eventToProcessingFunction[Mouse._MOUSEOVER_EVENT_NAME] = processMoveCallback;
-        this._eventToProcessingFunction[Mouse._MOUSEMOVE_EVENT_NAME] = processMoveCallback;
-        this._eventToProcessingFunction[Mouse._MOUSEOUT_EVENT_NAME] = processMoveCallback;
-        this._eventToProcessingFunction[Mouse._MOUSEDOWN_EVENT_NAME] =
+        _this._eventToProcessingFunction[Mouse._MOUSEOVER_EVENT_NAME] = processMoveCallback;
+        _this._eventToProcessingFunction[Mouse._MOUSEMOVE_EVENT_NAME] = processMoveCallback;
+        _this._eventToProcessingFunction[Mouse._MOUSEOUT_EVENT_NAME] = processMoveCallback;
+        _this._eventToProcessingFunction[Mouse._MOUSEDOWN_EVENT_NAME] =
             function (e) { return _this._measureAndDispatch(component, e, Mouse._MOUSEDOWN_EVENT_NAME); };
-        this._eventToProcessingFunction[Mouse._MOUSEUP_EVENT_NAME] =
+        _this._eventToProcessingFunction[Mouse._MOUSEUP_EVENT_NAME] =
             function (e) { return _this._measureAndDispatch(component, e, Mouse._MOUSEUP_EVENT_NAME, "page"); };
-        this._eventToProcessingFunction[Mouse._WHEEL_EVENT_NAME] =
+        _this._eventToProcessingFunction[Mouse._WHEEL_EVENT_NAME] =
             function (e) { return _this._measureAndDispatch(component, e, Mouse._WHEEL_EVENT_NAME); };
-        this._eventToProcessingFunction[Mouse._DBLCLICK_EVENT_NAME] =
+        _this._eventToProcessingFunction[Mouse._DBLCLICK_EVENT_NAME] =
             function (e) { return _this._measureAndDispatch(component, e, Mouse._DBLCLICK_EVENT_NAME); };
+        return _this;
     }
     /**
      * Get a Mouse Dispatcher for the component tree.
@@ -10828,16 +10854,16 @@ var Mouse = (function (_super) {
     Mouse.prototype.lastMousePosition = function () {
         return this._lastMousePosition;
     };
-    Mouse._DISPATCHER_KEY = "__Plottable_Dispatcher_Mouse";
-    Mouse._MOUSEOVER_EVENT_NAME = "mouseover";
-    Mouse._MOUSEMOVE_EVENT_NAME = "mousemove";
-    Mouse._MOUSEOUT_EVENT_NAME = "mouseout";
-    Mouse._MOUSEDOWN_EVENT_NAME = "mousedown";
-    Mouse._MOUSEUP_EVENT_NAME = "mouseup";
-    Mouse._WHEEL_EVENT_NAME = "wheel";
-    Mouse._DBLCLICK_EVENT_NAME = "dblclick";
     return Mouse;
 }(dispatcher_1.Dispatcher));
+Mouse._DISPATCHER_KEY = "__Plottable_Dispatcher_Mouse";
+Mouse._MOUSEOVER_EVENT_NAME = "mouseover";
+Mouse._MOUSEMOVE_EVENT_NAME = "mousemove";
+Mouse._MOUSEOUT_EVENT_NAME = "mouseout";
+Mouse._MOUSEDOWN_EVENT_NAME = "mousedown";
+Mouse._MOUSEUP_EVENT_NAME = "mouseup";
+Mouse._WHEEL_EVENT_NAME = "wheel";
+Mouse._DBLCLICK_EVENT_NAME = "dblclick";
 exports.Mouse = Mouse;
 
 
@@ -10866,17 +10892,17 @@ var Touch = (function (_super) {
      * @param {SVGElement} svg The root <svg> to attach to.
      */
     function Touch(component) {
-        var _this = this;
-        _super.call(this);
-        this._translator = Utils.getTranslator(component);
-        this._eventToProcessingFunction[Touch._TOUCHSTART_EVENT_NAME] =
+        var _this = _super.call(this) || this;
+        _this._translator = Utils.getTranslator(component);
+        _this._eventToProcessingFunction[Touch._TOUCHSTART_EVENT_NAME] =
             function (e) { return _this._measureAndDispatch(component, e, Touch._TOUCHSTART_EVENT_NAME, "page"); };
-        this._eventToProcessingFunction[Touch._TOUCHMOVE_EVENT_NAME] =
+        _this._eventToProcessingFunction[Touch._TOUCHMOVE_EVENT_NAME] =
             function (e) { return _this._measureAndDispatch(component, e, Touch._TOUCHMOVE_EVENT_NAME, "page"); };
-        this._eventToProcessingFunction[Touch._TOUCHEND_EVENT_NAME] =
+        _this._eventToProcessingFunction[Touch._TOUCHEND_EVENT_NAME] =
             function (e) { return _this._measureAndDispatch(component, e, Touch._TOUCHEND_EVENT_NAME, "page"); };
-        this._eventToProcessingFunction[Touch._TOUCHCANCEL_EVENT_NAME] =
+        _this._eventToProcessingFunction[Touch._TOUCHCANCEL_EVENT_NAME] =
             function (e) { return _this._measureAndDispatch(component, e, Touch._TOUCHCANCEL_EVENT_NAME, "page"); };
+        return _this;
     }
     /**
      * Gets a Touch Dispatcher for the component.
@@ -11006,13 +11032,13 @@ var Touch = (function (_super) {
     Touch.prototype.eventInside = function (component, event) {
         return this._translator.isInside(component, event);
     };
-    Touch._DISPATCHER_KEY = "__Plottable_Dispatcher_Touch";
-    Touch._TOUCHSTART_EVENT_NAME = "touchstart";
-    Touch._TOUCHMOVE_EVENT_NAME = "touchmove";
-    Touch._TOUCHEND_EVENT_NAME = "touchend";
-    Touch._TOUCHCANCEL_EVENT_NAME = "touchcancel";
     return Touch;
 }(dispatcher_1.Dispatcher));
+Touch._DISPATCHER_KEY = "__Plottable_Dispatcher_Touch";
+Touch._TOUCHSTART_EVENT_NAME = "touchstart";
+Touch._TOUCHMOVE_EVENT_NAME = "touchmove";
+Touch._TOUCHEND_EVENT_NAME = "touchend";
+Touch._TOUCHCANCEL_EVENT_NAME = "touchcancel";
 exports.Touch = Touch;
 
 
@@ -11035,9 +11061,10 @@ var drawer_1 = __webpack_require__(7);
 var Arc = (function (_super) {
     __extends(Arc, _super);
     function Arc(dataset) {
-        _super.call(this, dataset);
-        this._className = "arc fill";
-        this._svgElementName = "path";
+        var _this = _super.call(this, dataset) || this;
+        _this._className = "arc fill";
+        _this._svgElementName = "path";
+        return _this;
     }
     Arc.prototype._applyDefaultAttributes = function (selection) {
         _super.prototype._applyDefaultAttributes.call(this, selection);
@@ -11067,9 +11094,10 @@ var drawer_1 = __webpack_require__(7);
 var ArcOutline = (function (_super) {
     __extends(ArcOutline, _super);
     function ArcOutline(dataset) {
-        _super.call(this, dataset);
-        this._className = "arc outline";
-        this._svgElementName = "path";
+        var _this = _super.call(this, dataset) || this;
+        _this._className = "arc outline";
+        _this._svgElementName = "path";
+        return _this;
     }
     ArcOutline.prototype._applyDefaultAttributes = function (selection) {
         _super.prototype._applyDefaultAttributes.call(this, selection);
@@ -11100,9 +11128,10 @@ var drawer_1 = __webpack_require__(7);
 var Area = (function (_super) {
     __extends(Area, _super);
     function Area(dataset) {
-        _super.call(this, dataset);
-        this._className = "area";
-        this._svgElementName = "path";
+        var _this = _super.call(this, dataset) || this;
+        _this._className = "area";
+        _this._svgElementName = "path";
+        return _this;
     }
     Area.prototype._applyDefaultAttributes = function (selection) {
         _super.prototype._applyDefaultAttributes.call(this, selection);
@@ -11136,9 +11165,10 @@ var drawer_1 = __webpack_require__(7);
 var Line = (function (_super) {
     __extends(Line, _super);
     function Line(dataset) {
-        _super.call(this, dataset);
-        this._className = "line";
-        this._svgElementName = "path";
+        var _this = _super.call(this, dataset) || this;
+        _this._className = "line";
+        _this._svgElementName = "path";
+        return _this;
     }
     Line.prototype._applyDefaultAttributes = function (selection) {
         _super.prototype._applyDefaultAttributes.call(this, selection);
@@ -11172,8 +11202,9 @@ var drawer_1 = __webpack_require__(7);
 var Rectangle = (function (_super) {
     __extends(Rectangle, _super);
     function Rectangle(dataset) {
-        _super.call(this, dataset);
-        this._svgElementName = "rect";
+        var _this = _super.call(this, dataset) || this;
+        _this._svgElementName = "rect";
+        return _this;
     }
     Rectangle.prototype._drawStepCanvas = function (data, step) {
         var context = this.canvas().node().getContext("2d");
@@ -11232,8 +11263,9 @@ var drawer_1 = __webpack_require__(7);
 var Segment = (function (_super) {
     __extends(Segment, _super);
     function Segment(dataset) {
-        _super.call(this, dataset);
-        this._svgElementName = "line";
+        var _this = _super.call(this, dataset) || this;
+        _this._svgElementName = "line";
+        return _this;
     }
     return Segment;
 }(drawer_1.Drawer));
@@ -11259,9 +11291,10 @@ var drawer_1 = __webpack_require__(7);
 var Symbol = (function (_super) {
     __extends(Symbol, _super);
     function Symbol(dataset) {
-        _super.call(this, dataset);
-        this._svgElementName = "path";
-        this._className = "symbol";
+        var _this = _super.call(this, dataset) || this;
+        _this._svgElementName = "path";
+        _this._className = "symbol";
+        return _this;
     }
     return Symbol;
 }(drawer_1.Drawer));
@@ -11289,22 +11322,22 @@ var interaction_1 = __webpack_require__(14);
 var Click = (function (_super) {
     __extends(Click, _super);
     function Click() {
-        var _this = this;
-        _super.apply(this, arguments);
-        this._clickedDown = false;
-        this._doubleClicking = false;
-        this._onClickCallbacks = new Utils.CallbackSet();
-        this._onDoubleClickCallbacks = new Utils.CallbackSet();
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this._clickedDown = false;
+        _this._doubleClicking = false;
+        _this._onClickCallbacks = new Utils.CallbackSet();
+        _this._onDoubleClickCallbacks = new Utils.CallbackSet();
         /**
          * Note: we bind to mousedown, mouseup, touchstart and touchend because browsers
          * have a 300ms delay between touchstart and click to allow for scrolling cancelling etc.
          */
-        this._mouseDownCallback = function (p, event) { return _this._handleClickDown(p, event); };
-        this._mouseUpCallback = function (p, event) { return _this._handleClickUp(p, event); };
-        this._dblClickCallback = function (p, event) { return _this._handleDblClick(p, event); };
-        this._touchStartCallback = function (ids, idToPoint, event) { return _this._handleClickDown(idToPoint[ids[0]], event); };
-        this._touchEndCallback = function (ids, idToPoint, event) { return _this._handleClickUp(idToPoint[ids[0]], event); };
-        this._touchCancelCallback = function (ids, idToPoint) { return _this._clickedDown = false; };
+        _this._mouseDownCallback = function (p, event) { return _this._handleClickDown(p, event); };
+        _this._mouseUpCallback = function (p, event) { return _this._handleClickUp(p, event); };
+        _this._dblClickCallback = function (p, event) { return _this._handleDblClick(p, event); };
+        _this._touchStartCallback = function (ids, idToPoint, event) { return _this._handleClickDown(idToPoint[ids[0]], event); };
+        _this._touchEndCallback = function (ids, idToPoint, event) { return _this._handleClickUp(idToPoint[ids[0]], event); };
+        _this._touchCancelCallback = function (ids, idToPoint) { return _this._clickedDown = false; };
+        return _this;
     }
     Click.prototype._anchor = function (component) {
         _super.prototype._anchor.call(this, component);
@@ -11423,19 +11456,19 @@ var interaction_1 = __webpack_require__(14);
 var Drag = (function (_super) {
     __extends(Drag, _super);
     function Drag() {
-        var _this = this;
-        _super.apply(this, arguments);
-        this._dragging = false;
-        this._constrainedToComponent = true;
-        this._dragStartCallbacks = new Utils.CallbackSet();
-        this._dragCallbacks = new Utils.CallbackSet();
-        this._dragEndCallbacks = new Utils.CallbackSet();
-        this._mouseDownCallback = function (p, e) { return _this._startDrag(p, e); };
-        this._mouseMoveCallback = function (p, e) { return _this._doDrag(p, e); };
-        this._mouseUpCallback = function (p, e) { return _this._endDrag(p, e); };
-        this._touchStartCallback = function (ids, idToPoint, e) { return _this._startDrag(idToPoint[ids[0]], e); };
-        this._touchMoveCallback = function (ids, idToPoint, e) { return _this._doDrag(idToPoint[ids[0]], e); };
-        this._touchEndCallback = function (ids, idToPoint, e) { return _this._endDrag(idToPoint[ids[0]], e); };
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this._dragging = false;
+        _this._constrainedToComponent = true;
+        _this._dragStartCallbacks = new Utils.CallbackSet();
+        _this._dragCallbacks = new Utils.CallbackSet();
+        _this._dragEndCallbacks = new Utils.CallbackSet();
+        _this._mouseDownCallback = function (p, e) { return _this._startDrag(p, e); };
+        _this._mouseMoveCallback = function (p, e) { return _this._doDrag(p, e); };
+        _this._mouseUpCallback = function (p, e) { return _this._endDrag(p, e); };
+        _this._touchStartCallback = function (ids, idToPoint, e) { return _this._startDrag(idToPoint[ids[0]], e); };
+        _this._touchMoveCallback = function (ids, idToPoint, e) { return _this._doDrag(idToPoint[ids[0]], e); };
+        _this._touchEndCallback = function (ids, idToPoint, e) { return _this._endDrag(idToPoint[ids[0]], e); };
+        return _this;
     }
     Drag.prototype._anchor = function (component) {
         _super.prototype._anchor.call(this, component);
@@ -11607,30 +11640,30 @@ var PanZoom = (function (_super) {
      * @param {TransformableScale} [yScale] The y-scale to update on panning/zooming.
      */
     function PanZoom(xScale, yScale) {
-        var _this = this;
-        _super.call(this);
-        this._wheelCallback = function (p, e) { return _this._handleWheelEvent(p, e); };
-        this._touchStartCallback = function (ids, idToPoint, e) { return _this._handleTouchStart(ids, idToPoint, e); };
-        this._touchMoveCallback = function (ids, idToPoint, e) { return _this._handlePinch(ids, idToPoint, e); };
-        this._touchEndCallback = function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); };
-        this._touchCancelCallback = function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); };
-        this._panEndCallbacks = new Utils.CallbackSet();
-        this._zoomEndCallbacks = new Utils.CallbackSet();
-        this._xScales = new Utils.Set();
-        this._yScales = new Utils.Set();
-        this._dragInteraction = new Interactions.Drag();
-        this._setupDragInteraction();
-        this._touchIds = d3.map();
-        this._minDomainExtents = new Utils.Map();
-        this._maxDomainExtents = new Utils.Map();
-        this._minDomainValues = new Utils.Map();
-        this._maxDomainValues = new Utils.Map();
+        var _this = _super.call(this) || this;
+        _this._wheelCallback = function (p, e) { return _this._handleWheelEvent(p, e); };
+        _this._touchStartCallback = function (ids, idToPoint, e) { return _this._handleTouchStart(ids, idToPoint, e); };
+        _this._touchMoveCallback = function (ids, idToPoint, e) { return _this._handlePinch(ids, idToPoint, e); };
+        _this._touchEndCallback = function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); };
+        _this._touchCancelCallback = function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); };
+        _this._panEndCallbacks = new Utils.CallbackSet();
+        _this._zoomEndCallbacks = new Utils.CallbackSet();
+        _this._xScales = new Utils.Set();
+        _this._yScales = new Utils.Set();
+        _this._dragInteraction = new Interactions.Drag();
+        _this._setupDragInteraction();
+        _this._touchIds = d3.map();
+        _this._minDomainExtents = new Utils.Map();
+        _this._maxDomainExtents = new Utils.Map();
+        _this._minDomainValues = new Utils.Map();
+        _this._maxDomainValues = new Utils.Map();
         if (xScale != null) {
-            this.addXScale(xScale);
+            _this.addXScale(xScale);
         }
         if (yScale != null) {
-            this.addYScale(yScale);
+            _this.addYScale(yScale);
         }
+        return _this;
     }
     /**
      * Pans the chart by a specified amount
@@ -12116,12 +12149,12 @@ var PanZoom = (function (_super) {
         this._zoomEndCallbacks.delete(callback);
         return this;
     };
-    /**
-     * The number of pixels occupied in a line.
-     */
-    PanZoom._PIXELS_PER_LINE = 120;
     return PanZoom;
 }(interaction_1.Interaction));
+/**
+ * The number of pixels occupied in a line.
+ */
+PanZoom._PIXELS_PER_LINE = 120;
 exports.PanZoom = PanZoom;
 
 
@@ -12146,14 +12179,14 @@ var interaction_1 = __webpack_require__(14);
 var Pointer = (function (_super) {
     __extends(Pointer, _super);
     function Pointer() {
-        var _this = this;
-        _super.apply(this, arguments);
-        this._overComponent = false;
-        this._pointerEnterCallbacks = new Utils.CallbackSet();
-        this._pointerMoveCallbacks = new Utils.CallbackSet();
-        this._pointerExitCallbacks = new Utils.CallbackSet();
-        this._mouseMoveCallback = function (p, e) { return _this._handleMouseEvent(p, e); };
-        this._touchStartCallback = function (ids, idToPoint, e) { return _this._handleTouchEvent(idToPoint[ids[0]], e); };
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this._overComponent = false;
+        _this._pointerEnterCallbacks = new Utils.CallbackSet();
+        _this._pointerMoveCallbacks = new Utils.CallbackSet();
+        _this._pointerExitCallbacks = new Utils.CallbackSet();
+        _this._mouseMoveCallback = function (p, e) { return _this._handleMouseEvent(p, e); };
+        _this._touchStartCallback = function (ids, idToPoint, e) { return _this._handleTouchEvent(idToPoint[ids[0]], e); };
+        return _this;
     }
     Pointer.prototype._anchor = function (component) {
         _super.prototype._anchor.call(this, component);
@@ -12287,8 +12320,9 @@ var ClusteredBar = (function (_super) {
      */
     function ClusteredBar(orientation) {
         if (orientation === void 0) { orientation = barPlot_1.Bar.ORIENTATION_VERTICAL; }
-        _super.call(this, orientation);
-        this._clusterOffsets = new Utils.Map();
+        var _this = _super.call(this, orientation) || this;
+        _this._clusterOffsets = new Utils.Map();
+        return _this;
     }
     ClusteredBar.prototype._generateAttrToProjector = function () {
         var _this = this;
@@ -12358,20 +12392,20 @@ var Pie = (function (_super) {
      * @constructor
      */
     function Pie() {
-        var _this = this;
-        _super.call(this);
-        this._startAngle = 0;
-        this._endAngle = 2 * Math.PI;
-        this._labelFormatter = Formatters.identity();
-        this._labelsEnabled = false;
-        this.innerRadius(0);
-        this.outerRadius(function () {
+        var _this = _super.call(this) || this;
+        _this._startAngle = 0;
+        _this._endAngle = 2 * Math.PI;
+        _this._labelFormatter = Formatters.identity();
+        _this._labelsEnabled = false;
+        _this.innerRadius(0);
+        _this.outerRadius(function () {
             var pieCenter = _this._pieCenter();
             return Math.min(Math.max(_this.width() - pieCenter.x, pieCenter.x), Math.max(_this.height() - pieCenter.y, pieCenter.y));
         });
-        this.addClass("pie-plot");
-        this.attr("fill", function (d, i) { return String(i); }, new Scales.Color());
-        this._strokeDrawers = new Utils.Map();
+        _this.addClass("pie-plot");
+        _this.attr("fill", function (d, i) { return String(i); }, new Scales.Color());
+        _this._strokeDrawers = new Utils.Map();
+        return _this;
     }
     Pie.prototype._setup = function () {
         var _this = this;
@@ -12817,11 +12851,11 @@ var Pie = (function (_super) {
             }, g.node());
         });
     };
-    Pie._INNER_RADIUS_KEY = "inner-radius";
-    Pie._OUTER_RADIUS_KEY = "outer-radius";
-    Pie._SECTOR_VALUE_KEY = "sector-value";
     return Pie;
 }(plot_1.Plot));
+Pie._INNER_RADIUS_KEY = "inner-radius";
+Pie._OUTER_RADIUS_KEY = "outer-radius";
+Pie._SECTOR_VALUE_KEY = "sector-value";
 exports.Pie = Pie;
 
 
@@ -12862,12 +12896,13 @@ var Rectangle = (function (_super) {
      * @param {Scale.Scale} yScale
      */
     function Rectangle() {
-        _super.call(this);
-        this._labelsEnabled = false;
-        this._label = null;
-        this.animator("rectangles", new Animators.Null());
-        this.addClass("rectangle-plot");
-        this.attr("fill", new Scales.Color().range()[0]);
+        var _this = _super.call(this) || this;
+        _this._labelsEnabled = false;
+        _this._label = null;
+        _this.animator("rectangles", new Animators.Null());
+        _this.addClass("rectangle-plot");
+        _this.attr("fill", new Scales.Color().range()[0]);
+        return _this;
     }
     Rectangle.prototype._createDrawer = function (dataset) {
         return new Drawers.Rectangle(dataset);
@@ -13183,10 +13218,10 @@ var Rectangle = (function (_super) {
         }
         return false;
     };
-    Rectangle._X2_KEY = "x2";
-    Rectangle._Y2_KEY = "y2";
     return Rectangle;
 }(xyPlot_1.XYPlot));
+Rectangle._X2_KEY = "x2";
+Rectangle._Y2_KEY = "y2";
 exports.Rectangle = Rectangle;
 
 
@@ -13221,18 +13256,19 @@ var Scatter = (function (_super) {
      * @constructor
      */
     function Scatter() {
-        _super.call(this);
-        this.addClass("scatter-plot");
+        var _this = _super.call(this) || this;
+        _this.addClass("scatter-plot");
         var animator = new Animators.Easing();
         animator.startDelay(5);
         animator.stepDuration(250);
         animator.maxTotalDuration(plot_1.Plot._ANIMATION_MAX_DURATION);
-        this.animator(Plots.Animator.MAIN, animator);
-        this.attr("opacity", 0.6);
-        this.attr("fill", new Scales.Color().range()[0]);
-        this.size(6);
+        _this.animator(Plots.Animator.MAIN, animator);
+        _this.attr("opacity", 0.6);
+        _this.attr("fill", new Scales.Color().range()[0]);
+        _this.size(6);
         var circleSymbolFactory = SymbolFactories.circle();
-        this.symbol(function () { return circleSymbolFactory; });
+        _this.symbol(function () { return circleSymbolFactory; });
+        return _this;
     }
     Scatter.prototype._buildLightweightPlotEntities = function (datasets) {
         var _this = this;
@@ -13344,10 +13380,10 @@ var Scatter = (function (_super) {
             return x - size / 2 <= p.x && p.x <= x + size / 2 && y - size / 2 <= p.y && p.y <= y + size / 2;
         });
     };
-    Scatter._SIZE_KEY = "size";
-    Scatter._SYMBOL_KEY = "symbol";
     return Scatter;
 }(xyPlot_1.XYPlot));
+Scatter._SIZE_KEY = "size";
+Scatter._SYMBOL_KEY = "symbol";
 exports.Scatter = Scatter;
 
 
@@ -13379,10 +13415,11 @@ var Segment = (function (_super) {
      * @constructor
      */
     function Segment() {
-        _super.call(this);
-        this.addClass("segment-plot");
-        this.attr("stroke", new Scales.Color().range()[0]);
-        this.attr("stroke-width", "2px");
+        var _this = _super.call(this) || this;
+        _this.addClass("segment-plot");
+        _this.attr("stroke", new Scales.Color().range()[0]);
+        _this.attr("stroke-width", "2px");
+        return _this;
     }
     Segment.prototype._createDrawer = function (dataset) {
         return new Drawers.Segment(dataset);
@@ -13542,10 +13579,10 @@ var Segment = (function (_super) {
         // point3 and point4 are on different sides of line formed by point1 and point2
         return calcOrientation(point1, point2, point3) * calcOrientation(point1, point2, point4) < 0;
     };
-    Segment._X2_KEY = "x2";
-    Segment._Y2_KEY = "y2";
     return Segment;
 }(xyPlot_1.XYPlot));
+Segment._X2_KEY = "x2";
+Segment._Y2_KEY = "y2";
 exports.Segment = Segment;
 
 
@@ -13575,16 +13612,16 @@ var StackedArea = (function (_super) {
      * @constructor
      */
     function StackedArea() {
-        var _this = this;
-        _super.call(this);
-        this._baselineValue = 0;
-        this._stackingOrder = "bottomup";
-        this.addClass("stacked-area-plot");
-        this.attr("fill-opacity", 1);
-        this._stackingResult = new Utils.Map();
-        this._stackedExtent = [];
-        this._baselineValueProvider = function () { return [_this._baselineValue]; };
-        this.croppedRenderingEnabled(false);
+        var _this = _super.call(this) || this;
+        _this._baselineValue = 0;
+        _this._stackingOrder = "bottomup";
+        _this.addClass("stacked-area-plot");
+        _this.attr("fill-opacity", 1);
+        _this._stackingResult = new Utils.Map();
+        _this._stackedExtent = [];
+        _this._baselineValueProvider = function () { return [_this._baselineValue]; };
+        _this.croppedRenderingEnabled(false);
+        return _this;
     }
     StackedArea.prototype.croppedRenderingEnabled = function (croppedRendering) {
         if (croppedRendering == null) {
@@ -13784,11 +13821,12 @@ var StackedBar = (function (_super) {
      */
     function StackedBar(orientation) {
         if (orientation === void 0) { orientation = barPlot_1.Bar.ORIENTATION_VERTICAL; }
-        _super.call(this, orientation);
-        this.addClass("stacked-bar-plot");
-        this._stackingOrder = "bottomup";
-        this._stackingResult = new Utils.Map();
-        this._stackedExtent = [];
+        var _this = _super.call(this, orientation) || this;
+        _this.addClass("stacked-bar-plot");
+        _this._stackingOrder = "bottomup";
+        _this._stackingResult = new Utils.Map();
+        _this._stackedExtent = [];
+        return _this;
     }
     StackedBar.prototype.x = function (x, xScale) {
         if (x == null) {
@@ -13964,9 +14002,9 @@ var StackedBar = (function (_super) {
         _super.prototype.invalidateCache.call(this);
         this._measurer.reset();
     };
-    StackedBar._STACKED_BAR_LABEL_PADDING = 5;
     return StackedBar;
 }(barPlot_1.Bar));
+StackedBar._STACKED_BAR_LABEL_PADDING = 5;
 exports.StackedBar = StackedBar;
 
 
@@ -13991,9 +14029,10 @@ var plot_1 = __webpack_require__(2);
 var Waterfall = (function (_super) {
     __extends(Waterfall, _super);
     function Waterfall() {
-        _super.call(this);
-        this._connectorsEnabled = false;
-        this.addClass("waterfall-plot");
+        var _this = _super.call(this) || this;
+        _this._connectorsEnabled = false;
+        _this.addClass("waterfall-plot");
+        return _this;
     }
     Waterfall.prototype.connectorsEnabled = function (enabled) {
         if (enabled == null) {
@@ -14170,14 +14209,14 @@ var Waterfall = (function (_super) {
             this._calculateSubtotalsAndExtent(dataset);
         }
     };
-    Waterfall._BAR_DECLINE_CLASS = "waterfall-decline";
-    Waterfall._BAR_GROWTH_CLASS = "waterfall-growth";
-    Waterfall._BAR_TOTAL_CLASS = "waterfall-total";
-    Waterfall._CONNECTOR_CLASS = "connector";
-    Waterfall._CONNECTOR_AREA_CLASS = "connector-area";
-    Waterfall._TOTAL_KEY = "total";
     return Waterfall;
 }(barPlot_1.Bar));
+Waterfall._BAR_DECLINE_CLASS = "waterfall-decline";
+Waterfall._BAR_GROWTH_CLASS = "waterfall-growth";
+Waterfall._BAR_TOTAL_CLASS = "waterfall-total";
+Waterfall._CONNECTOR_CLASS = "connector";
+Waterfall._CONNECTOR_AREA_CLASS = "connector-area";
+Waterfall._TOTAL_KEY = "total";
 exports.Waterfall = Waterfall;
 
 
@@ -14210,7 +14249,7 @@ var Color = (function (_super) {
      *   If not supplied, reads the colors defined using CSS -- see plottable.css.
      */
     function Color(scaleType) {
-        _super.call(this);
+        var _this = _super.call(this) || this;
         var scale;
         switch (scaleType) {
             case null:
@@ -14243,7 +14282,8 @@ var Color = (function (_super) {
             default:
                 throw new Error("Unsupported ColorScale type");
         }
-        this._d3Scale = scale;
+        _this._d3Scale = scale;
+        return _this;
     }
     Color.prototype.extentOfValues = function (values) {
         return Utils.Array.uniq(values);
@@ -14304,11 +14344,11 @@ var Color = (function (_super) {
     Color.prototype._setRange = function (values) {
         this._d3Scale.range(values);
     };
-    Color._LOOP_LIGHTEN_FACTOR = 1.6;
-    // The maximum number of colors we are getting from CSS stylesheets
-    Color._MAXIMUM_COLORS_FROM_CSS = 256;
     return Color;
 }(scale_1.Scale));
+Color._LOOP_LIGHTEN_FACTOR = 1.6;
+// The maximum number of colors we are getting from CSS stylesheets
+Color._MAXIMUM_COLORS_FROM_CSS = 256;
 exports.Color = Color;
 
 
@@ -14339,25 +14379,26 @@ var InterpolatedColor = (function (_super) {
      */
     function InterpolatedColor(scaleType) {
         if (scaleType === void 0) { scaleType = "linear"; }
-        _super.call(this);
+        var _this = _super.call(this) || this;
         switch (scaleType) {
             case "linear":
-                this._colorScale = d3.scaleLinear();
+                _this._colorScale = d3.scaleLinear();
                 break;
             case "log":
-                this._colorScale = d3.scaleLog();
+                _this._colorScale = d3.scaleLog();
                 break;
             case "sqrt":
-                this._colorScale = d3.scaleSqrt();
+                _this._colorScale = d3.scaleSqrt();
                 break;
             case "pow":
-                this._colorScale = d3.scalePow();
+                _this._colorScale = d3.scalePow();
                 break;
         }
-        if (this._colorScale == null) {
+        if (_this._colorScale == null) {
             throw new Error("unknown QuantitativeScale scale type " + scaleType);
         }
-        this.range(InterpolatedColor.REDS);
+        _this.range(InterpolatedColor.REDS);
+        return _this;
     }
     InterpolatedColor.prototype.extentOfValues = function (values) {
         var extent = d3.extent(values);
@@ -14432,49 +14473,49 @@ var InterpolatedColor = (function (_super) {
         this._colorRange = range;
         this._resetScale();
     };
-    InterpolatedColor.REDS = [
-        "#FFFFFF",
-        "#FFF6E1",
-        "#FEF4C0",
-        "#FED976",
-        "#FEB24C",
-        "#FD8D3C",
-        "#FC4E2A",
-        "#E31A1C",
-        "#B10026",
-    ];
-    InterpolatedColor.BLUES = [
-        "#FFFFFF",
-        "#CCFFFF",
-        "#A5FFFD",
-        "#85F7FB",
-        "#6ED3EF",
-        "#55A7E0",
-        "#417FD0",
-        "#2545D3",
-        "#0B02E1",
-    ];
-    InterpolatedColor.POSNEG = [
-        "#0B02E1",
-        "#2545D3",
-        "#417FD0",
-        "#55A7E0",
-        "#6ED3EF",
-        "#85F7FB",
-        "#A5FFFD",
-        "#CCFFFF",
-        "#FFFFFF",
-        "#FFF6E1",
-        "#FEF4C0",
-        "#FED976",
-        "#FEB24C",
-        "#FD8D3C",
-        "#FC4E2A",
-        "#E31A1C",
-        "#B10026",
-    ];
     return InterpolatedColor;
 }(scale_1.Scale));
+InterpolatedColor.REDS = [
+    "#FFFFFF",
+    "#FFF6E1",
+    "#FEF4C0",
+    "#FED976",
+    "#FEB24C",
+    "#FD8D3C",
+    "#FC4E2A",
+    "#E31A1C",
+    "#B10026",
+];
+InterpolatedColor.BLUES = [
+    "#FFFFFF",
+    "#CCFFFF",
+    "#A5FFFD",
+    "#85F7FB",
+    "#6ED3EF",
+    "#55A7E0",
+    "#417FD0",
+    "#2545D3",
+    "#0B02E1",
+];
+InterpolatedColor.POSNEG = [
+    "#0B02E1",
+    "#2545D3",
+    "#417FD0",
+    "#55A7E0",
+    "#6ED3EF",
+    "#85F7FB",
+    "#A5FFFD",
+    "#CCFFFF",
+    "#FFFFFF",
+    "#FFF6E1",
+    "#FEF4C0",
+    "#FED976",
+    "#FEB24C",
+    "#FD8D3C",
+    "#FC4E2A",
+    "#E31A1C",
+    "#B10026",
+];
 exports.InterpolatedColor = InterpolatedColor;
 
 
@@ -14501,8 +14542,9 @@ var Linear = (function (_super) {
      * @constructor
      */
     function Linear() {
-        _super.call(this);
-        this._d3Scale = d3.scaleLinear();
+        var _this = _super.call(this) || this;
+        _this._d3Scale = d3.scaleLinear();
+        return _this;
     }
     Linear.prototype._defaultExtent = function () {
         return [0, 1];
@@ -14608,14 +14650,15 @@ var ModifiedLog = (function (_super) {
      */
     function ModifiedLog(base) {
         if (base === void 0) { base = 10; }
-        _super.call(this);
-        this._d3Scale = d3.scaleLinear();
-        this._base = base;
-        this._pivot = this._base;
-        this._setDomain(this._defaultExtent());
+        var _this = _super.call(this) || this;
+        _this._d3Scale = d3.scaleLinear();
+        _this._base = base;
+        _this._pivot = _this._base;
+        _this._setDomain(_this._defaultExtent());
         if (base <= 1) {
             throw new Error("ModifiedLogScale: The base must be > 1");
         }
+        return _this;
     }
     /**
      * Returns an adjusted log10 value for graphing purposes.  The first
@@ -14857,9 +14900,10 @@ var Time = (function (_super) {
      * @constructor
      */
     function Time() {
-        _super.call(this);
-        this._d3Scale = d3.scaleTime();
-        this.autoDomain();
+        var _this = _super.call(this) || this;
+        _this._d3Scale = d3.scaleTime();
+        _this.autoDomain();
+        return _this;
     }
     /**
      * Returns an array of ticks values separated by the specified interval.
@@ -15061,13 +15105,13 @@ var set_1 = __webpack_require__(40);
 var CallbackSet = (function (_super) {
     __extends(CallbackSet, _super);
     function CallbackSet() {
-        _super.apply(this, arguments);
+        return _super !== null && _super.apply(this, arguments) || this;
     }
     CallbackSet.prototype.callCallbacks = function () {
         var _this = this;
         var args = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i - 0] = arguments[_i];
+            args[_i] = arguments[_i];
         }
         this.forEach(function (callback) {
             callback.apply(_this, args);
@@ -15753,9 +15797,9 @@ var Translator = (function () {
     Translator.prototype.isInside = function (component, e) {
         return Utils.DOM.contains(component.root().rootElement().node(), e.target);
     };
-    Translator.SAMPLE_DISTANCE = 100;
     return Translator;
 }());
+Translator.SAMPLE_DISTANCE = 100;
 exports.Translator = Translator;
 
 
