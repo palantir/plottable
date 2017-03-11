@@ -30,9 +30,17 @@ type LabelConfig = {
   writer: Typesetter.Writer;
 };
 
+export type BarOrientation = "vertical" | "horizontal";
+
 export class Bar<X, Y> extends XYPlot<X, Y> {
-  public static ORIENTATION_VERTICAL = "vertical";
-  public static ORIENTATION_HORIZONTAL = "horizontal";
+  /**
+   * @deprecated use "vertical" instead
+   */
+  public static ORIENTATION_VERTICAL: BarOrientation = "vertical";
+  /**
+   * @deprecated use "horizontal" instead
+   */
+  public static ORIENTATION_HORIZONTAL: BarOrientation = "horizontal";
   private static _BAR_WIDTH_RATIO = 0.95;
   private static _SINGLE_BAR_DIMENSION_RATIO = 0.4;
   private static _BAR_AREA_CLASS = "bar-area";
@@ -58,13 +66,13 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
    * @constructor
    * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
    */
-  constructor(orientation = Bar.ORIENTATION_VERTICAL) {
+  constructor(orientation: BarOrientation = "vertical") {
     super();
     this.addClass("bar-plot");
-    if (orientation !== Bar.ORIENTATION_VERTICAL && orientation !== Bar.ORIENTATION_HORIZONTAL) {
+    if (orientation !== "vertical" && orientation !== "horizontal") {
       throw new Error(orientation + " is not a valid orientation for Plots.Bar");
     }
-    this._isVertical = orientation === Bar.ORIENTATION_VERTICAL;
+    this._isVertical = orientation === "vertical";
     this.animator("baseline", new Animators.Null());
     this.attr("fill", new Scales.Color().range()[0]);
     this.attr("width", () => this._barPixelWidth);
@@ -116,8 +124,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
    *
    * @return "vertical" | "horizontal"
    */
-  public orientation() {
-    return this._isVertical ? Bar.ORIENTATION_VERTICAL : Bar.ORIENTATION_HORIZONTAL;
+  public orientation(): BarOrientation {
+    return this._isVertical ? "vertical" : "horizontal";
   }
 
   public render() {

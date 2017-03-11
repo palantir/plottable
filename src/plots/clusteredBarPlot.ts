@@ -7,7 +7,7 @@ import { Dataset } from "../core/dataset";
 import * as Scales from "../scales";
 import * as Utils from "../utils";
 
-import { Bar } from "./barPlot";
+import { Bar, BarOrientation } from "./barPlot";
 import { Plot } from "./plot";
 
 export class ClusteredBar<X, Y> extends Bar<X, Y> {
@@ -22,7 +22,7 @@ export class ClusteredBar<X, Y> extends Bar<X, Y> {
    * @constructor
    * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
    */
-  constructor(orientation = Bar.ORIENTATION_VERTICAL) {
+  constructor(orientation: BarOrientation = "vertical") {
     super(orientation);
     this._clusterOffsets = new Utils.Map<Dataset, number>();
   }
