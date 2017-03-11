@@ -3,8 +3,8 @@ import * as d3 from "d3";
 import * as Utils from "../utils";
 
 import { Point } from "../";
-import { SimpleSelection } from "../core/interfaces";
 import { Component } from "../components/component";
+import { SimpleSelection } from "../core/interfaces";
 
 const _TRANSLATOR_KEY = "__Plottable_ClientTranslator";
 
@@ -12,7 +12,7 @@ export function getTranslator(component: Component): Translator {
   // The Translator works by first calculating the offset to root of the chart and then calculating
   // the offset from the component to the root. It is imperative that the _measurementElement
   // be added to the root of the hierarchy and nowhere else.
-  let root = component.root().rootElement().node() as Element;
+  const root = component.root().rootElement().node() as Element;
 
   let translator: Translator = (<any> root)[_TRANSLATOR_KEY];
   if (translator == null) {
@@ -37,8 +37,8 @@ export function getTranslator(component: Component): Translator {
  * When nested within an HTML, the style position is respected.
  */
 function move(node: SimpleSelection<any>, x: number, y: number) {
-  node.styles({ "left": `${x}px`, "top": `${y}px` });
-  node.attrs({ "x": `${x}`, "y": `${y}` });
+  node.styles({ left: `${x}px`, top: `${y}px` });
+  node.attrs({ x: `${x}`, y: `${y}` });
 }
 
 export class Translator {
@@ -59,27 +59,27 @@ export class Translator {
     move(this._measurementElement, 0, 0);
 
     let mrBCR = (this._measurementElement.node() as HTMLElement).getBoundingClientRect();
-    let origin = { x: mrBCR.left, y: mrBCR.top };
+    const origin = { x: mrBCR.left, y: mrBCR.top };
 
     // calculate the scale
     move(this._measurementElement, Translator.SAMPLE_DISTANCE, Translator.SAMPLE_DISTANCE);
 
     mrBCR = (this._measurementElement.node() as HTMLElement).getBoundingClientRect();
-    let testPoint = { x: mrBCR.left, y: mrBCR.top };
+    const testPoint = { x: mrBCR.left, y: mrBCR.top };
 
     // invalid measurements -- SVG might not be in the DOM
     if (origin.x === testPoint.x || origin.y === testPoint.y) {
       return null;
     }
 
-    let scaleX = (testPoint.x - origin.x) / Translator.SAMPLE_DISTANCE;
-    let scaleY = (testPoint.y - origin.y) / Translator.SAMPLE_DISTANCE;
+    const scaleX = (testPoint.x - origin.x) / Translator.SAMPLE_DISTANCE;
+    const scaleY = (testPoint.y - origin.y) / Translator.SAMPLE_DISTANCE;
 
     // get the true cursor position
     move(this._measurementElement, ((clientX - origin.x) / scaleX), ((clientY - origin.y) / scaleY));
 
     mrBCR = (this._measurementElement.node() as HTMLElement).getBoundingClientRect();
-    let trueCursorPosition = { x: mrBCR.left, y: mrBCR.top };
+    const trueCursorPosition = { x: mrBCR.left, y: mrBCR.top };
 
     const scaledPosition = {
       x: (trueCursorPosition.x - origin.x) / scaleX,
@@ -93,4 +93,3 @@ export class Translator {
     return Utils.DOM.contains(component.root().rootElement().node() as Element, e.target as Element);
   }
 }
-

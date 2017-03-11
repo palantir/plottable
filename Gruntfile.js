@@ -24,15 +24,6 @@ module.exports = function(grunt) {
     }
   };
 
-  var tslintConfig = {
-    options: {
-      configuration: grunt.file.readJSON("tslint.json")
-    },
-    all: {
-      src: ["src/**/*.ts", "test/**/*.ts"]
-    }
-  };
-
   var jscsConfig = {
     files: ["Gruntfile.js", "quicktests/**/*.js"],
     options: {
@@ -44,12 +35,6 @@ module.exports = function(grunt) {
     target: ["Gruntfile.js", "quicktests/**/*.js"],
     options: {
       configFile: ".eslintrc"
-    }
-  };
-
-  var parallelizeConfig = {
-    tslint: {
-      all: 4
     }
   };
 
@@ -165,11 +150,9 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON("package.json"),
     bump: bumpConfig,
-    tslint: tslintConfig,
     jscs: jscsConfig,
     eslint: eslintConfig,
     exec: execConfig,
-    parallelize: parallelizeConfig,
     watch: watchConfig,
     "blanket_mocha": blanketMochaConfig,
     connect: connectConfig,
@@ -206,7 +189,7 @@ module.exports = function(grunt) {
     grunt.task.run(["watch"]);
   });
 
-  grunt.registerTask("lint", ["parallelize:tslint", "jscs", "eslint"]);
+  grunt.registerTask("lint", ["jscs", "eslint"]);
 
   // Disable saucelabs on dev environments by checking if SAUCE_USERNAME is an environment variable
   if (process.env.SAUCE_USERNAME) {

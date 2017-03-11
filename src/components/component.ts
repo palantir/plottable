@@ -5,12 +5,12 @@
 
 import * as d3 from "d3";
 
-import { Point, SpaceRequest, Bounds, SimpleSelection } from "../core/interfaces";
+import { Bounds, Point, SimpleSelection, SpaceRequest } from "../core/interfaces";
 import * as RenderController from "../core/renderController";
 import * as Utils from "../utils";
 
-import { ComponentContainer } from "./componentContainer";
 import { coerceExternalD3 } from "../utils/coerceD3";
+import { ComponentContainer } from "./componentContainer";
 
 export type ComponentCallback = (component: Component) => void;
 
@@ -62,15 +62,15 @@ export class Component {
   private _parent: ComponentContainer;
   private _xAlignment: string = "left";
   private static _xAlignToProportion: { [alignment: string]: number } = {
-    "left": 0,
-    "center": 0.5,
-    "right": 1,
+    left: 0,
+    center: 0.5,
+    right: 1,
   };
   private _yAlignment: string = "top";
   private static _yAlignToProportion: { [alignment: string]: number } = {
-    "top": 0,
-    "center": 0.5,
-    "bottom": 1,
+    top: 0,
+    center: 0.5,
+    bottom: 1,
   };
   protected _isSetup = false;
   protected _isAnchored = false;
@@ -247,12 +247,12 @@ export class Component {
       }
     }
 
-    let size = this._sizeFromOffer(availableWidth, availableHeight);
+    const size = this._sizeFromOffer(availableWidth, availableHeight);
     this._width = size.width;
     this._height = size.height;
 
-    let xAlignProportion = Component._xAlignToProportion[this._xAlignment];
-    let yAlignProportion = Component._yAlignToProportion[this._yAlignment];
+    const xAlignProportion = Component._xAlignToProportion[this._xAlignment];
+    const yAlignProportion = Component._yAlignToProportion[this._yAlignment];
     this._origin = {
       x: origin.x + (availableWidth - this.width()) * xAlignProportion,
       y: origin.y + (availableHeight - this.height()) * yAlignProportion,
@@ -273,7 +273,7 @@ export class Component {
   }
 
   protected _sizeFromOffer(availableWidth: number, availableHeight: number) {
-    let requestedSpace = this.requestedSpace(availableWidth, availableHeight);
+    const requestedSpace = this.requestedSpace(availableWidth, availableHeight);
     return {
       width: this.fixedWidth() ? Math.min(availableWidth, requestedSpace.minWidth) : availableWidth,
       height: this.fixedHeight() ? Math.min(availableHeight, requestedSpace.minHeight) : availableHeight,
@@ -434,7 +434,7 @@ export class Component {
       throw new Error("Adding boxes before anchoring is currently disallowed");
     }
     parentElement = parentElement == null ? this._boxContainer : parentElement;
-    let box = parentElement.append("rect");
+    const box = parentElement.append("rect");
     if (className != null) {
       box.classed(className, true);
     }
@@ -596,9 +596,9 @@ export class Component {
       topLeft,
       bottomRight: {
         x: topLeft.x + this.width(),
-        y: topLeft.y + this.height()
+        y: topLeft.y + this.height(),
       },
-    }
+    };
   }
 
   /**
@@ -641,10 +641,10 @@ export class Component {
    * @return {Point}
    */
   public originToRoot(): Point {
-    let origin = this.origin();
+    const origin = this.origin();
     let ancestor = this.parent();
     while (ancestor != null) {
-      let ancestorOrigin = ancestor.origin();
+      const ancestorOrigin = ancestor.origin();
       origin.x += ancestorOrigin.x;
       origin.y += ancestorOrigin.y;
       ancestor = ancestor.parent();

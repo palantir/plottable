@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import { SpaceRequest, Point } from "../core/interfaces";
+import { Point, SpaceRequest } from "../core/interfaces";
 import * as Utils from "../utils";
 
 import { Component } from "./component";
@@ -39,7 +39,7 @@ export class Group extends ComponentContainer {
   }
 
   public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
-    let requests = this._components.map((c: Component) => c.requestedSpace(offeredWidth, offeredHeight));
+    const requests = this._components.map((c: Component) => c.requestedSpace(offeredWidth, offeredHeight));
     return {
       minWidth: Utils.Math.max<SpaceRequest, number>(requests, (request) => request.minWidth, 0),
       minHeight: Utils.Math.max<SpaceRequest, number>(requests, (request) => request.minHeight, 0),
@@ -91,7 +91,7 @@ export class Group extends ComponentContainer {
   }
 
   protected _remove(component: Component) {
-    let removeIndex = this._components.indexOf(component);
+    const removeIndex = this._components.indexOf(component);
     if (removeIndex >= 0) {
       this._components.splice(removeIndex, 1);
       return true;

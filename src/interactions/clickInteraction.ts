@@ -64,7 +64,7 @@ export class Click extends Interaction {
   }
 
   private _handleClickDown(p: Point, event: MouseEvent | TouchEvent) {
-    let translatedP = this._translateToComponentSpace(p);
+    const translatedP = this._translateToComponentSpace(p);
     if (this._isInsideComponent(translatedP)) {
       this._clickedDown = true;
       this._clickedPoint = translatedP;
@@ -72,7 +72,7 @@ export class Click extends Interaction {
   }
 
   private _handleClickUp(p: Point, event: MouseEvent | TouchEvent) {
-    let translatedP = this._translateToComponentSpace(p);
+    const translatedP = this._translateToComponentSpace(p);
     if (this._clickedDown && Click._pointsEqual(translatedP, this._clickedPoint)) {
       setTimeout(() => {
         if (!this._doubleClicking) {

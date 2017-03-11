@@ -28,15 +28,15 @@ export class ClusteredBar<X, Y> extends Bar<X, Y> {
   }
 
   protected _generateAttrToProjector() {
-    let attrToProjector = super._generateAttrToProjector();
+    const attrToProjector = super._generateAttrToProjector();
     // the width is constant, so set the inner scale range to that
-    let innerScale = this._makeInnerScale();
-    let innerWidthF = (d: any, i: number) => innerScale.rangeBand();
+    const innerScale = this._makeInnerScale();
+    const innerWidthF = (d: any, i: number) => innerScale.rangeBand();
     attrToProjector["width"] = this._isVertical ? innerWidthF : attrToProjector["width"];
     attrToProjector["height"] = !this._isVertical ? innerWidthF : attrToProjector["height"];
 
-    let xAttr = attrToProjector["x"];
-    let yAttr = attrToProjector["y"];
+    const xAttr = attrToProjector["x"];
+    const yAttr = attrToProjector["y"];
     attrToProjector["x"] = this._isVertical ?
       (d: any, i: number, ds: Dataset) => xAttr(d, i, ds) + this._clusterOffsets.get(ds) :
       (d: any, i: number, ds: Dataset) => xAttr(d, i, ds);
@@ -48,14 +48,14 @@ export class ClusteredBar<X, Y> extends Bar<X, Y> {
   }
 
   private _updateClusterPosition() {
-    let innerScale = this._makeInnerScale();
+    const innerScale = this._makeInnerScale();
     this.datasets().forEach((d, i) => this._clusterOffsets.set(d, innerScale.scale(String(i)) - innerScale.rangeBand() / 2));
   }
 
   private _makeInnerScale() {
-    let innerScale = new Scales.Category();
+    const innerScale = new Scales.Category();
     innerScale.domain(this.datasets().map((d, i) => String(i)));
-    let widthProjector = Plot._scaledAccessor(this.attr("width"));
+    const widthProjector = Plot._scaledAccessor(this.attr("width"));
     innerScale.range([0, widthProjector(null, 0, null)]);
     return innerScale;
   }

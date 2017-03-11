@@ -22,7 +22,7 @@ interface PredicatedFormat {
  * @returns {Formatter} A formatter for currency values.
  */
 export function currency(precision = 2, symbol = "$", prefix = true) {
-  let fixedFormatter = fixed(precision);
+  const fixedFormatter = fixed(precision);
   return (d: any) => {
     let formattedValue = fixedFormatter(Math.abs(d));
     if (formattedValue !== "") {
@@ -64,7 +64,7 @@ export function general(maxNumberOfDecimalPlaces = 3) {
   verifyPrecision(maxNumberOfDecimalPlaces);
   return (d: any) => {
     if (typeof d === "number") {
-      let multiplier = Math.pow(10, maxNumberOfDecimalPlaces);
+      const multiplier = Math.pow(10, maxNumberOfDecimalPlaces);
       return String(Math.round(d * multiplier) / multiplier);
     } else {
       return String(d);
@@ -90,13 +90,13 @@ export function identity() {
  * @returns {Formatter} A formatter for percentage values.
  */
 export function percentage(precision = 0) {
-  let fixedFormatter = fixed(precision);
+  const fixedFormatter = fixed(precision);
   return (d: any) => {
     let valToFormat = d * 100;
 
     // Account for float imprecision
-    let valString = d.toString();
-    let integerPowerTen = Math.pow(10, valString.length - (valString.indexOf(".") + 1));
+    const valString = d.toString();
+    const integerPowerTen = Math.pow(10, valString.length - (valString.indexOf(".") + 1));
     valToFormat = parseInt((valToFormat * integerPowerTen).toString(), 10) / integerPowerTen;
 
     return fixedFormatter(valToFormat) + "%";
@@ -133,13 +133,13 @@ export function siSuffix(numberOfSignificantFigures = 3) {
  */
 export function shortScale(precision = 3) {
   verifyPrecision(precision);
-  let suffixes = "KMBTQ";
-  let exponentFormatter = d3.format("." + precision + "e");
-  let fixedFormatter = d3.format("." + precision + "f");
-  let max = Math.pow(10, (3 * (suffixes.length + 1)));
-  let min = Math.pow(10, -precision);
+  const suffixes = "KMBTQ";
+  const exponentFormatter = d3.format("." + precision + "e");
+  const fixedFormatter = d3.format("." + precision + "f");
+  const max = Math.pow(10, (3 * (suffixes.length + 1)));
+  const min = Math.pow(10, -precision);
   return (num: number) => {
-    let absNum = Math.abs(num);
+    const absNum = Math.abs(num);
     if ((absNum < min || absNum >= max) && absNum !== 0) {
       return exponentFormatter(num);
     }
@@ -212,7 +212,7 @@ export function multiTime() {
 
   return (d: any) => {
     const acceptableFormats = candidateFormats.filter((candidate) => candidate.predicate(d));
-    let specifier = acceptableFormats.length > 0
+    const specifier = acceptableFormats.length > 0
       ? acceptableFormats[0].specifier
       : "%Y";
 
@@ -242,4 +242,3 @@ function verifyPrecision(precision: number) {
     throw new RangeError("Formatter precision must be an integer");
   }
 }
-

@@ -6,50 +6,50 @@
 import * as d3 from "d3";
 import * as d3Ease from "d3-ease";
 
-import { Animator } from "./animator";
 import { AttributeToAppliedProjector, SimpleSelection } from "../core/interfaces";
 import { coerceExternalD3 } from "../utils/coerceD3";
+import { Animator } from "./animator";
 
 export type EaseFn = (normalizedTime: number) => number;
 
 const EASE_NAME_MAPPING: { [name: string]: EaseFn } = {
-  "linear": d3Ease.easeLinear,
-  "quad": d3Ease.easeQuad,
-  "quadIn": d3Ease.easeQuadIn,
-  "quadOut": d3Ease.easeQuadOut,
-  "quadInOut": d3Ease.easeQuadInOut,
-  "cubic": d3Ease.easeCubic,
-  "cubicIn": d3Ease.easeCubicIn,
-  "cubicOut": d3Ease.easeCubicOut,
-  "cubicInOut": d3Ease.easeCubicInOut,
-  "poly": d3Ease.easePoly,
-  "polyIn": d3Ease.easePolyIn,
-  "polyOut": d3Ease.easePolyOut,
-  "polyInOut": d3Ease.easePolyInOut,
-  "sin": d3Ease.easeSin,
-  "sinIn": d3Ease.easeSinIn,
-  "sinOut": d3Ease.easeSinOut,
-  "sinInOut": d3Ease.easeSinInOut,
-  "exp": d3Ease.easeExp,
-  "expIn": d3Ease.easeExpIn,
-  "expOut": d3Ease.easeExpOut,
-  "expInOut": d3Ease.easeExpInOut,
-  "circle": d3Ease.easeCircle,
-  "circleIn": d3Ease.easeCircleIn,
-  "circleOut": d3Ease.easeCircleOut,
-  "circleInOut": d3Ease.easeCircleInOut,
-  "bounce": d3Ease.easeBounce,
-  "bounceIn": d3Ease.easeBounceIn,
-  "bounceOut": d3Ease.easeBounceOut,
-  "bounceInOut": d3Ease.easeBounceInOut,
-  "back": d3Ease.easeBack,
-  "backIn": d3Ease.easeBackIn,
-  "backOut": d3Ease.easeBackOut,
-  "backInOut": d3Ease.easeBackInOut,
-  "elastic": d3Ease.easeElastic,
-  "elasticIn": d3Ease.easeElasticIn,
-  "elasticOut": d3Ease.easeElasticOut,
-  "elasticInOut": d3Ease.easeElasticInOut,
+  linear: d3Ease.easeLinear,
+  quad: d3Ease.easeQuad,
+  quadIn: d3Ease.easeQuadIn,
+  quadOut: d3Ease.easeQuadOut,
+  quadInOut: d3Ease.easeQuadInOut,
+  cubic: d3Ease.easeCubic,
+  cubicIn: d3Ease.easeCubicIn,
+  cubicOut: d3Ease.easeCubicOut,
+  cubicInOut: d3Ease.easeCubicInOut,
+  poly: d3Ease.easePoly,
+  polyIn: d3Ease.easePolyIn,
+  polyOut: d3Ease.easePolyOut,
+  polyInOut: d3Ease.easePolyInOut,
+  sin: d3Ease.easeSin,
+  sinIn: d3Ease.easeSinIn,
+  sinOut: d3Ease.easeSinOut,
+  sinInOut: d3Ease.easeSinInOut,
+  exp: d3Ease.easeExp,
+  expIn: d3Ease.easeExpIn,
+  expOut: d3Ease.easeExpOut,
+  expInOut: d3Ease.easeExpInOut,
+  circle: d3Ease.easeCircle,
+  circleIn: d3Ease.easeCircleIn,
+  circleOut: d3Ease.easeCircleOut,
+  circleInOut: d3Ease.easeCircleInOut,
+  bounce: d3Ease.easeBounce,
+  bounceIn: d3Ease.easeBounceIn,
+  bounceOut: d3Ease.easeBounceOut,
+  bounceInOut: d3Ease.easeBounceInOut,
+  back: d3Ease.easeBack,
+  backIn: d3Ease.easeBackIn,
+  backOut: d3Ease.easeBackOut,
+  backInOut: d3Ease.easeBackInOut,
+  elastic: d3Ease.easeElastic,
+  elasticIn: d3Ease.easeElasticIn,
+  elasticOut: d3Ease.easeElasticOut,
+  elasticInOut: d3Ease.easeElasticInOut,
 };
 
 /**
@@ -139,14 +139,14 @@ export class Easing implements Animator {
   }
 
   public totalTime(numberOfSteps: number) {
-    let adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
+    const adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
     return this.startDelay() + adjustedIterativeDelay * (Math.max(numberOfSteps - 1, 0)) + this.stepDuration();
   }
 
   public animate(selection: SimpleSelection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Transition<any, any, any, any> {
     selection = coerceExternalD3(selection);
-    let numberOfSteps = selection.size();
-    let adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
+    const numberOfSteps = selection.size();
+    const adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
 
     return selection.transition()
       .ease(this._getEaseFactory())
@@ -294,7 +294,7 @@ export class Easing implements Animator {
   private _getAdjustedIterativeDelay(numberOfSteps: number) {
     let stepStartTimeInterval = this.maxTotalDuration() - this.stepDuration();
     stepStartTimeInterval = Math.max(stepStartTimeInterval, 0);
-    let maxPossibleIterativeDelay = stepStartTimeInterval / Math.max(numberOfSteps - 1, 1);
+    const maxPossibleIterativeDelay = stepStartTimeInterval / Math.max(numberOfSteps - 1, 1);
     return Math.min(this.stepDelay(), maxPossibleIterativeDelay);
   }
 }

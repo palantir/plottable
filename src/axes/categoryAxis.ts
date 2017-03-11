@@ -6,10 +6,10 @@
 import * as d3 from "d3";
 import * as Typesetter from "typesettable";
 
-import { Axis, AxisOrientation } from "./axis";
-import { SpaceRequest, Point, SimpleSelection } from "../core/interfaces";
+import { Point, SimpleSelection, SpaceRequest } from "../core/interfaces";
 import * as Scales from "../scales";
 import * as Utils from "../utils";
+import { Axis, AxisOrientation } from "./axis";
 
 export interface DownsampleInfo {
   domain: string[];
@@ -52,7 +52,7 @@ export class Category extends Axis<string> {
   private get _wrapper() {
     const wrapper = new Typesetter.Wrapper();
     if (this._tickLabelMaxLines != null) {
-      wrapper.maxLines(this._tickLabelMaxLines)
+      wrapper.maxLines(this._tickLabelMaxLines);
     }
     return wrapper;
   }
@@ -112,7 +112,7 @@ export class Category extends Axis<string> {
     }
 
     if (this.annotationsEnabled()) {
-      let tierTotalHeight = this._annotationTierHeight() * this.annotationTierCount();
+      const tierTotalHeight = this._annotationTierHeight() * this.annotationTierCount();
       if (this.isHorizontal()) {
         heightRequiredByTicks += tierTotalHeight;
       } else {
@@ -120,7 +120,7 @@ export class Category extends Axis<string> {
       }
     }
 
-    let measureResult = this._measureTickLabels(offeredWidth, offeredHeight);
+    const measureResult = this._measureTickLabels(offeredWidth, offeredHeight);
 
     return {
       minWidth: measureResult.usedWidth + widthRequiredByTicks,
@@ -129,12 +129,12 @@ export class Category extends Axis<string> {
   }
 
   protected _coreSize() {
-    let relevantDimension = this.isHorizontal() ? this.height() : this.width();
-    let relevantRequestedSpaceDimension = this.isHorizontal() ?
+    const relevantDimension = this.isHorizontal() ? this.height() : this.width();
+    const relevantRequestedSpaceDimension = this.isHorizontal() ?
       this.requestedSpace(this.width(), this.height()).minHeight :
       this.requestedSpace(this.width(), this.height()).minWidth;
-    let marginAndAnnotationSize = this.margin() + this._annotationTierHeight();
-    let axisHeightWithoutMargin = relevantRequestedSpaceDimension - marginAndAnnotationSize;
+    const marginAndAnnotationSize = this.margin() + this._annotationTierHeight();
+    const axisHeightWithoutMargin = relevantRequestedSpaceDimension - marginAndAnnotationSize;
     return Math.min(axisHeightWithoutMargin, relevantDimension);
   }
 
@@ -266,7 +266,7 @@ export class Category extends Axis<string> {
    * @param {d3.Selection} ticks The tick elements to write.
    */
   private _drawTicks(stepWidth: number, ticks: SimpleSelection<string>) {
-    let self = this;
+    const self = this;
     let xAlign: {[s: string]: Typesetter.IXAlign};
     let yAlign: {[s: string]: Typesetter.IYAlign};
     switch (this.tickLabelAngle()) {
@@ -353,13 +353,13 @@ export class Category extends Axis<string> {
       width = Math.min(width, this._tickLabelMaxWidth);
     }
 
-    let wrappingResults = domain.map((s: string) => {
+    const wrappingResults = domain.map((s: string) => {
       return this._wrapper.wrap(this.formatter()(s), this._measurer, width, height);
     });
 
     // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
-    let widthFn = (this.isHorizontal() && this._tickLabelAngle === 0) ? d3.sum : Utils.Math.max;
-    let heightFn = (this.isHorizontal() && this._tickLabelAngle === 0) ? Utils.Math.max : d3.sum;
+    const widthFn = (this.isHorizontal() && this._tickLabelAngle === 0) ? d3.sum : Utils.Math.max;
+    const heightFn = (this.isHorizontal() && this._tickLabelAngle === 0) ? Utils.Math.max : d3.sum;
 
     let usedWidth = widthFn<Typesetter.IWrappingResult, number>(wrappingResults,
       (t: Typesetter.IWrappingResult) => this._measurer.measure(t.wrappedText).width, 0);
@@ -380,7 +380,7 @@ export class Category extends Axis<string> {
 
   public renderImmediately() {
     super.renderImmediately();
-    let catScale = <Scales.Category> this._scale;
+    const catScale = <Scales.Category> this._scale;
     const { domain, stepWidth } = this.getDownsampleInfo(catScale);
     // Give each tick a stepWidth of space which will partition the entire axis evenly
     let availableTextSpace = stepWidth;
@@ -388,15 +388,15 @@ export class Category extends Axis<string> {
       availableTextSpace = Math.min(availableTextSpace, this._tickLabelMaxWidth);
     }
 
-    let getTickLabelTransform = (d: string, i: number) => {
+    const getTickLabelTransform = (d: string, i: number) => {
       // scale(d) will give the center of the band, so subtract half of the text width to get the left (top-most)
       // coordinate that the tick label should be transformed to.
-      let tickLabelEdge = catScale.scale(d) - availableTextSpace / 2;
-      let x = this.isHorizontal() ? tickLabelEdge : 0;
-      let y = this.isHorizontal() ? 0 : tickLabelEdge;
+      const tickLabelEdge = catScale.scale(d) - availableTextSpace / 2;
+      const x = this.isHorizontal() ? tickLabelEdge : 0;
+      const y = this.isHorizontal() ? 0 : tickLabelEdge;
       return "translate(" + x + "," + y + ")";
     };
-    let tickLabelsUpdate = this._tickLabelContainer.selectAll<SVGGElement, string>("." + Axis.TICK_LABEL_CLASS).data(domain);
+    const tickLabelsUpdate = this._tickLabelContainer.selectAll<SVGGElement, string>("." + Axis.TICK_LABEL_CLASS).data(domain);
     const tickLabels =
       tickLabelsUpdate
         .enter()
@@ -409,8 +409,8 @@ export class Category extends Axis<string> {
     tickLabels.text("");
     this._drawTicks(stepWidth, tickLabels);
 
-    let xTranslate = this.orientation() === "right" ? this._tickSpaceRequired() : 0;
-    let yTranslate = this.orientation() === "bottom" ? this._tickSpaceRequired() : 0;
+    const xTranslate = this.orientation() === "right" ? this._tickSpaceRequired() : 0;
+    const yTranslate = this.orientation() === "bottom" ? this._tickSpaceRequired() : 0;
     this._tickLabelContainer.attr("transform", `translate(${xTranslate},${yTranslate})`);
 
     // hide ticks and labels that overflow the axis
