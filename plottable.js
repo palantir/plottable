@@ -6322,7 +6322,8 @@ var Area = (function (_super) {
         return this;
     };
     Area.prototype._addDataset = function (dataset) {
-        var lineDrawer = new Drawers.Line(dataset, this._d3LineFactory);
+        var _this = this;
+        var lineDrawer = new Drawers.Line(dataset, function () { return _this._d3LineFactory(dataset); });
         if (this._isSetup) {
             lineDrawer.renderArea(this._renderArea.append("g"));
         }
@@ -6499,38 +6500,11 @@ var Line = (function (_super) {
      * @constructor
      */
     function Line() {
-        var _this = this;
         _super.call(this);
         this._curve = "linear";
         this._autorangeSmooth = false;
         this._croppedRenderingEnabled = true;
         this._downsamplingEnabled = false;
-        /**
-         * Return a d3.Line whose .x, .y, and .defined accessors are hooked up to the xProjector and yProjector
-         * after they've been fed the dataset, and whose curve is configured to this plot's curve.
-         * @param dataset
-         * @param xProjector
-         * @param yProjector
-         * @returns {Line<[number,number]>}
-         * @private
-         */
-        this._d3LineFactory = function (dataset, xProjector, yProjector) {
-            if (xProjector === void 0) { xProjector = plot_1.Plot._scaledAccessor(_this.x()); }
-            if (yProjector === void 0) { yProjector = plot_1.Plot._scaledAccessor(_this.y()); }
-            var xScaledAccessor = plot_1.Plot._scaledAccessor(_this.x());
-            var yScaledAccessor = plot_1.Plot._scaledAccessor(_this.x());
-            var definedProjector = function (d, i, dataset) {
-                var positionX = xScaledAccessor(d, i, dataset);
-                var positionY = yScaledAccessor(d, i, dataset);
-                return positionX != null && !Utils.Math.isNaN(positionX) &&
-                    positionY != null && !Utils.Math.isNaN(positionY);
-            };
-            return d3.line()
-                .x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); })
-                .y(function (innerDatum, innerIndex) { return yProjector(innerDatum, innerIndex, dataset); })
-                .curve(_this._getCurveFactory())
-                .defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); });
-        };
         this.addClass("line-plot");
         var animator = new Animators.Easing();
         animator.stepDuration(plot_1.Plot._ANIMATION_MAX_DURATION);
@@ -6613,7 +6587,8 @@ var Line = (function (_super) {
         return this;
     };
     Line.prototype._createDrawer = function (dataset) {
-        return new Drawers.Line(dataset, this._d3LineFactory);
+        var _this = this;
+        return new Drawers.Line(dataset, function () { return _this._d3LineFactory(dataset); });
     };
     Line.prototype._extentsForProperty = function (property) {
         var extents = _super.prototype._extentsForProperty.call(this, property);
@@ -6819,6 +6794,33 @@ var Line = (function (_super) {
             return _this._d3LineFactory(dataset, xProjector, yProjector)(datum);
         };
     };
+    /**
+     * Return a d3.Line whose .x, .y, and .defined accessors are hooked up to the xProjector and yProjector
+     * after they've been fed the dataset, and whose curve is configured to this plot's curve.
+     * @param dataset
+     * @param xProjector
+     * @param yProjector
+     * @returns {Line<[number,number]>}
+     * @private
+     */
+    Line.prototype._d3LineFactory = function (dataset, xProjector, yProjector) {
+        if (xProjector === void 0) { xProjector = plot_1.Plot._scaledAccessor(this.x()); }
+        if (yProjector === void 0) { yProjector = plot_1.Plot._scaledAccessor(this.y()); }
+        var xScaledAccessor = plot_1.Plot._scaledAccessor(this.x());
+        var yScaledAccessor = plot_1.Plot._scaledAccessor(this.x());
+        var definedProjector = function (d, i, dataset) {
+            var positionX = xScaledAccessor(d, i, dataset);
+            var positionY = yScaledAccessor(d, i, dataset);
+            return positionX != null && !Utils.Math.isNaN(positionX) &&
+                positionY != null && !Utils.Math.isNaN(positionY);
+        };
+        return d3.line()
+            .x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); })
+            .y(function (innerDatum, innerIndex) { return yProjector(innerDatum, innerIndex, dataset); })
+            .curve(this._getCurveFactory())
+            .defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); });
+    };
+    ;
     Line.prototype._getCurveFactory = function () {
         var curve = this.curve();
         if (typeof curve === "string") {
@@ -11173,9 +11175,16 @@ var Line = (function (_super) {
     Line.prototype.selectionForIndex = function (index) {
         return d3.select(this.selection().node());
     };
+    /**
+     *
+     * @param data Data to draw. The data will be passed through the line factory in order to get applied
+     * onto the canvas.
+     * @param step
+     * @private
+     */
     Line.prototype._drawStepCanvas = function (data, step) {
         var context = this.canvas().node().getContext("2d");
-        var d3Line = this._d3LineFactory(this._dataset);
+        var d3Line = this._d3LineFactory();
         var attrToAppliedProjector = step.attrToAppliedProjector;
         var resolvedAttrs = Object.keys(attrToAppliedProjector).reduce(function (obj, attrName) {
             obj[attrName] = attrToAppliedProjector[attrName](data, 0);

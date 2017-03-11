@@ -224,7 +224,7 @@ export class Line<X> extends XYPlot<X, number> {
   }
 
   protected _createDrawer(dataset: Dataset): Drawer {
-    return new Drawers.Line(dataset, this._d3LineFactory);
+    return new Drawers.Line(dataset, () => this._d3LineFactory(dataset));
   }
 
   protected _extentsForProperty(property: string) {
@@ -485,10 +485,10 @@ export class Line<X> extends XYPlot<X, number> {
    * @returns {Line<[number,number]>}
    * @private
    */
-  protected _d3LineFactory = (
+  protected _d3LineFactory(
     dataset: Dataset,
     xProjector = Plot._scaledAccessor(this.x()),
-    yProjector = Plot._scaledAccessor(this.y())): d3Shape.Line<any> => {
+    yProjector = Plot._scaledAccessor(this.y())): d3Shape.Line<any> {
     const xScaledAccessor = Plot._scaledAccessor(this.x());
     const yScaledAccessor = Plot._scaledAccessor(this.x());
     const definedProjector = (d: any, i: number, dataset: Dataset) => {
