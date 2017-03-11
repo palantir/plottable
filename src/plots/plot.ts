@@ -598,6 +598,11 @@ export class Plot extends Component {
     let dataToDraw = this._getDataToDraw();
     let drawers = this.datasets().map((dataset) => this._datasetToDrawer.get(dataset));
 
+    if (this.renderer() === "canvas") {
+      const canvas = this._canvas.node();
+      const context = canvas.getContext("2d");
+      context.clearRect(0, 0, canvas.width, canvas.height);
+    }
     this.datasets().forEach((ds, i) => drawers[i].draw(dataToDraw.get(ds), drawSteps));
 
     let times = this.datasets().map((ds, i) => drawers[i].totalDrawTime(dataToDraw.get(ds), drawSteps));

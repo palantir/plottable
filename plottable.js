@@ -16,41 +16,41 @@
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
-
+/******/
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
-
+/******/
 /******/ 		// Check if module is in cache
 /******/ 		if(installedModules[moduleId])
 /******/ 			return installedModules[moduleId].exports;
-
+/******/
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
 /******/ 			l: false,
 /******/ 			exports: {}
 /******/ 		};
-
+/******/
 /******/ 		// Execute the module function
 /******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-
+/******/
 /******/ 		// Flag the module as loaded
 /******/ 		module.l = true;
-
+/******/
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-
-
+/******/
+/******/
 /******/ 	// expose the modules object (__webpack_modules__)
 /******/ 	__webpack_require__.m = modules;
-
+/******/
 /******/ 	// expose the module cache
 /******/ 	__webpack_require__.c = installedModules;
-
+/******/
 /******/ 	// identity function for calling harmony imports with the correct context
 /******/ 	__webpack_require__.i = function(value) { return value; };
-
+/******/
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
 /******/ 		if(!__webpack_require__.o(exports, name)) {
@@ -61,7 +61,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 			});
 /******/ 		}
 /******/ 	};
-
+/******/
 /******/ 	// getDefaultExport function for compatibility with non-harmony modules
 /******/ 	__webpack_require__.n = function(module) {
 /******/ 		var getter = module && module.__esModule ?
@@ -70,13 +70,13 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 		__webpack_require__.d(getter, 'a', getter);
 /******/ 		return getter;
 /******/ 	};
-
+/******/
 /******/ 	// Object.prototype.hasOwnProperty.call
 /******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-
+/******/
 /******/ 	// __webpack_public_path__
 /******/ 	__webpack_require__.p = "";
-
+/******/
 /******/ 	// Load entry module and return exports
 /******/ 	return __webpack_require__(__webpack_require__.s = 124);
 /******/ })
@@ -552,6 +552,11 @@ var Plot = (function (_super) {
         var drawSteps = this._generateDrawSteps();
         var dataToDraw = this._getDataToDraw();
         var drawers = this.datasets().map(function (dataset) { return _this._datasetToDrawer.get(dataset); });
+        if (this.renderer() === "canvas") {
+            var canvas = this._canvas.node();
+            var context_1 = canvas.getContext("2d");
+            context_1.clearRect(0, 0, canvas.width, canvas.height);
+        }
         this.datasets().forEach(function (ds, i) { return drawers[i].draw(dataToDraw.get(ds), drawSteps); });
         var times = this.datasets().map(function (ds, i) { return drawers[i].totalDrawTime(dataToDraw.get(ds), drawSteps); });
         var maxTime = Utils.Math.max(times, 0);
@@ -1504,9 +1509,6 @@ var Drawer = (function () {
             });
         }
         else if (this._canvas != null) {
-            var canvas = this.canvas().node();
-            var context_1 = canvas.getContext("2d");
-            context_1.clearRect(0, 0, canvas.width, canvas.height);
             // don't support animations for now; just draw the last draw step immediately
             var lastDrawStep_1 = appliedDrawSteps[appliedDrawSteps.length - 1];
             Utils.Window.setTimeout(function () { return _this._drawStepCanvas(data, lastDrawStep_1); }, 0);
@@ -6320,7 +6322,7 @@ var Area = (function (_super) {
         return this;
     };
     Area.prototype._addDataset = function (dataset) {
-        var lineDrawer = new Drawers.Line(dataset);
+        var lineDrawer = new Drawers.Line(dataset, this);
         if (this._isSetup) {
             lineDrawer.renderArea(this._renderArea.append("g"));
         }
@@ -6497,11 +6499,29 @@ var Line = (function (_super) {
      * @constructor
      */
     function Line() {
+        var _this = this;
         _super.call(this);
         this._curve = "linear";
         this._autorangeSmooth = false;
         this._croppedRenderingEnabled = true;
         this._downsamplingEnabled = false;
+        this.d3LineFactory = function (dataset, xProjector, yProjector) {
+            if (xProjector === void 0) { xProjector = plot_1.Plot._scaledAccessor(_this.x()); }
+            if (yProjector === void 0) { yProjector = plot_1.Plot._scaledAccessor(_this.y()); }
+            var xScaledAccessor = plot_1.Plot._scaledAccessor(_this.x());
+            var yScaledAccessor = plot_1.Plot._scaledAccessor(_this.x());
+            var definedProjector = function (d, i, dataset) {
+                var positionX = xScaledAccessor(d, i, dataset);
+                var positionY = yScaledAccessor(d, i, dataset);
+                return positionX != null && !Utils.Math.isNaN(positionX) &&
+                    positionY != null && !Utils.Math.isNaN(positionY);
+            };
+            return d3.line()
+                .x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); })
+                .y(function (innerDatum, innerIndex) { return yProjector(innerDatum, innerIndex, dataset); })
+                .curve(_this._getCurveFactory())
+                .defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); });
+        };
         this.addClass("line-plot");
         var animator = new Animators.Easing();
         animator.stepDuration(plot_1.Plot._ANIMATION_MAX_DURATION);
@@ -6584,7 +6604,7 @@ var Line = (function (_super) {
         return this;
     };
     Line.prototype._createDrawer = function (dataset) {
-        return new Drawers.Line(dataset);
+        return new Drawers.Line(dataset, this.d3LineFactory);
     };
     Line.prototype._extentsForProperty = function (property) {
         var extents = _super.prototype._extentsForProperty.call(this, property);
@@ -6683,7 +6703,6 @@ var Line = (function (_super) {
                     });
                 }
             }
-            ;
         });
         return intersectionPoints;
     };
@@ -6787,18 +6806,8 @@ var Line = (function (_super) {
     };
     Line.prototype._constructLineProjector = function (xProjector, yProjector) {
         var _this = this;
-        var definedProjector = function (d, i, dataset) {
-            var positionX = plot_1.Plot._scaledAccessor(_this.x())(d, i, dataset);
-            var positionY = plot_1.Plot._scaledAccessor(_this.y())(d, i, dataset);
-            return positionX != null && !Utils.Math.isNaN(positionX) &&
-                positionY != null && !Utils.Math.isNaN(positionY);
-        };
         return function (datum, index, dataset) {
-            return d3.line()
-                .x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); })
-                .y(function (innerDatum, innerIndex) { return yProjector(innerDatum, innerIndex, dataset); })
-                .curve(_this._getCurveFactory())
-                .defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); })(datum);
+            return _this.d3LineFactory(dataset, xProjector, yProjector)(datum);
         };
     };
     Line.prototype._getCurveFactory = function () {
@@ -11137,8 +11146,14 @@ var d3 = __webpack_require__(1);
 var drawer_1 = __webpack_require__(7);
 var Line = (function (_super) {
     __extends(Line, _super);
-    function Line(dataset) {
+    /**
+     * @param dataset
+     * @param _d3LineFactory A callback that gives this Line Drawer a d3.Line object which will be
+     * used to draw with.
+     */
+    function Line(dataset, d3LineFactory) {
         _super.call(this, dataset);
+        this._d3LineFactory = d3LineFactory;
         this._className = "line";
         this._svgElementName = "path";
     }
@@ -11148,6 +11163,31 @@ var Line = (function (_super) {
     };
     Line.prototype.selectionForIndex = function (index) {
         return d3.select(this.selection().node());
+    };
+    Line.prototype._drawStepCanvas = function (data, step) {
+        var context = this.canvas().node().getContext("2d");
+        var d3Line = this._d3LineFactory(this._dataset);
+        var attrToAppliedProjector = step.attrToAppliedProjector;
+        var resolvedAttrs = Object.keys(attrToAppliedProjector).reduce(function (obj, attrName) {
+            obj[attrName] = attrToAppliedProjector[attrName](data, 0);
+            return obj;
+        }, {});
+        context.save();
+        context.beginPath();
+        d3Line.context(context);
+        d3Line(data[0]);
+        if (resolvedAttrs["stroke-width"]) {
+            context.lineWidth = parseFloat(resolvedAttrs["stroke-width"]);
+        }
+        if (resolvedAttrs["stroke"]) {
+            var strokeColor = d3.color(resolvedAttrs["stroke"]);
+            if (resolvedAttrs["opacity"]) {
+                strokeColor.opacity = resolvedAttrs["opacity"];
+            }
+            context.strokeStyle = strokeColor.rgb().toString();
+            context.stroke();
+        }
+        context.restore();
     };
     return Line;
 }(drawer_1.Drawer));

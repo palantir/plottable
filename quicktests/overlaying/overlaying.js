@@ -244,8 +244,7 @@ function evalAndRunTest(name, error, text, firstQTBranch, secondQTBranch) {
   var className = "quicktest " + name;
   var div = d3.select("#results").append("div").attr("class", className);
   div.insert("label").text(name);
-  // var firstTarget = div.append("div").attr("class", "first").append("div").styles({"width": targetWidth + "px", "height": targetHeight + "px"});
-  var firstTarget = div.append("div").attr("class", "first").append("svg").styles({"width": targetWidth + "px", "height": targetHeight + "px"});
+  var firstTarget = div.append("div").attr("class", "first").append("div").styles({"width": targetWidth + "px", "height": targetHeight + "px"});
   var secondTarget = div.append("div").attr("class", "second").append("div").styles({"width": targetWidth + "px", "height": targetHeight + "px"});
   var data = result.makeData();
 
