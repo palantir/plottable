@@ -2851,7 +2851,7 @@ var Axis = (function (_super) {
         this._scale.offUpdate(this._rescaleCallback);
     };
     /**
-     * Gets the tick label data at a particular point. Returns undefined if point has no label.
+     * Gets the tick label data at a particular point.
      *
      * @param {Point} point
      */

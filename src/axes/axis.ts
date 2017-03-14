@@ -105,7 +105,7 @@ export class Axis<D> extends Component {
   }
 
   /**
-   * Gets the tick label data at a particular point. Returns undefined if point has no label.
+   * Gets the tick label data at a particular point.
    *
    * @param {Point} point
    */
