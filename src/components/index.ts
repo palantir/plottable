@@ -16,14 +16,3 @@ export * from "./selectionBoxLayer";
 export * from "./table";
 export * from "./xDragBoxLayer";
 export * from "./yDragBoxLayer";
-
-/**
- * @deprecated just use string literals for alignment
- */
-export const Alignment = {
-  TOP: "top" as "top",
-  BOTTOM: "bottom" as "bottom",
-  LEFT: "left" as "left",
-  RIGHT: "right" as "right",
-  CENTER: "center" as "center",
-};
