@@ -9,12 +9,23 @@ general:
     - node_modules/d3
     - node_modules/jquery
     - node_modules/requirejs
+
 machine:
   node:
     version: 6.1
+  environment:
+    PATH: "${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin"
+
+dependencies:
+  override:
+    - yarn
+  cache_directories:
+    - ~/.cache/yarn
+
 test:
   override:
-    - npm test
+    - yarn test
+
 deployment:
   demo:
     branch: /.*/
@@ -24,7 +35,7 @@ deployment:
     tag: /v[0-9.]+(-beta[0-9.]*)?/
     commands:
       # Confirm we are ready to publish
-      - npm run dist-compile
+      - yarn dist-compile
       - git diff HEAD..origin/develop --quiet || (echo "dist not built"; exit 1)
       - npm run -s check_version || (echo "package.json version not updated"; exit 1)
       # Publish
