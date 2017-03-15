@@ -23,6 +23,7 @@ import { PlotEntity } from "./";
 import { LightweightPlotEntity } from "./commons";
 import { Plot } from "./plot";
 import { XYPlot } from "./xyPlot";
+import { makeEnum } from "../utils/makeEnum";
 
 type LabelConfig = {
   labelArea: SimpleSelection<void>;
@@ -30,17 +31,10 @@ type LabelConfig = {
   writer: Typesetter.Writer;
 };
 
-export type BarOrientation = "vertical" | "horizontal";
+export const BarOrientation = makeEnum(["vertical", "horizontal"]);
+export type BarOrientation = keyof typeof BarOrientation;
 
 export class Bar<X, Y> extends XYPlot<X, Y> {
-  /**
-   * @deprecated use "vertical" instead
-   */
-  public static ORIENTATION_VERTICAL: BarOrientation = "vertical";
-  /**
-   * @deprecated use "horizontal" instead
-   */
-  public static ORIENTATION_HORIZONTAL: BarOrientation = "horizontal";
   private static _BAR_WIDTH_RATIO = 0.95;
   private static _SINGLE_BAR_DIMENSION_RATIO = 0.4;
   private static _BAR_AREA_CLASS = "bar-area";

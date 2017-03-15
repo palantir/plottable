@@ -11,7 +11,7 @@ describe("Plots", () => {
   describe("Bar Plot", () => {
     describe ("setting orientation", () => {
       it("rejects invalid orientations", () => {
-        assert.throws(() => new Plottable.Plots.Bar("diagonal"), Error);
+        assert.throws(() => new Plottable.Plots.Bar("diagonal" as any), Error);
       });
 
       it("defaults to vertical", () => {

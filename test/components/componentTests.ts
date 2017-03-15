@@ -571,7 +571,7 @@ describe("Component", () => {
     });
 
     it("throws errors on bad alignments", () => {
-      let invalidAlignment = "foo";
+      let invalidAlignment = "foo" as any;
       // HACKHACK: https://github.com/palantir/plottable/issues/2661 Cannot assert errors being thrown with description
       (<any> assert).throws(() => c.xAlignment(invalidAlignment), Error,
         "Unsupported alignment", "cannot set an invalid x alignment");

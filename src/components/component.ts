@@ -11,13 +11,17 @@ import * as Utils from "../utils";
 
 import { coerceExternalD3 } from "../utils/coerceD3";
 import { ComponentContainer } from "./componentContainer";
+import { makeEnum } from "../utils/makeEnum";
 
 export type ComponentCallback = (component: Component) => void;
 
 export type IResizeHandler = (size: { height: number, width: number }) => void;
 
-export type XAlignment = "left" | "center" | "right";
-export type YAlignment = "top" | "center" | "bottom";
+export const XAlignment = makeEnum(["left", "center", "right"]);
+export type XAlignment = keyof typeof XAlignment;
+
+export const YAlignment = makeEnum(["top", "center", "bottom"]);
+export type YAlignment = keyof typeof YAlignment;
 
 /**
  * Components are the core logical units that build Plottable visualizations.

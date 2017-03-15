@@ -23,7 +23,7 @@ describe("Plots", () => {
         div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
         categoryScale = new Plottable.Scales.Category();
         linearScale = new Plottable.Scales.Linear();
-        clusterBarPlot = new Plottable.Plots.ClusteredBar<number | string, number | string>(orientation);
+        clusterBarPlot = new Plottable.Plots.ClusteredBar<number | string, number | string>(orientation as any);
         clusterBarPlot.x((d) => isVertical ? d.category : d.num, isVertical ? categoryScale : linearScale);
         clusterBarPlot.y((d) => isVertical ? d.num : d.category, isVertical ? linearScale : categoryScale);
         clusterBarPlot.baselineValue(0);
