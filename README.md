@@ -18,6 +18,7 @@ Plottable is used and developed at [Palantir Technologies](http://palantir.com/)
 
 - Get Plottable:
   - npm: `npm install --save plottable`
+  - yarn: `yarn add plottable`
   - Bower (**deprecated**): `bower install --save plottable`
   - [cdnjs URL](https://cdnjs.com/libraries/plottable.js)
   - [Direct download: plottable.zip](plottable.zip)
@@ -36,9 +37,8 @@ If you run into any problems using Plottable, please let us know. We want Plotta
 ## Development
 
 - Clone the repo
-- Install global dependencies `npm install grunt grunt-cli -g`
-- Install local dependencies `npm install`
-- Run `npm run start` and it will spin up a server (pointed at http://localhost:9999) and begin compiling the typescript code
+- Install local dependencies `yarn install`
+- Run `yarn start` and it will spin up a server (pointed at http://localhost:9999) and begin compiling the typescript code
 - If you get an EACCESS error at any point, instead of running command with ``sudo`` try first changing permission to following folders:
   - ``usr/local`` by running ``sudo chown -R "$(whoami)" /usr/local``
   - ``~/.npm/`` by running ``sudo chown -R "$(whoami)" ~/.npm/``
@@ -48,6 +48,6 @@ If you run into any problems using Plottable, please let us know. We want Plotta
 
 - Write your code
 - Add tests for new functionality, and please add some quicktests too
-- Run `grunt test` and verify it completes with no warnings or failures
+- Run `yarn test` and verify it completes with no warnings or failures
 - Commit new files, including the updated built files like `plottable.js` and `plottable.d.ts`
 - Submit a pull request and sign the CLA when prompted by our bot
