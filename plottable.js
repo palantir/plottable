@@ -1566,6 +1566,10 @@ exports.Drawer = Drawer;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
 
 function makeEnum(values) {
     return values.reduce(function (obj, v) {
@@ -5581,16 +5585,6 @@ __export(__webpack_require__(36));
 __export(__webpack_require__(64));
 __export(__webpack_require__(65));
 __export(__webpack_require__(66));
-/**
- * @deprecated just use string literals for alignment
- */
-exports.Alignment = {
-    TOP: "top",
-    BOTTOM: "bottom",
-    LEFT: "left",
-    RIGHT: "right",
-    CENTER: "center",
-};
 
 
 /***/ }),
