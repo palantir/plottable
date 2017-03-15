@@ -11,17 +11,17 @@ import * as Formatters from "../core/formatters";
 import * as Scales from "../scales";
 import * as Utils from "../utils";
 
-import { Axis } from "./axis";
 import { SimpleSelection } from "../core/interfaces";
+import { Axis } from "./axis";
 
 export namespace TimeInterval {
-  export var second = "second";
-  export var minute = "minute";
-  export var hour = "hour";
-  export var day = "day";
-  export var week = "week";
-  export var month = "month";
-  export var year = "year";
+  export let second = "second";
+  export let minute = "minute";
+  export let hour = "hour";
+  export let day = "day";
+  export let week = "week";
+  export let month = "month";
+  export let year = "year";
 }
 
 /**
@@ -62,7 +62,7 @@ export class Time extends Axis<Date> {
     [TimeInterval.day]: 3,
     [TimeInterval.week]: 4,
     [TimeInterval.month]: 5,
-    [TimeInterval.year]: 6
+    [TimeInterval.year]: 6,
   };
 
   private static _DEFAULT_TIME_AXIS_CONFIGURATIONS: TimeAxisConfiguration[] = [
@@ -292,8 +292,8 @@ export class Time extends Axis<Date> {
       this._setupDomElements();
     }
 
-    let oldLabelPositions: string[] = this.tierLabelPositions();
-    let newLabelPositions: string[] = [];
+    const oldLabelPositions: string[] = this.tierLabelPositions();
+    const newLabelPositions: string[] = [];
     for (let i = 0; i < this._numTiers; i++) {
       newLabelPositions.push(oldLabelPositions[i] || "between");
     }
@@ -333,7 +333,7 @@ export class Time extends Axis<Date> {
   }
 
   protected _computeHeight() {
-    let textHeight = this._measurer.measure().height;
+    const textHeight = this._measurer.measure().height;
 
     this._tierHeights = [];
     for (let i = 0; i < this._numTiers; i++) {
@@ -345,15 +345,15 @@ export class Time extends Axis<Date> {
   }
 
   private _getIntervalLength(config: TimeAxisTierConfiguration) {
-    let startDate = this._scale.domain()[0];
-    let d3Interval = Scales.Time.timeIntervalToD3Time(config.interval);
-    let endDate = d3Interval.offset(startDate, config.step);
+    const startDate = this._scale.domain()[0];
+    const d3Interval = Scales.Time.timeIntervalToD3Time(config.interval);
+    const endDate = d3Interval.offset(startDate, config.step);
     if (endDate > this._scale.domain()[1]) {
       // this offset is too large, so just return available width
       return this.width();
     }
     // measure how much space one date can get
-    let stepLength = Math.abs(this._scale.scale(endDate) - this._scale.scale(startDate));
+    const stepLength = Math.abs(this._scale.scale(endDate) - this._scale.scale(startDate));
     return stepLength;
   }
 
@@ -377,7 +377,7 @@ export class Time extends Axis<Date> {
       }
     }
 
-    let worstWidth = this._maxWidthForInterval(config) + 2 * this.tickLabelPadding();
+    const worstWidth = this._maxWidthForInterval(config) + 2 * this.tickLabelPadding();
     return Math.min(this._getIntervalLength(config), this.width()) >= worstWidth;
   }
 
@@ -385,11 +385,11 @@ export class Time extends Axis<Date> {
     // Makes sure that the size it requires is a multiple of tier sizes, such that
     // we have no leftover tiers
 
-    let size = super._sizeFromOffer(availableWidth, availableHeight);
-    let tierHeights = this._tierHeights.reduce((prevValue, currValue, index, arr) => {
+    const size = super._sizeFromOffer(availableWidth, availableHeight);
+    const tierHeights = this._tierHeights.reduce((prevValue, currValue, index, arr) => {
       return (prevValue + currValue > size.height) ? prevValue : (prevValue + currValue);
     });
-    let nonCoreHeight = this.margin() + (this.annotationsEnabled() ? this.annotationTierCount() * this._annotationTierHeight() : 0);
+    const nonCoreHeight = this.margin() + (this.annotationsEnabled() ? this.annotationTierCount() * this._annotationTierHeight() : 0);
     size.height = Math.min(size.height, tierHeights + nonCoreHeight);
     return size;
   }
@@ -409,7 +409,7 @@ export class Time extends Axis<Date> {
     this._baseline.remove();
 
     for (let i = 0; i < this._numTiers; ++i) {
-      let tierContainer = this.content().append("g").classed(Time.TIME_AXIS_TIER_CLASS, true);
+      const tierContainer = this.content().append("g").classed(Time.TIME_AXIS_TIER_CLASS, true);
       this._tierLabelContainers.push(tierContainer.append("g").classed(Axis.TICK_LABEL_CLASS + "-container", true));
       this._tierMarkContainers.push(tierContainer.append("g").classed(Axis.TICK_MARK_CLASS + "-container", true));
       this._tierBaselines.push(tierContainer.append("line").classed("baseline", true));
@@ -426,7 +426,7 @@ export class Time extends Axis<Date> {
   protected _getTickValues() {
     return this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].reduce(
       (ticks: any[], config: TimeAxisTierConfiguration) => ticks.concat(this._getTickIntervalValues(config)),
-      []
+      [],
     );
   }
 
@@ -439,9 +439,9 @@ export class Time extends Axis<Date> {
   }
 
   private _getTickValuesForConfiguration(config: TimeAxisTierConfiguration) {
-    let tickPos = (<Scales.Time> this._scale).tickInterval(config.interval, config.step);
-    let domain = this._scale.domain();
-    let tickPosValues = tickPos.map((d: Date) => d.valueOf()); // can't indexOf with objects
+    const tickPos = (<Scales.Time> this._scale).tickInterval(config.interval, config.step);
+    const domain = this._scale.domain();
+    const tickPosValues = tickPos.map((d: Date) => d.valueOf()); // can't indexOf with objects
     if (tickPosValues.indexOf(domain[0].valueOf()) === -1) {
       tickPos.unshift(domain[0]);
     }
@@ -452,7 +452,7 @@ export class Time extends Axis<Date> {
   }
 
   private _renderTierLabels(container: SimpleSelection<void>, config: TimeAxisTierConfiguration, index: number) {
-    let tickPos = this._getTickValuesForConfiguration(config);
+    const tickPos = this._getTickValuesForConfiguration(config);
     let labelPos: Date[] = [];
     if (this._tierLabelPositions[index] === "between" && config.step === 1) {
       tickPos.map((datum: any, i: any) => {
@@ -465,15 +465,15 @@ export class Time extends Axis<Date> {
       labelPos = tickPos;
     }
 
-    let tickLabelsUpdate = container.selectAll("." + Axis.TICK_LABEL_CLASS).data(labelPos, (d) => String(d.valueOf()));
-    let tickLabelsEnter =
+    const tickLabelsUpdate = container.selectAll("." + Axis.TICK_LABEL_CLASS).data(labelPos, (d) => String(d.valueOf()));
+    const tickLabelsEnter =
       tickLabelsUpdate
         .enter()
         .append("g")
           .classed(Axis.TICK_LABEL_CLASS, true);
 
     tickLabelsEnter.append("text");
-    let xTranslate = (this._tierLabelPositions[index] === "center" || config.step === 1) ? 0 : this.tickLabelPadding();
+    const xTranslate = (this._tierLabelPositions[index] === "center" || config.step === 1) ? 0 : this.tickLabelPadding();
     let yTranslate: number;
     if (this.orientation() === "bottom") {
       yTranslate = d3.sum(this._tierHeights.slice(0, index + 1)) - this.tickLabelPadding();
@@ -487,18 +487,18 @@ export class Time extends Axis<Date> {
 
     const tickLabels = tickLabelsUpdate.merge(tickLabelsEnter);
 
-    let textSelection = tickLabels.selectAll("text");
+    const textSelection = tickLabels.selectAll("text");
     if (textSelection.size() > 0) {
       textSelection.attr("transform", `translate(${xTranslate},${yTranslate})`);
     }
     tickLabelsUpdate.exit().remove();
     tickLabels.attr("transform", (d: any) => "translate(" + this._scale.scale(d) + ",0)");
-    let anchor = (this._tierLabelPositions[index] === "center" || config.step === 1) ? "middle" : "start";
+    const anchor = (this._tierLabelPositions[index] === "center" || config.step === 1) ? "middle" : "start";
     tickLabels.selectAll("text").text(config.formatter).style("text-anchor", anchor);
   }
 
   private _renderTickMarks(tickValues: Date[], index: number) {
-    let tickMarksUpdate = this._tierMarkContainers[index].selectAll("." + Axis.TICK_MARK_CLASS).data(tickValues);
+    const tickMarksUpdate = this._tierMarkContainers[index].selectAll("." + Axis.TICK_MARK_CLASS).data(tickValues);
     const tickMarks =
       tickMarksUpdate
         .enter()
@@ -506,8 +506,8 @@ export class Time extends Axis<Date> {
           .classed(Axis.TICK_MARK_CLASS, true)
         .merge(tickMarksUpdate);
 
-    let attr = this._generateTickMarkAttrHash();
-    let offset = this._tierHeights.slice(0, index).reduce((translate: number, height: number) => translate + height, 0);
+    const attr = this._generateTickMarkAttrHash();
+    const offset = this._tierHeights.slice(0, index).reduce((translate: number, height: number) => translate + height, 0);
     if (this.orientation() === "bottom") {
       attr["y1"] = offset;
       attr["y2"] = offset + (this._tierLabelPositions[index] === "center" ? this.innerTickLength() : this._tierHeights[index]);
@@ -536,14 +536,14 @@ export class Time extends Axis<Date> {
   }
 
   private _renderLabellessTickMarks(tickValues: Date[]) {
-    let tickMarksUpdate = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickValues);
+    const tickMarksUpdate = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickValues);
     const tickMarks =
       tickMarksUpdate
         .enter()
         .append("line")
           .classed(Axis.TICK_MARK_CLASS, true)
         .merge(tickMarksUpdate);
-    let attr = this._generateTickMarkAttrHash();
+    const attr = this._generateTickMarkAttrHash();
     attr["y2"] = (this.orientation() === "bottom") ? this.tickLabelPadding() : this.height() - this.tickLabelPadding();
     tickMarks.attrs(attr);
     tickMarksUpdate.exit().remove();
@@ -559,20 +559,20 @@ export class Time extends Axis<Date> {
 
   public renderImmediately() {
     this._mostPreciseConfigIndex = this._getMostPreciseConfigurationIndex();
-    let tierConfigs = this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex];
+    const tierConfigs = this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex];
 
     this._cleanTiers();
 
     tierConfigs.forEach((config: TimeAxisTierConfiguration, i: number) =>
-      this._renderTierLabels(this._tierLabelContainers[i], config, i)
+      this._renderTierLabels(this._tierLabelContainers[i], config, i),
     );
-    let tierTicks = tierConfigs.map((config: TimeAxisTierConfiguration, i: number) =>
-      this._getTickValuesForConfiguration(config)
+    const tierTicks = tierConfigs.map((config: TimeAxisTierConfiguration, i: number) =>
+      this._getTickValuesForConfiguration(config),
     );
 
     let baselineOffset = 0;
     for (let i = 0; i < Math.max(tierConfigs.length, 1); ++i) {
-      let attr = this._generateBaselineAttrHash();
+      const attr = this._generateBaselineAttrHash();
       attr["y1"] += (this.orientation() === "bottom") ? baselineOffset : -baselineOffset;
       attr["y2"] = attr["y1"];
       this._tierBaselines[i].attrs(attr).style("visibility", "inherit");
@@ -580,8 +580,8 @@ export class Time extends Axis<Date> {
     }
 
     let labelLessTicks: Date[] = [];
-    let domain = this._scale.domain();
-    let totalLength = this._scale.scale(domain[1]) - this._scale.scale(domain[0]);
+    const domain = this._scale.domain();
+    const totalLength = this._scale.scale(domain[1]) - this._scale.scale(domain[0]);
     if (this._getIntervalLength(tierConfigs[0]) * 1.5 >= totalLength) {
       labelLessTicks = this._generateLabellessTicks();
     }
@@ -604,7 +604,7 @@ export class Time extends Axis<Date> {
   }
 
   private _hideOverflowingTiers() {
-    let availableHeight = this.height();
+    const availableHeight = this.height();
     let usedHeight = 0;
 
     this.content()
@@ -616,9 +616,9 @@ export class Time extends Axis<Date> {
   }
 
   private _hideOverlappingAndCutOffLabels(index: number) {
-    let boundingBox = (<Element> this._boundingBox.node()).getBoundingClientRect();
+    const boundingBox = (<Element> this._boundingBox.node()).getBoundingClientRect();
 
-    let isInsideBBox = (tickBox: ClientRect) => {
+    const isInsideBBox = (tickBox: ClientRect) => {
       return (
         Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) &&
         Math.floor(boundingBox.top) <= Math.ceil(tickBox.top) &&
@@ -627,33 +627,33 @@ export class Time extends Axis<Date> {
       );
     };
 
-    let visibleTickMarks = this._tierMarkContainers[index]
+    const visibleTickMarks = this._tierMarkContainers[index]
       .selectAll("." + Axis.TICK_MARK_CLASS)
       .filter(function (d: Element, i: number) {
-        let visibility = d3.select(this).style("visibility");
+        const visibility = d3.select(this).style("visibility");
         return visibility === "visible" || visibility === "inherit";
       });
 
     // We use the ClientRects because x1/x2 attributes are not comparable to ClientRects of labels
-    let visibleTickMarkRects = visibleTickMarks.nodes().map((mark: Element) => mark.getBoundingClientRect());
+    const visibleTickMarkRects = visibleTickMarks.nodes().map((mark: Element) => mark.getBoundingClientRect());
 
-    let visibleTickLabels = this._tierLabelContainers[index]
+    const visibleTickLabels = this._tierLabelContainers[index]
       .selectAll<SVGGElement, any>("." + Axis.TICK_LABEL_CLASS)
       .filter(function (d: Element, i: number) {
-        let visibility = d3.select(this).style("visibility");
+        const visibility = d3.select(this).style("visibility");
         return visibility === "visible" || visibility === "inherit";
       });
     let lastLabelClientRect: ClientRect;
 
     visibleTickLabels.each(function (d: Element, i: number) {
-      let clientRect = this.getBoundingClientRect();
-      let tickLabel = d3.select(this);
-      let leadingTickMark = visibleTickMarkRects[i];
-      let trailingTickMark = visibleTickMarkRects[i + 1];
+      const clientRect = this.getBoundingClientRect();
+      const tickLabel = d3.select(this);
+      const leadingTickMark = visibleTickMarkRects[i];
+      const trailingTickMark = visibleTickMarkRects[i + 1];
 
-      let isOverlappingLastLabel = (lastLabelClientRect != null && Utils.DOM.clientRectsOverlap(clientRect, lastLabelClientRect));
-      let isOverlappingLeadingTickMark = (leadingTickMark != null && Utils.DOM.clientRectsOverlap(clientRect, leadingTickMark));
-      let isOverlappingTrailingTickMark = (trailingTickMark != null && Utils.DOM.clientRectsOverlap(clientRect, trailingTickMark));
+      const isOverlappingLastLabel = (lastLabelClientRect != null && Utils.DOM.clientRectsOverlap(clientRect, lastLabelClientRect));
+      const isOverlappingLeadingTickMark = (leadingTickMark != null && Utils.DOM.clientRectsOverlap(clientRect, leadingTickMark));
+      const isOverlappingTrailingTickMark = (trailingTickMark != null && Utils.DOM.clientRectsOverlap(clientRect, trailingTickMark));
 
       if (!isInsideBBox(clientRect) || isOverlappingLastLabel || isOverlappingLeadingTickMark || isOverlappingTrailingTickMark) {
         tickLabel.style("visibility", "hidden");

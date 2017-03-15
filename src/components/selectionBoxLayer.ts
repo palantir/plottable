@@ -3,8 +3,6 @@
  * @license MIT
  */
 
-import * as d3 from "d3";
-
 import { Bounds, Point, SimpleSelection } from "../core/interfaces";
 import { QuantitativeScale } from "../scales/quantitativeScale";
 import { ScaleCallback } from "../scales/scale";
@@ -79,11 +77,11 @@ export class SelectionBoxLayer extends Component {
   }
 
   protected _setBounds(newBounds: Bounds) {
-    let topLeft: Point = {
+    const topLeft: Point = {
       x: Math.min(newBounds.topLeft.x, newBounds.bottomRight.x),
       y: Math.min(newBounds.topLeft.y, newBounds.bottomRight.y),
     };
-    let bottomRight: Point = {
+    const bottomRight: Point = {
       x: Math.max(newBounds.topLeft.x, newBounds.bottomRight.x),
       y: Math.max(newBounds.topLeft.y, newBounds.bottomRight.y),
     };
@@ -125,11 +123,11 @@ export class SelectionBoxLayer extends Component {
   public renderImmediately() {
     super.renderImmediately();
     if (this._boxVisible) {
-      let bounds = this.bounds();
-      let t = bounds.topLeft.y;
-      let b = bounds.bottomRight.y;
-      let l = bounds.topLeft.x;
-      let r = bounds.bottomRight.x;
+      const bounds = this.bounds();
+      const t = bounds.topLeft.y;
+      const b = bounds.bottomRight.y;
+      const l = bounds.topLeft.x;
+      const r = bounds.bottomRight.x;
 
       if (!(Utils.Math.isValidNumber(t) &&
         Utils.Math.isValidNumber(b) &&

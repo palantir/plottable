@@ -32,8 +32,8 @@ export class Time extends QuantitativeScale<Date> {
    */
   public tickInterval(interval: string, step: number = 1): Date[] {
     // temporarily creats a time scale from our linear scale into a time scale so we can get access to its api
-    let tempScale = d3.scaleTime();
-    let d3Interval = Time.timeIntervalToD3Time(interval).every(step);
+    const tempScale = d3.scaleTime();
+    const d3Interval = Time.timeIntervalToD3Time(interval).every(step);
     tempScale.domain(this.domain());
     tempScale.range(this.range());
     return tempScale.ticks(d3Interval);
@@ -51,12 +51,12 @@ export class Time extends QuantitativeScale<Date> {
   }
 
   protected _expandSingleValueDomain(singleValueDomain: Date[]): Date[] {
-    let startTime = singleValueDomain[0].getTime();
-    let endTime = singleValueDomain[1].getTime();
+    const startTime = singleValueDomain[0].getTime();
+    const endTime = singleValueDomain[1].getTime();
     if (startTime === endTime) {
-      let startDate = new Date(startTime);
+      const startDate = new Date(startTime);
       startDate.setDate(startDate.getDate() - 1);
-      let endDate = new Date(endTime);
+      const endDate = new Date(endTime);
       endDate.setDate(endDate.getDate() + 1);
       return [startDate, endDate];
     }
@@ -76,7 +76,7 @@ export class Time extends QuantitativeScale<Date> {
   }
 
   public getTransformationDomain() {
-    let dates = this.domain();
+    const dates = this.domain();
     return [dates[0].valueOf(), dates[1].valueOf()] as [number, number];
   }
 

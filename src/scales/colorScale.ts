@@ -78,10 +78,10 @@ export class Color extends Scale<string, string> {
   }
 
   private static _getPlottableColors(): string[] {
-    let plottableDefaultColors: string[] = [];
-    let colorTester = d3.select("body").append("plottable-color-tester");
+    const plottableDefaultColors: string[] = [];
+    const colorTester = d3.select("body").append("plottable-color-tester");
 
-    let defaultColorHex: string = Utils.Color.colorTest(colorTester, "");
+    const defaultColorHex: string = Utils.Color.colorTest(colorTester, "");
     let i = 0;
     let colorHex = Utils.Color.colorTest(colorTester, "plottable-colors-0");
     while (colorHex != null && i < this._MAXIMUM_COLORS_FROM_CSS) {
@@ -105,10 +105,10 @@ export class Color extends Scale<string, string> {
    * @returns {string}
    */
   public scale(value: string): string {
-    let color = this._d3Scale(value);
-    let index = this.domain().indexOf(value);
-    let numLooped = Math.floor(index / this.range().length);
-    let modifyFactor = Math.log(numLooped * Color._LOOP_LIGHTEN_FACTOR + 1);
+    const color = this._d3Scale(value);
+    const index = this.domain().indexOf(value);
+    const numLooped = Math.floor(index / this.range().length);
+    const modifyFactor = Math.log(numLooped * Color._LOOP_LIGHTEN_FACTOR + 1);
     return Utils.Color.lightenColor(color, modifyFactor);
   }
 

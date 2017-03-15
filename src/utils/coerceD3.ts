@@ -1,5 +1,4 @@
 
-import { SimpleSelection } from "../core/interfaces";
 import * as d3 from "d3";
 
 /**

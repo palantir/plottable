@@ -9,11 +9,11 @@ import * as Typesetter from "typesettable";
 import * as Configs from "../core/config";
 import * as Formatters from "../core/formatters";
 import { Formatter } from "../core/formatters";
-import { SpaceRequest, Point, Entity } from "../core/interfaces";
+import { Entity, Point, SpaceRequest } from "../core/interfaces";
 import * as SymbolFactories from "../core/symbolFactories";
 import { SymbolFactory } from "../core/symbolFactories";
-import { ScaleCallback } from "../scales/scale";
 import * as Scales from "../scales";
+import { ScaleCallback } from "../scales/scale";
 import * as Utils from "../utils";
 
 import { Component } from "./component";
@@ -92,7 +92,7 @@ class LegendRow {
       bottomRight: {
         x: columnXOffset + column.width,
         y: column.height,
-      }
+      },
     };
   }
 
@@ -111,7 +111,7 @@ class LegendRow {
   public getWidth() {
     return Math.min(
       this.columns.reduce((sum, { width }) => sum + width, 0),
-      this.maxWidth
+      this.maxWidth,
     );
   }
 
@@ -181,7 +181,7 @@ class LegendTable {
       bottomRight: {
         x: rowXOffset + this.rows[rowIndex].getWidth(),
         y: rowYOffset + this.rows[rowIndex].getHeight(),
-      }
+      },
     };
 
     return rowBounds;
@@ -195,7 +195,7 @@ class LegendTable {
   public getHeight() {
     return Math.min(
       this.rows.reduce((sum, row) => sum + row.getHeight(), 0) + this.padding * 2,
-      this.maxHeight
+      this.maxHeight,
     );
   }
 
@@ -207,7 +207,7 @@ class LegendTable {
   public getWidth() {
     return Math.min(
       Utils.Math.max(this.rows.map((row) => row.getWidth()), 0) + this.padding * 2,
-      this.maxWidth
+      this.maxWidth,
     );
   }
 }
@@ -263,7 +263,7 @@ export class Legend extends Component {
     this.maxLinesPerEntry(1);
     this.xAlignment("right").yAlignment("top");
     this.comparator((a: string, b: string) => {
-      let formattedText = this._colorScale.domain().slice().map((d: string) => this._formatter(d));
+      const formattedText = this._colorScale.domain().slice().map((d: string) => this._formatter(d));
       return formattedText.indexOf(a) - formattedText.indexOf(b);
     });
     this._symbolFactoryAccessor = () => SymbolFactories.circle();
@@ -272,8 +272,8 @@ export class Legend extends Component {
 
   protected _setup() {
     super._setup();
-    let fakeLegendRow = this.content().append("g").classed(Legend.LEGEND_ROW_CLASS, true);
-    let fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
+    const fakeLegendRow = this.content().append("g").classed(Legend.LEGEND_ROW_CLASS, true);
+    const fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
     fakeLegendEntry.append("text");
     const context = new Typesetter.SvgContext(fakeLegendRow.node() as SVGElement, null, Configs.ADD_TITLE_ELEMENTS);
     this._measurer = new Typesetter.Measurer(context);
@@ -427,7 +427,7 @@ export class Legend extends Component {
   }
 
   private _buildLegendTable(width: number, height: number) {
-    let textHeight = this._measurer.measure().height;
+    const textHeight = this._measurer.measure().height;
 
     const table = new LegendTable(width, height, this._padding);
     const entryNames = this._colorScale.domain().slice().sort((a, b) => this._comparator(this._formatter(a), this._formatter(b)));
@@ -470,9 +470,9 @@ export class Legend extends Component {
       const usedNameWidth = Math.min(availableWidth, unwrappedNameWidth);
 
       this._wrapper.maxLines(this.maxLinesPerEntry());
-      let numberOfRows = this._wrapper.wrap(formattedName, this._measurer, usedNameWidth).noLines;
+      const numberOfRows = this._wrapper.wrap(formattedName, this._measurer, usedNameWidth).noLines;
 
-      let nameColumnHeight = numberOfRows * textHeight;
+      const nameColumnHeight = numberOfRows * textHeight;
       const nameColumn = { width: usedNameWidth, height: nameColumnHeight, data: { name, type: "text" } };
       row.addColumn(nameColumn);
     });
@@ -485,12 +485,12 @@ export class Legend extends Component {
     // if max width is not set, the table will be as wide as the longest untruncated row
     const table = this._buildLegendTable(
       Utils.Math.min([this.maxWidth(), offeredWidth], offeredWidth),
-      offeredHeight
+      offeredHeight,
     );
 
     return {
       minHeight: table.getHeight(),
-      minWidth: table.getWidth()
+      minWidth: table.getWidth(),
     };
   }
 
@@ -541,7 +541,7 @@ export class Legend extends Component {
             datum: column.data.name,
             position: {
               x: rowTranslate[0] + symbolTranslate[0],
-              y: rowTranslate[1] + symbolTranslate[1]
+              y: rowTranslate[1] + symbolTranslate[1],
             },
             selection: d3.select(entryElement),
             component: this,
@@ -551,14 +551,13 @@ export class Legend extends Component {
         return entity;
       }, entity);
 
-    }, [] as Entity<Legend>[])
+    }, [] as Entity<Legend>[]);
   }
 
   public renderImmediately() {
     super.renderImmediately();
 
     const table = this._buildLegendTable(this.width(), this.height());
-    const entryNames = this._colorScale.domain().slice().sort((a, b) => this._comparator(this._formatter(a), this._formatter(b)));
 
     // clear content from previous renders
     this.content().selectAll("*").remove();
@@ -614,7 +613,7 @@ export class Legend extends Component {
           const entry = symbolEntryPair[1];
           const columnIndex = table.rows[rowIndex].columns.indexOf(entry);
           const columnBounds = table.getColumnBounds(rowIndex, columnIndex);
-          return "translate(" + columnBounds.topLeft.x + ", 0)"
+          return "translate(" + columnBounds.topLeft.x + ", 0)";
         })
         .each(function (symbolEntryPair, i, rowIndex) {
           const textContainer = d3.select(this);
@@ -626,10 +625,10 @@ export class Legend extends Component {
             textRotation: 0,
           } as Typesetter.IWriteOptions;
 
-          self._writer.write(self._formatter(column.data.name), column.width, self.height(), writeOptions, textContainer.node())
+          self._writer.write(self._formatter(column.data.name), column.width, self.height(), writeOptions, textContainer.node());
         });
 
-        entriesUpdate.exit().remove();
+      entriesUpdate.exit().remove();
     });
 
     return this;

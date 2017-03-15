@@ -5,8 +5,8 @@
 
 import * as Typesetter from "typesettable";
 
-import { Accessor, Point, SimpleSelection } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
+import { Accessor, Point, SimpleSelection } from "../core/interfaces";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
 
@@ -193,28 +193,28 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
   }
 
   protected _generateAttrToProjector() {
-    let attrToProjector = super._generateAttrToProjector();
+    const attrToProjector = super._generateAttrToProjector();
 
-    let valueAttr = this._isVertical ? "y" : "x";
-    let keyAttr = this._isVertical ? "x" : "y";
-    let primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
-    let primaryAccessor = this._propertyBindings.get(valueAttr).accessor;
-    let keyAccessor = this._propertyBindings.get(keyAttr).accessor;
-    let normalizedKeyAccessor = (datum: any, index: number, dataset: Dataset) => {
+    const valueAttr = this._isVertical ? "y" : "x";
+    const keyAttr = this._isVertical ? "x" : "y";
+    const primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
+    const primaryAccessor = this._propertyBindings.get(valueAttr).accessor;
+    const keyAccessor = this._propertyBindings.get(keyAttr).accessor;
+    const normalizedKeyAccessor = (datum: any, index: number, dataset: Dataset) => {
       return Utils.Stacking.normalizeKey(keyAccessor(datum, index, dataset));
     };
-    let getStart = (d: any, i: number, dataset: Dataset) =>
+    const getStart = (d: any, i: number, dataset: Dataset) =>
       primaryScale.scale(this._stackingResult.get(dataset).get(normalizedKeyAccessor(d, i, dataset)).offset);
-    let getEnd = (d: any, i: number, dataset: Dataset) =>
+    const getEnd = (d: any, i: number, dataset: Dataset) =>
       primaryScale.scale(+primaryAccessor(d, i, dataset) +
         this._stackingResult.get(dataset).get(normalizedKeyAccessor(d, i, dataset)).offset);
 
-    let heightF = (d: any, i: number, dataset: Dataset) => {
+    const heightF = (d: any, i: number, dataset: Dataset) => {
       return Math.abs(getEnd(d, i, dataset) - getStart(d, i, dataset));
     };
     attrToProjector[this._isVertical ? "height" : "width"] = heightF;
 
-    let attrFunction = (d: any, i: number, dataset: Dataset) =>
+    const attrFunction = (d: any, i: number, dataset: Dataset) =>
       +primaryAccessor(d, i, dataset) < 0 ? getStart(d, i, dataset) : getEnd(d, i, dataset);
     attrToProjector[valueAttr] = (d: any, i: number, dataset: Dataset) =>
       this._isVertical ? attrFunction(d, i, dataset) : attrFunction(d, i, dataset) - heightF(d, i, dataset);
@@ -236,7 +236,7 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
   }
 
   protected _extentsForProperty(attr: string) {
-    let primaryAttr = this._isVertical ? "y" : "x";
+    const primaryAttr = this._isVertical ? "y" : "x";
     if (attr === primaryAttr) {
       return [this._stackedExtent];
     } else {
@@ -249,10 +249,10 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
       return;
     }
 
-    let datasets = this.datasets();
-    let keyAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
-    let valueAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
-    let filter = this._filterForProperty(this._isVertical ? "y" : "x");
+    const datasets = this.datasets();
+    const keyAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
+    const valueAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
+    const filter = this._filterForProperty(this._isVertical ? "y" : "x");
 
     this._stackingResult = Utils.Stacking.stack(datasets, keyAccessor, valueAccessor, this._stackingOrder);
     this._stackedExtent = Utils.Stacking.stackedExtent(this._stackingResult, keyAccessor, filter);

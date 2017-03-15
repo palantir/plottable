@@ -5,8 +5,8 @@
 
 import * as d3 from "d3";
 
-import { Dataset } from "./dataset";
 import { Component } from "../components/component";
+import { Dataset } from "./dataset";
 
 export type SimpleSelection<Datum> = d3.Selection<d3.BaseType, Datum | {}, any, any>;
 

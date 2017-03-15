@@ -6,8 +6,8 @@
 import * as d3 from "d3";
 
 import * as Animators from "../animators";
-import { Accessor, AttributeToProjector, Projector, Point, Bounds, Range } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
+import { Accessor, AttributeToProjector, Bounds, Point, Projector, Range } from "../core/interfaces";
 import * as Drawers from "../drawers";
 import { Drawer } from "../drawers/drawer";
 import * as Scales from "../scales";
@@ -24,23 +24,23 @@ type EdgeIntersections = {
   left: Point[],
   right: Point[],
   top: Point[],
-  bottom: Point[]
+  bottom: Point[],
 };
 
 const CURVE_NAME_MAPPING: { [name: string]: d3.CurveFactory | d3.CurveFactoryLineOnly } = {
-  "linear": d3.curveLinear,
-  "linearClosed": d3.curveLinearClosed,
-  "step": d3.curveStep,
-  "stepBefore": d3.curveStepBefore,
-  "stepAfter": d3.curveStepAfter,
-  "basis": d3.curveBasis,
-  "basisOpen": d3.curveBasisOpen,
-  "basisClosed": d3.curveBasisClosed,
-  "bundle": d3.curveBundle,
-  "cardinal": d3.curveCardinal,
-  "cardinalOpen": d3.curveCardinalOpen,
-  "cardinalClosed": d3.curveCardinalClosed,
-  "monotone": d3.curveMonotoneX,
+  linear: d3.curveLinear,
+  linearClosed: d3.curveLinearClosed,
+  step: d3.curveStep,
+  stepBefore: d3.curveStepBefore,
+  stepAfter: d3.curveStepAfter,
+  basis: d3.curveBasis,
+  basisOpen: d3.curveBasisOpen,
+  basisClosed: d3.curveBasisClosed,
+  bundle: d3.curveBundle,
+  cardinal: d3.curveCardinal,
+  cardinalOpen: d3.curveCardinalOpen,
+  cardinalClosed: d3.curveCardinalClosed,
+  monotone: d3.curveMonotoneX,
 };
 
 /**
@@ -77,7 +77,7 @@ export class Line<X> extends XYPlot<X, number> {
   constructor() {
     super();
     this.addClass("line-plot");
-    let animator = new Animators.Easing();
+    const animator = new Animators.Easing();
     animator.stepDuration(Plot._ANIMATION_MAX_DURATION);
     animator.easingMode("expInOut");
     animator.maxTotalDuration(Plot._ANIMATION_MAX_DURATION);
@@ -227,7 +227,7 @@ export class Line<X> extends XYPlot<X, number> {
   }
 
   protected _extentsForProperty(property: string) {
-    let extents = super._extentsForProperty(property);
+    const extents = super._extentsForProperty(property);
 
     if (!this._autorangeSmooth) {
       return extents;
@@ -241,7 +241,7 @@ export class Line<X> extends XYPlot<X, number> {
       return extents;
     }
 
-    let edgeIntersectionPoints = this._getEdgeIntersectionPoints();
+    const edgeIntersectionPoints = this._getEdgeIntersectionPoints();
     let includedValues: number[];
     if (this.autorangeMode() === "y") {
       includedValues = edgeIntersectionPoints.left.concat(edgeIntersectionPoints.right).map((point) => point.y);
@@ -262,22 +262,22 @@ export class Line<X> extends XYPlot<X, number> {
       };
     }
 
-    let yScale = <QuantitativeScale<number>>this.y().scale;
-    let xScale = <QuantitativeScale<any>>this.x().scale;
+    const yScale = <QuantitativeScale<number>>this.y().scale;
+    const xScale = <QuantitativeScale<any>>this.x().scale;
 
-    let intersectionPoints: EdgeIntersections = {
+    const intersectionPoints: EdgeIntersections = {
       left: [],
       right: [],
       top: [],
       bottom: [],
     };
-    let leftX = xScale.scale(xScale.domain()[0]);
-    let rightX = xScale.scale(xScale.domain()[1]);
-    let bottomY = yScale.scale(yScale.domain()[0]);
-    let topY = yScale.scale(yScale.domain()[1]);
+    const leftX = xScale.scale(xScale.domain()[0]);
+    const rightX = xScale.scale(xScale.domain()[1]);
+    const bottomY = yScale.scale(yScale.domain()[0]);
+    const topY = yScale.scale(yScale.domain()[1]);
 
     this.datasets().forEach((dataset) => {
-      let data = dataset.data();
+      const data = dataset.data();
 
       let x1: number, x2: number, y1: number, y2: number;
       let prevX: number, prevY: number, currX: number, currY: number;
@@ -348,39 +348,39 @@ export class Line<X> extends XYPlot<X, number> {
 
   protected _getResetYFunction() {
     // gets the y-value generator for the animation start point
-    let yDomain = this.y().scale.domain();
-    let domainMax = Math.max(yDomain[0], yDomain[1]);
-    let domainMin = Math.min(yDomain[0], yDomain[1]);
+    const yDomain = this.y().scale.domain();
+    const domainMax = Math.max(yDomain[0], yDomain[1]);
+    const domainMin = Math.min(yDomain[0], yDomain[1]);
     // start from zero, or the closest domain value to zero
     // avoids lines zooming on from offscreen.
-    let startValue = (domainMax < 0 && domainMax) || (domainMin > 0 && domainMin) || 0;
-    let scaledStartValue = this.y().scale.scale(startValue);
+    const startValue = (domainMax < 0 && domainMax) || (domainMin > 0 && domainMin) || 0;
+    const scaledStartValue = this.y().scale.scale(startValue);
     return (d: any, i: number, dataset: Dataset) => scaledStartValue;
   }
 
   protected _generateDrawSteps(): Drawers.DrawStep[] {
-    let drawSteps: Drawers.DrawStep[] = [];
+    const drawSteps: Drawers.DrawStep[] = [];
     if (this._animateOnNextRender()) {
-      let attrToProjector = this._generateAttrToProjector();
+      const attrToProjector = this._generateAttrToProjector();
       attrToProjector["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), this._getResetYFunction());
       drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
     }
 
     drawSteps.push({
       attrToProjector: this._generateAttrToProjector(),
-      animator: this._getAnimator(Plots.Animator.MAIN)
+      animator: this._getAnimator(Plots.Animator.MAIN),
     });
 
     return drawSteps;
   }
 
   protected _generateAttrToProjector() {
-    let attrToProjector = super._generateAttrToProjector();
+    const attrToProjector = super._generateAttrToProjector();
     Object.keys(attrToProjector).forEach((attribute: string) => {
       if (attribute === "d") {
         return;
       }
-      let projector = attrToProjector[attribute];
+      const projector = attrToProjector[attribute];
       attrToProjector[attribute] = (data: any[], i: number, dataset: Dataset) =>
         data.length > 0 ? projector(data[0], i, dataset) : null;
     });
@@ -416,7 +416,7 @@ export class Line<X> extends XYPlot<X, number> {
     let dataXRange: Range;
     let dataYRange: Range;
     if (yRange == null) {
-      let bounds = (<Bounds> xRangeOrBounds);
+      const bounds = (<Bounds> xRangeOrBounds);
       dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
       dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
     } else {
@@ -451,8 +451,8 @@ export class Line<X> extends XYPlot<X, number> {
       if (!this._entityVisibleOnPlot(entity, chartBounds)) {
         return;
       }
-      let xDist = Math.abs(queryPoint.x - entity.position.x);
-      let yDist = Math.abs(queryPoint.y - entity.position.y);
+      const xDist = Math.abs(queryPoint.x - entity.position.x);
+      const yDist = Math.abs(queryPoint.y - entity.position.y);
 
       if (xDist < minXDist || xDist === minXDist && yDist < minYDist) {
         closest = entity;
@@ -465,15 +465,15 @@ export class Line<X> extends XYPlot<X, number> {
   }
 
   protected _propertyProjectors(): AttributeToProjector {
-    let propertyToProjectors = super._propertyProjectors();
+    const propertyToProjectors = super._propertyProjectors();
     propertyToProjectors["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), Plot._scaledAccessor(this.y()));
     return propertyToProjectors;
   }
 
   protected _constructLineProjector(xProjector: Projector, yProjector: Projector) {
-    let definedProjector = (d: any, i: number, dataset: Dataset) => {
-      let positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
-      let positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
+    const definedProjector = (d: any, i: number, dataset: Dataset) => {
+      const positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
+      const positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
       return positionX != null && !Utils.Math.isNaN(positionX) &&
         positionY != null && !Utils.Math.isNaN(positionY);
     };
@@ -507,10 +507,10 @@ export class Line<X> extends XYPlot<X, number> {
    * @private
    */
   protected _getDataToDraw(): Utils.Map<Dataset, any[]> {
-    let dataToDraw = new Utils.Map<Dataset, any[]>();
+    const dataToDraw = new Utils.Map<Dataset, any[]>();
 
     this.datasets().forEach((dataset) => {
-      let data = dataset.data();
+      const data = dataset.data();
 
       if (!this._croppedRenderingEnabled && !this._downsamplingEnabled) {
         dataToDraw.set(dataset, [data]);
@@ -531,30 +531,30 @@ export class Line<X> extends XYPlot<X, number> {
   }
 
   private _filterCroppedRendering(dataset: Dataset, indices: number[]) {
-    let xProjector = Plot._scaledAccessor(this.x());
-    let yProjector = Plot._scaledAccessor(this.y());
+    const xProjector = Plot._scaledAccessor(this.x());
+    const yProjector = Plot._scaledAccessor(this.y());
 
-    let data = dataset.data();
-    let filteredDataIndices: number[] = [];
-    let pointInViewport = (x: number, y: number) => {
+    const data = dataset.data();
+    const filteredDataIndices: number[] = [];
+    const pointInViewport = (x: number, y: number) => {
       return Utils.Math.inRange(x, 0, this.width()) &&
         Utils.Math.inRange(y, 0, this.height());
     };
 
     for (let i = 0; i < indices.length; i++) {
-      let currXPoint = xProjector(data[indices[i]], indices[i], dataset);
-      let currYPoint = yProjector(data[indices[i]], indices[i], dataset);
+      const currXPoint = xProjector(data[indices[i]], indices[i], dataset);
+      const currYPoint = yProjector(data[indices[i]], indices[i], dataset);
       let shouldShow = pointInViewport(currXPoint, currYPoint);
 
       if (!shouldShow && indices[i - 1] != null && data[indices[i - 1]] != null) {
-        let prevXPoint = xProjector(data[indices[i - 1]], indices[i - 1], dataset);
-        let prevYPoint = yProjector(data[indices[i - 1]], indices[i - 1], dataset);
+        const prevXPoint = xProjector(data[indices[i - 1]], indices[i - 1], dataset);
+        const prevYPoint = yProjector(data[indices[i - 1]], indices[i - 1], dataset);
         shouldShow = shouldShow || pointInViewport(prevXPoint, prevYPoint);
       }
 
       if (!shouldShow && indices[i + 1] != null && data[indices[i + 1]] != null) {
-        let nextXPoint = xProjector(data[indices[i + 1]], indices[i + 1], dataset);
-        let nextYPoint = yProjector(data[indices[i + 1]], indices[i + 1], dataset);
+        const nextXPoint = xProjector(data[indices[i + 1]], indices[i + 1], dataset);
+        const nextYPoint = yProjector(data[indices[i + 1]], indices[i + 1], dataset);
         shouldShow = shouldShow || pointInViewport(nextXPoint, nextYPoint);
       }
 
@@ -569,31 +569,31 @@ export class Line<X> extends XYPlot<X, number> {
     if (indices.length === 0) {
       return [];
     }
-    let data = dataset.data();
-    let scaledXAccessor = Plot._scaledAccessor(this.x());
-    let scaledYAccessor = Plot._scaledAccessor(this.y());
-    let filteredIndices = [indices[0]];
+    const data = dataset.data();
+    const scaledXAccessor = Plot._scaledAccessor(this.x());
+    const scaledYAccessor = Plot._scaledAccessor(this.y());
+    const filteredIndices = [indices[0]];
 
-    let indexOnCurrentSlope = (i: number, currentSlope: number) => {
-      let p1x = scaledXAccessor(data[indices[i]], indices[i], dataset);
-      let p1y = scaledYAccessor(data[indices[i]], indices[i], dataset);
-      let p2x = scaledXAccessor(data[indices[i + 1]], indices[i + 1], dataset);
-      let p2y = scaledYAccessor(data[indices[i + 1]], indices[i + 1], dataset);
+    const indexOnCurrentSlope = (i: number, currentSlope: number) => {
+      const p1x = scaledXAccessor(data[indices[i]], indices[i], dataset);
+      const p1y = scaledYAccessor(data[indices[i]], indices[i], dataset);
+      const p2x = scaledXAccessor(data[indices[i + 1]], indices[i + 1], dataset);
+      const p2y = scaledYAccessor(data[indices[i + 1]], indices[i + 1], dataset);
       if (currentSlope === Infinity) {
         return Math.floor(p1x) === Math.floor(p2x);
       } else {
-        let expectedP2y = p1y + (p2x - p1x) * currentSlope;
+        const expectedP2y = p1y + (p2x - p1x) * currentSlope;
         return Math.floor(p2y) === Math.floor(expectedP2y);
       }
     };
 
     for (let i = 0; i < indices.length - 1;) {
-      let indexFirst = indices[i];
-      let p1x = scaledXAccessor(data[indices[i]], indices[i], dataset);
-      let p1y = scaledYAccessor(data[indices[i]], indices[i], dataset);
-      let p2x = scaledXAccessor(data[indices[i + 1]], indices[i + 1], dataset);
-      let p2y = scaledYAccessor(data[indices[i + 1]], indices[i + 1], dataset);
-      let currentSlope = (Math.floor(p1x) === Math.floor(p2x)) ? Infinity : (p2y - p1y) / (p2x - p1x);
+      const indexFirst = indices[i];
+      const p1x = scaledXAccessor(data[indices[i]], indices[i], dataset);
+      const p1y = scaledYAccessor(data[indices[i]], indices[i], dataset);
+      const p2x = scaledXAccessor(data[indices[i + 1]], indices[i + 1], dataset);
+      const p2y = scaledYAccessor(data[indices[i + 1]], indices[i + 1], dataset);
+      const currentSlope = (Math.floor(p1x) === Math.floor(p2x)) ? Infinity : (p2y - p1y) / (p2x - p1x);
       let indexMin = indices[i];
       let minScaledValue = (currentSlope === Infinity) ? p1y : p1x;
       let indexMax = indexMin;
@@ -603,7 +603,7 @@ export class Line<X> extends XYPlot<X, number> {
       while (i < indices.length - 1 && (firstIndexOnCurrentSlope || indexOnCurrentSlope(i, currentSlope))) {
         i++;
         firstIndexOnCurrentSlope = false;
-        let currScaledValue = currentSlope === Infinity ? scaledYAccessor(data[indices[i]], indices[i], dataset) :
+        const currScaledValue = currentSlope === Infinity ? scaledYAccessor(data[indices[i]], indices[i], dataset) :
           scaledXAccessor(data[indices[i]], indices[i], dataset);
         if (currScaledValue > maxScaledValue) {
           maxScaledValue = currScaledValue;
@@ -615,7 +615,7 @@ export class Line<X> extends XYPlot<X, number> {
         }
       }
 
-      let indexLast = indices[i];
+      const indexLast = indices[i];
 
       if (indexMin !== indexFirst) {
         filteredIndices.push(indexMin);

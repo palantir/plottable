@@ -3,7 +3,6 @@
  * @license MIT
  */
 
-
 import * as Utils from "../utils";
 import * as Scales from "./";
 
@@ -42,7 +41,7 @@ export class Scale<D, R> {
   protected _getAllIncludedValues(): D[] {
     let providerArray: D[] = [];
     this._includedValuesProviders.forEach((provider: Scales.IncludedValuesProvider<D>) => {
-      let extents = provider(this);
+      const extents = provider(this);
       providerArray = providerArray.concat(extents);
     });
     return providerArray;

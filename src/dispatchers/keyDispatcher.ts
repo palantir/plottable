@@ -3,8 +3,8 @@
  * @license MIT
  */
 
-import { Dispatcher } from "./dispatcher";
 import * as Dispatchers from "./";
+import { Dispatcher } from "./dispatcher";
 
 export type KeyCallback = (keyCode: number, event: KeyboardEvent) => void;
 

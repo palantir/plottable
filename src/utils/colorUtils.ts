@@ -6,7 +6,7 @@
 import * as d3 from "d3";
 import { SimpleSelection } from "../core/interfaces";
 
-let nativeMath: Math = (<any>window).Math;
+const nativeMath: Math = (<any>window).Math;
 
 /**
  * Return contrast ratio between two colors
@@ -16,8 +16,8 @@ let nativeMath: Math = (<any>window).Math;
  * see http://www.w3.org/TR/2008/REC-WCAG20-20081211/#contrast-ratiodef
  */
 export function contrast(a: string, b: string) {
-  let l1 = luminance(a) + 0.05;
-  let l2 = luminance(b) + 0.05;
+  const l1 = luminance(a) + 0.05;
+  const l2 = luminance(b) + 0.05;
   return l1 > l2 ? l1 / l2 : l2 / l1;
 }
 
@@ -26,7 +26,7 @@ export function contrast(a: string, b: string) {
  * Channel values are capped at the maximum value of 255, and the minimum value of 30.
  */
 export function lightenColor(color: string, factor: number) {
-  let brightened = d3.color(color).brighter(factor);
+  const brightened = d3.color(color).brighter(factor);
   return brightened.rgb().toString();
 }
 
@@ -41,21 +41,21 @@ export function lightenColor(color: string, factor: number) {
 export function colorTest(colorTester: SimpleSelection<any>, className: string) {
   colorTester.classed(className, true);
   // Use regex to get the text inside the rgb parentheses
-  let colorStyle = colorTester.style("background-color");
+  const colorStyle = colorTester.style("background-color");
   if (colorStyle === "transparent") {
     return null;
   }
-  let rgb = /\((.+)\)/.exec(colorStyle)[1]
+  const rgb = /\((.+)\)/.exec(colorStyle)[1]
     .split(",")
     .map((colorValue: string) => {
-      let colorNumber = +colorValue;
-      let hexValue = colorNumber.toString(16);
+      const colorNumber = +colorValue;
+      const hexValue = colorNumber.toString(16);
       return colorNumber < 16 ? "0" + hexValue : hexValue;
     });
   if (rgb.length === 4 && rgb[3] === "00") {
     return null;
   }
-  let hexCode = "#" + rgb.join("");
+  const hexCode = "#" + rgb.join("");
   colorTester.classed(className, false);
   return hexCode;
 }
@@ -67,14 +67,14 @@ export function colorTest(colorTester: SimpleSelection<any>, className: string) 
  * License may be found here: https://github.com/gka/chroma.js/blob/master/LICENSE
  */
 function luminance(color: string) {
-  let rgb = d3.rgb(color);
+  const rgb = d3.rgb(color);
 
-  let lum = (x: number) => {
+  const lum = (x: number) => {
     x = x / 255;
     return x <= 0.03928 ? x / 12.92 : nativeMath.pow((x + 0.055) / 1.055, 2.4);
   };
-  let r = lum(rgb.r);
-  let g = lum(rgb.g);
-  let b = lum(rgb.b);
+  const r = lum(rgb.r);
+  const g = lum(rgb.g);
+  const b = lum(rgb.b);
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }

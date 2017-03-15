@@ -7,16 +7,16 @@ import * as d3 from "d3";
 import * as Typesetter from "typesettable";
 
 import * as Animators from "../animators";
-import { Accessor, Point, AttributeToProjector, SimpleSelection } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
-import * as Drawers from "../drawers";
 import { Formatter } from "../core/formatters";
 import * as Formatters from "../core/formatters";
+import { Accessor, AttributeToProjector, Point, SimpleSelection } from "../core/interfaces";
+import * as Drawers from "../drawers";
 import * as Scales from "../scales";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
 
-import { PlotEntity, AccessorScaleBinding } from "./";
+import { AccessorScaleBinding, PlotEntity } from "./";
 import { Plot } from "./plot";
 
 export interface PiePlotEntity extends PlotEntity {
@@ -41,9 +41,9 @@ export class Pie extends Plot {
    */
   constructor() {
     super();
-    this.innerRadius(0)
+    this.innerRadius(0);
     this.outerRadius(() => {
-      let pieCenter = this._pieCenter();
+      const pieCenter = this._pieCenter();
       return Math.min(Math.max(this.width() - pieCenter.x, pieCenter.x), Math.max(this.height() - pieCenter.y, pieCenter.y));
     });
     this.addClass("pie-plot");
@@ -60,10 +60,10 @@ export class Pie extends Plot {
   public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
     super.computeLayout(origin, availableWidth, availableHeight);
 
-    let pieCenter = this._pieCenter()
+    const pieCenter = this._pieCenter();
     this._renderArea.attr("transform", "translate(" + pieCenter.x + "," + pieCenter.y + ")");
 
-    let radiusLimit = Math.min(Math.max(this.width() - pieCenter.x, pieCenter.x), Math.max(this.height() - pieCenter.y, pieCenter.y));
+    const radiusLimit = Math.min(Math.max(this.width() - pieCenter.x, pieCenter.x), Math.max(this.height() - pieCenter.y, pieCenter.y));
 
     if (this.innerRadius().scale != null) {
       this.innerRadius().scale.range([0, radiusLimit]);
@@ -85,7 +85,7 @@ export class Pie extends Plot {
       return this;
     }
     this._updatePieAngles();
-    let strokeDrawer = new Drawers.ArcOutline(dataset);
+    const strokeDrawer = new Drawers.ArcOutline(dataset);
     if (this._isSetup) {
       strokeDrawer.renderArea(this._renderArea.append("g"));
     }
@@ -112,9 +112,9 @@ export class Pie extends Plot {
   }
 
   public selections(datasets = this.datasets()): SimpleSelection<any> {
-    let allSelections = super.selections(datasets).nodes();
+    const allSelections = super.selections(datasets).nodes();
     datasets.forEach((dataset) => {
-      let drawer = this._strokeDrawers.get(dataset);
+      const drawer = this._strokeDrawers.get(dataset);
       if (drawer == null) {
         return;
       }
@@ -136,11 +136,11 @@ export class Pie extends Plot {
   }
 
   public entities(datasets = this.datasets()): PiePlotEntity[] {
-    let entities = super.entities(datasets);
+    const entities = super.entities(datasets);
     return entities.map((entity) => {
       entity.position.x += this.width() / 2;
       entity.position.y += this.height() / 2;
-      let stroke = this._strokeDrawers.get(entity.dataset).selectionForIndex(entity.index);
+      const stroke = this._strokeDrawers.get(entity.dataset).selectionForIndex(entity.index);
       const piePlotEntity = entity as PiePlotEntity;
       piePlotEntity.strokeSelection = stroke;
       return piePlotEntity;
@@ -334,16 +334,16 @@ export class Pie extends Plot {
    * @param {PlotEntity[]}
    */
   public entitiesAt(queryPoint: Point) {
-    let center = { x: this.width() / 2, y: this.height() / 2 };
-    let adjustedQueryPoint = { x: queryPoint.x - center.x, y: queryPoint.y - center.y };
-    let index = this._sliceIndexForPoint(adjustedQueryPoint);
+    const center = { x: this.width() / 2, y: this.height() / 2 };
+    const adjustedQueryPoint = { x: queryPoint.x - center.x, y: queryPoint.y - center.y };
+    const index = this._sliceIndexForPoint(adjustedQueryPoint);
     return index == null ? [] : [this.entities()[index]];
   }
 
   protected _propertyProjectors(): AttributeToProjector {
-    let attrToProjector = super._propertyProjectors();
-    let innerRadiusAccessor = Plot._scaledAccessor(this.innerRadius());
-    let outerRadiusAccessor = Plot._scaledAccessor(this.outerRadius());
+    const attrToProjector = super._propertyProjectors();
+    const innerRadiusAccessor = Plot._scaledAccessor(this.innerRadius());
+    const outerRadiusAccessor = Plot._scaledAccessor(this.outerRadius());
     attrToProjector["d"] = (datum: any, index: number, ds: Dataset) => {
       return d3.arc().innerRadius(innerRadiusAccessor(datum, index, ds))
         .outerRadius(outerRadiusAccessor(datum, index, ds))
@@ -360,22 +360,22 @@ export class Pie extends Plot {
     if (this.datasets().length === 0) {
       return;
     }
-    let sectorValueAccessor = Plot._scaledAccessor(this.sectorValue());
-    let dataset = this.datasets()[0];
-    let data = this._getDataToDraw().get(dataset);
-    let pie = d3.pie().sort(null).startAngle(this._startAngle).endAngle(this._endAngle)
+    const sectorValueAccessor = Plot._scaledAccessor(this.sectorValue());
+    const dataset = this.datasets()[0];
+    const data = this._getDataToDraw().get(dataset);
+    const pie = d3.pie().sort(null).startAngle(this._startAngle).endAngle(this._endAngle)
       .value((d, i) => sectorValueAccessor(d, i, dataset))(data);
     this._startAngles = pie.map((slice) => slice.startAngle);
     this._endAngles = pie.map((slice) => slice.endAngle);
   }
 
   private _pieCenter(): Point {
-    let a = this._startAngle < this._endAngle ? this._startAngle : this._endAngle;
-    let b = this._startAngle < this._endAngle ? this._endAngle : this._startAngle;
-    let sinA = Math.sin(a);
-    let cosA = Math.cos(a);
-    let sinB = Math.sin(b);
-    let cosB = Math.cos(b);
+    const a = this._startAngle < this._endAngle ? this._startAngle : this._endAngle;
+    const b = this._startAngle < this._endAngle ? this._endAngle : this._startAngle;
+    const sinA = Math.sin(a);
+    const cosA = Math.cos(a);
+    const sinB = Math.sin(b);
+    const cosB = Math.cos(b);
     let hTop: number;
     let hBottom: number;
     let wRight: number;
@@ -404,7 +404,7 @@ export class Pie extends Plot {
         hTop = cosA;
         hBottom = -cosB;
         wLeft = 0;
-        wRight = sinA
+        wRight = sinA;
       }
       else if (cosA < 0 && cosB >= 0) {
         hTop = 1;
@@ -494,19 +494,19 @@ export class Pie extends Plot {
 
     return {
       x: wLeft + wRight == 0 ? 0 : (wLeft / (wLeft + wRight)) * this.width(),
-      y: hTop + hBottom == 0 ? 0 : (hTop / (hTop + hBottom)) * this.height()
-    }
+      y: hTop + hBottom == 0 ? 0 : (hTop / (hTop + hBottom)) * this.height(),
+    };
   }
 
   protected _getDataToDraw(): Utils.Map<Dataset, any[]> {
-    let dataToDraw = super._getDataToDraw();
+    const dataToDraw = super._getDataToDraw();
     if (this.datasets().length === 0) {
       return dataToDraw;
     }
-    let sectorValueAccessor = Plot._scaledAccessor(this.sectorValue());
-    let ds = this.datasets()[0];
-    let data = dataToDraw.get(ds);
-    let filteredData = data.filter((d, i) => Pie._isValidData(sectorValueAccessor(d, i, ds)));
+    const sectorValueAccessor = Plot._scaledAccessor(this.sectorValue());
+    const ds = this.datasets()[0];
+    const data = dataToDraw.get(ds);
+    const filteredData = data.filter((d, i) => Pie._isValidData(sectorValueAccessor(d, i, ds)));
     dataToDraw.set(ds, filteredData);
     return dataToDraw;
   }
@@ -516,24 +516,24 @@ export class Pie extends Plot {
   }
 
   protected _pixelPoint(datum: any, index: number, dataset: Dataset) {
-    let scaledValueAccessor = Plot._scaledAccessor(this.sectorValue());
+    const scaledValueAccessor = Plot._scaledAccessor(this.sectorValue());
     if (!Pie._isValidData(scaledValueAccessor(datum, index, dataset))) {
       return { x: NaN, y: NaN };
     }
 
-    let innerRadius = Plot._scaledAccessor(this.innerRadius())(datum, index, dataset);
-    let outerRadius = Plot._scaledAccessor(this.outerRadius())(datum, index, dataset);
-    let avgRadius = (innerRadius + outerRadius) / 2;
+    const innerRadius = Plot._scaledAccessor(this.innerRadius())(datum, index, dataset);
+    const outerRadius = Plot._scaledAccessor(this.outerRadius())(datum, index, dataset);
+    const avgRadius = (innerRadius + outerRadius) / 2;
 
-    let pie = d3.pie()
+    const pie = d3.pie()
       .sort(null)
       .value((d: any, i: number) => {
-        let value = scaledValueAccessor(d, i, dataset);
+        const value = scaledValueAccessor(d, i, dataset);
         return Pie._isValidData(value) ? value : 0;
       }).startAngle(this._startAngle).endAngle(this._endAngle)(dataset.data());
-    let startAngle = pie[index].startAngle;
-    let endAngle = pie[index].endAngle;
-    let avgAngle = (startAngle + endAngle) / 2;
+    const startAngle = pie[index].startAngle;
+    const endAngle = pie[index].endAngle;
+    const avgAngle = (startAngle + endAngle) / 2;
     return { x: avgRadius * Math.sin(avgAngle), y: -avgRadius * Math.cos(avgAngle) };
   }
 
@@ -543,18 +543,18 @@ export class Pie extends Plot {
       Utils.Window.setTimeout(() => this._drawLabels(), time);
     }
 
-    let drawSteps = this._generateStrokeDrawSteps();
-    let dataToDraw = this._getDataToDraw();
+    const drawSteps = this._generateStrokeDrawSteps();
+    const dataToDraw = this._getDataToDraw();
     this.datasets().forEach((dataset) => this._strokeDrawers.get(dataset).draw(dataToDraw.get(dataset), drawSteps));
   }
 
   private _generateStrokeDrawSteps() {
-    let attrToProjector = this._generateAttrToProjector();
+    const attrToProjector = this._generateAttrToProjector();
     return [{ attrToProjector: attrToProjector, animator: new Animators.Null() }];
   }
 
   private _sliceIndexForPoint(p: Point) {
-    let pointRadius = Math.sqrt(Math.pow(p.x, 2) + Math.pow(p.y, 2));
+    const pointRadius = Math.sqrt(Math.pow(p.x, 2) + Math.pow(p.y, 2));
     let pointAngle = Math.acos(-p.y / pointRadius);
     if (p.x < 0) {
       pointAngle = Math.PI * 2 - pointAngle;
@@ -567,10 +567,10 @@ export class Pie extends Plot {
       }
     }
     if (index !== undefined) {
-      let dataset = this.datasets()[0];
-      let datum = dataset.data()[index];
-      let innerRadius = this.innerRadius().accessor(datum, index, dataset);
-      let outerRadius = this.outerRadius().accessor(datum, index, dataset);
+      const dataset = this.datasets()[0];
+      const datum = dataset.data()[index];
+      const innerRadius = this.innerRadius().accessor(datum, index, dataset);
+      const outerRadius = this.outerRadius().accessor(datum, index, dataset);
       if (pointRadius > innerRadius && pointRadius < outerRadius) {
         return index;
       }
@@ -593,9 +593,9 @@ export class Pie extends Plot {
         return;
       }
       value = this._labelFormatter(value);
-      let measurement = measurer.measure(value);
+      const measurement = measurer.measure(value);
 
-      let theta = (this._endAngles[datumIndex] + this._startAngles[datumIndex]) / 2;
+      const theta = (this._endAngles[datumIndex] + this._startAngles[datumIndex]) / 2;
       let outerRadius = this.outerRadius().accessor(datum, datumIndex, dataset);
       if (this.outerRadius().scale) {
         outerRadius = this.outerRadius().scale.scale(outerRadius);
@@ -604,12 +604,12 @@ export class Pie extends Plot {
       if (this.innerRadius().scale) {
         innerRadius = this.innerRadius().scale.scale(innerRadius);
       }
-      let labelRadius = (outerRadius + innerRadius) / 2;
+      const labelRadius = (outerRadius + innerRadius) / 2;
 
-      let x = Math.sin(theta) * labelRadius - measurement.width / 2;
-      let y = -Math.cos(theta) * labelRadius - measurement.height / 2;
+      const x = Math.sin(theta) * labelRadius - measurement.width / 2;
+      const y = -Math.cos(theta) * labelRadius - measurement.height / 2;
 
-      let corners = [
+      const corners = [
         { x: x, y: y },
         { x: x, y: y + measurement.height },
         { x: x + measurement.width, y: y },
@@ -621,14 +621,14 @@ export class Pie extends Plot {
       });
 
       if (showLabel) {
-        let sliceIndices = corners.map((corner) => this._sliceIndexForPoint(corner));
+        const sliceIndices = corners.map((corner) => this._sliceIndexForPoint(corner));
         showLabel = sliceIndices.every((index) => index === datumIndex);
       }
 
-      let color = attrToProjector["fill"](datum, datumIndex, dataset);
-      let dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
-      let g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
-      let className = dark ? "dark-label" : "light-label";
+      const color = attrToProjector["fill"](datum, datumIndex, dataset);
+      const dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
+      const g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
+      const className = dark ? "dark-label" : "light-label";
       g.classed(className, true);
       g.style("visibility", showLabel ? "inherit" : "hidden");
 
