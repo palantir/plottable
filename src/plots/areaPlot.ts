@@ -100,7 +100,7 @@ export class Area<X> extends Line<X> {
   }
 
   protected _addDataset(dataset: Dataset) {
-    const lineDrawer = new Drawers.Line(dataset);
+    const lineDrawer = new Drawers.Line(dataset, () => this._d3LineFactory(dataset));
     if (this._isSetup) {
       lineDrawer.renderArea(this._renderArea.append("g"));
     }

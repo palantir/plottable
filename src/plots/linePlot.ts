@@ -4,6 +4,7 @@
  */
 
 import * as d3 from "d3";
+import * as d3Shape from "d3-shape";
 
 import * as Animators from "../animators";
 import { Dataset } from "../core/dataset";
@@ -223,7 +224,7 @@ export class Line<X> extends XYPlot<X, number> {
   }
 
   protected _createDrawer(dataset: Dataset): Drawer {
-    return new Drawers.Line(dataset);
+    return new Drawers.Line(dataset, () => this._d3LineFactory(dataset));
   }
 
   protected _extentsForProperty(property: string) {
@@ -340,7 +341,6 @@ export class Line<X> extends XYPlot<X, number> {
           });
         }
       }
-      ;
     });
 
     return intersectionPoints;
@@ -471,20 +471,37 @@ export class Line<X> extends XYPlot<X, number> {
   }
 
   protected _constructLineProjector(xProjector: Projector, yProjector: Projector) {
+    return (datum: any, index: number, dataset: Dataset) => {
+      return this._d3LineFactory(dataset, xProjector, yProjector)(datum);
+    };
+  }
+
+  /**
+   * Return a d3.Line whose .x, .y, and .defined accessors are hooked up to the xProjector and yProjector
+   * after they've been fed the dataset, and whose curve is configured to this plot's curve.
+   * @param dataset
+   * @param xProjector
+   * @param yProjector
+   * @returns {Line<[number,number]>}
+   * @private
+   */
+  protected _d3LineFactory(
+    dataset: Dataset,
+    xProjector = Plot._scaledAccessor(this.x()),
+    yProjector = Plot._scaledAccessor(this.y())): d3Shape.Line<any> {
     const definedProjector = (d: any, i: number, dataset: Dataset) => {
       const positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
       const positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
       return positionX != null && !Utils.Math.isNaN(positionX) &&
         positionY != null && !Utils.Math.isNaN(positionY);
     };
-    return (datum: any, index: number, dataset: Dataset) => {
-      return d3.line()
-        .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
-        .y((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
-        .curve(this._getCurveFactory())
-        .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset))(datum);
-    };
-  }
+
+    return d3.line()
+      .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
+      .y((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
+      .curve(this._getCurveFactory())
+      .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset));
+  };
 
   protected _getCurveFactory(): d3.CurveFactory | d3.CurveFactoryLineOnly {
     const curve = this.curve();

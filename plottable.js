@@ -552,6 +552,11 @@ var Plot = (function (_super) {
         var drawSteps = this._generateDrawSteps();
         var dataToDraw = this._getDataToDraw();
         var drawers = this.datasets().map(function (dataset) { return _this._datasetToDrawer.get(dataset); });
+        if (this.renderer() === "canvas") {
+            var canvas = this._canvas.node();
+            var context_1 = canvas.getContext("2d");
+            context_1.clearRect(0, 0, canvas.width, canvas.height);
+        }
         this.datasets().forEach(function (ds, i) { return drawers[i].draw(dataToDraw.get(ds), drawSteps); });
         var times = this.datasets().map(function (ds, i) { return drawers[i].totalDrawTime(dataToDraw.get(ds), drawSteps); });
         var maxTime = Utils.Math.max(times, 0);
@@ -1509,9 +1514,6 @@ var Drawer = (function () {
             });
         }
         else if (this._canvas != null) {
-            var canvas = this.canvas().node();
-            var context_1 = canvas.getContext("2d");
-            context_1.clearRect(0, 0, canvas.width, canvas.height);
             // don't support animations for now; just draw the last draw step immediately
             var lastDrawStep_1 = appliedDrawSteps[appliedDrawSteps.length - 1];
             Utils.Window.setTimeout(function () { return _this._drawStepCanvas(data, lastDrawStep_1); }, 0);
@@ -6325,7 +6327,8 @@ var Area = (function (_super) {
         return this;
     };
     Area.prototype._addDataset = function (dataset) {
-        var lineDrawer = new Drawers.Line(dataset);
+        var _this = this;
+        var lineDrawer = new Drawers.Line(dataset, function () { return _this._d3LineFactory(dataset); });
         if (this._isSetup) {
             lineDrawer.renderArea(this._renderArea.append("g"));
         }
@@ -6589,7 +6592,8 @@ var Line = (function (_super) {
         return this;
     };
     Line.prototype._createDrawer = function (dataset) {
-        return new Drawers.Line(dataset);
+        var _this = this;
+        return new Drawers.Line(dataset, function () { return _this._d3LineFactory(dataset); });
     };
     Line.prototype._extentsForProperty = function (property) {
         var extents = _super.prototype._extentsForProperty.call(this, property);
@@ -6688,7 +6692,6 @@ var Line = (function (_super) {
                     });
                 }
             }
-            ;
         });
         return intersectionPoints;
     };
@@ -6792,20 +6795,36 @@ var Line = (function (_super) {
     };
     Line.prototype._constructLineProjector = function (xProjector, yProjector) {
         var _this = this;
+        return function (datum, index, dataset) {
+            return _this._d3LineFactory(dataset, xProjector, yProjector)(datum);
+        };
+    };
+    /**
+     * Return a d3.Line whose .x, .y, and .defined accessors are hooked up to the xProjector and yProjector
+     * after they've been fed the dataset, and whose curve is configured to this plot's curve.
+     * @param dataset
+     * @param xProjector
+     * @param yProjector
+     * @returns {Line<[number,number]>}
+     * @private
+     */
+    Line.prototype._d3LineFactory = function (dataset, xProjector, yProjector) {
+        var _this = this;
+        if (xProjector === void 0) { xProjector = plot_1.Plot._scaledAccessor(this.x()); }
+        if (yProjector === void 0) { yProjector = plot_1.Plot._scaledAccessor(this.y()); }
         var definedProjector = function (d, i, dataset) {
             var positionX = plot_1.Plot._scaledAccessor(_this.x())(d, i, dataset);
             var positionY = plot_1.Plot._scaledAccessor(_this.y())(d, i, dataset);
             return positionX != null && !Utils.Math.isNaN(positionX) &&
                 positionY != null && !Utils.Math.isNaN(positionY);
         };
-        return function (datum, index, dataset) {
-            return d3.line()
-                .x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); })
-                .y(function (innerDatum, innerIndex) { return yProjector(innerDatum, innerIndex, dataset); })
-                .curve(_this._getCurveFactory())
-                .defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); })(datum);
-        };
+        return d3.line()
+            .x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); })
+            .y(function (innerDatum, innerIndex) { return yProjector(innerDatum, innerIndex, dataset); })
+            .curve(this._getCurveFactory())
+            .defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); });
     };
+    ;
     Line.prototype._getCurveFactory = function () {
         var curve = this.curve();
         if (typeof curve === "string") {
@@ -11140,8 +11159,14 @@ var d3 = __webpack_require__(1);
 var drawer_1 = __webpack_require__(7);
 var Line = (function (_super) {
     __extends(Line, _super);
-    function Line(dataset) {
+    /**
+     * @param dataset
+     * @param _d3LineFactory A callback that gives this Line Drawer a d3.Line object which will be
+     * used to draw with.
+     */
+    function Line(dataset, d3LineFactory) {
         _super.call(this, dataset);
+        this._d3LineFactory = d3LineFactory;
         this._className = "line";
         this._svgElementName = "path";
     }
@@ -11151,6 +11176,38 @@ var Line = (function (_super) {
     };
     Line.prototype.selectionForIndex = function (index) {
         return d3.select(this.selection().node());
+    };
+    /**
+     *
+     * @param data Data to draw. The data will be passed through the line factory in order to get applied
+     * onto the canvas.
+     * @param step
+     * @private
+     */
+    Line.prototype._drawStepCanvas = function (data, step) {
+        var context = this.canvas().node().getContext("2d");
+        var d3Line = this._d3LineFactory();
+        var attrToAppliedProjector = step.attrToAppliedProjector;
+        var resolvedAttrs = Object.keys(attrToAppliedProjector).reduce(function (obj, attrName) {
+            obj[attrName] = attrToAppliedProjector[attrName](data, 0);
+            return obj;
+        }, {});
+        context.save();
+        context.beginPath();
+        d3Line.context(context);
+        d3Line(data[0]);
+        if (resolvedAttrs["stroke-width"]) {
+            context.lineWidth = parseFloat(resolvedAttrs["stroke-width"]);
+        }
+        if (resolvedAttrs["stroke"]) {
+            var strokeColor = d3.color(resolvedAttrs["stroke"]);
+            if (resolvedAttrs["opacity"]) {
+                strokeColor.opacity = resolvedAttrs["opacity"];
+            }
+            context.strokeStyle = strokeColor.rgb().toString();
+            context.stroke();
+        }
+        context.restore();
     };
     return Line;
 }(drawer_1.Drawer));
