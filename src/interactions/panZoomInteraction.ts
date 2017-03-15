@@ -12,8 +12,8 @@ import * as Scales from "../scales";
 import { TransformableScale } from "../scales/scale";
 import * as Utils from "../utils";
 
-import { Interaction } from "./interaction";
 import * as Interactions from "./";
+import { Interaction } from "./interaction";
 
 export type PanCallback = () => void;
 export type ZoomCallback = () => void;
@@ -156,7 +156,7 @@ export class PanZoom extends Interaction {
 
   private _handleTouchStart(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {
     for (let i = 0; i < ids.length && this._touchIds.size() < 2; i++) {
-      let id = ids[i];
+      const id = ids[i];
       this._touchIds.set(id.toString(), this._translateToComponentSpace(idToPoint[id]));
     }
   }
@@ -166,13 +166,13 @@ export class PanZoom extends Interaction {
       return;
     }
 
-    let oldPoints = this._touchIds.values();
+    const oldPoints = this._touchIds.values();
 
     if (!this._isInsideComponent(this._translateToComponentSpace(oldPoints[0])) || !this._isInsideComponent(this._translateToComponentSpace(oldPoints[1]))) {
       return;
     }
 
-    let oldCornerDistance = PanZoom._pointDistance(oldPoints[0], oldPoints[1]);
+    const oldCornerDistance = PanZoom._pointDistance(oldPoints[0], oldPoints[1]);
 
     if (oldCornerDistance === 0) {
       return;
@@ -184,8 +184,8 @@ export class PanZoom extends Interaction {
       }
     });
 
-    let points = this._touchIds.values();
-    let newCornerDistance = PanZoom._pointDistance(points[0], points[1]);
+    const points = this._touchIds.values();
+    const newCornerDistance = PanZoom._pointDistance(points[0], points[1]);
 
     if (newCornerDistance === 0) {
       return;
@@ -193,11 +193,11 @@ export class PanZoom extends Interaction {
 
     let magnifyAmount = oldCornerDistance / newCornerDistance;
 
-    let normalizedPointDiffs = points.map((point, i) => {
+    const normalizedPointDiffs = points.map((point, i) => {
       return { x: (point.x - oldPoints[i].x) / magnifyAmount, y: (point.y - oldPoints[i].y) / magnifyAmount };
     });
 
-    let oldCenterPoint = PanZoom.centerPoint(oldPoints[0], oldPoints[1]);
+    const oldCenterPoint = PanZoom.centerPoint(oldPoints[0], oldPoints[1]);
     let centerX = oldCenterPoint.x;
     let centerY = oldCenterPoint.y;
 
@@ -213,7 +213,7 @@ export class PanZoom extends Interaction {
       magnifyAmount = constrained.zoomAmount;
     });
 
-    let constrainedPoints = oldPoints.map((oldPoint, i) => {
+    const constrainedPoints = oldPoints.map((oldPoint, i) => {
       return {
         x: normalizedPointDiffs[i].x * magnifyAmount + oldPoint.x,
         y: normalizedPointDiffs[i].y * magnifyAmount + oldPoint.y,
@@ -222,7 +222,7 @@ export class PanZoom extends Interaction {
 
     const translateAmount = {
       x: centerX - ((constrainedPoints[0].x + constrainedPoints[1].x) / 2),
-      y: centerY - ((constrainedPoints[0].y + constrainedPoints[1].y) / 2)
+      y: centerY - ((constrainedPoints[0].y + constrainedPoints[1].y) / 2),
     };
 
     this.zoom(magnifyAmount, { x: centerX, y: centerY });
@@ -230,19 +230,19 @@ export class PanZoom extends Interaction {
   }
 
   public static centerPoint(point1: Point, point2: Point) {
-    let leftX = Math.min(point1.x, point2.x);
-    let rightX = Math.max(point1.x, point2.x);
-    let topY = Math.min(point1.y, point2.y);
-    let bottomY = Math.max(point1.y, point2.y);
+    const leftX = Math.min(point1.x, point2.x);
+    const rightX = Math.max(point1.x, point2.x);
+    const topY = Math.min(point1.y, point2.y);
+    const bottomY = Math.max(point1.y, point2.y);
 
     return { x: (leftX + rightX) / 2, y: (bottomY + topY) / 2 };
   }
 
   private static _pointDistance(point1: Point, point2: Point) {
-    let leftX = Math.min(point1.x, point2.x);
-    let rightX = Math.max(point1.x, point2.x);
-    let topY = Math.min(point1.y, point2.y);
-    let bottomY = Math.max(point1.y, point2.y);
+    const leftX = Math.min(point1.x, point2.x);
+    const rightX = Math.max(point1.x, point2.x);
+    const topY = Math.min(point1.y, point2.y);
+    const bottomY = Math.max(point1.y, point2.y);
 
     return Math.sqrt(Math.pow(rightX - leftX, 2) + Math.pow(bottomY - topY, 2));
   }
@@ -258,11 +258,11 @@ export class PanZoom extends Interaction {
   }
 
   private _handleWheelEvent(p: Point, e: WheelEvent) {
-    let translatedP = this._translateToComponentSpace(p);
+    const translatedP = this._translateToComponentSpace(p);
     if (this._isInsideComponent(translatedP)) {
       e.preventDefault();
 
-      let deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom._PIXELS_PER_LINE : 1);
+      const deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom._PIXELS_PER_LINE : 1);
       let zoomAmount = Math.pow(2, deltaPixelAmount * .002);
       let centerX = translatedP.x;
       let centerY = translatedP.y;
@@ -300,16 +300,16 @@ export class PanZoom extends Interaction {
   }
 
   private _constrainZoomExtents(scale: TransformableScale<any, number>, zoomAmount: number) {
-    let extentIncreasing = zoomAmount > 1;
+    const extentIncreasing = zoomAmount > 1;
 
-    let boundingDomainExtent = extentIncreasing ? this.maxDomainExtent(scale) : this.minDomainExtent(scale);
+    const boundingDomainExtent = extentIncreasing ? this.maxDomainExtent(scale) : this.minDomainExtent(scale);
     if (boundingDomainExtent == null) {
       return zoomAmount;
     }
 
     const [ scaleDomainMin, scaleDomainMax ] = scale.getTransformationDomain();
-    let domainExtent = Math.abs(scaleDomainMax - scaleDomainMin);
-    let compareF = extentIncreasing ? Math.min : Math.max;
+    const domainExtent = Math.abs(scaleDomainMax - scaleDomainMin);
+    const compareF = extentIncreasing ? Math.min : Math.max;
     return compareF(zoomAmount, boundingDomainExtent / domainExtent);
   }
 
@@ -404,7 +404,7 @@ export class PanZoom extends Interaction {
 
       const translateAmount = {
         x: (lastDragPoint == null ? startPoint.x : lastDragPoint.x) - endPoint.x,
-        y: (lastDragPoint == null ? startPoint.y : lastDragPoint.y) - endPoint.y
+        y: (lastDragPoint == null ? startPoint.y : lastDragPoint.y) - endPoint.y,
       };
       this.pan(translateAmount);
 
@@ -457,7 +457,7 @@ export class PanZoom extends Interaction {
   public xScales(xScales: TransformableScale<any, number>[]): this;
   public xScales(xScales?: TransformableScale<any, number>[]): any {
     if (xScales == null) {
-      let scales: TransformableScale<any, number>[] = [];
+      const scales: TransformableScale<any, number>[] = [];
       this._xScales.forEach((xScale) => {
         scales.push(xScale);
       });
@@ -482,7 +482,7 @@ export class PanZoom extends Interaction {
   public yScales(yScales: TransformableScale<any, number>[]): this;
   public yScales(yScales?: TransformableScale<any, number>[]): any {
     if (yScales == null) {
-      let scales: TransformableScale<any, number>[] = [];
+      const scales: TransformableScale<any, number>[] = [];
       this._yScales.forEach((yScale) => {
         scales.push(yScale);
       });
@@ -578,7 +578,7 @@ export class PanZoom extends Interaction {
     if (minDomainExtent.valueOf() < 0) {
       throw new Error("extent must be non-negative");
     }
-    let maxExtentForScale = this.maxDomainExtent(scale);
+    const maxExtentForScale = this.maxDomainExtent(scale);
     if (maxExtentForScale != null && maxExtentForScale.valueOf() < minDomainExtent.valueOf()) {
       throw new Error("minDomainExtent must be smaller than maxDomainExtent for the same Scale");
     }
@@ -624,7 +624,7 @@ export class PanZoom extends Interaction {
     if (maxDomainExtent.valueOf() <= 0) {
       throw new Error("extent must be positive");
     }
-    let minExtentForScale = this.minDomainExtent(scale);
+    const minExtentForScale = this.minDomainExtent(scale);
     if (minExtentForScale != null && maxDomainExtent.valueOf() < minExtentForScale.valueOf()) {
       throw new Error("maxDomainExtent must be larger than minDomainExtent for the same Scale");
     }

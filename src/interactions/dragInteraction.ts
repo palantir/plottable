@@ -12,7 +12,6 @@ import { Interaction } from "./interaction";
 
 export type DragCallback = (start: Point, end: Point) => void;
 
-
 export class Drag extends Interaction {
   private _dragging = false;
   private _constrainedToComponent = true;
@@ -57,7 +56,7 @@ export class Drag extends Interaction {
   }
 
   private _translateAndConstrain(p: Point) {
-    let translatedP = this._translateToComponentSpace(p);
+    const translatedP = this._translateToComponentSpace(p);
     if (!this._constrainedToComponent) {
       return translatedP;
     }
@@ -72,7 +71,7 @@ export class Drag extends Interaction {
     if (event instanceof MouseEvent && (<MouseEvent> event).button !== 0) {
       return;
     }
-    let translatedP = this._translateToComponentSpace(point);
+    const translatedP = this._translateToComponentSpace(point);
     if (this._isInsideComponent(translatedP)) {
       event.preventDefault();
       this._dragging = true;

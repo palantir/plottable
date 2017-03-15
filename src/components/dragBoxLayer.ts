@@ -9,9 +9,9 @@ import { Bounds, Point, SimpleSelection } from "../core/interfaces";
 import * as Interactions from "../interactions";
 import * as Utils from "../utils";
 
+import { coerceExternalD3 } from "../utils/coerceD3";
 import { PropertyMode } from "./";
 import { SelectionBoxLayer } from "./selectionBoxLayer";
-import { coerceExternalD3 } from "../utils/coerceD3";
 
 export type DragBoxCallback = (bounds: Bounds) => void;
 
@@ -71,18 +71,18 @@ export class DragBoxLayer extends SelectionBoxLayer {
     let bottomRight: Point;
     let lastEndPoint: Point;
 
-    let DRAG_MODES = {
+    const DRAG_MODES = {
       newBox: 0,
       resize: 1,
       move: 2,
     };
     let mode = DRAG_MODES.newBox;
 
-    let onDragStartCallback = (startPoint: Point) => {
+    const onDragStartCallback = (startPoint: Point) => {
       resizingEdges = this._getResizingEdges(startPoint);
 
       let bounds = this.bounds();
-      let isInsideBox = bounds.topLeft.x <= startPoint.x && startPoint.x <= bounds.bottomRight.x &&
+      const isInsideBox = bounds.topLeft.x <= startPoint.x && startPoint.x <= bounds.bottomRight.x &&
         bounds.topLeft.y <= startPoint.y && startPoint.y <= bounds.bottomRight.y;
 
       if (this.boxVisible() && (resizingEdges.top || resizingEdges.bottom || resizingEdges.left || resizingEdges.right)) {
@@ -113,7 +113,7 @@ export class DragBoxLayer extends SelectionBoxLayer {
       this._dragStartCallbacks.callCallbacks(bounds);
     };
 
-    let onDragCallback = (startPoint: Point, endPoint: Point) => {
+    const onDragCallback = (startPoint: Point, endPoint: Point) => {
       switch (mode) {
         case DRAG_MODES.newBox:
           bottomRight.x = endPoint.x;
@@ -133,8 +133,8 @@ export class DragBoxLayer extends SelectionBoxLayer {
           }
           break;
         case DRAG_MODES.move:
-          let dx = endPoint.x - lastEndPoint.x;
-          let dy = endPoint.y - lastEndPoint.y;
+          const dx = endPoint.x - lastEndPoint.x;
+          const dy = endPoint.y - lastEndPoint.y;
           topLeft.x += dx;
           topLeft.y += dy;
           bottomRight.x += dx;
@@ -158,7 +158,7 @@ export class DragBoxLayer extends SelectionBoxLayer {
       this._dragCallbacks.callCallbacks(this.bounds());
     };
 
-    let onDragEndCallback = (startPoint: Point, endPoint: Point) => {
+    const onDragEndCallback = (startPoint: Point, endPoint: Point) => {
       if (mode === DRAG_MODES.newBox && startPoint.x === endPoint.x && startPoint.y === endPoint.y) {
         this.boxVisible(false);
       }
@@ -181,9 +181,9 @@ export class DragBoxLayer extends SelectionBoxLayer {
   protected _setup() {
     super._setup();
 
-    let createLine = () => this._box.append("line").styles({
-      "opacity": 0,
-      "stroke": "pink",
+    const createLine = () => this._box.append("line").styles({
+      opacity: 0,
+      stroke: "pink",
       "pointer-events": "visibleStroke",
     });
     this._detectionEdgeT = createLine().classed("drag-edge-tb", true);
@@ -192,10 +192,10 @@ export class DragBoxLayer extends SelectionBoxLayer {
     this._detectionEdgeR = createLine().classed("drag-edge-lr", true);
 
     if (this._hasCorners) {
-      let createCorner = () => this._box.append("circle")
+      const createCorner = () => this._box.append("circle")
         .styles({
-          "opacity": 0,
-          "fill": "pink",
+          opacity: 0,
+          fill: "pink",
           "pointer-events": "visibleFill",
         });
       this._detectionCornerTL = createCorner().classed("drag-corner-tl", true);
@@ -206,7 +206,7 @@ export class DragBoxLayer extends SelectionBoxLayer {
   }
 
   private _getResizingEdges(p: Point) {
-    let edges = {
+    const edges = {
       top: false,
       bottom: false,
       left: false,
@@ -217,12 +217,12 @@ export class DragBoxLayer extends SelectionBoxLayer {
       return edges;
     }
 
-    let bounds = this.bounds();
-    let t = bounds.topLeft.y;
-    let b = bounds.bottomRight.y;
-    let l = bounds.topLeft.x;
-    let r = bounds.bottomRight.x;
-    let rad = this._detectionRadius;
+    const bounds = this.bounds();
+    const t = bounds.topLeft.y;
+    const b = bounds.bottomRight.y;
+    const l = bounds.topLeft.x;
+    const r = bounds.bottomRight.x;
+    const rad = this._detectionRadius;
 
     if (l - rad <= p.x && p.x <= r + rad) {
       edges.top = (t - rad <= p.y && p.y <= t + rad);
@@ -240,26 +240,26 @@ export class DragBoxLayer extends SelectionBoxLayer {
   public renderImmediately() {
     super.renderImmediately();
     if (this.boxVisible()) {
-      let bounds = this.bounds();
-      let t = bounds.topLeft.y;
-      let b = bounds.bottomRight.y;
-      let l = bounds.topLeft.x;
-      let r = bounds.bottomRight.x;
+      const bounds = this.bounds();
+      const t = bounds.topLeft.y;
+      const b = bounds.bottomRight.y;
+      const l = bounds.topLeft.x;
+      const r = bounds.bottomRight.x;
 
       this._detectionEdgeT.attrs({
-        x1: l, y1: t, x2: r, y2: t,
+        "x1": l, "y1": t, "x2": r, "y2": t,
         "stroke-width": this._detectionRadius * 2,
       });
       this._detectionEdgeB.attrs({
-        x1: l, y1: b, x2: r, y2: b,
+        "x1": l, "y1": b, "x2": r, "y2": b,
         "stroke-width": this._detectionRadius * 2,
       });
       this._detectionEdgeL.attrs({
-        x1: l, y1: t, x2: l, y2: b,
+        "x1": l, "y1": t, "x2": l, "y2": b,
         "stroke-width": this._detectionRadius * 2,
       });
       this._detectionEdgeR.attrs({
-        x1: r, y1: t, x2: r, y2: b,
+        "x1": r, "y1": t, "x2": r, "y2": b,
         "stroke-width": this._detectionRadius * 2,
       });
 

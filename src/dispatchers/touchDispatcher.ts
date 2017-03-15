@@ -6,9 +6,9 @@
 import { Point } from "../core/interfaces";
 import * as Utils from "../utils";
 
-import { Dispatcher } from "./dispatcher";
-import * as Dispatchers from "./";
 import { Component } from "../components/component";
+import * as Dispatchers from "./";
+import { Dispatcher } from "./dispatcher";
 
 export type TouchCallback = (ids: number[], idToPoint: { [id: number]: Point; }, event: TouchEvent) => void;
 
@@ -28,7 +28,7 @@ export class Touch extends Dispatcher {
    * @return {Dispatchers.Touch}
    */
   public static getDispatcher(component: Component): Dispatchers.Touch {
-    let svg = component.root().rootElement();
+    const svg = component.root().rootElement();
 
     let dispatcher: Dispatchers.Touch = (<any> svg)[Touch._DISPATCHER_KEY];
     if (dispatcher == null) {
@@ -157,13 +157,13 @@ export class Touch extends Dispatcher {
     if (scope === "element" && !this.eventInside(component, event)) {
       return;
     }
-    let touches = event.changedTouches;
-    let touchPositions: { [id: number]: Point; } = {};
-    let touchIdentifiers: number[] = [];
+    const touches = event.changedTouches;
+    const touchPositions: { [id: number]: Point; } = {};
+    const touchIdentifiers: number[] = [];
     for (let i = 0; i < touches.length; i++) {
-      let touch = touches[i];
-      let touchID = touch.identifier;
-      let newTouchPosition = this._translator.computePosition(touch.clientX, touch.clientY);
+      const touch = touches[i];
+      const touchID = touch.identifier;
+      const newTouchPosition = this._translator.computePosition(touch.clientX, touch.clientY);
       if (newTouchPosition != null) {
         touchPositions[touchID] = newTouchPosition;
         touchIdentifiers.push(touchID);

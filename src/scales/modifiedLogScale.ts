@@ -64,7 +64,7 @@ export class ModifiedLog extends QuantitativeScale<number> {
    * adjusted to 1, resulting in a returned result of 0.
    */
   private _adjustedLog(x: number): number {
-    let negationFactor = x < 0 ? -1 : 1;
+    const negationFactor = x < 0 ? -1 : 1;
     x *= negationFactor;
 
     if (x < this._pivot) {
@@ -78,7 +78,7 @@ export class ModifiedLog extends QuantitativeScale<number> {
   }
 
   private _invertedAdjustedLog(x: number): number {
-    let negationFactor = x < 0 ? -1 : 1;
+    const negationFactor = x < 0 ? -1 : 1;
     x *= negationFactor;
 
     x = Math.pow(this._base, x);
@@ -117,7 +117,7 @@ export class ModifiedLog extends QuantitativeScale<number> {
 
   protected _setDomain(values: number[]) {
     this._untransformedDomain = values;
-    let transformedDomain = [this._adjustedLog(values[0]), this._adjustedLog(values[1])];
+    const transformedDomain = [this._adjustedLog(values[0]), this._adjustedLog(values[1])];
     super._setDomain(transformedDomain);
   }
 
@@ -136,20 +136,20 @@ export class ModifiedLog extends QuantitativeScale<number> {
     // Say your domain is [-100, 100] and your pivot is 10.
     // then we're going to draw negative log ticks from -100 to -10,
     // linear ticks from -10 to 10, and positive log ticks from 10 to 100.
-    let middle = (x: number, y: number, z: number) => [x, y, z].sort((a, b) => a - b)[1];
-    let min = Utils.Math.min(this._untransformedDomain, 0);
-    let max = Utils.Math.max(this._untransformedDomain, 0);
-    let negativeLower = min;
-    let negativeUpper = middle(min, max, -this._pivot);
-    let positiveLower = middle(min, max, this._pivot);
-    let positiveUpper = max;
+    const middle = (x: number, y: number, z: number) => [x, y, z].sort((a, b) => a - b)[1];
+    const min = Utils.Math.min(this._untransformedDomain, 0);
+    const max = Utils.Math.max(this._untransformedDomain, 0);
+    const negativeLower = min;
+    const negativeUpper = middle(min, max, -this._pivot);
+    const positiveLower = middle(min, max, this._pivot);
+    const positiveUpper = max;
 
-    let negativeLogTicks = this._logTicks(-negativeUpper, -negativeLower).map((x) => -x).reverse();
-    let positiveLogTicks = this._logTicks(positiveLower, positiveUpper);
+    const negativeLogTicks = this._logTicks(-negativeUpper, -negativeLower).map((x) => -x).reverse();
+    const positiveLogTicks = this._logTicks(positiveLower, positiveUpper);
 
-    let linearMin = Math.max(min, -this._pivot);
-    let linearMax = Math.min(max, this._pivot);
-    let linearTicks = d3.scaleLinear().domain([linearMin, linearMax]).ticks(this._howManyTicks(linearMin, linearMax));
+    const linearMin = Math.max(min, -this._pivot);
+    const linearMax = Math.min(max, this._pivot);
+    const linearTicks = d3.scaleLinear().domain([linearMin, linearMax]).ticks(this._howManyTicks(linearMin, linearMax));
     let ticks = negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
 
     // If you only have 1 tick, you can't tell how big the scale is.
@@ -173,19 +173,19 @@ export class ModifiedLog extends QuantitativeScale<number> {
    * drastically exceeding its number of ticks.
    */
   private _logTicks(lower: number, upper: number): number[] {
-    let nTicks = this._howManyTicks(lower, upper);
+    const nTicks = this._howManyTicks(lower, upper);
     if (nTicks === 0) {
       return [];
     }
-    let startLogged = Math.floor(Math.log(lower) / Math.log(this._base));
-    let endLogged = Math.ceil(Math.log(upper) / Math.log(this._base));
-    let bases = d3.range(endLogged, startLogged, -Math.ceil((endLogged - startLogged) / nTicks));
-    let multiples = d3.range(this._base, 1, -(this._base - 1)).map(Math.floor);
-    let uniqMultiples = Utils.Array.uniq(multiples);
-    let clusters = bases.map((b) => uniqMultiples.map((x) => Math.pow(this._base, b - 1) * x));
-    let flattened = Utils.Array.flatten(clusters);
-    let filtered = flattened.filter((x) => lower <= x && x <= upper);
-    let sorted = filtered.sort((x, y) => x - y);
+    const startLogged = Math.floor(Math.log(lower) / Math.log(this._base));
+    const endLogged = Math.ceil(Math.log(upper) / Math.log(this._base));
+    const bases = d3.range(endLogged, startLogged, -Math.ceil((endLogged - startLogged) / nTicks));
+    const multiples = d3.range(this._base, 1, -(this._base - 1)).map(Math.floor);
+    const uniqMultiples = Utils.Array.uniq(multiples);
+    const clusters = bases.map((b) => uniqMultiples.map((x) => Math.pow(this._base, b - 1) * x));
+    const flattened = Utils.Array.flatten(clusters);
+    const filtered = flattened.filter((x) => lower <= x && x <= upper);
+    const sorted = filtered.sort((x, y) => x - y);
     return sorted;
   }
 
@@ -197,12 +197,12 @@ export class ModifiedLog extends QuantitativeScale<number> {
    * distance when plotted.
    */
   private _howManyTicks(lower: number, upper: number): number {
-    let adjustedMin = this._adjustedLog(Utils.Math.min(this._untransformedDomain, 0));
-    let adjustedMax = this._adjustedLog(Utils.Math.max(this._untransformedDomain, 0));
-    let adjustedLower = this._adjustedLog(lower);
-    let adjustedUpper = this._adjustedLog(upper);
-    let proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);
-    let ticks = Math.ceil(proportion * Scales.ModifiedLog._DEFAULT_NUM_TICKS);
+    const adjustedMin = this._adjustedLog(Utils.Math.min(this._untransformedDomain, 0));
+    const adjustedMax = this._adjustedLog(Utils.Math.max(this._untransformedDomain, 0));
+    const adjustedLower = this._adjustedLog(lower);
+    const adjustedUpper = this._adjustedLog(upper);
+    const proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);
+    const ticks = Math.ceil(proportion * Scales.ModifiedLog._DEFAULT_NUM_TICKS);
     return ticks;
   }
 
@@ -216,7 +216,7 @@ export class ModifiedLog extends QuantitativeScale<number> {
 
   protected _expandSingleValueDomain(singleValueDomain: number[]): number[] {
     if (singleValueDomain[0] === singleValueDomain[1]) {
-      let singleValue = singleValueDomain[0];
+      const singleValue = singleValueDomain[0];
       if (singleValue > 0) {
         return [singleValue / this._base, singleValue * this._base];
       } else if (singleValue === 0) {

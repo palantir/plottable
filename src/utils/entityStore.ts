@@ -69,11 +69,11 @@ export class EntityArray<T extends PositionedEntity> implements EntityStore<T> {
     let closestDistanceSquared = Infinity;
     let closestPointEntity: T;
     this._entities.forEach((entity) => {
-      if (filter !== undefined && filter(entity) === false) {
+      if (filter !== undefined && !filter(entity)) {
         return;
       }
 
-      let distanceSquared = Math.distanceSquared(entity.position, queryPoint);
+      const distanceSquared = Math.distanceSquared(entity.position, queryPoint);
       if (distanceSquared < closestDistanceSquared) {
         closestDistanceSquared = distanceSquared;
         closestPointEntity = entity;

@@ -56,4 +56,3 @@ export function deprecated(callingMethod: string, version: string, message = "")
   warn("Method " + callingMethod + " has been deprecated in version " + version +
     ". Please refer to the release notes. " + message);
 }
-

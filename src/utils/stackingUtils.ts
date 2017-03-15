@@ -14,9 +14,9 @@ export type GenericStackedDatum<D> = {
   value: number;
   offset: number;
   axisValue: D;
-}
+};
 
-export type StackExtent<D> = { extent: number, axisValue: D }
+export type StackExtent<D> = { extent: number, axisValue: D };
 
 export type StackedDatum = GenericStackedDatum<string>;
 /**
@@ -39,7 +39,7 @@ export type GenericStackingResult<D> = Utils.Map<Dataset, Utils.Map<string | num
  */
 export type StackingResult = GenericStackingResult<string>;
 
-let nativeMath: Math = (<any>window).Math;
+const nativeMath: Math = (<any>window).Math;
 
 /**
  * Computes the StackingResult (value and offset) for each data point in each Dataset.
@@ -56,9 +56,9 @@ export function stack(
   valueAccessor: Accessor<number>,
   stackingOrder: IStackingOrder = "bottomup",
 ): StackingResult {
-  let positiveOffsets = d3.map<number>();
-  let negativeOffsets = d3.map<number>();
-  let datasetToKeyToStackedDatum = new Utils.Map<Dataset, Utils.Map<string, StackedDatum>>();
+  const positiveOffsets = d3.map<number>();
+  const negativeOffsets = d3.map<number>();
+  const datasetToKeyToStackedDatum = new Utils.Map<Dataset, Utils.Map<string, StackedDatum>>();
 
   if (stackingOrder === "topdown") {
     datasets = datasets.slice();
@@ -66,12 +66,12 @@ export function stack(
   }
 
   datasets.forEach((dataset) => {
-    let keyToStackedDatum = new Utils.Map<string, StackedDatum>();
+    const keyToStackedDatum = new Utils.Map<string, StackedDatum>();
     dataset.data().forEach((datum, index) => {
-      let key = normalizeKey(keyAccessor(datum, index, dataset));
-      let value = +valueAccessor(datum, index, dataset);
+      const key = normalizeKey(keyAccessor(datum, index, dataset));
+      const value = +valueAccessor(datum, index, dataset);
       let offset: number;
-      let offsetMap = (value >= 0) ? positiveOffsets : negativeOffsets;
+      const offsetMap = (value >= 0) ? positiveOffsets : negativeOffsets;
       if (offsetMap.has(key)) {
         offset = offsetMap.get(key);
         offsetMap.set(key, offset + value);
@@ -89,7 +89,6 @@ export function stack(
   });
   return datasetToKeyToStackedDatum;
 }
-
 
 /**
  * Computes the maximum and minimum extents of each stack individually.
@@ -137,18 +136,18 @@ export function stackedExtents<D>(stackingResult: GenericStackingResult<D>): {
  * @return {[number, number]} The total extent
  */
 export function stackedExtent(stackingResult: StackingResult, keyAccessor: Accessor<any>, filter: Accessor<boolean>) {
-  let extents: number[] = [];
+  const extents: number[] = [];
   stackingResult.forEach((stackedDatumMap: Utils.Map<string, StackedDatum>, dataset: Dataset) => {
     dataset.data().forEach((datum, index) => {
       if (filter != null && !filter(datum, index, dataset)) {
         return;
       }
-      let stackedDatum = stackedDatumMap.get(normalizeKey(keyAccessor(datum, index, dataset)));
+      const stackedDatum = stackedDatumMap.get(normalizeKey(keyAccessor(datum, index, dataset)));
       extents.push(stackedDatum.value + stackedDatum.offset);
     });
   });
-  let maxStackExtent = Utils.Math.max(extents, 0);
-  let minStackExtent = Utils.Math.min(extents, 0);
+  const maxStackExtent = Utils.Math.max(extents, 0);
+  const minStackExtent = Utils.Math.min(extents, 0);
 
   return [nativeMath.min(minStackExtent, 0), nativeMath.max(0, maxStackExtent)];
 }
@@ -162,4 +161,3 @@ export function stackedExtent(stackingResult: StackingResult, keyAccessor: Acces
 export function normalizeKey(key: any) {
   return String(key);
 }
-

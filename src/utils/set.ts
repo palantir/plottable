@@ -38,12 +38,12 @@ export class Set<T> {
 
   public delete(value: T) {
     if (this._es6Set != null) {
-      let deleted = <boolean>this._es6Set.delete(value);
+      const deleted = <boolean>this._es6Set.delete(value);
       this.size = this._es6Set.size;
       return deleted;
     }
 
-    let index = this._values.indexOf(value);
+    const index = this._values.indexOf(value);
     if (index !== -1) {
       this._values.splice(index, 1);
       this.size = this._values.length;
@@ -62,7 +62,7 @@ export class Set<T> {
 
   public forEach(callback: (value: T, value2: T, set: Set<T>) => void, thisArg?: any) {
     if (this._es6Set != null) {
-      let callbackWrapper = (value: T, value2: T) => callback.call(thisArg, value, value2, this);
+      const callbackWrapper = (value: T, value2: T) => callback.call(thisArg, value, value2, this);
       this._es6Set.forEach(callbackWrapper, thisArg);
       return;
     }

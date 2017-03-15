@@ -5,7 +5,7 @@
 
 import * as Typesetter from "typesettable";
 
-import { SpaceRequest, SimpleSelection } from "../core/interfaces";
+import { SimpleSelection, SpaceRequest } from "../core/interfaces";
 
 import { Component } from "./component";
 
@@ -35,9 +35,9 @@ export class Label extends Component {
   }
 
   public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
-    let desiredWH = this._measurer.measure(this._text);
-    let desiredWidth = (this.angle() === 0 ? desiredWH.width : desiredWH.height) + 2 * this.padding();
-    let desiredHeight = (this.angle() === 0 ? desiredWH.height : desiredWH.width) + 2 * this.padding();
+    const desiredWH = this._measurer.measure(this._text);
+    const desiredWidth = (this.angle() === 0 ? desiredWH.width : desiredWH.height) + 2 * this.padding();
+    const desiredHeight = (this.angle() === 0 ? desiredWH.height : desiredWH.width) + 2 * this.padding();
 
     return {
       minWidth: desiredWidth,
@@ -147,13 +147,13 @@ export class Label extends Component {
     super.renderImmediately();
     // HACKHACK Typesetter.remove existing content - #21 on Typesetter.
     this._textContainer.selectAll("g").remove();
-    let textMeasurement = this._measurer.measure(this._text);
-    let heightPadding = Math.max(Math.min((this.height() - textMeasurement.height) / 2, this.padding()), 0);
-    let widthPadding = Math.max(Math.min((this.width() - textMeasurement.width) / 2, this.padding()), 0);
+    const textMeasurement = this._measurer.measure(this._text);
+    const heightPadding = Math.max(Math.min((this.height() - textMeasurement.height) / 2, this.padding()), 0);
+    const widthPadding = Math.max(Math.min((this.width() - textMeasurement.width) / 2, this.padding()), 0);
     this._textContainer.attr("transform", "translate(" + widthPadding + "," + heightPadding + ")");
-    let writeWidth = this.width() - 2 * widthPadding;
-    let writeHeight = this.height() - 2 * heightPadding;
-    let writeOptions = {
+    const writeWidth = this.width() - 2 * widthPadding;
+    const writeHeight = this.height() - 2 * heightPadding;
+    const writeOptions = {
       xAlign: this.xAlignment() as Typesetter.IXAlign,
       yAlign: this.yAlignment() as Typesetter.IYAlign,
       textRotation: this.angle(),

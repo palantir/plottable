@@ -46,7 +46,7 @@ export class QuantitativeScale<D> extends Scale<D, number> implements Transforma
       return;
     }
 
-    let computedExtent = this._getExtent();
+    const computedExtent = this._getExtent();
 
     if (this._domainMin != null) {
       let maxValue = computedExtent[1];
@@ -70,10 +70,10 @@ export class QuantitativeScale<D> extends Scale<D, number> implements Transforma
   }
 
   protected _getExtent(): D[] {
-    let includedValues = this._getAllIncludedValues();
+    const includedValues = this._getAllIncludedValues();
     let extent = this._defaultExtent();
     if (includedValues.length !== 0) {
-      let combinedExtent = [
+      const combinedExtent = [
         Utils.Math.min<D>(includedValues, extent[0]),
         Utils.Math.max<D>(includedValues, extent[1]),
       ];
@@ -148,13 +148,13 @@ export class QuantitativeScale<D> extends Scale<D, number> implements Transforma
       return domain;
     }
 
-    let p = this._padProportion / 2;
-    let min = domain[0];
-    let max = domain[1];
+    const p = this._padProportion / 2;
+    const min = domain[0];
+    const max = domain[1];
     let minExistsInExceptions = false;
     let maxExistsInExceptions = false;
     this._paddingExceptionsProviders.forEach((provider) => {
-      let values = provider(this);
+      const values = provider(this);
       values.forEach((value) => {
         if (value.valueOf() === min.valueOf()) {
           minExistsInExceptions = true;
@@ -166,8 +166,8 @@ export class QuantitativeScale<D> extends Scale<D, number> implements Transforma
     });
     const originalDomain = this._backingScaleDomain();
     this._backingScaleDomain(domain);
-    let newMin = minExistsInExceptions ? min : this.invert(this.scale(min) - (this.scale(max) - this.scale(min)) * p);
-    let newMax = maxExistsInExceptions ? max : this.invert(this.scale(max) + (this.scale(max) - this.scale(min)) * p);
+    const newMin = minExistsInExceptions ? min : this.invert(this.scale(min) - (this.scale(max) - this.scale(min)) * p);
+    const newMax = maxExistsInExceptions ? max : this.invert(this.scale(max) + (this.scale(max) - this.scale(min)) * p);
     this._backingScaleDomain(originalDomain);
 
     if (this._snappingDomainEnabled) {
@@ -262,7 +262,7 @@ export class QuantitativeScale<D> extends Scale<D, number> implements Transforma
 
   public extentOfValues(values: D[]): D[] {
     // HACKHACK: TS1.4 doesn't consider numbers to be Number-like (valueOf() returning number), so D can't be typed correctly
-    let extent = d3.extent(<any[]> values.filter((value) => Utils.Math.isValidNumber(+value)));
+    const extent = d3.extent(<any[]> values.filter((value) => Utils.Math.isValidNumber(+value)));
     if (extent[0] == null || extent[1] == null) {
       return [];
     } else {
@@ -271,12 +271,12 @@ export class QuantitativeScale<D> extends Scale<D, number> implements Transforma
   }
 
   public zoom(magnifyAmount: number, centerValue: number) {
-    let magnifyTransform = (rangeValue: number) => this.invert(Interactions.zoomAt(rangeValue, magnifyAmount, centerValue));
+    const magnifyTransform = (rangeValue: number) => this.invert(Interactions.zoomAt(rangeValue, magnifyAmount, centerValue));
     this.domain(this.range().map(magnifyTransform));
   }
 
   public pan(translateAmount: number) {
-    let translateTransform = (rangeValue: number) => this.invert(rangeValue + translateAmount);
+    const translateTransform = (rangeValue: number) => this.invert(rangeValue + translateAmount);
     this.domain(this.range().map(translateTransform));
   }
 
@@ -293,7 +293,7 @@ export class QuantitativeScale<D> extends Scale<D, number> implements Transforma
   }
 
   protected _setDomain(values: D[]) {
-    let isNaNOrInfinity = (x: any) => Utils.Math.isNaN(x) || x === Infinity || x === -Infinity;
+    const isNaNOrInfinity = (x: any) => Utils.Math.isNaN(x) || x === Infinity || x === -Infinity;
     if (isNaNOrInfinity(values[0]) || isNaNOrInfinity(values[1])) {
       Utils.Window.warn("Warning: QuantitativeScales cannot take NaN or Infinity as a domain value. Ignoring.");
       return;

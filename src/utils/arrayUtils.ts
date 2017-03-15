@@ -5,7 +5,7 @@
 
 import * as d3 from "d3";
 
-let nativeArray = (<any>window).Array;
+const nativeArray = (<any>window).Array;
 
 /**
  * Takes two arrays of numbers and adds them together
@@ -29,8 +29,8 @@ export function add(aList: number[], bList: number[]): number[] {
  * @return {T[]} The unique values
  */
 export function uniq<T>(arr: T[]): T[] {
-  let seen: d3.Set = d3.set();
-  let result: T[] = [];
+  const seen: d3.Set = d3.set();
+  const result: T[] = [];
   arr.forEach((x) => {
     if (!seen.has(String(x))) {
       seen.add(String(x));
@@ -56,10 +56,9 @@ export function flatten<T>(a: T[][]): T[] {
  * @return {any[]}
  */
 export function createFilledArray<T>(value: T | ((index?: number) => T), count: number) {
-  let out: T[] = [];
+  const out: T[] = [];
   for (let i = 0; i < count; i++) {
     out[i] = typeof(value) === "function" ? (<(index?: number) => T> value)(i) : <T> value;
   }
   return out;
 }
-
