@@ -612,19 +612,23 @@ export class Plot extends Component {
    * @returns {d3.Selection}
    */
   public selections(datasets = this.datasets()): SimpleSelection<any> {
-    const selections: d3.BaseType[] = [];
+    if (this.renderer() === "canvas") {
+      return null;
+    } else {
+      const selections: d3.BaseType[] = [];
 
-    datasets.forEach((dataset) => {
-      const drawer = this._datasetToDrawer.get(dataset);
-      if (drawer == null) {
-        return;
-      }
-      drawer.renderArea().selectAll(drawer.selector()).each(function () {
-        selections.push(this);
+      datasets.forEach((dataset) => {
+        const drawer = this._datasetToDrawer.get(dataset);
+        if (drawer == null) {
+          return;
+        }
+        drawer.renderArea().selectAll(drawer.selector()).each(function () {
+          selections.push(this);
+        });
       });
-    });
 
-    return d3.selectAll(selections);
+      return d3.selectAll(selections);
+    }
   }
 
   /**

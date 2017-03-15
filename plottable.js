@@ -567,17 +567,22 @@ var Plot = (function (_super) {
     Plot.prototype.selections = function (datasets) {
         var _this = this;
         if (datasets === void 0) { datasets = this.datasets(); }
-        var selections = [];
-        datasets.forEach(function (dataset) {
-            var drawer = _this._datasetToDrawer.get(dataset);
-            if (drawer == null) {
-                return;
-            }
-            drawer.renderArea().selectAll(drawer.selector()).each(function () {
-                selections.push(this);
+        if (this.renderer() === "canvas") {
+            return null;
+        }
+        else {
+            var selections_1 = [];
+            datasets.forEach(function (dataset) {
+                var drawer = _this._datasetToDrawer.get(dataset);
+                if (drawer == null) {
+                    return;
+                }
+                drawer.renderArea().selectAll(drawer.selector()).each(function () {
+                    selections_1.push(this);
+                });
             });
-        });
-        return d3.selectAll(selections);
+            return d3.selectAll(selections_1);
+        }
     };
     /**
      * Gets the Entities associated with the specified Datasets.
