@@ -676,18 +676,18 @@ describe("Axis", () => {
     });
 
     it("returns label data when clicking on label text", () => {
-      assert.equal(axis.tickLabelAt({ x: 30, y: 10}), 10);
-      assert.equal(axis.tickLabelAt({ x: 60, y: 10}), 20);
+      assert.equal(axis.tickLabelDataAt({ x: 30, y: 10}), 10);
+      assert.equal(axis.tickLabelDataAt({ x: 60, y: 10}), 20);
     });
 
     it("calculates only in the direction of the axis", () => {
-      assert.equal(axis.tickLabelAt({ x: 60, y: 0}), 20);
-      assert.equal(axis.tickLabelAt({ x: 60, y: 50}), 20);
-      assert.equal(axis.tickLabelAt({ x: 60, y: 100}), 20);
+      assert.equal(axis.tickLabelDataAt({ x: 60, y: 0}), 20);
+      assert.equal(axis.tickLabelDataAt({ x: 60, y: 50}), 20);
+      assert.equal(axis.tickLabelDataAt({ x: 60, y: 100}), 20);
     });
 
     it("returns undefined if point is outside of labels", () => {
-      assert.isUndefined(axis.tickLabelAt({ x: 10, y: 10 }));
+      assert.isUndefined(axis.tickLabelDataAt({ x: 10, y: 10 }));
     });
   });
 });

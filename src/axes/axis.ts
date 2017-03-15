@@ -8,10 +8,10 @@ import * as d3 from "d3";
 import * as Typesetter from "typesettable";
 
 import { Component } from "../components/component";
-import { Formatter } from "../core/formatters";
 import * as Formatters from "../core/formatters";
+import { Formatter } from "../core/formatters";
 import { Point, SimpleSelection, SpaceRequest } from "../core/interfaces";
-import { Scale, ScaleCallback } from "../scales/scale";
+import { Scale, ScaleCallback, TransformableScale } from "../scales/scale";
 import * as Utils from "../utils";
 
 export type AxisOrientation =  "bottom" | "left" | "right" | "top";
@@ -49,7 +49,7 @@ export class Axis<D> extends Component {
   protected _tickMarkContainer: SimpleSelection<void>;
   protected _tickLabelContainer: SimpleSelection<void>;
   protected _baseline: SimpleSelection<void>;
-  protected _scale: Scale<D, number>;
+  protected _scale: TransformableScale<D, number>;
   private _formatter: Formatter;
   private _orientation: AxisOrientation;
   private _endTickLength = 5;
@@ -80,7 +80,7 @@ export class Axis<D> extends Component {
     if (scale == null || orientation == null) {
       throw new Error("Axis requires a scale and orientation");
     }
-    this._scale = scale;
+    this._scale = scale as TransformableScale<D, number>;
     this.orientation(orientation);
     this._setDefaultAlignment();
     this.addClass("axis");
@@ -105,31 +105,45 @@ export class Axis<D> extends Component {
   }
 
   /**
-   * Gets the tick label data at a particular point.
+   * Gets the tick label data (including hidden) at a particular point in the direction of the axis.
    *
    * @param {Point} point
    */
-  public tickLabelAt(point: Point): D {
-    // only measure in the direction of the axis.
+  public tickLabelDataAt(point: Point): D {
     const pointValue = this.isHorizontal() ? point.x : point.y;
     const tickValues = this._getTickValues();
 
-    const axisScale = this._scale;
-    let tickLabel: D;
+    // find the closest label via scaling since it's more performant than getBBox
+    const scaledTickLabels = tickValues.map((tickValue) => this._scale.scale(tickValue));
+
+    let closestTickDistance = Infinity;
+    let closestTickIndex: number;
+    scaledTickLabels.forEach((scaledTickLabel, index) => {
+      const distance = Math.abs(scaledTickLabel - pointValue);
+      if (distance < closestTickDistance) {
+        closestTickDistance = distance;
+        closestTickIndex = index;
+      }
+    });
+
+    // check whether the click point is inside the closest label text
+    const axis = this;
+    let tickLabelData: D;
     this._tickLabelContainer.selectAll<SVGGElement, any>("." + Axis.TICK_LABEL_CLASS)
       .each(function (data: D, index: number) {
-        const labelWidth = this.getBBox().width;
-        const scaledTick = axisScale.scale(tickValues[index]);
-        const start = scaledTick - (labelWidth / 2);
-        const end = scaledTick + (labelWidth / 2);
+        if (index === closestTickIndex) {
+          const labelDimension = axis.isHorizontal() ? this.getBBox().width : this.getBBox().height;
+          const start = scaledTickLabels[index] - (labelDimension / 2);
+          const end = scaledTickLabels[index] + (labelDimension / 2);
 
-        if (start <= pointValue && pointValue <= end) {
-          tickLabel = data;
+          if (start <= pointValue && pointValue <= end) {
+            tickLabelData = data;
+          }
         }
       });
 
-    return tickLabel;
-  }
+    return tickLabelData;
+  };
 
   protected _computeWidth() {
     // to be overridden by subclass logic

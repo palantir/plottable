@@ -2851,28 +2851,42 @@ var Axis = (function (_super) {
         this._scale.offUpdate(this._rescaleCallback);
     };
     /**
-     * Gets the tick label data at a particular point.
+     * Gets the tick label data (including hidden) at a particular point in the direction of the axis.
      *
      * @param {Point} point
      */
-    Axis.prototype.tickLabelAt = function (point) {
-        // only measure in the direction of the axis.
+    Axis.prototype.tickLabelDataAt = function (point) {
+        var _this = this;
         var pointValue = this.isHorizontal() ? point.x : point.y;
         var tickValues = this._getTickValues();
-        var axisScale = this._scale;
-        var tickLabel;
-        this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS)
-            .each(function (data, index) {
-            var labelWidth = this.getBBox().width;
-            var scaledTick = axisScale.scale(tickValues[index]);
-            var start = scaledTick - (labelWidth / 2);
-            var end = scaledTick + (labelWidth / 2);
-            if (start <= pointValue && pointValue <= end) {
-                tickLabel = data;
+        // find the closest label via scaling since it's more performant than getBBox
+        var scaledTickLabels = tickValues.map(function (tickValue) { return _this._scale.scale(tickValue); });
+        var closestTickDistance = Infinity;
+        var closestTickIndex;
+        scaledTickLabels.forEach(function (scaledTickLabel, index) {
+            var distance = Math.abs(scaledTickLabel - pointValue);
+            if (distance < closestTickDistance) {
+                closestTickDistance = distance;
+                closestTickIndex = index;
             }
         });
-        return tickLabel;
+        // check whether the click point is inside the closest label text
+        var axis = this;
+        var tickLabelData;
+        this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS)
+            .each(function (data, index) {
+            if (index === closestTickIndex) {
+                var labelDimension = axis.isHorizontal() ? this.getBBox().width : this.getBBox().height;
+                var start = scaledTickLabels[index] - (labelDimension / 2);
+                var end = scaledTickLabels[index] + (labelDimension / 2);
+                if (start <= pointValue && pointValue <= end) {
+                    tickLabelData = data;
+                }
+            }
+        });
+        return tickLabelData;
     };
+    ;
     Axis.prototype._computeWidth = function () {
         // to be overridden by subclass logic
         return this._maxLabelTickLength();

@@ -1,7 +1,7 @@
 function makeData() {
   "use strict";
 
-  var  data1 = [{month: "January", avg: 2.75, city: "Palo Alto"}, {month: "February", avg: 3.07, city: "Palo Alto"}, {month: "March", avg: 2.26, city: "Palo Alto"}, {month: "April", avg: 0.98, city: "Palo Alto"}];
+  var  data1 = [{month: "January", avg: 0.75, city: "Palo Alto"}, {month: "February", avg: 3.07, city: "Palo Alto"}, {month: "March", avg: 2.26, city: "Palo Alto"}, {month: "April", avg: 0.98, city: "Palo Alto"}];
   var  data2 = [{month: "January", avg: 4.21, city: "San Francisco"}, {month: "February", avg: 4.10, city: "San Francisco"}, {month: "March", avg: 2.74, city: "San Francisco"}, {month: "April", avg: 1.18, city: "San Francisco"}];
   var  data3 = [{month: "January", avg: 2.99, city: "San Jose"}, {month: "February", avg: 3.32, city: "San Jose"}, {month: "March", avg: 2.04, city: "San Jose"}, {month: "April", avg: 1.06, city: "San Jose"}];
 
@@ -38,7 +38,7 @@ function run(svg, data, Plottable){
   [xAxis, yAxis].forEach((axis) => {
     var clickInteraction = new Plottable.Interactions.Click();
     clickInteraction.onClick((point) => {
-        const label = JSON.stringify(axis.tickLabelAt(point));
+        const label = JSON.stringify(axis.tickLabelDataAt(point));
         title.text(label ? label : "no label");
     });
     clickInteraction.attachTo(axis);
