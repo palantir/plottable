@@ -65,7 +65,7 @@
     "write-file-webpack-plugin": "3.4.2"
   },
   "dependencies": {
-    "@types/d3": "4.5.0",
+    "@types/d3": "^4.5.0",
     "d3": "^4.5.0",
     "typesettable": "^3.0.2"
   }
