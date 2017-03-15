@@ -18,12 +18,12 @@ import { QuantitativeScale } from "../scales/quantitativeScale";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
 
+import { makeEnum } from "../utils/makeEnum";
 import * as Plots from "./";
 import { PlotEntity } from "./";
 import { LightweightPlotEntity } from "./commons";
 import { Plot } from "./plot";
 import { XYPlot } from "./xyPlot";
-import { makeEnum } from "../utils/makeEnum";
 
 type LabelConfig = {
   labelArea: SimpleSelection<void>;

@@ -6,6 +6,7 @@ import { assert } from "chai";
 import * as Plottable from "../../src";
 
 import * as TestMethods from "../testMethods";
+import { BarOrientation } from "../../src/plots/barPlot";
 
 describe("Plots", () => {
   describe("Bar Plot", () => {
@@ -28,9 +29,9 @@ describe("Plots", () => {
       });
     });
 
-    const orientations = [Plottable.Plots.Bar.ORIENTATION_VERTICAL, Plottable.Plots.Bar.ORIENTATION_HORIZONTAL];
+    const orientations: BarOrientation[] = [BarOrientation.vertical, BarOrientation.horizontal];
     orientations.forEach((orientation) => {
-      const isVertical = orientation === Plottable.Plots.Bar.ORIENTATION_VERTICAL;
+      const isVertical = orientation === BarOrientation.vertical;
       const basePositionAttr = isVertical ? "x" : "y";
       const baseSizeAttr = isVertical ? "width" : "height";
       const getDivBaseSizeDimension = (div: d3.Selection<HTMLDivElement, any, any, any>) => {
@@ -60,7 +61,7 @@ describe("Plots", () => {
           barPlot = new Plottable.Plots.Bar<string | number, number | string>(orientation);
           baseScale = new Plottable.Scales.Category();
           valueScale = new Plottable.Scales.Linear();
-          if (orientation === Plottable.Plots.Bar.ORIENTATION_VERTICAL) {
+          if (orientation === BarOrientation.vertical) {
             barPlot.x((d: any) => d.base, baseScale);
             barPlot.y((d: any) => d.value, valueScale);
           } else {
@@ -172,7 +173,7 @@ describe("Plots", () => {
           barPlot = new Plottable.Plots.Bar<number, number>(orientation);
           baseScale = new Plottable.Scales.Linear();
           valueScale = new Plottable.Scales.Linear();
-          if (orientation === Plottable.Plots.Bar.ORIENTATION_VERTICAL) {
+          if (orientation === BarOrientation.vertical) {
             barPlot.x(baseAccessor, baseScale);
             barPlot.y(valueAccessor, valueScale);
           } else {
@@ -245,7 +246,7 @@ describe("Plots", () => {
 
               const baseAccessor = scaleType === "Time" ? (d: any) => new Date(d.base) : (d: any) => d.base;
               const valueAccessor = (d: any) => d.value;
-              if (orientation === Plottable.Plots.Bar.ORIENTATION_VERTICAL) {
+              if (orientation === BarOrientation.vertical) {
                 barPlot.x(baseAccessor, baseScale);
                 barPlot.y(valueAccessor, valueScale);
               } else {
@@ -391,7 +392,7 @@ describe("Plots", () => {
           baseScale.domain(DEFAULT_DOMAIN);
           valueScale = new Plottable.Scales.Linear();
           valueScale.domain(DEFAULT_DOMAIN);
-          if (orientation === Plottable.Plots.Bar.ORIENTATION_VERTICAL) {
+          if (orientation === BarOrientation.vertical) {
             barPlot.x((d: any) => d.base, baseScale);
             barPlot.y((d: any) => d.value, valueScale);
           } else {
@@ -615,7 +616,7 @@ describe("Plots", () => {
           baseScale.domain(DEFAULT_DOMAIN);
           valueScale = new Plottable.Scales.Linear();
           valueScale.domain(DEFAULT_DOMAIN);
-          if (orientation === Plottable.Plots.Bar.ORIENTATION_VERTICAL) {
+          if (orientation === BarOrientation.vertical) {
             barPlot.x((d: any) => d.base, baseScale);
             barPlot.y((d: any) => d.value, valueScale);
           } else {

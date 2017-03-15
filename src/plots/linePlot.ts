@@ -15,6 +15,7 @@ import { QuantitativeScale } from "../scales/quantitativeScale";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
 
+import { makeEnum } from "../utils/makeEnum";
 import * as Plots from "./";
 import { PlotEntity } from "./";
 import { Plot } from "./plot";
@@ -46,20 +47,22 @@ const CURVE_NAME_MAPPING: { [P in CurveName]: d3.CurveFactory | d3.CurveFactoryL
 /**
  * Known curve types that line and area plot's .curve() methods understand
  */
-export type CurveName =
-"linear" |
-"linearClosed" |
-"step" |
-"stepBefore" |
-"stepAfter" |
-"basis" |
-"basisOpen" |
-"basisClosed" |
-"bundle" |
-"cardinal" |
-"cardinalOpen" |
-"cardinalClosed" |
-"monotone";
+export const CurveName = makeEnum([
+  "linear",
+  "linearClosed",
+  "step",
+  "stepBefore",
+  "stepAfter",
+  "basis",
+  "basisOpen",
+  "basisClosed",
+  "bundle",
+  "cardinal",
+  "cardinalOpen",
+  "cardinalClosed",
+  "monotone",
+]);
+export type CurveName = keyof typeof CurveName;
 
 export class Line<X> extends XYPlot<X, number> {
   private _curve: CurveName | d3.CurveFactory | d3.CurveFactoryLineOnly = "linear";

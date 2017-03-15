@@ -10,8 +10,8 @@ import * as RenderController from "../core/renderController";
 import * as Utils from "../utils";
 
 import { coerceExternalD3 } from "../utils/coerceD3";
-import { ComponentContainer } from "./componentContainer";
 import { makeEnum } from "../utils/makeEnum";
+import { ComponentContainer } from "./componentContainer";
 
 export type ComponentCallback = (component: Component) => void;
 

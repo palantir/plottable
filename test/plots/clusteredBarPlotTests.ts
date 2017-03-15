@@ -6,13 +6,14 @@ import { assert } from "chai";
 import * as Plottable from "../../src";
 
 import * as TestMethods from "../testMethods";
+import { BarOrientation } from "../../src/plots/barPlot";
 
 describe("Plots", () => {
-  [Plottable.Plots.Bar.ORIENTATION_VERTICAL, Plottable.Plots.Bar.ORIENTATION_HORIZONTAL].forEach((orientation: string) => {
+  [BarOrientation.vertical, BarOrientation.horizontal].forEach((orientation: string) => {
     describe(`Clustered Bar Plot in ${orientation} orientation`, () => {
       const DIV_WIDTH = 400;
       const DIV_HEIGHT = 400;
-      const isVertical = orientation === Plottable.Plots.Bar.ORIENTATION_VERTICAL;
+      const isVertical = orientation === BarOrientation.vertical;
 
       let div: d3.Selection<HTMLDivElement, any, any, any>;
       let categoryScale: Plottable.Scales.Category;

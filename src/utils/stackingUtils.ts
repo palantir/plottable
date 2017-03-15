@@ -9,6 +9,7 @@ import { Dataset } from "../core/dataset";
 import { Accessor } from "../core/interfaces";
 
 import * as Utils from "./";
+import { makeEnum } from "./makeEnum";
 
 export type GenericStackedDatum<D> = {
   value: number;
@@ -25,7 +26,8 @@ export type StackedDatum = GenericStackedDatum<string>;
  * can be reversed with the "topdown" option, which produces a stacking order
  * that matches the order of series in the legend.
  */
-export type IStackingOrder = "topdown" | "bottomup";
+export const IStackingOrder = makeEnum(["topdown", "bottomup"]);
+export type IStackingOrder = keyof typeof IStackingOrder;
 
 // HACKHACK More accurate stacking result definition. Remove typeless stacking result
 // and replace with typed stacking result in 3.0.

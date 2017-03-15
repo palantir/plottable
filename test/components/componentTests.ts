@@ -738,7 +738,7 @@ describe("Component", () => {
     });
 
     afterEach(() => {
-      Plottable.RenderController.renderPolicy(Plottable.RenderController.Policy.IMMEDIATE);
+      Plottable.RenderController.renderPolicy(Plottable.RenderController.Policy.immediate);
     });
 
     it("renders to a DOM node involves anchoring, layout computing, and actual rendering", () => {
@@ -753,7 +753,7 @@ describe("Component", () => {
 
     it("only computes layout once", (done) => {
       // use async rendering so flushing doesn't happen immediately
-      Plottable.RenderController.renderPolicy(Plottable.RenderController.Policy.ANIMATION_FRAME);
+      Plottable.RenderController.renderPolicy(Plottable.RenderController.Policy.animationFrame);
       // set up a bar plot with a color scale
       const colorScale = new Plottable.Scales.Color();
       const xScale = new Plottable.Scales.Linear();
