@@ -47,7 +47,6 @@
     "grunt-exec": "1.0.1",
     "grunt-git": "0.3.7",
     "grunt-jscs": "2.6.0",
-    "grunt-mocha-phantomjs": "2.0.1",
     "grunt-saucelabs": "8.6.2",
     "grunt-shell": "1.1.2",
     "grunt-ts": "5.5.0",
