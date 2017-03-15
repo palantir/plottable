@@ -794,7 +794,7 @@ export class Axis<D> extends Component {
    * container.
    */
   protected _hideOverflowingTickLabels() {
-    const boundingBox = (<Element> this._boundingBox.node()).getBoundingClientRect();
+    const boundingBox = this.element().node().getBoundingClientRect();
     const tickLabels = this._tickLabelContainer.selectAll<SVGGElement, any>("." + Axis.TICK_LABEL_CLASS);
     if (tickLabels.empty()) {
       return;

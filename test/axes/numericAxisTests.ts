@@ -258,7 +258,7 @@ describe("Axes", () => {
           axis.renderTo(div);
 
           const visibconstickLabels = applyVisibleFilter(axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
-          const boundingBox = div.select(".axis").select<Element>(".bounding-box").node().getBoundingClientRect();
+          const boundingBox = axis.element().node().getBoundingClientRect();
           visibconstickLabels.each(function(d, i) {
             const visibconstickLabelRect = this.getBoundingClientRect();
             assertBoxInside(visibconstickLabelRect, boundingBox, 0.5, `tick label ${i} is inside the bounding box`);
@@ -275,7 +275,7 @@ describe("Axes", () => {
           axis.renderTo(div);
 
           const visibconstickLabels = applyVisibleFilter(axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
-          const boundingBox = div.select(".axis").select<Element>(".bounding-box").node().getBoundingClientRect();
+          const boundingBox = axis.element().node().getBoundingClientRect();
           visibconstickLabels.each(function(d, i) {
             const visibconstickLabelRect = this.getBoundingClientRect();
             assertBoxInside(visibconstickLabelRect, boundingBox, 0, `long tick label ${i} is inside the bounding box`);

@@ -70,8 +70,8 @@ describe("Legend", () => {
 
       const contentBBox = Plottable.Utils.DOM.elementBBox(legend.content());
       const contentBottomEdge = contentBBox.y + contentBBox.height;
-      const bboxBBox = Plottable.Utils.DOM.elementBBox((<any> legend)._element.select(".bounding-box"));
-      const bboxBottomEdge = bboxBBox.y + bboxBBox.height;
+      const bboxBBox = legend.element().node().getBoundingClientRect();
+      const bboxBottomEdge = bboxBBox.top + bboxBBox.height;
 
       assert.operator(contentBottomEdge, "<=", bboxBottomEdge, "content does not extend past bounding box");
       div.remove();
@@ -84,8 +84,7 @@ describe("Legend", () => {
       let text = legend.content().select("text").text();
       assert.notEqual(text, "foooboooloonoogoorooboopoo", "the text was truncated");
       let rightEdge = (<Element> legend.content().select("text").node()).getBoundingClientRect().right;
-      let bbox = (<any> legend)._element.select(".bounding-box");
-      let rightEdgeBBox = (<Element> bbox.node()).getBoundingClientRect().right;
+      let rightEdgeBBox = legend.element().node().getBoundingClientRect().right;
       assert.operator(rightEdge, "<=", rightEdgeBBox, "the long text did not overflow the legend");
       div.remove();
     });
