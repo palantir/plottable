@@ -616,7 +616,7 @@ export class Time extends Axis<Date> {
   }
 
   private _hideOverlappingAndCutOffLabels(index: number) {
-    const boundingBox = (<Element> this._boundingBox.node()).getBoundingClientRect();
+    const boundingBox = this.element().node().getBoundingClientRect();
 
     const isInsideBBox = (tickBox: ClientRect) => {
       return (

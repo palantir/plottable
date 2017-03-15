@@ -34,10 +34,6 @@ export class Component {
    */
   private _content: SimpleSelection<void>;
   /**
-   * Used by axes to hide cut off axis labels.
-   */
-  protected _boundingBox: SimpleSelection<void>;
-  /**
    * Place more objects just behind this Component's Content by appending them to the _backgroundContainer.
    */
   private _backgroundContainer: SimpleSelection<void>;
@@ -75,26 +71,6 @@ export class Component {
   protected _isSetup = false;
   protected _isAnchored = false;
 
-  /**
-   * List of "boxes"; SVGComponent has a "box" API that lets subclasses add boxes
-   * with "addBox". Two boxes are added:
-   *
-   * .background-fill - for the background container (unclear what it's use is)
-   * .bounding-box - this._boundingBox
-   *
-   * boxes get their width/height attributes updated in computeLayout.
-   *
-   * I think this API is to make an idea of a "100% width/height" box that could be
-   * useful in a variety of situations. But enumerating the three usages of it, it
-   * doesn't look like it's being used very much.
-   *
-   * TODO possily remove in HTML world
-   */
-  private _boxes: SimpleSelection<void>[] = [];
-  /**
-   * Element containing all the boxes.
-   */
-  private _boxContainer: SimpleSelection<void>;
   /**
    * If we're the root Component (top-level), this is the HTMLElement we've anchored to (user-supplied).
    */
@@ -192,18 +168,14 @@ export class Component {
     this._cssClasses = new Utils.Set<string>();
 
     this._backgroundContainer = this._element.append("svg").classed("background-container", true);
-    this._addBox("background-fill", this._backgroundContainer);
     this._content = this._element.append("svg").classed("content", true);
     this._foregroundContainer = this._element.append("svg").classed("foreground-container", true);
-    this._boxContainer = this._element.append("svg").classed("box-container", true);
 
     if (this._overflowHidden) {
       this._content.classed("component-overflow-hidden", true);
     } else {
       this._content.classed("component-overflow-visible", true);
     }
-
-    this._boundingBox = this._addBox("bounding-box");
 
     this._isSetup = true;
   }
@@ -263,7 +235,6 @@ export class Component {
       top: `${this._origin.y}px`,
       width: `${this.width()}px`,
     });
-    this._boxes.forEach((b: SimpleSelection<void>) => b.attr("width", this.width()).attr("height", this.height()));
 
     if (this._resizeHandler != null) {
       this._resizeHandler(size);
@@ -427,24 +398,6 @@ export class Component {
     this._yAlignment = yAlignment;
     this.redraw();
     return this;
-  }
-
-  private _addBox(className?: string, parentElement?: SimpleSelection<void>) {
-    if (this._element == null) {
-      throw new Error("Adding boxes before anchoring is currently disallowed");
-    }
-    parentElement = parentElement == null ? this._boxContainer : parentElement;
-    const box = parentElement.append("rect");
-    if (className != null) {
-      box.classed(className, true);
-    }
-    box.attr("stroke-width", "0");
-
-    this._boxes.push(box);
-    if (this.width() != null && this.height() != null) {
-      box.attr("width", this.width()).attr("height", this.height());
-    }
-    return box;
   }
 
   /**

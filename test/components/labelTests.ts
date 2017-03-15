@@ -23,7 +23,6 @@ describe("Labels", () => {
 
   describe("Label", () => {
     describe("Basic Usage", () => {
-      const BBOX_SELECTOR = ".bounding-box";
       let div: d3.Selection<HTMLDivElement, any, any, any>;
 
       beforeEach(() => {
@@ -54,7 +53,7 @@ describe("Labels", () => {
         label.angle(90);
         text = content.select("text");
         bbox = Plottable.Utils.DOM.elementBBox(text);
-        TestMethods.assertBBoxInclusion((<any> label)._element.select(BBOX_SELECTOR), text);
+        TestMethods.assertBBoxInclusion(label.element(), text);
         assert.closeTo(bbox.height, label.width(), window.Pixel_CloseTo_Requirement, "label is in vertical position");
 
         div.remove();
@@ -107,7 +106,7 @@ describe("Labels", () => {
         const content = label.content();
         const text = content.select("text");
         const textBBox = Plottable.Utils.DOM.elementBBox(text);
-        TestMethods.assertBBoxInclusion((<any> label)._element.select(BBOX_SELECTOR), text);
+        TestMethods.assertBBoxInclusion(label.element(), text);
         assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
         // OS/Browser specific kerning messes with typesetter's per-character measurement
         const widthFudge = str.length;
@@ -122,7 +121,7 @@ describe("Labels", () => {
         const content = label.content();
         const text = content.select("text");
         const textBBox = Plottable.Utils.DOM.elementBBox(text);
-        TestMethods.assertBBoxInclusion((<any> label)._element.select(BBOX_SELECTOR), text);
+        TestMethods.assertBBoxInclusion(label.element(), text);
         assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
         // OS/Browser specific kerning messes with typesetter's per-character measurement
         const widthFudge = str.length;
@@ -179,7 +178,7 @@ describe("Labels", () => {
       it("adds padding for label accordingly under left alignment", () => {
         label.xAlignment("left").renderTo(div);
         const testTextRect = (<Element> label.content().select("text").node()).getBoundingClientRect();
-        const elementRect = (<any> label)._element.node().getBoundingClientRect();
+        const elementRect = label.element().node().getBoundingClientRect();
         assert.closeTo(testTextRect.left, elementRect.left + PADDING, window.Pixel_CloseTo_Requirement,
           "left difference by padding amount");
 
@@ -189,7 +188,7 @@ describe("Labels", () => {
       it("adds padding for label accordingly under right alignment", () => {
         label.xAlignment("right").renderTo(div);
         const testTextRect = (<Element> label.content().select("text").node()).getBoundingClientRect();
-        const elementRect = (<any> label)._element.node().getBoundingClientRect();
+        const elementRect = label.element().node().getBoundingClientRect();
         assert.closeTo(testTextRect.right, elementRect.right - PADDING, window.Pixel_CloseTo_Requirement,
           "right difference by padding amount");
 
@@ -199,7 +198,7 @@ describe("Labels", () => {
       it("adds padding for label accordingly under top alignment", () => {
         label.yAlignment("top").renderTo(div);
         const testTextRect = (<Element> label.content().select("text").node()).getBoundingClientRect();
-        const elementRect = (<any> label)._element.node().getBoundingClientRect();
+        const elementRect = label.element().node().getBoundingClientRect();
         assert.closeTo(testTextRect.top, elementRect.top + PADDING, window.Pixel_CloseTo_Requirement,
           "top difference by padding amount");
 
@@ -209,7 +208,7 @@ describe("Labels", () => {
       it("adds padding for label accordingly under bottom alignment", () => {
         label.yAlignment("bottom").renderTo(div);
         const testTextRect = (<Element> label.content().select("text").node()).getBoundingClientRect();
-        const elementRect = (<any> label)._element.node().getBoundingClientRect();
+        const elementRect = label.element().node().getBoundingClientRect();
         assert.closeTo(testTextRect.bottom, elementRect.bottom - PADDING, window.Pixel_CloseTo_Requirement,
           "bottom difference by padding amount");
 
