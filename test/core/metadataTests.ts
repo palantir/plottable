@@ -6,6 +6,7 @@ import * as Plottable from "../../src";
 
 import * as TestMethods from "../testMethods";
 import { getTranslateValues } from "../../src/utils/domUtils";
+import { BarOrientation } from "../../src/plots/barPlot";
 
 describe("Metadata", () => {
   let xScale: Plottable.Scales.Linear;
@@ -120,9 +121,9 @@ describe("Metadata", () => {
     checkXYPlot(new Plottable.Plots.StackedArea());
     checkXYPlot(new Plottable.Plots.Bar());
     checkXYPlot(new Plottable.Plots.StackedBar());
-    checkXYPlot(new Plottable.Plots.StackedBar( Plottable.Plots.Bar.ORIENTATION_HORIZONTAL));
+    checkXYPlot(new Plottable.Plots.StackedBar(BarOrientation.horizontal));
     checkXYPlot(new Plottable.Plots.ClusteredBar());
-    checkXYPlot(new Plottable.Plots.Bar(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL));
+    checkXYPlot(new Plottable.Plots.Bar(BarOrientation.horizontal));
     checkXYPlot(new Plottable.Plots.Scatter());
     checkPiePlot(new Plottable.Plots.Pie());
     div.remove();

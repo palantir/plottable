@@ -12,19 +12,18 @@ describe("RenderController", () => {
 
   describe("configuring the render policy", () => {
     after(() => {
-      Plottable.RenderController.renderPolicy(Plottable.RenderController.Policy.IMMEDIATE);
+      Plottable.RenderController.renderPolicy(Plottable.RenderController.Policy.immediate);
     });
 
     it("can set a render policy", () => {
-      let renderPolicy = Plottable.RenderController.Policy.TIMEOUT;
-      Plottable.RenderController.renderPolicy(renderPolicy);
+      Plottable.RenderController.renderPolicy(Plottable.RenderController.Policy.timeout);
 
       assert.strictEqual(Object.getPrototypeOf(Plottable.RenderController.renderPolicy()),
         Plottable.RenderPolicies.Timeout.prototype, "render policy is of the same type");
     });
 
     it("throws a warning for unrecognized render policies", () => {
-      let unrecognizedRenderPolicy = "foo";
+      let unrecognizedRenderPolicy: any = "foo";
       TestMethods.assertWarns(() => Plottable.RenderController.renderPolicy(unrecognizedRenderPolicy),
         "Unrecognized renderPolicy", "warning sent for unrecognized render policy");
     });

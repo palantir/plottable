@@ -17,9 +17,11 @@ import { Scale, ScaleCallback } from "../scales/scale";
 import * as Utils from "../utils";
 
 import { coerceExternalD3 } from "../utils/coerceD3";
+import { makeEnum } from "../utils/makeEnum";
 import * as Plots from "./commons";
 
-export type Renderer = "svg" | "canvas";
+export const Renderer = makeEnum(["svg", "canvas"]);
+export type Renderer = keyof typeof Renderer;
 
 export class Plot extends Component {
   protected static _ANIMATION_MAX_DURATION = 600;

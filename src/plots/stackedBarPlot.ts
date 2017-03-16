@@ -11,7 +11,7 @@ import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
 
 import * as Plots from "./";
-import { Bar } from "./barPlot";
+import { Bar, BarOrientation } from "./barPlot";
 
 export class StackedBar<X, Y> extends Bar<X, Y> {
   protected static _STACKED_BAR_LABEL_PADDING = 5;
@@ -33,7 +33,7 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
    * @param {Scale} yScale
    * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
    */
-  constructor(orientation = Bar.ORIENTATION_VERTICAL) {
+  constructor(orientation: BarOrientation = "vertical") {
     super(orientation);
     this.addClass("stacked-bar-plot");
     this._stackingOrder = "bottomup";

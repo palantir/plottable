@@ -12,17 +12,19 @@ import * as Scales from "../scales";
 import * as Utils from "../utils";
 
 import { SimpleSelection } from "../core/interfaces";
+import { makeEnum } from "../utils/makeEnum";
 import { Axis } from "./axis";
 
-export namespace TimeInterval {
-  export let second = "second";
-  export let minute = "minute";
-  export let hour = "hour";
-  export let day = "day";
-  export let week = "week";
-  export let month = "month";
-  export let year = "year";
-}
+export const TimeInterval = makeEnum([
+  "second",
+  "minute",
+  "hour",
+  "day",
+  "week",
+  "month",
+  "year",
+]);
+export type TimeInterval = keyof typeof TimeInterval;
 
 /**
  * Defines a configuration for a Time Axis tier.
@@ -47,7 +49,11 @@ export type TimeAxisConfiguration = TimeAxisTierConfiguration[];
 /**
  * Possible orientations for a Time Axis.
  */
-export type TimeAxisOrientation = "top" | "bottom";
+export const TimeAxisOrientation = makeEnum(["top", "bottom"]);
+export type TimeAxisOrientation = keyof typeof TimeAxisOrientation;
+
+export const TierLabelPosition = makeEnum(["between", "center"]);
+export type TierLabelPosition = keyof typeof TierLabelPosition;
 
 export class Time extends Axis<Date> {
   /**
@@ -182,11 +188,11 @@ export class Time extends Axis<Date> {
   private _possibleTimeAxisConfigurations: TimeAxisConfiguration[];
   private _numTiers: number;
   private _measurer: Typesetter.Measurer;
-  private _maxTimeIntervalPrecision: string = null;
+  private _maxTimeIntervalPrecision: TimeInterval = null;
 
   private _mostPreciseConfigIndex: number;
 
-  private _tierLabelPositions: string[] = [];
+  private _tierLabelPositions: TierLabelPosition[] = [];
 
   private static _LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
 
@@ -211,15 +217,15 @@ export class Time extends Axis<Date> {
   /**
    * Gets the label positions for each tier.
    */
-  public tierLabelPositions(): string[];
+  public tierLabelPositions(): TierLabelPosition[];
   /**
    * Sets the label positions for each tier.
    *
-   * @param {string[]} newPositions The positions for each tier. "bottom" and "center" are the only supported values.
+   * @param {string[]} newPositions The positions for each tier. "between" and "center" are the only supported values.
    * @returns {Axes.Time} The calling Time Axis.
    */
-  public tierLabelPositions(newPositions: string[]): this;
-  public tierLabelPositions(newPositions?: string[]): any {
+  public tierLabelPositions(newPositions: TierLabelPosition[]): this;
+  public tierLabelPositions(newPositions?: TierLabelPosition[]): any {
     if (newPositions == null) {
       return this._tierLabelPositions;
     } else {
@@ -235,7 +241,7 @@ export class Time extends Axis<Date> {
   /**
    * Gets the maximum TimeInterval precision
    */
-  public maxTimeIntervalPrecision(): string;
+  public maxTimeIntervalPrecision(): TimeInterval;
   /**
    * Sets the maximum TimeInterval precision. This limits the display to not
    * show time intervals above this precision. For example, if this is set to
@@ -245,8 +251,8 @@ export class Time extends Axis<Date> {
    * @param {TimeInterval} newPrecision The new maximum precision.
    * @returns {Axes.Time} The calling Time Axis.
    */
-  public maxTimeIntervalPrecision(newPrecision: string): this;
-  public maxTimeIntervalPrecision(newPrecision?: string): any {
+  public maxTimeIntervalPrecision(newPrecision: TimeInterval): this;
+  public maxTimeIntervalPrecision(newPrecision?: TimeInterval): any {
     if (newPrecision == null) {
       return this._maxTimeIntervalPrecision;
     } else {
@@ -292,8 +298,8 @@ export class Time extends Axis<Date> {
       this._setupDomElements();
     }
 
-    const oldLabelPositions: string[] = this.tierLabelPositions();
-    const newLabelPositions: string[] = [];
+    const oldLabelPositions = this.tierLabelPositions();
+    const newLabelPositions: TierLabelPosition[] = [];
     for (let i = 0; i < this._numTiers; i++) {
       newLabelPositions.push(oldLabelPositions[i] || "between");
     }
