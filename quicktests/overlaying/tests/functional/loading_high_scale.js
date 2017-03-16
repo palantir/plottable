@@ -1,14 +1,14 @@
-// Tweak scale here
-const DATAPOINTS_PER_MINUTE = 1.0;
-const MSEC_PER_YEAR = 1000 * 60 * 60 * 24 * 356.25;
-const INITIAL_DOMAIN = [new Date(), new Date().valueOf() + MSEC_PER_YEAR];
-const MAX_DOMAIN_EXTENT = 3 * MSEC_PER_YEAR;
-const STEP = Math.floor(3.6e6 / DATAPOINTS_PER_MINUTE);
-
-// Other constants
+// Constants
 const MASK = 0xFFF;
 const RANDOMS = Array.apply(null, Array(MASK + 1)).map(() => Math.random());
 const DATA_SCALE = 1e-7;
+const MSEC_PER_YEAR = 1000 * 60 * 60 * 24 * 356.25;
+
+// Tweak scale here
+const DATAPOINTS_PER_MINUTE = 1.0;
+const INITIAL_DOMAIN = [new Date(), new Date().valueOf() + MSEC_PER_YEAR];
+const MAX_DOMAIN_EXTENT = 20 * MSEC_PER_YEAR; // 20 years max extent
+const STEP = Math.floor(3.6e6 / DATAPOINTS_PER_MINUTE);
 
 function round(v, step) {
     return Math.floor(v/step) * step;
