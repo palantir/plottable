@@ -4,7 +4,7 @@
  */
 
 // __VERSION__ is a global constant which will be replaced by webpack's DefinePlugin
-declare var __VERSION__: string;
+const __VERSION__ = "blargh";
 
 /*
  * WARNING: The js output of this expression is searched by string (yes, I know) and replaced with a

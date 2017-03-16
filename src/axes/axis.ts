@@ -104,45 +104,23 @@ export class Axis<D> extends Component {
   }
 
   /**
-   * Gets the tick label data (including hidden) at a particular point in the direction of the axis.
+   * Gets the tick label data on a element.
    *
-   * @param {Point} point
+   * @param {Element} element
    */
-  public tickLabelDataAt(point: Point): D {
-    const pointValue = this.isHorizontal() ? point.x : point.y;
-    const tickValues = this._getTickValues();
-
-    // find the closest label via scaling since it's more performant than getBBox
-    const scaledTickLabels = tickValues.map((tickValue) => this._scale.scale(tickValue));
-
-    let closestTickDistance = Infinity;
-    let closestTickIndex: number;
-    scaledTickLabels.forEach((scaledTickLabel, index) => {
-      const distance = Math.abs(scaledTickLabel - pointValue);
-      if (distance < closestTickDistance) {
-        closestTickDistance = distance;
-        closestTickIndex = index;
+  public tickLabelDataInteractedWith(element: SVGElement) {
+    let tickLabel: SVGElement;
+    // go up DOM tree to find tick label element in ancestor elements
+    while ((element !== null) && (element.classList) && (tickLabel === undefined)) {
+      if (element.classList.contains(Axis.TICK_LABEL_CLASS)) {
+        tickLabel = element;
+      } else {
+        element = element.parentNode as SVGElement;
       }
-    });
+    }
 
-    // check whether the click point is inside the closest label text
-    const axis = this;
-    let tickLabelData: D;
-    this._tickLabelContainer.selectAll<SVGGElement, any>("." + Axis.TICK_LABEL_CLASS)
-      .each(function (data: D, index: number) {
-        if (index === closestTickIndex) {
-          const labelDimension = axis.isHorizontal() ? this.getBBox().width : this.getBBox().height;
-          const start = scaledTickLabels[index] - (labelDimension / 2);
-          const end = scaledTickLabels[index] + (labelDimension / 2);
-
-          if (start <= pointValue && pointValue <= end) {
-            tickLabelData = data;
-          }
-        }
-      });
-
-    return tickLabelData;
-  };
+    return d3.select(element).datum();
+  }
 
   protected _computeWidth() {
     // to be overridden by subclass logic

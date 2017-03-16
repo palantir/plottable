@@ -656,14 +656,14 @@ describe("Axis", () => {
     div.remove();
   });
 
-  describe("tickLabelAt", () => {
+  describe("tickLabelDataInteractedWith", () => {
+    const TICK_LABEL = "tick-label";
     let div: d3.Selection<HTMLDivElement, void | {}, any, any>;
     let axis: Plottable.Axis<number>;
     let scale: Plottable.Scales.Linear;
 
     before(() => {
-      // labels are spaced ~(300px / 10)
-      div = TestMethods.generateDiv(300, 100);
+      div = TestMethods.generateDiv();
       scale = new Plottable.Scales.Linear();
       scale.domain([0, 100]);
       axis = new Plottable.Axes.Numeric(scale, "bottom");
@@ -675,19 +675,28 @@ describe("Axis", () => {
       div.remove();
     });
 
-    it("returns label data when clicking on label text", () => {
-      assert.equal(axis.tickLabelDataAt({ x: 30, y: 10}), 10);
-      assert.equal(axis.tickLabelDataAt({ x: 60, y: 10}), 20);
+    it("returns label datum when element has tick label class", () => {
     });
 
-    it("calculates only in the direction of the axis", () => {
-      assert.equal(axis.tickLabelDataAt({ x: 60, y: 0}), 20);
-      assert.equal(axis.tickLabelDataAt({ x: 60, y: 50}), 20);
-      assert.equal(axis.tickLabelDataAt({ x: 60, y: 100}), 20);
+    it("returns label datum when element in ancestor has tick label class", () => {
     });
 
-    it("returns undefined if point is outside of labels", () => {
-      assert.isUndefined(axis.tickLabelDataAt({ x: 10, y: 10 }));
+    it("returns undefined when element is null / undefined", () => {
     });
+
+    it("returns undefined when no ancestor has tick label class", () => {
+    });
+
+    // it("returns label datum when clicking on label text", () => {
+    //   div.selectAll(".tick-label").nodes().forEach((node, index) => {
+    //     // labels are 0, 10, 20...
+    //     assert.equal(axis.tickLabelDataInteractedWith(node as SVGElement), index * 10);
+    //   });
+    // });
+
+    // it("returns undefined if point is outside of labels", () => {
+    //   const svg = TestMethods.generateSVG() as SVGElement;
+    //   assert.isUndefined(axis.tickLabelDataInteractedWith(svg));
+    // });
   });
 });
