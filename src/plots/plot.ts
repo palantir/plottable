@@ -141,12 +141,23 @@ export class Plot extends Component {
   }
 
   protected _setup() {
+    if (this._isSetup) {
+      return;
+    }
     super._setup();
     if (this._canvas != null) {
-      this.element().node().appendChild(this._canvas.node());
+      this._appendCanvasNode();
     }
     this._renderArea = this.content().append("g").classed("render-area", true);
     this.datasets().forEach((dataset) => this._createNodesForDataset(dataset));
+  }
+
+  private _appendCanvasNode() {
+    let canvasContainer = this.element().select<HTMLDivElement>(".plot-canvas-container");
+    if (canvasContainer.empty()) {
+      canvasContainer = this.element().append<HTMLDivElement>("div").classed("plot-canvas-container", true);
+      canvasContainer.node().appendChild(this._canvas.node());
+    }
   }
 
   public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
@@ -453,7 +464,7 @@ export class Plot extends Component {
         // construct the canvas, remove drawer's renderAreas, set drawer's canvas
         this._canvas = d3.select(document.createElement("canvas")).classed("plot-canvas", true);
         if (this.element() != null) {
-          this.element().node().appendChild(this._canvas.node());
+          this._appendCanvasNode();
         }
         this._datasetToDrawer.forEach((drawer) => {
           if (drawer.renderArea() != null) {

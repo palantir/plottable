@@ -195,12 +195,22 @@ var Plot = (function (_super) {
     };
     Plot.prototype._setup = function () {
         var _this = this;
+        if (this._isSetup) {
+            return;
+        }
         _super.prototype._setup.call(this);
         if (this._canvas != null) {
-            this.element().node().appendChild(this._canvas.node());
+            this._appendCanvasNode();
         }
         this._renderArea = this.content().append("g").classed("render-area", true);
         this.datasets().forEach(function (dataset) { return _this._createNodesForDataset(dataset); });
+    };
+    Plot.prototype._appendCanvasNode = function () {
+        var canvasContainer = this.element().select(".plot-canvas-container");
+        if (canvasContainer.empty()) {
+            canvasContainer = this.element().append("div").classed("plot-canvas-container", true);
+            canvasContainer.node().appendChild(this._canvas.node());
+        }
     };
     Plot.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
         _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
@@ -425,7 +435,7 @@ var Plot = (function (_super) {
                 // construct the canvas, remove drawer's renderAreas, set drawer's canvas
                 this._canvas = d3.select(document.createElement("canvas")).classed("plot-canvas", true);
                 if (this.element() != null) {
-                    this.element().node().appendChild(this._canvas.node());
+                    this._appendCanvasNode();
                 }
                 this._datasetToDrawer.forEach(function (drawer) {
                     if (drawer.renderArea() != null) {
