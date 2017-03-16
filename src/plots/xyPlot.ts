@@ -63,7 +63,6 @@ export class XYPlot<X, Y> extends Plot {
       }
       this._renderArea.attr("transform", `translate(${_deltaX}, ${_deltaY}) scale(${_scalingX}, ${_scalingY})`);
       if (this._canvas != null) {
-        const context = this._canvas.node().getContext("2d");
         this._canvas.style("transform", `translate(${_deltaX}px, ${_deltaY}px) scale(${_scalingX}, ${_scalingY})`);
       }
       clearTimeout(_timeoutReference);
