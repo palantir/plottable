@@ -54,7 +54,6 @@ function run(div, data, Plottable) {
         .y((d) => d.y, yScale);
     const gridlines = new Plottable.Components.Gridlines(xScale, yScale);
 
-
     // layout components
     const plotGroup = new Plottable.Components.Group([linePlot, gridlines]);
     const table = new Plottable.Components.Table([
