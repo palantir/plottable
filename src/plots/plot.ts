@@ -107,7 +107,7 @@ export class Plot extends Component {
    * renderer. The node may be parent-less (which means that the plot isn't setup yet but is still using the canvas
    * renderer).
    */
-  private _canvas: d3.Selection<HTMLCanvasElement, any, any, any>;
+  protected _canvas: d3.Selection<HTMLCanvasElement, any, any, any>;
 
   /**
    * A Plot draws some visualization of the inputted Datasets.

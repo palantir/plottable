@@ -92,6 +92,10 @@
 .plottable .plot-canvas {
   width: 100%;
   height: 100%;
+  /**
+   * Play well with deferred rendering.
+   */
+  transform-origin: 0px 0px 0px;
 }
 
 .plottable .label text {
