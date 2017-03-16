@@ -277,7 +277,7 @@ export class Numeric extends Axis<number> {
   }
 
   private _hideEndTickLabels() {
-    const boundingBox = (<Element> this._boundingBox.node()).getBoundingClientRect();
+    const boundingBox = this.element().node().getBoundingClientRect();
     const tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS);
     if (tickLabels.size() === 0) {
       return;

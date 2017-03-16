@@ -37,7 +37,7 @@ div.panel {
 
 <h2>Plottable Fiddle</h2>
 <div class="panel">
-    <svg width="600" height="400"></svg>
+    <div id="content" style="width: 600px; height: 400px;"></div>
 </div>
         `;
 
@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .addDataset(new Plottable.Dataset(data))
         .x(((d, i) => i), xScale)
         .y(((d, i) => d), yScale)
-        .renderTo("svg");
+        .renderTo("#content");
 
 }, {once: true});
         `;

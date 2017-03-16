@@ -3,12 +3,12 @@
 module.exports = function(grunt) {
   "use strict";
 
-  // run an arbitrary npm command through grunt, e.g. grunt exec:npm:build:test -> npm run build:test
+  // run an arbitrary yarn command through grunt, e.g. grunt exec:yarn:build:test -> yarn run build:test
   var execConfig = {
-    npm: {
+    yarn: {
       cmd: function () {
-        var npmCommandName = Array.prototype.slice.call(arguments).join(":");
-        return "npm run " + npmCommandName;
+        var yarnCommandName = Array.prototype.slice.call(arguments).join(":");
+        return "yarn run " + yarnCommandName;
       }
     }
   };
@@ -166,7 +166,7 @@ module.exports = function(grunt) {
   require("load-grunt-tasks")(grunt);
 
   grunt.registerTask("dev-compile", [
-    "exec:npm:build",
+    "exec:yarn:build",
     "update-quicktests"
   ]);
 
@@ -174,10 +174,10 @@ module.exports = function(grunt) {
   grunt.registerTask("release:minor", ["bump:minor", "dist-compile", "gitcommit:version"]);
   grunt.registerTask("release:major", ["bump:major", "dist-compile", "gitcommit:version"]);
 
-  grunt.registerTask("dist-compile", ["exec:npm:build", "exec:npm:sed-version", "uglify", "compress"]);
+  grunt.registerTask("dist-compile", ["exec:yarn:build", "exec:yarn:sed-version", "uglify", "compress"]);
 
   grunt.registerTask("commitjs", ["dist-compile", "gitcommit:built"]);
-  grunt.registerTask("default", ["exec:npm:start"]);
+  grunt.registerTask("default", ["exec:yarn:start"]);
 
   grunt.registerTask("test", ["dev-compile", "test-local"]);
   grunt.registerTask("test-local", ["blanket_mocha", "lint"]);

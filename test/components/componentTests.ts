@@ -36,26 +36,21 @@ describe("Component", () => {
       assert.isFalse(c.foreground().empty(), "foreground exists in the DOM");
       assert.isFalse(c.background().empty(), "background exists in the DOM");
       assert.isFalse(c.content().empty(), "content exists in the DOM");
-      assert.isFalse(c.background().select(".background-fill").empty(), "background fill container exists in the DOM");
 
       let componentElement = div.select(".component");
       let containerNodes = componentElement.selectAll<Element, any>("svg").nodes();
       assert.strictEqual(containerNodes[0], c.background().node(), "background at the back");
       assert.strictEqual(containerNodes[1], c.content().node(), "content at the middle");
       assert.strictEqual(containerNodes[2], c.foreground().node(), "foreground at the front");
-      assert.strictEqual(containerNodes[3], componentElement.select(".box-container").node(), "boxes at front of foreground");
       c.destroy();
       div.remove();
     });
 
-    it("sets the foreground-container and box-container pointer-events to none", () => {
+    it("sets the foreground-container pointer-events to none", () => {
       c.anchor(div);
       const foreground = c.foreground().node();
-      const boxContainer = c.element().select(".box-container").node();
       let pointerEventForeground = window.getComputedStyle(<Element>foreground).pointerEvents;
-      let pointerEventBox = window.getComputedStyle(<Element>boxContainer).pointerEvents;
       assert.strictEqual(pointerEventForeground, "none", "foreground-container's pointer-event is set to none");
-      assert.strictEqual(pointerEventBox, "none", "box-container's pointer-event is set to none");
       c.destroy();
       div.remove();
     });
@@ -450,14 +445,9 @@ describe("Component", () => {
       assert.strictEqual(c.width() , width, "width set");
       assert.strictEqual(c.height(), height, "height set");
 
-      let componentElement = div.select(".component");
+      let componentElement = c.element();
       let translate = [parseFloat(componentElement.style("left")), parseFloat(componentElement.style("top"))];
       assert.deepEqual(translate, [origin.x, origin.y], "the element translated appropriately");
-      let backgroundFillBox = div.select(".background-fill");
-      assert.closeTo(TestMethods.numAttr(backgroundFillBox, "width"),
-        width, window.Pixel_CloseTo_Requirement, "box width set to computed width");
-      assert.closeTo(TestMethods.numAttr(backgroundFillBox, "height"),
-        height, window.Pixel_CloseTo_Requirement, "box height set to computed height");
       c.destroy();
       div.remove();
     });

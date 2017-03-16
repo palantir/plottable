@@ -68,8 +68,7 @@
 
 .plottable .background-container,
 .plottable .content,
-.plottable .foreground-container,
-.plottable .box-container {
+.plottable .foreground-container {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -78,19 +77,8 @@
 /**
  * Don't allow svg elements above the content to steal events
  */
-.plottable .foreground-container,
-.plottable .box-container {
+.plottable .foreground-container {
   pointer-events: none;
-}
-
-.plottable .background-fill {
-  fill: none;
-}
-
-.plottable .bounding-box {
-  /* Invisible pink bounding-box to allow for collision testing */
-  fill: pink;
-  visibility: hidden;
 }
 
 .plottable .component-overflow-hidden {

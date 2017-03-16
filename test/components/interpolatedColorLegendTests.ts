@@ -11,7 +11,6 @@ describe("InterpolatedColorLegend", () => {
   const SWATCH_SELECTOR = ".swatch";
   const SWATCH_CONTAINER_SELECTOR = ".swatch-container";
   const SWATCH_BBOX_SELECTOR = ".swatch-bounding-box";
-  const BACKGROUND_SELECTOR = ".background-fill";
   const ORIENTATIONS = ["horizontal", "left", "right"];
 
   describe("Basic Usage", () => {
@@ -325,7 +324,7 @@ describe("InterpolatedColorLegend", () => {
       legend.orientation("left");
       legend.renderTo(div);
       let swatchBoundingRect = (<Element> legend.content().select(SWATCH_CONTAINER_SELECTOR).node()).getBoundingClientRect();
-      let legendBoundingRect = (<Element> legend.background().select(BACKGROUND_SELECTOR).node()).getBoundingClientRect();
+      let legendBoundingRect = legend.element().node().getBoundingClientRect();
       let swatchWidth = swatchBoundingRect.width;
       let swatchEdge = swatchBoundingRect.right;
       let legendEdge = legendBoundingRect.right;
@@ -334,7 +333,7 @@ describe("InterpolatedColorLegend", () => {
         "padding is approximately equal to swatch width");
       legend.expands(true);
       swatchBoundingRect = (<Element> legend.content().select(SWATCH_CONTAINER_SELECTOR).node()).getBoundingClientRect();
-      legendBoundingRect = (<Element> legend.background().select(BACKGROUND_SELECTOR).node()).getBoundingClientRect();
+      legendBoundingRect = legend.element().node().getBoundingClientRect();
       swatchWidth = swatchBoundingRect.width;
       swatchEdge = swatchBoundingRect.right;
       legendEdge = legendBoundingRect.right;
@@ -348,7 +347,7 @@ describe("InterpolatedColorLegend", () => {
       legend.orientation("right");
       legend.renderTo(div);
       let swatchBoundingRect = (<Element> legend.content().select(SWATCH_CONTAINER_SELECTOR).node()).getBoundingClientRect();
-      let legendBoundingRect = (<Element> legend.background().select(BACKGROUND_SELECTOR).node()).getBoundingClientRect();
+      let legendBoundingRect = legend.element().node().getBoundingClientRect();
       let swatchWidth = swatchBoundingRect.width;
       let swatchEdge = swatchBoundingRect.left;
       let legendEdge = legendBoundingRect.left;
@@ -358,7 +357,7 @@ describe("InterpolatedColorLegend", () => {
         "padding is approximately equal to swatch width");
       legend.expands(true);
       swatchBoundingRect = (<Element> legend.content().select(SWATCH_CONTAINER_SELECTOR).node()).getBoundingClientRect();
-      legendBoundingRect = (<Element> legend.background().select(BACKGROUND_SELECTOR).node()).getBoundingClientRect();
+      legendBoundingRect = legend.element().node().getBoundingClientRect();
       swatchWidth = swatchBoundingRect.width;
       swatchEdge = swatchBoundingRect.left;
       legendEdge = legendBoundingRect.left;
@@ -373,7 +372,7 @@ describe("InterpolatedColorLegend", () => {
       legend.orientation("horizontal");
       legend.renderTo(div);
       let swatchBoundingRect = (<Element> legend.content().select(SWATCH_CONTAINER_SELECTOR).node()).getBoundingClientRect();
-      let legendBoundingRect = (<Element> legend.background().select(BACKGROUND_SELECTOR).node()).getBoundingClientRect();
+      let legendBoundingRect = legend.element().node().getBoundingClientRect();
       let swatchHeight = swatchBoundingRect.height;
       let swatchEdge = swatchBoundingRect.bottom;
       let legendEdge = legendBoundingRect.bottom;
@@ -382,7 +381,7 @@ describe("InterpolatedColorLegend", () => {
         "padding is approximately equal to swatch height");
       legend.expands(true);
       swatchBoundingRect = (<Element> legend.content().select(SWATCH_CONTAINER_SELECTOR).node()).getBoundingClientRect();
-      legendBoundingRect = (<Element> legend.background().select(BACKGROUND_SELECTOR).node()).getBoundingClientRect();
+      legendBoundingRect = legend.element().node().getBoundingClientRect();
       swatchHeight = swatchBoundingRect.height;
       swatchEdge = swatchBoundingRect.bottom;
       legendEdge = legendBoundingRect.bottom;
@@ -413,7 +412,7 @@ describe("InterpolatedColorLegend", () => {
       const constrainedHeight = textHeight;
       div.style("height", constrainedHeight + "px");
       legend.redraw();
-      const legendBoundingRect = (<Element> legend.background().select(BACKGROUND_SELECTOR).node()).getBoundingClientRect();
+      const legendBoundingRect = legend.element().node().getBoundingClientRect();
       swatchBoundingRect = (<Element> legend.content().select(SWATCH_CONTAINER_SELECTOR).node()).getBoundingClientRect();
       const topPadding = swatchBoundingRect.top - legendBoundingRect.top;
       const bottomPadding = legendBoundingRect.bottom - swatchBoundingRect.bottom;
@@ -431,7 +430,7 @@ describe("InterpolatedColorLegend", () => {
       const constrainedWidth = textHeight * 2;
       div.style("width", constrainedWidth + "px");
       legend.redraw();
-      const legendBoundingRect = (<Element> legend.background().select(BACKGROUND_SELECTOR).node()).getBoundingClientRect();
+      const legendBoundingRect = legend.element().node().getBoundingClientRect();
       swatchBoundingRect = (<Element> legend.content().select(SWATCH_CONTAINER_SELECTOR).node()).getBoundingClientRect();
       const leftPadding = legendBoundingRect.right - swatchBoundingRect.right;
       assert.operator(leftPadding, "<", textHeight, "right-side padding degrades to be smaller than textHeight");
@@ -447,7 +446,7 @@ describe("InterpolatedColorLegend", () => {
       const constrainedWidth = textHeight * 2;
       div.style("width", constrainedWidth + "px");
       legend.redraw();
-      const legendBoundingRect = (<Element> legend.background().select(BACKGROUND_SELECTOR).node()).getBoundingClientRect();
+      const legendBoundingRect = legend.element().node().getBoundingClientRect();
       swatchBoundingRect = (<Element> legend.content().select(SWATCH_CONTAINER_SELECTOR).node()).getBoundingClientRect();
       const leftPadding = swatchBoundingRect.left - legendBoundingRect.left;
       assert.operator(leftPadding, "<", textHeight, "left-side padding degrades to be smaller than textHeight");

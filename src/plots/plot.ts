@@ -599,6 +599,11 @@ export class Plot extends Component {
     const dataToDraw = this._getDataToDraw();
     const drawers = this.datasets().map((dataset) => this._datasetToDrawer.get(dataset));
 
+    if (this.renderer() === "canvas") {
+      const canvas = this._canvas.node();
+      const context = canvas.getContext("2d");
+      context.clearRect(0, 0, canvas.width, canvas.height);
+    }
     this.datasets().forEach((ds, i) => drawers[i].draw(dataToDraw.get(ds), drawSteps));
 
     const times = this.datasets().map((ds, i) => drawers[i].totalDrawTime(dataToDraw.get(ds), drawSteps));
@@ -614,19 +619,23 @@ export class Plot extends Component {
    * @returns {d3.Selection}
    */
   public selections(datasets = this.datasets()): SimpleSelection<any> {
-    const selections: d3.BaseType[] = [];
+    if (this.renderer() === "canvas") {
+      return null;
+    } else {
+      const selections: d3.BaseType[] = [];
 
-    datasets.forEach((dataset) => {
-      const drawer = this._datasetToDrawer.get(dataset);
-      if (drawer == null) {
-        return;
-      }
-      drawer.renderArea().selectAll(drawer.selector()).each(function () {
-        selections.push(this);
+      datasets.forEach((dataset) => {
+        const drawer = this._datasetToDrawer.get(dataset);
+        if (drawer == null) {
+          return;
+        }
+        drawer.renderArea().selectAll(drawer.selector()).each(function () {
+          selections.push(this);
+        });
       });
-    });
 
-    return d3.selectAll(selections);
+      return d3.selectAll(selections);
+    }
   }
 
   /**

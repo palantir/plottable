@@ -438,6 +438,16 @@ describe("Plots", () => {
 
         div.remove();
       });
+
+      it("returns null on .selections()", () => {
+        plot.addDataset(new Plottable.Dataset([]));
+        plot.renderer("canvas");
+        const div = TestMethods.generateDiv();
+        plot.renderTo(div);
+        
+        assert.isNull(plot.selections(), "no selections on canvas");
+        div.remove();
+      });
     });
   });
 });

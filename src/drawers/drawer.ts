@@ -30,7 +30,7 @@ export class Drawer {
 
   protected _svgElementName: string;
   protected _className: string;
-  private _dataset: Dataset;
+  protected _dataset: Dataset;
 
   private _cachedSelectionValid = false;
   private _cachedSelection: SimpleSelection<any>;
@@ -192,9 +192,6 @@ export class Drawer {
         delay += drawStep.animator.totalTime(data.length);
       });
     } else if (this._canvas != null) {
-      const canvas = this.canvas().node();
-      const context = canvas.getContext("2d");
-      context.clearRect(0, 0, canvas.width, canvas.height);
       // don't support animations for now; just draw the last draw step immediately
       const lastDrawStep = appliedDrawSteps[appliedDrawSteps.length - 1];
       Utils.Window.setTimeout(() => this._drawStepCanvas(data, lastDrawStep), 0);
