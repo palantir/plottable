@@ -329,7 +329,7 @@ describe("TimeAxis", () => {
 
       axis.renderTo(div);
 
-      let axisBoundingRect = (<Element> div.select(".axis").select(".bounding-box").node()).getBoundingClientRect();
+      let axisBoundingRect = axis.element().node().getBoundingClientRect();
 
       let isInsideAxisBoundingRect = function(innerRect: ClientRect) {
         return Math.floor(innerRect.bottom) <= Math.ceil(axisBoundingRect.bottom) + window.Pixel_CloseTo_Requirement &&

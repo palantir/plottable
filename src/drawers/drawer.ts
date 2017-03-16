@@ -8,10 +8,10 @@ import * as d3 from "d3";
 import * as Utils from "../utils";
 
 import { Dataset } from "../core/dataset";
-import { AttributeToProjector, AttributeToAppliedProjector, SimpleSelection } from "../core/interfaces";
+import { AttributeToAppliedProjector, AttributeToProjector, SimpleSelection } from "../core/interfaces";
 
-import * as Drawers from "./";
 import { coerceExternalD3 } from "../utils/coerceD3";
+import * as Drawers from "./";
 
 /**
  * A Drawer is responsible for actually committing the DrawSteps to the DOM. You first pass a renderArea
@@ -30,7 +30,7 @@ export class Drawer {
 
   protected _svgElementName: string;
   protected _className: string;
-  private _dataset: Dataset;
+  protected _dataset: Dataset;
 
   private _cachedSelectionValid = false;
   private _cachedSelection: SimpleSelection<any>;
@@ -101,7 +101,7 @@ export class Drawer {
    * @param{any[]} data The data to be drawn
    */
   private _bindSelectionData(data: any[]) {
-    let dataElementsUpdate = this.selection().data(data);
+    const dataElementsUpdate = this.selection().data(data);
     const dataElements =
       dataElementsUpdate
         .enter()
@@ -124,8 +124,8 @@ export class Drawer {
    * @param{AppliedDrawStep} step The step, how data should be drawn.
    */
   private _drawStep(step: Drawers.AppliedDrawStep) {
-    let selection = this.selection();
-    let colorAttributes = ["fill", "stroke"];
+    const selection = this.selection();
+    const colorAttributes = ["fill", "stroke"];
     colorAttributes.forEach((colorAttribute) => {
       if (step.attrToAppliedProjector[colorAttribute] != null) {
         selection.attr(colorAttribute, step.attrToAppliedProjector[colorAttribute]);
@@ -142,7 +142,7 @@ export class Drawer {
   }
 
   private _appliedProjectors(attrToProjector: AttributeToProjector): AttributeToAppliedProjector {
-    let modifiedAttrToProjector: AttributeToAppliedProjector = {};
+    const modifiedAttrToProjector: AttributeToAppliedProjector = {};
     Object.keys(attrToProjector).forEach((attr: string) => {
       modifiedAttrToProjector[attr] =
         (datum: any, index: number) => attrToProjector[attr](datum, index, this._dataset);
@@ -174,8 +174,8 @@ export class Drawer {
    * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
    */
   public draw(data: any[], drawSteps: Drawers.DrawStep[]) {
-    let appliedDrawSteps: Drawers.AppliedDrawStep[] = drawSteps.map((dr: Drawers.DrawStep) => {
-      let attrToAppliedProjector = this._appliedProjectors(dr.attrToProjector);
+    const appliedDrawSteps: Drawers.AppliedDrawStep[] = drawSteps.map((dr: Drawers.DrawStep) => {
+      const attrToAppliedProjector = this._appliedProjectors(dr.attrToProjector);
       return {
         attrToAppliedProjector: attrToAppliedProjector,
         animator: dr.animator,
@@ -192,9 +192,6 @@ export class Drawer {
         delay += drawStep.animator.totalTime(data.length);
       });
     } else if (this._canvas != null) {
-      const canvas = this.canvas().node();
-      const context = canvas.getContext("2d");
-      context.clearRect(0, 0, canvas.width, canvas.height);
       // don't support animations for now; just draw the last draw step immediately
       const lastDrawStep = appliedDrawSteps[appliedDrawSteps.length - 1];
       Utils.Window.setTimeout(() => this._drawStepCanvas(data, lastDrawStep), 0);

@@ -31,7 +31,7 @@ export class DragLineLayer<D> extends GuideLineLayer<D> {
     this._dragInteraction = new Interactions.Drag();
     this._dragInteraction.attachTo(this);
 
-    let onLine = (p: Point) => {
+    const onLine = (p: Point) => {
       return (this._isVertical() &&
           this.pixelPosition() - this.detectionRadius() <= p.x &&
           p.x <= this.pixelPosition() + this.detectionRadius()
@@ -44,7 +44,7 @@ export class DragLineLayer<D> extends GuideLineLayer<D> {
     };
 
     let dragging = false;
-    let interactionDragStartCallback = (start: Point) => {
+    const interactionDragStartCallback = (start: Point) => {
       if (onLine(start)) {
         dragging = true;
         this._dragStartCallbacks.callCallbacks(this);
@@ -52,7 +52,7 @@ export class DragLineLayer<D> extends GuideLineLayer<D> {
     };
     this._dragInteraction.onDragStart(interactionDragStartCallback);
 
-    let interactionDragCallback = (start: Point, end: Point) => {
+    const interactionDragCallback = (start: Point, end: Point) => {
       if (dragging) {
         this._setPixelPositionWithoutChangingMode(this._isVertical() ? end.x : end.y);
         this._dragCallbacks.callCallbacks(this);
@@ -60,7 +60,7 @@ export class DragLineLayer<D> extends GuideLineLayer<D> {
     };
     this._dragInteraction.onDrag(interactionDragCallback);
 
-    let interactionDragEndCallback = (start: Point, end: Point) => {
+    const interactionDragEndCallback = (start: Point, end: Point) => {
       if (dragging) {
         dragging = false;
         this._dragEndCallbacks.callCallbacks(this);
@@ -83,8 +83,8 @@ export class DragLineLayer<D> extends GuideLineLayer<D> {
   protected _setup() {
     super._setup();
     this._detectionEdge = this.content().append("line").styles({
-      "opacity": 0,
-      "stroke": "pink",
+      opacity: 0,
+      stroke: "pink",
       "pointer-events": "visibleStroke",
     }).classed("drag-edge", true);
   }
@@ -92,10 +92,10 @@ export class DragLineLayer<D> extends GuideLineLayer<D> {
   public renderImmediately() {
     super.renderImmediately();
     this._detectionEdge.attrs({
-      x1: this._isVertical() ? this.pixelPosition() : 0,
-      y1: this._isVertical() ? 0 : this.pixelPosition(),
-      x2: this._isVertical() ? this.pixelPosition() : this.width(),
-      y2: this._isVertical() ? this.height() : this.pixelPosition(),
+      "x1": this._isVertical() ? this.pixelPosition() : 0,
+      "y1": this._isVertical() ? 0 : this.pixelPosition(),
+      "x2": this._isVertical() ? this.pixelPosition() : this.width(),
+      "y2": this._isVertical() ? this.height() : this.pixelPosition(),
       "stroke-width": this._detectionRadius * 2,
     });
 

@@ -3,8 +3,8 @@
  * @license MIT
  */
 
-import { Accessor, Point, Bounds, Range, AttributeToProjector, SimpleSelection } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
+import { Accessor, SimpleSelection } from "../core/interfaces";
 import { Drawer } from "../drawers/drawer";
 import * as Utils from "../utils";
 
@@ -77,13 +77,13 @@ export class Waterfall<X, Y> extends Bar<X, number> {
   }
 
   protected _createNodesForDataset(dataset: Dataset): Drawer {
-    let drawer = super._createNodesForDataset(dataset);
+    const drawer = super._createNodesForDataset(dataset);
     this._connectorArea = this._renderArea.append("g").classed(Waterfall._CONNECTOR_AREA_CLASS, true);
     return drawer;
   }
 
   protected _extentsForProperty(attr: string) {
-    let primaryAttr = "y";
+    const primaryAttr = "y";
     if (attr === primaryAttr) {
       return [this._extent];
     } else {
@@ -92,20 +92,20 @@ export class Waterfall<X, Y> extends Bar<X, number> {
   }
 
   protected _generateAttrToProjector() {
-    let attrToProjector = super._generateAttrToProjector();
+    const attrToProjector = super._generateAttrToProjector();
 
-    let yScale = this.y().scale;
-    let totalAccessor = Plot._scaledAccessor(this.total());
+    const yScale = this.y().scale;
+    const totalAccessor = Plot._scaledAccessor(this.total());
 
-    let yAttr = this.attr("y");
+    const yAttr = this.attr("y");
     if (yAttr == null) {
       attrToProjector["y"] = (d, i, dataset) => {
-        let currentValue = this.y().accessor(d, i, dataset);
-        let isTotal = totalAccessor(d, i, dataset);
+        const currentValue = this.y().accessor(d, i, dataset);
+        const isTotal = totalAccessor(d, i, dataset);
         if (isTotal) {
           return Math.min(yScale.scale(currentValue), yScale.scale(0));
         } else {
-          let currentSubtotal = this._subtotals[i];
+          const currentSubtotal = this._subtotals[i];
           if (i === 0) {
             if (currentValue < 0) {
               return yScale.scale(currentSubtotal - currentValue);
@@ -113,7 +113,7 @@ export class Waterfall<X, Y> extends Bar<X, number> {
               return yScale.scale(currentSubtotal);
             }
           }
-          let priorSubtotal = this._subtotals[i - 1];
+          const priorSubtotal = this._subtotals[i - 1];
           if (currentSubtotal > priorSubtotal) {
             return yScale.scale(currentSubtotal);
           } else {
@@ -123,19 +123,19 @@ export class Waterfall<X, Y> extends Bar<X, number> {
       };
     }
 
-    let heightAttr = this.attr("height");
+    const heightAttr = this.attr("height");
     if (heightAttr == null) {
       attrToProjector["height"] = (d, i, dataset) => {
-        let isTotal = totalAccessor(d, i, dataset);
-        let currentValue = this.y().accessor(d, i, dataset);
+        const isTotal = totalAccessor(d, i, dataset);
+        const currentValue = this.y().accessor(d, i, dataset);
         if (isTotal) {
           return Math.abs(yScale.scale(currentValue) - yScale.scale(0));
         } else {
-          let currentSubtotal = this._subtotals[i];
+          const currentSubtotal = this._subtotals[i];
           if (i === 0) {
             return Math.abs(yScale.scale(currentSubtotal) - yScale.scale(currentSubtotal - currentValue));
           } else {
-            let priorSubtotal = this._subtotals[i - 1];
+            const priorSubtotal = this._subtotals[i - 1];
             return Math.abs(yScale.scale(currentSubtotal) - yScale.scale(priorSubtotal));
           }
         }
@@ -147,11 +147,11 @@ export class Waterfall<X, Y> extends Bar<X, number> {
       if (this.attr("class") != null) {
         baseClass = this.attr("class").accessor(d, i, dataset) + " ";
       }
-      let isTotal = totalAccessor(d, i, dataset);
+      const isTotal = totalAccessor(d, i, dataset);
       if (isTotal) {
         return baseClass + Waterfall._BAR_TOTAL_CLASS;
       } else {
-        let delta = this.y().accessor(d, i, dataset);
+        const delta = this.y().accessor(d, i, dataset);
         return baseClass + (delta > 0 ? Waterfall._BAR_GROWTH_CLASS : Waterfall._BAR_DECLINE_CLASS);
       }
     };
@@ -171,8 +171,8 @@ export class Waterfall<X, Y> extends Bar<X, number> {
     let total = 0;
     let hasStarted = false;
     dataset.data().forEach((datum, index) => {
-      let currentValue = this.y().accessor(datum, index, dataset);
-      let isTotal = this.total().accessor(datum, index, dataset);
+      const currentValue = this.y().accessor(datum, index, dataset);
+      const isTotal = this.total().accessor(datum, index, dataset);
       if (!isTotal || index === 0) {
         total += currentValue;
       }
@@ -192,7 +192,7 @@ export class Waterfall<X, Y> extends Bar<X, number> {
         }
       }
       if (!hasStarted && isTotal) {
-        let startTotal = currentValue - total;
+        const startTotal = currentValue - total;
         for (let i = 0; i < this._subtotals.length; i++) {
           this._subtotals[i] += startTotal;
         }
@@ -206,14 +206,14 @@ export class Waterfall<X, Y> extends Bar<X, number> {
   }
 
   private _drawConnectors() {
-    let attrToProjector = this._generateAttrToProjector();
-    let dataset = this.datasets()[0];
+    const attrToProjector = this._generateAttrToProjector();
+    const dataset = this.datasets()[0];
     for (let datumIndex = 1; datumIndex < dataset.data().length; datumIndex++) {
-      let prevIndex = datumIndex - 1;
-      let datum = dataset.data()[datumIndex];
-      let prevDatum = dataset.data()[prevIndex];
-      let x = attrToProjector["x"](prevDatum, prevIndex, dataset);
-      let x2 = attrToProjector["x"](datum, datumIndex, dataset) + attrToProjector["width"](datum, datumIndex, dataset);
+      const prevIndex = datumIndex - 1;
+      const datum = dataset.data()[datumIndex];
+      const prevDatum = dataset.data()[prevIndex];
+      const x = attrToProjector["x"](prevDatum, prevIndex, dataset);
+      const x2 = attrToProjector["x"](datum, datumIndex, dataset) + attrToProjector["width"](datum, datumIndex, dataset);
       let y = attrToProjector["y"](datum, datumIndex, dataset);
       if ((this._subtotals[datumIndex] > 0 && this._subtotals[datumIndex] > this._subtotals[prevIndex]) ||
         (this._subtotals[datumIndex] < 0 && this._subtotals[datumIndex] >= this._subtotals[prevIndex])) {
@@ -225,9 +225,9 @@ export class Waterfall<X, Y> extends Bar<X, number> {
   }
 
   private _updateSubtotals() {
-    let datasets = this.datasets();
+    const datasets = this.datasets();
     if (datasets.length > 0) {
-      let dataset = datasets[datasets.length - 1];
+      const dataset = datasets[datasets.length - 1];
       this._subtotals = new Array();
       this._calculateSubtotalsAndExtent(dataset);
     }

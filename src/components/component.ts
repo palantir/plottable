@@ -5,12 +5,12 @@
 
 import * as d3 from "d3";
 
-import { Point, SpaceRequest, Bounds, SimpleSelection } from "../core/interfaces";
+import { Bounds, Point, SimpleSelection, SpaceRequest } from "../core/interfaces";
 import * as RenderController from "../core/renderController";
 import * as Utils from "../utils";
 
-import { ComponentContainer } from "./componentContainer";
 import { coerceExternalD3 } from "../utils/coerceD3";
+import { ComponentContainer } from "./componentContainer";
 
 export type ComponentCallback = (component: Component) => void;
 
@@ -33,10 +33,6 @@ export class Component {
    * elements onto the _content. Located in between the background and the foreground.
    */
   private _content: SimpleSelection<void>;
-  /**
-   * Used by axes to hide cut off axis labels.
-   */
-  protected _boundingBox: SimpleSelection<void>;
   /**
    * Place more objects just behind this Component's Content by appending them to the _backgroundContainer.
    */
@@ -62,39 +58,19 @@ export class Component {
   private _parent: ComponentContainer;
   private _xAlignment: string = "left";
   private static _xAlignToProportion: { [alignment: string]: number } = {
-    "left": 0,
-    "center": 0.5,
-    "right": 1,
+    left: 0,
+    center: 0.5,
+    right: 1,
   };
   private _yAlignment: string = "top";
   private static _yAlignToProportion: { [alignment: string]: number } = {
-    "top": 0,
-    "center": 0.5,
-    "bottom": 1,
+    top: 0,
+    center: 0.5,
+    bottom: 1,
   };
   protected _isSetup = false;
   protected _isAnchored = false;
 
-  /**
-   * List of "boxes"; SVGComponent has a "box" API that lets subclasses add boxes
-   * with "addBox". Two boxes are added:
-   *
-   * .background-fill - for the background container (unclear what it's use is)
-   * .bounding-box - this._boundingBox
-   *
-   * boxes get their width/height attributes updated in computeLayout.
-   *
-   * I think this API is to make an idea of a "100% width/height" box that could be
-   * useful in a variety of situations. But enumerating the three usages of it, it
-   * doesn't look like it's being used very much.
-   *
-   * TODO possily remove in HTML world
-   */
-  private _boxes: SimpleSelection<void>[] = [];
-  /**
-   * Element containing all the boxes.
-   */
-  private _boxContainer: SimpleSelection<void>;
   /**
    * If we're the root Component (top-level), this is the HTMLElement we've anchored to (user-supplied).
    */
@@ -192,18 +168,14 @@ export class Component {
     this._cssClasses = new Utils.Set<string>();
 
     this._backgroundContainer = this._element.append("svg").classed("background-container", true);
-    this._addBox("background-fill", this._backgroundContainer);
     this._content = this._element.append("svg").classed("content", true);
     this._foregroundContainer = this._element.append("svg").classed("foreground-container", true);
-    this._boxContainer = this._element.append("svg").classed("box-container", true);
 
     if (this._overflowHidden) {
       this._content.classed("component-overflow-hidden", true);
     } else {
       this._content.classed("component-overflow-visible", true);
     }
-
-    this._boundingBox = this._addBox("bounding-box");
 
     this._isSetup = true;
   }
@@ -247,12 +219,12 @@ export class Component {
       }
     }
 
-    let size = this._sizeFromOffer(availableWidth, availableHeight);
+    const size = this._sizeFromOffer(availableWidth, availableHeight);
     this._width = size.width;
     this._height = size.height;
 
-    let xAlignProportion = Component._xAlignToProportion[this._xAlignment];
-    let yAlignProportion = Component._yAlignToProportion[this._yAlignment];
+    const xAlignProportion = Component._xAlignToProportion[this._xAlignment];
+    const yAlignProportion = Component._yAlignToProportion[this._yAlignment];
     this._origin = {
       x: origin.x + (availableWidth - this.width()) * xAlignProportion,
       y: origin.y + (availableHeight - this.height()) * yAlignProportion,
@@ -263,7 +235,6 @@ export class Component {
       top: `${this._origin.y}px`,
       width: `${this.width()}px`,
     });
-    this._boxes.forEach((b: SimpleSelection<void>) => b.attr("width", this.width()).attr("height", this.height()));
 
     if (this._resizeHandler != null) {
       this._resizeHandler(size);
@@ -273,7 +244,7 @@ export class Component {
   }
 
   protected _sizeFromOffer(availableWidth: number, availableHeight: number) {
-    let requestedSpace = this.requestedSpace(availableWidth, availableHeight);
+    const requestedSpace = this.requestedSpace(availableWidth, availableHeight);
     return {
       width: this.fixedWidth() ? Math.min(availableWidth, requestedSpace.minWidth) : availableWidth,
       height: this.fixedHeight() ? Math.min(availableHeight, requestedSpace.minHeight) : availableHeight,
@@ -429,24 +400,6 @@ export class Component {
     return this;
   }
 
-  private _addBox(className?: string, parentElement?: SimpleSelection<void>) {
-    if (this._element == null) {
-      throw new Error("Adding boxes before anchoring is currently disallowed");
-    }
-    parentElement = parentElement == null ? this._boxContainer : parentElement;
-    let box = parentElement.append("rect");
-    if (className != null) {
-      box.classed(className, true);
-    }
-    box.attr("stroke-width", "0");
-
-    this._boxes.push(box);
-    if (this.width() != null && this.height() != null) {
-      box.attr("width", this.width()).attr("height", this.height());
-    }
-    return box;
-  }
-
   /**
    * Checks if the Component has a given CSS class.
    *
@@ -596,9 +549,9 @@ export class Component {
       topLeft,
       bottomRight: {
         x: topLeft.x + this.width(),
-        y: topLeft.y + this.height()
+        y: topLeft.y + this.height(),
       },
-    }
+    };
   }
 
   /**
@@ -641,10 +594,10 @@ export class Component {
    * @return {Point}
    */
   public originToRoot(): Point {
-    let origin = this.origin();
+    const origin = this.origin();
     let ancestor = this.parent();
     while (ancestor != null) {
-      let ancestorOrigin = ancestor.origin();
+      const ancestorOrigin = ancestor.origin();
       origin.x += ancestorOrigin.x;
       origin.y += ancestorOrigin.y;
       ancestor = ancestor.parent();

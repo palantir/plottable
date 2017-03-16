@@ -6,10 +6,10 @@
 import * as d3 from "d3";
 import * as Typesetter from "typesettable";
 
-import { Axis, AxisOrientation } from "./axis";
 import * as Formatters from "../core/formatters";
 import { QuantitativeScale } from "../scales/quantitativeScale";
 import * as Utils from "../utils";
+import { Axis, AxisOrientation } from "./axis";
 
 export class Numeric extends Axis<number> {
 
@@ -40,7 +40,7 @@ export class Numeric extends Axis<number> {
   }
 
   protected _computeWidth() {
-    let maxTextWidth = this._usesTextWidthApproximation ? this._computeApproximateTextWidth() : this._computeExactTextWidth();
+    const maxTextWidth = this._usesTextWidthApproximation ? this._computeApproximateTextWidth() : this._computeExactTextWidth();
 
     if (this._tickLabelPositioning === "center") {
       return this._maxLabelTickLength() + this.tickLabelPadding() + maxTextWidth;
@@ -50,9 +50,9 @@ export class Numeric extends Axis<number> {
   }
 
   private _computeExactTextWidth(): number {
-    let tickValues = this._getTickValues();
-    let textLengths = tickValues.map((v: any) => {
-      let formattedValue = this.formatter()(v);
+    const tickValues = this._getTickValues();
+    const textLengths = tickValues.map((v: any) => {
+      const formattedValue = this.formatter()(v);
       return this._measurer.measure(formattedValue).width;
     });
 
@@ -60,10 +60,10 @@ export class Numeric extends Axis<number> {
   }
 
   private _computeApproximateTextWidth(): number {
-    let tickValues = this._getTickValues();
-    let mWidth = this._measurer.measure("M").width;
-    let textLengths = tickValues.map((v: number): number => {
-      let formattedValue = this.formatter()(v);
+    const tickValues = this._getTickValues();
+    const mWidth = this._measurer.measure("M").width;
+    const textLengths = tickValues.map((v: number): number => {
+      const formattedValue = this.formatter()(v);
       return formattedValue.length * mWidth;
     });
 
@@ -71,7 +71,7 @@ export class Numeric extends Axis<number> {
   }
 
   protected _computeHeight() {
-    let textHeight = this._measurer.measure().height;
+    const textHeight = this._measurer.measure().height;
 
     if (this._tickLabelPositioning === "center") {
       return this._maxLabelTickLength() + this.tickLabelPadding() + textHeight;
@@ -81,10 +81,10 @@ export class Numeric extends Axis<number> {
   }
 
   protected _getTickValues() {
-    let scale = (<QuantitativeScale<number>> this._scale);
-    let domain = scale.domain();
-    let min = domain[0] <= domain[1] ? domain[0] : domain[1];
-    let max = domain[0] >= domain[1] ? domain[0] : domain[1];
+    const scale = (<QuantitativeScale<number>> this._scale);
+    const domain = scale.domain();
+    const min = domain[0] <= domain[1] ? domain[0] : domain[1];
+    const max = domain[0] >= domain[1] ? domain[0] : domain[1];
     return scale.ticks().filter((i: number) => i >= min && i <= max);
   }
 
@@ -94,7 +94,7 @@ export class Numeric extends Axis<number> {
     }
 
     if (!this.isHorizontal()) {
-      let reComputedWidth = this._computeWidth();
+      const reComputedWidth = this._computeWidth();
       if (reComputedWidth > this.width() || reComputedWidth < (this.width() - this.margin())) {
         this.redraw();
         return;
@@ -107,15 +107,15 @@ export class Numeric extends Axis<number> {
   public renderImmediately() {
     super.renderImmediately();
 
-    let tickLabelAttrHash: { [key: string]: number | string | ((d: any) => number) } = {
+    const tickLabelAttrHash: { [key: string]: number | string | ((d: any) => number) } = {
       x: <any> 0,
       y: <any> 0,
       dx: "0em",
       dy: "0.3em",
     };
 
-    let tickMarkLength = this._maxLabelTickLength();
-    let tickLabelPadding = this.tickLabelPadding();
+    const tickMarkLength = this._maxLabelTickLength();
+    const tickLabelPadding = this.tickLabelPadding();
 
     let tickLabelTextAnchor = "middle";
 
@@ -157,7 +157,7 @@ export class Numeric extends Axis<number> {
       }
     }
 
-    let tickMarkAttrHash = this._generateTickMarkAttrHash();
+    const tickMarkAttrHash = this._generateTickMarkAttrHash();
     switch (this.orientation()) {
       case "bottom":
         tickLabelAttrHash["x"] = tickMarkAttrHash["x1"];
@@ -184,8 +184,8 @@ export class Numeric extends Axis<number> {
         break;
     }
 
-    let tickLabelValues = this._getTickValues();
-    let tickLabelsUpdate = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS).data(tickLabelValues);
+    const tickLabelValues = this._getTickValues();
+    const tickLabelsUpdate = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS).data(tickLabelValues);
     tickLabelsUpdate.exit().remove();
 
     const tickLabels =
@@ -199,7 +199,7 @@ export class Numeric extends Axis<number> {
       .attrs(tickLabelAttrHash)
       .text((s: any) => this.formatter()(s));
 
-    let labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
+    const labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
     this._tickLabelContainer.attr("transform", labelGroupTransform);
 
     this._showAllTickMarks();
@@ -235,7 +235,7 @@ export class Numeric extends Axis<number> {
     if (position == null) {
       return this._tickLabelPositioning;
     } else {
-      let positionLC = position.toLowerCase();
+      const positionLC = position.toLowerCase();
       if (this.isHorizontal()) {
         if (!(positionLC === "left" || positionLC === "center" || positionLC === "right")) {
           throw new Error(positionLC + " is not a valid tick label position for a horizontal NumericAxis");
@@ -277,30 +277,30 @@ export class Numeric extends Axis<number> {
   }
 
   private _hideEndTickLabels() {
-    let boundingBox = (<Element> this._boundingBox.node()).getBoundingClientRect();
-    let tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS);
+    const boundingBox = this.element().node().getBoundingClientRect();
+    const tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS);
     if (tickLabels.size() === 0) {
       return;
     }
-    let firstTickLabel = <Element> tickLabels.nodes()[0];
+    const firstTickLabel = <Element> tickLabels.nodes()[0];
     if (!Utils.DOM.clientRectInside(firstTickLabel.getBoundingClientRect(), boundingBox)) {
       d3.select(firstTickLabel).style("visibility", "hidden");
     }
-    let lastTickLabel = <Element> tickLabels.nodes()[tickLabels.size() - 1];
+    const lastTickLabel = <Element> tickLabels.nodes()[tickLabels.size() - 1];
     if (!Utils.DOM.clientRectInside(lastTickLabel.getBoundingClientRect(), boundingBox)) {
       d3.select(lastTickLabel).style("visibility", "hidden");
     }
   }
 
   private _hideOverlappingTickLabels() {
-    let visibleTickLabels = this._tickLabelContainer
+    const visibleTickLabels = this._tickLabelContainer
       .selectAll("." + Axis.TICK_LABEL_CLASS)
       .filter(function (d: any, i: number) {
-        let visibility = d3.select(this).style("visibility");
+        const visibility = d3.select(this).style("visibility");
         return (visibility === "inherit") || (visibility === "visible");
       });
 
-    let visibleTickLabelRects = visibleTickLabels.nodes().map((label: HTMLScriptElement) => label.getBoundingClientRect());
+    const visibleTickLabelRects = visibleTickLabels.nodes().map((label: HTMLScriptElement) => label.getBoundingClientRect());
     let interval = 1;
 
     while (!this._hasOverlapWithInterval(interval, visibleTickLabelRects) && interval < visibleTickLabelRects.length) {
@@ -308,7 +308,7 @@ export class Numeric extends Axis<number> {
     }
 
     visibleTickLabels.each(function (d: string, i: number) {
-      let tickLabel = d3.select(this);
+      const tickLabel = d3.select(this);
       if (i % interval !== 0) {
         tickLabel.style("visibility", "hidden");
       }
@@ -333,8 +333,8 @@ export class Numeric extends Axis<number> {
     const rectsWithPadding = rects.map((rect) => Utils.DOM.expandRect(rect, padding));
 
     for (let i = 0; i < rectsWithPadding.length - interval; i += interval) {
-      let currRect = rectsWithPadding[i];
-      let nextRect = rectsWithPadding[i + interval];
+      const currRect = rectsWithPadding[i];
+      const nextRect = rectsWithPadding[i + interval];
       if (Utils.DOM.clientRectsOverlap(currRect, nextRect)) {
         return false;
       }

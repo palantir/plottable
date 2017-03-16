@@ -4,14 +4,12 @@
  */
 
 import * as Animators from "../animators";
-import { Accessor, Point, Bounds, Range, AttributeToProjector } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
+import { Accessor, AttributeToProjector, Bounds, Point, Range } from "../core/interfaces";
 import * as Drawers from "../drawers";
 import * as Scales from "../scales";
 import { Scale } from "../scales/scale";
-
-import * as Plots from "./";
-import { PlotEntity, TransformableAccessorScaleBinding, AccessorScaleBinding } from "./";
+import { AccessorScaleBinding, PlotEntity, TransformableAccessorScaleBinding } from "./";
 import { Plot } from "./plot";
 import { XYPlot } from "./xyPlot";
 
@@ -85,8 +83,8 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
       super.x(<number | Accessor<number>>x);
     } else {
       super.x(<X | Accessor<X>>x, xScale);
-      let x2Binding = this.x2();
-      let x2 = x2Binding && x2Binding.accessor;
+      const x2Binding = this.x2();
+      const x2 = x2Binding && x2Binding.accessor;
       if (x2 != null) {
         this._bindProperty(Segment._X2_KEY, x2, xScale);
       }
@@ -110,8 +108,8 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
     if (x2 == null) {
       return this._propertyBindings.get(Segment._X2_KEY);
     }
-    let xBinding = this.x();
-    let xScale = xBinding && xBinding.scale;
+    const xBinding = this.x();
+    const xScale = xBinding && xBinding.scale;
     this._bindProperty(Segment._X2_KEY, x2, xScale);
     this.render();
     return this;
@@ -145,8 +143,8 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
       super.y(<number | Accessor<number>>y);
     } else {
       super.y(<Y | Accessor<Y>>y, yScale);
-      let y2Binding = this.y2();
-      let y2 = y2Binding && y2Binding.accessor;
+      const y2Binding = this.y2();
+      const y2 = y2Binding && y2Binding.accessor;
       if (y2 != null) {
         this._bindProperty(Segment._Y2_KEY, y2, yScale);
       }
@@ -170,15 +168,15 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
     if (y2 == null) {
       return this._propertyBindings.get(Segment._Y2_KEY);
     }
-    let yBinding = this.y();
-    let yScale = yBinding && yBinding.scale;
+    const yBinding = this.y();
+    const yScale = yBinding && yBinding.scale;
     this._bindProperty(Segment._Y2_KEY, y2, yScale);
     this.render();
     return this;
   }
 
   protected _propertyProjectors(): AttributeToProjector {
-    let attrToProjector = super._propertyProjectors();
+    const attrToProjector = super._propertyProjectors();
     attrToProjector["x1"] = Plot._scaledAccessor(this.x());
     attrToProjector["x2"] = this.x2() == null ? Plot._scaledAccessor(this.x()) : Plot._scaledAccessor(this.x2());
     attrToProjector["y1"] = Plot._scaledAccessor(this.y());
@@ -214,7 +212,7 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
     let dataXRange: Range;
     let dataYRange: Range;
     if (yRange == null) {
-      let bounds = (<Bounds> xRangeOrBounds);
+      const bounds = (<Bounds> xRangeOrBounds);
       dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
       dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
     } else {
@@ -225,8 +223,8 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
   }
 
   private _entitiesIntersecting(xRange: Range, yRange: Range): PlotEntity[] {
-    let intersected: PlotEntity[] = [];
-    let attrToProjector = this._generateAttrToProjector();
+    const intersected: PlotEntity[] = [];
+    const attrToProjector = this._generateAttrToProjector();
     this.entities().forEach((entity) => {
       if (this._lineIntersectsBox(entity, xRange, yRange, attrToProjector)) {
         intersected.push(entity);
@@ -236,10 +234,10 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
   }
 
   private _lineIntersectsBox(entity: PlotEntity, xRange: Range, yRange: Range, attrToProjector: AttributeToProjector) {
-    let x1 = attrToProjector["x1"](entity.datum, entity.index, entity.dataset);
-    let x2 = attrToProjector["x2"](entity.datum, entity.index, entity.dataset);
-    let y1 = attrToProjector["y1"](entity.datum, entity.index, entity.dataset);
-    let y2 = attrToProjector["y2"](entity.datum, entity.index, entity.dataset);
+    const x1 = attrToProjector["x1"](entity.datum, entity.index, entity.dataset);
+    const x2 = attrToProjector["x2"](entity.datum, entity.index, entity.dataset);
+    const y1 = attrToProjector["y1"](entity.datum, entity.index, entity.dataset);
+    const y2 = attrToProjector["y2"](entity.datum, entity.index, entity.dataset);
 
     // check if any of end points of the segment is inside the box
     if (( xRange.min <= x1 && x1 <= xRange.max && yRange.min <= y1 && y1 <= yRange.max ) ||
@@ -247,15 +245,15 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
       return true;
     }
 
-    let startPoint = { x: x1, y: y1 };
-    let endPoint = { x: x2, y: y2 };
-    let corners = [
+    const startPoint = { x: x1, y: y1 };
+    const endPoint = { x: x2, y: y2 };
+    const corners = [
       { x: xRange.min, y: yRange.min },
       { x: xRange.min, y: yRange.max },
       { x: xRange.max, y: yRange.max },
       { x: xRange.max, y: yRange.min },
     ];
-    let intersections = corners.filter((point: Point, index: number) => {
+    const intersections = corners.filter((point: Point, index: number) => {
       if (index !== 0) {
         // return true if border formed by conecting current corner and previous corner intersects with the segment
         return this._lineIntersectsSegment(startPoint, endPoint, point, corners[index - 1]) &&
@@ -268,7 +266,7 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
 
   private _lineIntersectsSegment(point1: Point, point2: Point, point3: Point, point4: Point) {
     /* tslint:disable no-shadowed-variable */
-    let calcOrientation = (point1: Point, point2: Point, point: Point) => {
+    const calcOrientation = (point1: Point, point2: Point, point: Point) => {
       return (point2.x - point1.x) * (point.y - point2.y) - (point2.y - point1.y) * (point.x - point2.x);
     };
     /* tslint:enable no-shadowed-variable */

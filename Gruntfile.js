@@ -3,12 +3,12 @@
 module.exports = function(grunt) {
   "use strict";
 
-  // run an arbitrary npm command through grunt, e.g. grunt exec:npm:build:test -> npm run build:test
+  // run an arbitrary yarn command through grunt, e.g. grunt exec:yarn:build:test -> yarn run build:test
   var execConfig = {
-    npm: {
+    yarn: {
       cmd: function () {
-        var npmCommandName = Array.prototype.slice.call(arguments).join(":");
-        return "npm run " + npmCommandName;
+        var yarnCommandName = Array.prototype.slice.call(arguments).join(":");
+        return "yarn run " + yarnCommandName;
       }
     }
   };
@@ -24,15 +24,6 @@ module.exports = function(grunt) {
     }
   };
 
-  var tslintConfig = {
-    options: {
-      configuration: grunt.file.readJSON("tslint.json")
-    },
-    all: {
-      src: ["src/**/*.ts", "test/**/*.ts"]
-    }
-  };
-
   var jscsConfig = {
     files: ["Gruntfile.js", "quicktests/**/*.js"],
     options: {
@@ -44,12 +35,6 @@ module.exports = function(grunt) {
     target: ["Gruntfile.js", "quicktests/**/*.js"],
     options: {
       configFile: ".eslintrc"
-    }
-  };
-
-  var parallelizeConfig = {
-    tslint: {
-      all: 4
     }
   };
 
@@ -165,11 +150,9 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON("package.json"),
     bump: bumpConfig,
-    tslint: tslintConfig,
     jscs: jscsConfig,
     eslint: eslintConfig,
     exec: execConfig,
-    parallelize: parallelizeConfig,
     watch: watchConfig,
     "blanket_mocha": blanketMochaConfig,
     connect: connectConfig,
@@ -183,7 +166,7 @@ module.exports = function(grunt) {
   require("load-grunt-tasks")(grunt);
 
   grunt.registerTask("dev-compile", [
-    "exec:npm:build",
+    "exec:yarn:build",
     "update-quicktests"
   ]);
 
@@ -191,10 +174,10 @@ module.exports = function(grunt) {
   grunt.registerTask("release:minor", ["bump:minor", "dist-compile", "gitcommit:version"]);
   grunt.registerTask("release:major", ["bump:major", "dist-compile", "gitcommit:version"]);
 
-  grunt.registerTask("dist-compile", ["exec:npm:build", "exec:npm:sed-version", "uglify", "compress"]);
+  grunt.registerTask("dist-compile", ["exec:yarn:build", "exec:yarn:sed-version", "uglify", "compress"]);
 
   grunt.registerTask("commitjs", ["dist-compile", "gitcommit:built"]);
-  grunt.registerTask("default", ["exec:npm:start"]);
+  grunt.registerTask("default", ["exec:yarn:start"]);
 
   grunt.registerTask("test", ["dev-compile", "test-local"]);
   grunt.registerTask("test-local", ["blanket_mocha", "lint"]);
@@ -206,7 +189,7 @@ module.exports = function(grunt) {
     grunt.task.run(["watch"]);
   });
 
-  grunt.registerTask("lint", ["parallelize:tslint", "jscs", "eslint"]);
+  grunt.registerTask("lint", ["jscs", "eslint"]);
 
   // Disable saucelabs on dev environments by checking if SAUCE_USERNAME is an environment variable
   if (process.env.SAUCE_USERNAME) {

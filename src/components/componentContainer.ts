@@ -4,10 +4,8 @@
  */
 
 import * as d3 from "d3";
-
-import { Component, ComponentCallback } from "./component";
-import { SimpleSelection } from "../core/interfaces";
 import { coerceExternalD3 } from "../utils/coerceD3";
+import { Component, ComponentCallback } from "./component";
 
 /*
  * ComponentContainer class encapsulates Table and ComponentGroup's shared functionality.

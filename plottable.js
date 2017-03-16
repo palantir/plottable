@@ -140,8 +140,8 @@ var Animators = __webpack_require__(6);
 var component_1 = __webpack_require__(5);
 var drawer_1 = __webpack_require__(7);
 var Utils = __webpack_require__(0);
-var Plots = __webpack_require__(37);
 var coerceD3_1 = __webpack_require__(11);
+var Plots = __webpack_require__(37);
 var Plot = (function (_super) {
     __extends(Plot, _super);
     /**
@@ -552,6 +552,11 @@ var Plot = (function (_super) {
         var drawSteps = this._generateDrawSteps();
         var dataToDraw = this._getDataToDraw();
         var drawers = this.datasets().map(function (dataset) { return _this._datasetToDrawer.get(dataset); });
+        if (this.renderer() === "canvas") {
+            var canvas = this._canvas.node();
+            var context_1 = canvas.getContext("2d");
+            context_1.clearRect(0, 0, canvas.width, canvas.height);
+        }
         this.datasets().forEach(function (ds, i) { return drawers[i].draw(dataToDraw.get(ds), drawSteps); });
         var times = this.datasets().map(function (ds, i) { return drawers[i].totalDrawTime(dataToDraw.get(ds), drawSteps); });
         var maxTime = Utils.Math.max(times, 0);
@@ -567,17 +572,22 @@ var Plot = (function (_super) {
     Plot.prototype.selections = function (datasets) {
         var _this = this;
         if (datasets === void 0) { datasets = this.datasets(); }
-        var selections = [];
-        datasets.forEach(function (dataset) {
-            var drawer = _this._datasetToDrawer.get(dataset);
-            if (drawer == null) {
-                return;
-            }
-            drawer.renderArea().selectAll(drawer.selector()).each(function () {
-                selections.push(this);
+        if (this.renderer() === "canvas") {
+            return null;
+        }
+        else {
+            var selections_1 = [];
+            datasets.forEach(function (dataset) {
+                var drawer = _this._datasetToDrawer.get(dataset);
+                if (drawer == null) {
+                    return;
+                }
+                drawer.renderArea().selectAll(drawer.selector()).each(function () {
+                    selections_1.push(this);
+                });
             });
-        });
-        return d3.selectAll(selections);
+            return d3.selectAll(selections_1);
+        }
     };
     /**
      * Gets the Entities associated with the specified Datasets.
@@ -781,22 +791,6 @@ var Component = (function () {
         this._yAlignment = "top";
         this._isSetup = false;
         this._isAnchored = false;
-        /**
-         * List of "boxes"; SVGComponent has a "box" API that lets subclasses add boxes
-         * with "addBox". Two boxes are added:
-         *
-         * .background-fill - for the background container (unclear what it's use is)
-         * .bounding-box - this._boundingBox
-         *
-         * boxes get their width/height attributes updated in computeLayout.
-         *
-         * I think this API is to make an idea of a "100% width/height" box that could be
-         * useful in a variety of situations. But enumerating the three usages of it, it
-         * doesn't look like it's being used very much.
-         *
-         * TODO possily remove in HTML world
-         */
-        this._boxes = [];
         this._cssClasses = new Utils.Set();
         /**
          * If .destroy() has been called on this Component.
@@ -874,17 +868,14 @@ var Component = (function () {
         });
         this._cssClasses = new Utils.Set();
         this._backgroundContainer = this._element.append("svg").classed("background-container", true);
-        this._addBox("background-fill", this._backgroundContainer);
         this._content = this._element.append("svg").classed("content", true);
         this._foregroundContainer = this._element.append("svg").classed("foreground-container", true);
-        this._boxContainer = this._element.append("svg").classed("box-container", true);
         if (this._overflowHidden) {
             this._content.classed("component-overflow-hidden", true);
         }
         else {
             this._content.classed("component-overflow-visible", true);
         }
-        this._boundingBox = this._addBox("bounding-box");
         this._isSetup = true;
     };
     /**
@@ -911,7 +902,6 @@ var Component = (function () {
      * @returns {Component} The calling Component.
      */
     Component.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
-        var _this = this;
         if (origin == null || availableWidth == null || availableHeight == null) {
             if (this._element == null) {
                 throw new Error("anchor() must be called before computeLayout()");
@@ -942,7 +932,6 @@ var Component = (function () {
             top: this._origin.y + "px",
             width: this.width() + "px",
         });
-        this._boxes.forEach(function (b) { return b.attr("width", _this.width()).attr("height", _this.height()); });
         if (this._resizeHandler != null) {
             this._resizeHandler(size);
         }
@@ -1074,22 +1063,6 @@ var Component = (function () {
         this.redraw();
         return this;
     };
-    Component.prototype._addBox = function (className, parentElement) {
-        if (this._element == null) {
-            throw new Error("Adding boxes before anchoring is currently disallowed");
-        }
-        parentElement = parentElement == null ? this._boxContainer : parentElement;
-        var box = parentElement.append("rect");
-        if (className != null) {
-            box.classed(className, true);
-        }
-        box.attr("stroke-width", "0");
-        this._boxes.push(box);
-        if (this.width() != null && this.height() != null) {
-            box.attr("width", this.width()).attr("height", this.height());
-        }
-        return box;
-    };
     /**
      * Checks if the Component has a given CSS class.
      *
@@ -1214,7 +1187,7 @@ var Component = (function () {
             topLeft: topLeft,
             bottomRight: {
                 x: topLeft.x + this.width(),
-                y: topLeft.y + this.height()
+                y: topLeft.y + this.height(),
             },
         };
     };
@@ -1321,14 +1294,14 @@ var Component = (function () {
         return this._backgroundContainer;
     };
     Component._xAlignToProportion = {
-        "left": 0,
-        "center": 0.5,
-        "right": 1,
+        left: 0,
+        center: 0.5,
+        right: 1,
     };
     Component._yAlignToProportion = {
-        "top": 0,
-        "center": 0.5,
-        "bottom": 1,
+        top: 0,
+        center: 0.5,
+        bottom: 1,
     };
     return Component;
 }());
@@ -1504,9 +1477,6 @@ var Drawer = (function () {
             });
         }
         else if (this._canvas != null) {
-            var canvas = this.canvas().node();
-            var context_1 = canvas.getContext("2d");
-            context_1.clearRect(0, 0, canvas.width, canvas.height);
             // don't support animations for now; just draw the last draw step immediately
             var lastDrawStep_1 = appliedDrawSteps[appliedDrawSteps.length - 1];
             Utils.Window.setTimeout(function () { return _this._drawStepCanvas(data, lastDrawStep_1); }, 0);
@@ -3032,7 +3002,7 @@ var Axis = (function (_super) {
             var measurement = _this._annotationMeasurer.measure(_this.annotationFormatter()(annotatedTick));
             var paddedMeasurement = {
                 width: measurement.width + 2 * labelPadding,
-                height: measurement.height + 2 * labelPadding
+                height: measurement.height + 2 * labelPadding,
             };
             measurements.set(annotatedTick, paddedMeasurement);
         });
@@ -3085,10 +3055,10 @@ var Axis = (function (_super) {
         var isHorizontal = this.isHorizontal();
         bindElements(this._annotationContainer.select(".annotation-line-container"), "line", Axis.ANNOTATION_LINE_CLASS)
             .attrs({
-            x1: isHorizontal ? positionF : secondaryPosition,
-            x2: isHorizontal ? positionF : offsetF,
-            y1: isHorizontal ? secondaryPosition : positionF,
-            y2: isHorizontal ? offsetF : positionF,
+            "x1": isHorizontal ? positionF : secondaryPosition,
+            "x2": isHorizontal ? positionF : offsetF,
+            "y1": isHorizontal ? secondaryPosition : positionF,
+            "y2": isHorizontal ? offsetF : positionF,
             visibility: visibilityF,
         });
         bindElements(this._annotationContainer.select(".annotation-circle-container"), "circle", Axis.ANNOTATION_CIRCLE_CLASS)
@@ -3195,10 +3165,10 @@ var Axis = (function (_super) {
     };
     Axis.prototype._generateBaselineAttrHash = function () {
         var baselineAttrHash = {
-            x1: 0,
-            y1: 0,
-            x2: 0,
-            y2: 0,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
         };
         switch (this._orientation) {
             case "bottom":
@@ -3224,10 +3194,10 @@ var Axis = (function (_super) {
         var _this = this;
         if (isEndTickMark === void 0) { isEndTickMark = false; }
         var tickMarkAttrHash = {
-            x1: 0,
-            y1: 0,
-            x2: 0,
-            y2: 0,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
         };
         var scalingFunction = function (d) { return _this._scale.scale(d); };
         if (this.isHorizontal()) {
@@ -3402,7 +3372,7 @@ var Axis = (function (_super) {
      * container.
      */
     Axis.prototype._hideOverflowingTickLabels = function () {
-        var boundingBox = this._boundingBox.node().getBoundingClientRect();
+        var boundingBox = this.element().node().getBoundingClientRect();
         var tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS);
         if (tickLabels.empty()) {
             return;
@@ -3582,8 +3552,8 @@ var __extends = (this && this.__extends) || function (d, b) {
 var d3 = __webpack_require__(1);
 var Typesetter = __webpack_require__(4);
 var Animators = __webpack_require__(6);
-var Drawers = __webpack_require__(9);
 var Formatters = __webpack_require__(8);
+var Drawers = __webpack_require__(9);
 var Scales = __webpack_require__(3);
 var quantitativeScale_1 = __webpack_require__(10);
 var Utils = __webpack_require__(0);
@@ -4079,7 +4049,7 @@ var Bar = (function (_super) {
         }
         drawSteps.push({
             attrToProjector: this._generateAttrToProjector(),
-            animator: this._getAnimator(Plots.Animator.MAIN)
+            animator: this._getAnimator(Plots.Animator.MAIN),
         });
         return drawSteps;
     };
@@ -4582,7 +4552,7 @@ var Time = (function (_super) {
     };
     Time.prototype._hideOverlappingAndCutOffLabels = function (index) {
         var _this = this;
-        var boundingBox = this._boundingBox.node().getBoundingClientRect();
+        var boundingBox = this.element().node().getBoundingClientRect();
         var isInsideBBox = function (tickBox) {
             return (Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) &&
                 Math.floor(boundingBox.top) <= Math.ceil(tickBox.top) &&
@@ -4770,8 +4740,8 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var component_1 = __webpack_require__(5);
 var coerceD3_1 = __webpack_require__(11);
+var component_1 = __webpack_require__(5);
 /*
  * ComponentContainer class encapsulates Table and ComponentGroup's shared functionality.
  * It will not do anything if instantiated directly.
@@ -5045,9 +5015,9 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Interactions = __webpack_require__(13);
 var Utils = __webpack_require__(0);
+var coerceD3_1 = __webpack_require__(11);
 var _1 = __webpack_require__(30);
 var selectionBoxLayer_1 = __webpack_require__(35);
-var coerceD3_1 = __webpack_require__(11);
 var DragBoxLayer = (function (_super) {
     __extends(DragBoxLayer, _super);
     /**
@@ -5181,8 +5151,8 @@ var DragBoxLayer = (function (_super) {
         var _this = this;
         _super.prototype._setup.call(this);
         var createLine = function () { return _this._box.append("line").styles({
-            "opacity": 0,
-            "stroke": "pink",
+            opacity: 0,
+            stroke: "pink",
             "pointer-events": "visibleStroke",
         }); };
         this._detectionEdgeT = createLine().classed("drag-edge-tb", true);
@@ -5192,8 +5162,8 @@ var DragBoxLayer = (function (_super) {
         if (this._hasCorners) {
             var createCorner = function () { return _this._box.append("circle")
                 .styles({
-                "opacity": 0,
-                "fill": "pink",
+                opacity: 0,
+                fill: "pink",
                 "pointer-events": "visibleFill",
             }); };
             this._detectionCornerTL = createCorner().classed("drag-corner-tl", true);
@@ -5237,19 +5207,19 @@ var DragBoxLayer = (function (_super) {
             var l = bounds.topLeft.x;
             var r = bounds.bottomRight.x;
             this._detectionEdgeT.attrs({
-                x1: l, y1: t, x2: r, y2: t,
+                "x1": l, "y1": t, "x2": r, "y2": t,
                 "stroke-width": this._detectionRadius * 2,
             });
             this._detectionEdgeB.attrs({
-                x1: l, y1: b, x2: r, y2: b,
+                "x1": l, "y1": b, "x2": r, "y2": b,
                 "stroke-width": this._detectionRadius * 2,
             });
             this._detectionEdgeL.attrs({
-                x1: l, y1: t, x2: l, y2: b,
+                "x1": l, "y1": t, "x2": l, "y2": b,
                 "stroke-width": this._detectionRadius * 2,
             });
             this._detectionEdgeR.attrs({
-                x1: r, y1: t, x2: r, y2: b,
+                "x1": r, "y1": t, "x2": r, "y2": b,
                 "stroke-width": this._detectionRadius * 2,
             });
             if (this._hasCorners) {
@@ -5971,10 +5941,10 @@ var GuideLineLayer = (function (_super) {
         _super.prototype.renderImmediately.call(this);
         this._syncPixelPositionAndValue();
         this._guideLine.attrs({
-            x1: this._isVertical() ? this.pixelPosition() : 0,
-            y1: this._isVertical() ? 0 : this.pixelPosition(),
-            x2: this._isVertical() ? this.pixelPosition() : this.width(),
-            y2: this._isVertical() ? this.height() : this.pixelPosition(),
+            "x1": this._isVertical() ? this.pixelPosition() : 0,
+            "y1": this._isVertical() ? 0 : this.pixelPosition(),
+            "x2": this._isVertical() ? this.pixelPosition() : this.width(),
+            "y2": this._isVertical() ? this.height() : this.pixelPosition(),
         });
         return this;
     };
@@ -6357,7 +6327,8 @@ var Area = (function (_super) {
         return this;
     };
     Area.prototype._addDataset = function (dataset) {
-        var lineDrawer = new Drawers.Line(dataset);
+        var _this = this;
+        var lineDrawer = new Drawers.Line(dataset, function () { return _this._d3LineFactory(dataset); });
         if (this._isSetup) {
             lineDrawer.renderArea(this._renderArea.append("g"));
         }
@@ -6384,7 +6355,7 @@ var Area = (function (_super) {
         }
         drawSteps.push({
             attrToProjector: this._generateLineAttrToProjector(),
-            animator: this._getAnimator(Plots.Animator.MAIN)
+            animator: this._getAnimator(Plots.Animator.MAIN),
         });
         return drawSteps;
     };
@@ -6405,7 +6376,7 @@ var Area = (function (_super) {
         }
         drawSteps.push({
             attrToProjector: this._generateAttrToProjector(),
-            animator: this._getAnimator(Plots.Animator.MAIN)
+            animator: this._getAnimator(Plots.Animator.MAIN),
         });
         return drawSteps;
     };
@@ -6512,19 +6483,19 @@ var Plots = __webpack_require__(16);
 var plot_1 = __webpack_require__(2);
 var xyPlot_1 = __webpack_require__(15);
 var CURVE_NAME_MAPPING = {
-    "linear": d3.curveLinear,
-    "linearClosed": d3.curveLinearClosed,
-    "step": d3.curveStep,
-    "stepBefore": d3.curveStepBefore,
-    "stepAfter": d3.curveStepAfter,
-    "basis": d3.curveBasis,
-    "basisOpen": d3.curveBasisOpen,
-    "basisClosed": d3.curveBasisClosed,
-    "bundle": d3.curveBundle,
-    "cardinal": d3.curveCardinal,
-    "cardinalOpen": d3.curveCardinalOpen,
-    "cardinalClosed": d3.curveCardinalClosed,
-    "monotone": d3.curveMonotoneX,
+    linear: d3.curveLinear,
+    linearClosed: d3.curveLinearClosed,
+    step: d3.curveStep,
+    stepBefore: d3.curveStepBefore,
+    stepAfter: d3.curveStepAfter,
+    basis: d3.curveBasis,
+    basisOpen: d3.curveBasisOpen,
+    basisClosed: d3.curveBasisClosed,
+    bundle: d3.curveBundle,
+    cardinal: d3.curveCardinal,
+    cardinalOpen: d3.curveCardinalOpen,
+    cardinalClosed: d3.curveCardinalClosed,
+    monotone: d3.curveMonotoneX,
 };
 var Line = (function (_super) {
     __extends(Line, _super);
@@ -6621,7 +6592,8 @@ var Line = (function (_super) {
         return this;
     };
     Line.prototype._createDrawer = function (dataset) {
-        return new Drawers.Line(dataset);
+        var _this = this;
+        return new Drawers.Line(dataset, function () { return _this._d3LineFactory(dataset); });
     };
     Line.prototype._extentsForProperty = function (property) {
         var extents = _super.prototype._extentsForProperty.call(this, property);
@@ -6720,7 +6692,6 @@ var Line = (function (_super) {
                     });
                 }
             }
-            ;
         });
         return intersectionPoints;
     };
@@ -6744,7 +6715,7 @@ var Line = (function (_super) {
         }
         drawSteps.push({
             attrToProjector: this._generateAttrToProjector(),
-            animator: this._getAnimator(Plots.Animator.MAIN)
+            animator: this._getAnimator(Plots.Animator.MAIN),
         });
         return drawSteps;
     };
@@ -6824,20 +6795,36 @@ var Line = (function (_super) {
     };
     Line.prototype._constructLineProjector = function (xProjector, yProjector) {
         var _this = this;
+        return function (datum, index, dataset) {
+            return _this._d3LineFactory(dataset, xProjector, yProjector)(datum);
+        };
+    };
+    /**
+     * Return a d3.Line whose .x, .y, and .defined accessors are hooked up to the xProjector and yProjector
+     * after they've been fed the dataset, and whose curve is configured to this plot's curve.
+     * @param dataset
+     * @param xProjector
+     * @param yProjector
+     * @returns {Line<[number,number]>}
+     * @private
+     */
+    Line.prototype._d3LineFactory = function (dataset, xProjector, yProjector) {
+        var _this = this;
+        if (xProjector === void 0) { xProjector = plot_1.Plot._scaledAccessor(this.x()); }
+        if (yProjector === void 0) { yProjector = plot_1.Plot._scaledAccessor(this.y()); }
         var definedProjector = function (d, i, dataset) {
             var positionX = plot_1.Plot._scaledAccessor(_this.x())(d, i, dataset);
             var positionY = plot_1.Plot._scaledAccessor(_this.y())(d, i, dataset);
             return positionX != null && !Utils.Math.isNaN(positionX) &&
                 positionY != null && !Utils.Math.isNaN(positionY);
         };
-        return function (datum, index, dataset) {
-            return d3.line()
-                .x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); })
-                .y(function (innerDatum, innerIndex) { return yProjector(innerDatum, innerIndex, dataset); })
-                .curve(_this._getCurveFactory())
-                .defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); })(datum);
-        };
+        return d3.line()
+            .x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); })
+            .y(function (innerDatum, innerIndex) { return yProjector(innerDatum, innerIndex, dataset); })
+            .curve(this._getCurveFactory())
+            .defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); });
     };
+    ;
     Line.prototype._getCurveFactory = function () {
         var curve = this.curve();
         if (typeof curve === "string") {
@@ -7808,13 +7795,13 @@ var d3Transition = d3;
 function attrsFunction(selection, map) {
     return selection.each(function () {
         var x = map.apply(this, arguments), s = d3Selection.select(this);
-        for (var name in x)
-            s.attr(name, x[name]);
+        for (var name_1 in x)
+            s.attr(name_1, x[name_1]);
     });
 }
 function attrsObject(selection, map) {
-    for (var name in map)
-        selection.attr(name, map[name]);
+    for (var name_2 in map)
+        selection.attr(name_2, map[name_2]);
     return selection;
 }
 function selection_attrs(map) {
@@ -7823,13 +7810,13 @@ function selection_attrs(map) {
 function stylesFunction(selection, map, priority) {
     return selection.each(function () {
         var x = map.apply(this, arguments), s = d3Selection.select(this);
-        for (var name in x)
-            s.style(name, x[name], priority);
+        for (var name_3 in x)
+            s.style(name_3, x[name_3], priority);
     });
 }
 function stylesObject(selection, map, priority) {
-    for (var name in map)
-        selection.style(name, map[name], priority);
+    for (var name_4 in map)
+        selection.style(name_4, map[name_4], priority);
     return selection;
 }
 function selection_styles(map, priority) {
@@ -7838,13 +7825,13 @@ function selection_styles(map, priority) {
 function propertiesFunction(selection, map) {
     return selection.each(function () {
         var x = map.apply(this, arguments), s = d3Selection.select(this);
-        for (var name in x)
-            s.property(name, x[name]);
+        for (var name_5 in x)
+            s.property(name_5, x[name_5]);
     });
 }
 function propertiesObject(selection, map) {
-    for (var name in map)
-        selection.property(name, map[name]);
+    for (var name_6 in map)
+        selection.property(name_6, map[name_6]);
     return selection;
 }
 function selection_properties(map) {
@@ -7853,13 +7840,13 @@ function selection_properties(map) {
 function attrsFunction$1(transition, map) {
     return transition.each(function () {
         var x = map.apply(this, arguments), t = d3Selection.select(this).transition(transition);
-        for (var name in x)
-            t.attr(name, x[name]);
+        for (var name_7 in x)
+            t.attr(name_7, x[name_7]);
     });
 }
 function attrsObject$1(transition, map) {
-    for (var name in map)
-        transition.attr(name, map[name]);
+    for (var name_8 in map)
+        transition.attr(name_8, map[name_8]);
     return transition;
 }
 function transition_attrs(map) {
@@ -7868,13 +7855,13 @@ function transition_attrs(map) {
 function stylesFunction$1(transition, map, priority) {
     return transition.each(function () {
         var x = map.apply(this, arguments), t = d3Selection.select(this).transition(transition);
-        for (var name in x)
-            t.style(name, x[name], priority);
+        for (var name_9 in x)
+            t.style(name_9, x[name_9], priority);
     });
 }
 function stylesObject$1(transition, map, priority) {
-    for (var name in map)
-        transition.style(name, map[name], priority);
+    for (var name_10 in map)
+        transition.style(name_10, map[name_10], priority);
     return transition;
 }
 function transition_styles(map, priority) {
@@ -7900,43 +7887,43 @@ d3Transition.transition.prototype.styles = transition_styles;
 var d3Ease = __webpack_require__(103);
 var coerceD3_1 = __webpack_require__(11);
 var EASE_NAME_MAPPING = {
-    "linear": d3Ease.easeLinear,
-    "quad": d3Ease.easeQuad,
-    "quadIn": d3Ease.easeQuadIn,
-    "quadOut": d3Ease.easeQuadOut,
-    "quadInOut": d3Ease.easeQuadInOut,
-    "cubic": d3Ease.easeCubic,
-    "cubicIn": d3Ease.easeCubicIn,
-    "cubicOut": d3Ease.easeCubicOut,
-    "cubicInOut": d3Ease.easeCubicInOut,
-    "poly": d3Ease.easePoly,
-    "polyIn": d3Ease.easePolyIn,
-    "polyOut": d3Ease.easePolyOut,
-    "polyInOut": d3Ease.easePolyInOut,
-    "sin": d3Ease.easeSin,
-    "sinIn": d3Ease.easeSinIn,
-    "sinOut": d3Ease.easeSinOut,
-    "sinInOut": d3Ease.easeSinInOut,
-    "exp": d3Ease.easeExp,
-    "expIn": d3Ease.easeExpIn,
-    "expOut": d3Ease.easeExpOut,
-    "expInOut": d3Ease.easeExpInOut,
-    "circle": d3Ease.easeCircle,
-    "circleIn": d3Ease.easeCircleIn,
-    "circleOut": d3Ease.easeCircleOut,
-    "circleInOut": d3Ease.easeCircleInOut,
-    "bounce": d3Ease.easeBounce,
-    "bounceIn": d3Ease.easeBounceIn,
-    "bounceOut": d3Ease.easeBounceOut,
-    "bounceInOut": d3Ease.easeBounceInOut,
-    "back": d3Ease.easeBack,
-    "backIn": d3Ease.easeBackIn,
-    "backOut": d3Ease.easeBackOut,
-    "backInOut": d3Ease.easeBackInOut,
-    "elastic": d3Ease.easeElastic,
-    "elasticIn": d3Ease.easeElasticIn,
-    "elasticOut": d3Ease.easeElasticOut,
-    "elasticInOut": d3Ease.easeElasticInOut,
+    linear: d3Ease.easeLinear,
+    quad: d3Ease.easeQuad,
+    quadIn: d3Ease.easeQuadIn,
+    quadOut: d3Ease.easeQuadOut,
+    quadInOut: d3Ease.easeQuadInOut,
+    cubic: d3Ease.easeCubic,
+    cubicIn: d3Ease.easeCubicIn,
+    cubicOut: d3Ease.easeCubicOut,
+    cubicInOut: d3Ease.easeCubicInOut,
+    poly: d3Ease.easePoly,
+    polyIn: d3Ease.easePolyIn,
+    polyOut: d3Ease.easePolyOut,
+    polyInOut: d3Ease.easePolyInOut,
+    sin: d3Ease.easeSin,
+    sinIn: d3Ease.easeSinIn,
+    sinOut: d3Ease.easeSinOut,
+    sinInOut: d3Ease.easeSinInOut,
+    exp: d3Ease.easeExp,
+    expIn: d3Ease.easeExpIn,
+    expOut: d3Ease.easeExpOut,
+    expInOut: d3Ease.easeExpInOut,
+    circle: d3Ease.easeCircle,
+    circleIn: d3Ease.easeCircleIn,
+    circleOut: d3Ease.easeCircleOut,
+    circleInOut: d3Ease.easeCircleInOut,
+    bounce: d3Ease.easeBounce,
+    bounceIn: d3Ease.easeBounceIn,
+    bounceOut: d3Ease.easeBounceOut,
+    bounceInOut: d3Ease.easeBounceInOut,
+    back: d3Ease.easeBack,
+    backIn: d3Ease.easeBackIn,
+    backOut: d3Ease.easeBackOut,
+    backInOut: d3Ease.easeBackInOut,
+    elastic: d3Ease.easeElastic,
+    elasticIn: d3Ease.easeElasticIn,
+    elasticOut: d3Ease.easeElasticOut,
+    elasticInOut: d3Ease.easeElasticInOut,
 };
 /**
  * An Animator with easing and configurable durations and delays.
@@ -8111,8 +8098,8 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Typesetter = __webpack_require__(4);
-var axis_1 = __webpack_require__(19);
 var Utils = __webpack_require__(0);
+var axis_1 = __webpack_require__(19);
 var Category = (function (_super) {
     __extends(Category, _super);
     /**
@@ -8483,9 +8470,9 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Typesetter = __webpack_require__(4);
-var axis_1 = __webpack_require__(19);
 var Formatters = __webpack_require__(8);
 var Utils = __webpack_require__(0);
+var axis_1 = __webpack_require__(19);
 var Numeric = (function (_super) {
     __extends(Numeric, _super);
     /**
@@ -8695,7 +8682,7 @@ var Numeric = (function (_super) {
         }
     };
     Numeric.prototype._hideEndTickLabels = function () {
-        var boundingBox = this._boundingBox.node().getBoundingClientRect();
+        var boundingBox = this.element().node().getBoundingClientRect();
         var tickLabels = this._tickLabelContainer.selectAll("." + axis_1.Axis.TICK_LABEL_CLASS);
         if (tickLabels.size() === 0) {
             return;
@@ -8833,18 +8820,18 @@ var DragLineLayer = (function (_super) {
     DragLineLayer.prototype._setup = function () {
         _super.prototype._setup.call(this);
         this._detectionEdge = this.content().append("line").styles({
-            "opacity": 0,
-            "stroke": "pink",
+            opacity: 0,
+            stroke: "pink",
             "pointer-events": "visibleStroke",
         }).classed("drag-edge", true);
     };
     DragLineLayer.prototype.renderImmediately = function () {
         _super.prototype.renderImmediately.call(this);
         this._detectionEdge.attrs({
-            x1: this._isVertical() ? this.pixelPosition() : 0,
-            y1: this._isVertical() ? 0 : this.pixelPosition(),
-            x2: this._isVertical() ? this.pixelPosition() : this.width(),
-            y2: this._isVertical() ? this.height() : this.pixelPosition(),
+            "x1": this._isVertical() ? this.pixelPosition() : 0,
+            "y1": this._isVertical() ? 0 : this.pixelPosition(),
+            "x2": this._isVertical() ? this.pixelPosition() : this.width(),
+            "y2": this._isVertical() ? this.height() : this.pixelPosition(),
             "stroke-width": this._detectionRadius * 2,
         });
         return this;
@@ -9298,11 +9285,11 @@ var InterpolatedColorLegend = (function (_super) {
         var swatches = swatchesUpdate.merge(rects);
         swatchesUpdate.exit().remove();
         swatches.attrs({
-            "fill": function (d, i) { return _this._scale.scale(d); },
-            "width": swatchWidth,
-            "height": swatchHeight,
-            "x": swatchX,
-            "y": swatchY,
+            fill: function (d, i) { return _this._scale.scale(d); },
+            width: swatchWidth,
+            height: swatchHeight,
+            x: swatchX,
+            y: swatchY,
             "shape-rendering": "crispEdges",
         });
         if (Configs.ADD_TITLE_ELEMENTS) {
@@ -9565,7 +9552,7 @@ var LegendRow = (function () {
             bottomRight: {
                 x: columnXOffset + column.width,
                 y: column.height,
-            }
+            },
         };
     };
     /**
@@ -9652,7 +9639,7 @@ var LegendTable = (function () {
             bottomRight: {
                 x: rowXOffset + this.rows[rowIndex].getWidth(),
                 y: rowYOffset + this.rows[rowIndex].getHeight(),
-            }
+            },
         };
         return rowBounds;
     };
@@ -9830,7 +9817,7 @@ var Legend = (function (_super) {
         var table = this._buildLegendTable(Utils.Math.min([this.maxWidth(), offeredWidth], offeredWidth), offeredHeight);
         return {
             minHeight: table.getHeight(),
-            minWidth: table.getWidth()
+            minWidth: table.getWidth(),
         };
     };
     /**
@@ -9874,7 +9861,7 @@ var Legend = (function (_super) {
                             datum: column.data.name,
                             position: {
                                 x: rowTranslate[0] + symbolTranslate[0],
-                                y: rowTranslate[1] + symbolTranslate[1]
+                                y: rowTranslate[1] + symbolTranslate[1],
                             },
                             selection: d3.select(entryElement),
                             component: _this,
@@ -9885,10 +9872,8 @@ var Legend = (function (_super) {
         }, []);
     };
     Legend.prototype.renderImmediately = function () {
-        var _this = this;
         _super.prototype.renderImmediately.call(this);
         var table = this._buildLegendTable(this.width(), this.height());
-        var entryNames = this._colorScale.domain().slice().sort(function (a, b) { return _this._comparator(_this._formatter(a), _this._formatter(b)); });
         // clear content from previous renders
         this.content().selectAll("*").remove();
         var rowsUpdate = this.content().selectAll("g." + Legend.LEGEND_ROW_CLASS).data(table.rows);
@@ -11174,8 +11159,14 @@ var d3 = __webpack_require__(1);
 var drawer_1 = __webpack_require__(7);
 var Line = (function (_super) {
     __extends(Line, _super);
-    function Line(dataset) {
+    /**
+     * @param dataset
+     * @param _d3LineFactory A callback that gives this Line Drawer a d3.Line object which will be
+     * used to draw with.
+     */
+    function Line(dataset, d3LineFactory) {
         _super.call(this, dataset);
+        this._d3LineFactory = d3LineFactory;
         this._className = "line";
         this._svgElementName = "path";
     }
@@ -11185,6 +11176,38 @@ var Line = (function (_super) {
     };
     Line.prototype.selectionForIndex = function (index) {
         return d3.select(this.selection().node());
+    };
+    /**
+     *
+     * @param data Data to draw. The data will be passed through the line factory in order to get applied
+     * onto the canvas.
+     * @param step
+     * @private
+     */
+    Line.prototype._drawStepCanvas = function (data, step) {
+        var context = this.canvas().node().getContext("2d");
+        var d3Line = this._d3LineFactory();
+        var attrToAppliedProjector = step.attrToAppliedProjector;
+        var resolvedAttrs = Object.keys(attrToAppliedProjector).reduce(function (obj, attrName) {
+            obj[attrName] = attrToAppliedProjector[attrName](data, 0);
+            return obj;
+        }, {});
+        context.save();
+        context.beginPath();
+        d3Line.context(context);
+        d3Line(data[0]);
+        if (resolvedAttrs["stroke-width"]) {
+            context.lineWidth = parseFloat(resolvedAttrs["stroke-width"]);
+        }
+        if (resolvedAttrs["stroke"]) {
+            var strokeColor = d3.color(resolvedAttrs["stroke"]);
+            if (resolvedAttrs["opacity"]) {
+                strokeColor.opacity = resolvedAttrs["opacity"];
+            }
+            context.strokeStyle = strokeColor.rgb().toString();
+            context.stroke();
+        }
+        context.restore();
     };
     return Line;
 }(drawer_1.Drawer));
@@ -11625,8 +11648,8 @@ var d3 = __webpack_require__(1);
 var Dispatchers = __webpack_require__(12);
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var interaction_1 = __webpack_require__(14);
 var Interactions = __webpack_require__(13);
+var interaction_1 = __webpack_require__(14);
 /**
  * Performs a zoom transformation of the `value` argument scaled by the
  * `zoom` argument about the point defined by the `center` argument.
@@ -11786,7 +11809,7 @@ var PanZoom = (function (_super) {
         });
         var translateAmount = {
             x: centerX - ((constrainedPoints[0].x + constrainedPoints[1].x) / 2),
-            y: centerY - ((constrainedPoints[0].y + constrainedPoints[1].y) / 2)
+            y: centerY - ((constrainedPoints[0].y + constrainedPoints[1].y) / 2),
         };
         this.zoom(magnifyAmount, { x: centerX, y: centerY });
         this.pan(translateAmount);
@@ -11939,7 +11962,7 @@ var PanZoom = (function (_super) {
             }
             var translateAmount = {
                 x: (lastDragPoint == null ? startPoint.x : lastDragPoint.x) - endPoint.x,
-                y: (lastDragPoint == null ? startPoint.y : lastDragPoint.y) - endPoint.y
+                y: (lastDragPoint == null ? startPoint.y : lastDragPoint.y) - endPoint.y,
             };
             _this.pan(translateAmount);
             lastDragPoint = endPoint;
@@ -12386,8 +12409,8 @@ var __extends = (this && this.__extends) || function (d, b) {
 var d3 = __webpack_require__(1);
 var Typesetter = __webpack_require__(4);
 var Animators = __webpack_require__(6);
-var Drawers = __webpack_require__(9);
 var Formatters = __webpack_require__(8);
+var Drawers = __webpack_require__(9);
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
 var plot_1 = __webpack_require__(2);
@@ -12728,7 +12751,7 @@ var Pie = (function (_super) {
         }
         return {
             x: wLeft + wRight == 0 ? 0 : (wLeft / (wLeft + wRight)) * this.width(),
-            y: hTop + hBottom == 0 ? 0 : (hTop / (hTop + hBottom)) * this.height()
+            y: hTop + hBottom == 0 ? 0 : (hTop / (hTop + hBottom)) * this.height(),
         };
     };
     Pie.prototype._getDataToDraw = function () {
@@ -13311,7 +13334,7 @@ var Scatter = (function (_super) {
         }
         drawSteps.push({
             attrToProjector: this._generateAttrToProjector(),
-            animator: this._getAnimator(Plots.Animator.MAIN)
+            animator: this._getAnimator(Plots.Animator.MAIN),
         });
         return drawSteps;
     };
@@ -13629,7 +13652,7 @@ var StackedArea = (function (_super) {
         if (croppedRendering == null) {
             return _super.prototype.croppedRenderingEnabled.call(this);
         }
-        if (croppedRendering === true) {
+        if (croppedRendering) {
             // HACKHACK #3032: cropped rendering doesn't currently work correctly on StackedArea
             Utils.Window.warn("Warning: Stacked Area Plot does not support cropped rendering.");
             return this;
@@ -15380,7 +15403,7 @@ function expandRect(rect, amount) {
         right: rect.right + amount,
         bottom: rect.bottom + amount,
         width: rect.width + amount * 2,
-        height: rect.height + amount * 2
+        height: rect.height + amount * 2,
     };
 }
 exports.expandRect = expandRect;
@@ -15478,7 +15501,7 @@ var EntityArray = (function () {
         var closestDistanceSquared = Infinity;
         var closestPointEntity;
         this._entities.forEach(function (entity) {
-            if (filter !== undefined && filter(entity) === false) {
+            if (filter !== undefined && !filter(entity)) {
                 return;
             }
             var distanceSquared = Math.distanceSquared(entity.position, queryPoint);
@@ -15752,8 +15775,8 @@ exports.getTranslator = getTranslator;
  * When nested within an HTML, the style position is respected.
  */
 function move(node, x, y) {
-    node.styles({ "left": x + "px", "top": y + "px" });
-    node.attrs({ "x": "" + x, "y": "" + y });
+    node.styles({ left: x + "px", top: y + "px" });
+    node.attrs({ x: "" + x, y: "" + y });
 }
 var Translator = (function () {
     function Translator(measurementElement) {
