@@ -9,6 +9,7 @@ const DATAPOINTS_PER_MINUTE = 1.0;
 const INITIAL_DOMAIN = [new Date(), new Date().valueOf() + MSEC_PER_YEAR];
 const MAX_DOMAIN_EXTENT = 20 * MSEC_PER_YEAR; // 20 years max extent
 const STEP = Math.floor(3.6e6 / DATAPOINTS_PER_MINUTE);
+const LOAD_DELAY_MSEC = 2000;
 
 function round(v, step) {
     return Math.floor(v/step) * step;
@@ -71,11 +72,18 @@ function run(div, data, Plottable) {
         pointCountLabel.text(`${data.length} Data Points`);
     }
 
+    let loadToken = null;
+    function delayFakeLoadData() {
+        clearTimeout(loadToken);
+        pointCountLabel.text('"Loading..."');
+        loadToken = setTimeout(fakeLoadData, LOAD_DELAY_MSEC);
+    }
+
     new Plottable.Interactions.PanZoom(xScale)
       .attachTo(plotGroup)
       .maxDomainExtent(xScale, MAX_DOMAIN_EXTENT)
-      .onPanEnd(fakeLoadData)
-      .onZoomEnd(fakeLoadData);
+      .onPanEnd(delayFakeLoadData)
+      .onZoomEnd(delayFakeLoadData);
     fakeLoadData();
 
     table.renderTo(div);
