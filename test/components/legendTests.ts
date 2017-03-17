@@ -1,4 +1,5 @@
 import { SimpleSelection } from "../../src/core/interfaces";
+import * as d3Shape from "d3-shape";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -323,7 +324,7 @@ describe("Legend", () => {
       const symbolChecker = (d: any, index: number) => {
         assert.strictEqual(index, expectedIndex, "index passed in is correct");
         expectedIndex++;
-        return (size: number) => "";
+        return (size: number) => null as d3Shape.Symbol<any, any>;
       };
       legend.symbol(symbolChecker);
 

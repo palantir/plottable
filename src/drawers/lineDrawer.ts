@@ -36,7 +36,6 @@ export class Line extends Drawer {
   }
 
   /**
-   *
    * @param data Data to draw. The data will be passed through the line factory in order to get applied
    * onto the canvas.
    * @param step
@@ -54,10 +53,9 @@ export class Line extends Drawer {
     }, {} as { [key: string]: any | number | string });
 
     context.save();
-
     context.beginPath();
-    d3Line.context(context);
 
+    d3Line.context(context);
     d3Line(data[0]);
 
     if (resolvedAttrs["stroke-width"]) {
