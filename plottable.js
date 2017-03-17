@@ -7756,7 +7756,7 @@ exports.Dataset = Dataset;
  * real version number during the dist phase for for npm module publishing. Modifying this line should
  * be accompanied by modifying the "sed-version" task in package.json accordingly.
  */
-exports.version = "3.0.0-beta.3";
+exports.version = "3.0.0-beta.4";
 
 
 /***/ }),
