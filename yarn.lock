@@ -154,9 +154,9 @@
     "@types/d3-interpolate" "*"
     "@types/d3-selection" "*"
 
-"@types/d3@4.5.0":
-  version "4.5.0"
-  resolved "https://registry.yarnpkg.com/@types/d3/-/d3-4.5.0.tgz#397feea693ef213601dc559e4c94cbe772fb1d69"
+"@types/d3@^4.5.0":
+  version "4.7.0"
+  resolved "https://registry.yarnpkg.com/@types/d3/-/d3-4.7.0.tgz#667d84f3bbf003eac80fded78930cf1c24bcdb4c"
   dependencies:
     "@types/d3-array" "*"
     "@types/d3-axis" "*"
@@ -5449,9 +5449,9 @@ typedarray@^0.0.6, typedarray@~0.0.5:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
 
-typescript@2.0.6:
-  version "2.0.6"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.0.6.tgz#5385499ac9811508c2c43e0ea07a1ddca435e111"
+typescript@2.1.5:
+  version "2.1.5"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.1.5.tgz#6fe9479e00e01855247cea216e7561bafcdbcd4a"
 
 typesettable@^3.0.2:
   version "3.0.2"
