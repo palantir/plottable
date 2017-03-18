@@ -493,8 +493,8 @@ export class Line<X> extends XYPlot<X, number> {
     xProjector = Plot._scaledAccessor(this.x()),
     yProjector = Plot._scaledAccessor(this.y())): d3Shape.Line<any> {
     const definedProjector = (d: any, i: number, dataset: Dataset) => {
-      const positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
-      const positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
+      const positionX = xProjector(d, i, dataset);
+      const positionY = yProjector(d, i, dataset);
       return positionX != null && !Utils.Math.isNaN(positionX) &&
         positionY != null && !Utils.Math.isNaN(positionY);
     };
