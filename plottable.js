@@ -6811,12 +6811,11 @@ var Line = (function (_super) {
      * @private
      */
     Line.prototype._d3LineFactory = function (dataset, xProjector, yProjector) {
-        var _this = this;
         if (xProjector === void 0) { xProjector = plot_1.Plot._scaledAccessor(this.x()); }
         if (yProjector === void 0) { yProjector = plot_1.Plot._scaledAccessor(this.y()); }
         var definedProjector = function (d, i, dataset) {
-            var positionX = plot_1.Plot._scaledAccessor(_this.x())(d, i, dataset);
-            var positionY = plot_1.Plot._scaledAccessor(_this.y())(d, i, dataset);
+            var positionX = xProjector(d, i, dataset);
+            var positionY = yProjector(d, i, dataset);
             return positionX != null && !Utils.Math.isNaN(positionX) &&
                 positionY != null && !Utils.Math.isNaN(positionY);
         };
