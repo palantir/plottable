@@ -205,10 +205,12 @@ var Plot = (function (_super) {
     Plot.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
         _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
         if (this._canvas != null) {
-            // update canvas width/height; this will also clear the canvas of any drawn elements so we should
+            // update canvas width/height taking into account retina displays.
+            // This will also clear the canvas of any drawn elements so we should
             // be sure not to computeLayout() without a render() in the future.
-            this._canvas.attr("width", this.width());
-            this._canvas.attr("height", this.height());
+            this._canvas.attr("width", this.width() * window.devicePixelRatio);
+            this._canvas.attr("height", this.height() * window.devicePixelRatio);
+            this._canvas.node().getContext("2d").scale(window.devicePixelRatio, window.devicePixelRatio);
         }
         return this;
     };
