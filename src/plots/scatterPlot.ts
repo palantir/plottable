@@ -64,7 +64,7 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
   }
 
   protected _createDrawer(dataset: Dataset): Drawers.Symbol {
-    return new Drawers.Symbol(dataset, () => this._d3SymbolFactory(dataset));
+    return new Drawers.Symbol(dataset, () => this._d3SymbolFactory());
   }
 
   /**
@@ -124,7 +124,7 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
       const attrToProjector = this._generateAttrToProjector();
 
       const symbolProjector = Plot._scaledAccessor(this.symbol());
-      attrToProjector["d"] = (datum: any, index: number, dataset: Dataset) => symbolProjector(datum, index, dataset)(0);
+      attrToProjector["d"] = (datum: any, index: number, dataset: Dataset) => symbolProjector(datum, index, dataset)(0)(null);
       drawSteps.push({ attrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
     }
 
@@ -138,40 +138,38 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
   protected _propertyProjectors(): AttributeToProjector {
     const propertyToProjectors = super._propertyProjectors();
 
-    const xProjector = Plot._scaledAccessor(this.x());
-    const yProjector = Plot._scaledAccessor(this.y());
-    propertyToProjectors["transform"] = this._constructTransformProjector(xProjector, yProjector);
-
-    const symbolProjector = Plot._scaledAccessor(this.symbol());
-    const sizeProjector = Plot._scaledAccessor(this.size());
+    propertyToProjectors["transform"] = this._constructTransformProjector();
     if (this.renderer() === "svg") {
-      propertyToProjectors["d"] = this._constructSymbolProjector(symbolProjector, sizeProjector);
+      propertyToProjectors["d"] = this._constructSymbolProjector();
     }
 
     return propertyToProjectors;
   }
 
-  protected _constructTransformProjector(xProjector: Projector, yProjector: Projector) {
+  protected _constructTransformProjector() {
+    const xProjector = Plot._scaledAccessor(this.x());
+    const yProjector = Plot._scaledAccessor(this.y());
     return (datum: any, index: number, dataset: Dataset) => {
       return this.renderer() === "svg"
         ? "translate(" + xProjector(datum, index, dataset) + "," + yProjector(datum, index, dataset) + ")"
         : { x: xProjector(datum, index, dataset), y: yProjector(datum, index, dataset) };
-    }
+    };
   }
 
-  protected _constructSymbolProjector(symbolProjector: Projector, sizeProjector: Projector) {
+  protected _constructSymbolProjector() {
+    const symbolProjector = Plot._scaledAccessor(this.symbol());
+    const sizeProjector = Plot._scaledAccessor(this.size());
     return (datum: any, index: number, dataset: Dataset) => {
       return symbolProjector(datum, index, dataset)(sizeProjector(datum, index, dataset))(null);
     };
   }
 
-  protected _d3SymbolFactory(
-      dataset: Dataset,
-      symbolProjector = Plot._scaledAccessor(this.symbol()),
-      sizeProjector = Plot._scaledAccessor(this.size())): d3Shape.Symbol<any, any> {
-    return d3.symbol()
-      .type((innerDatum, innerIndex) => symbolProjector(innerDatum, innerIndex, dataset))
-      .size((innerDatum, innerIndex) => sizeProjector(innerDatum, innerIndex, dataset));
+  protected _d3SymbolFactory() {
+    const symbolProjector = Plot._scaledAccessor(this.symbol());
+    const sizeProjector = Plot._scaledAccessor(this.size());
+    return (datum: any, index: number, dataset: Dataset) => {
+        return symbolProjector(datum, index, dataset)(sizeProjector(datum, index, dataset));
+    };
   }
 
   protected _entityVisibleOnPlot(entity: LightweightScatterPlotEntity, bounds: Bounds) {

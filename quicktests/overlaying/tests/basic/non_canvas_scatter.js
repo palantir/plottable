@@ -2,7 +2,7 @@ function makeData() {
   "use strict";
 
   // makes 10k points
-  return Array.apply(null, Array(20)).map((_) => ({
+  return Array.apply(null, Array(10000)).map((_) => ({
     x: Math.random(),
     y: Math.random(),
   }));
@@ -19,7 +19,7 @@ function run(div, data, Plottable) {
   var plot = new Plottable.Plots.Scatter().addDataset(new Plottable.Dataset(data))
     .x((d) => d.x, xScale)
     .y((d) => d.y, yScale)
-    .size((d) => 50)
+    .size((d) => 5)
     .symbol((d) => new Plottable.SymbolFactories.cross());
 
   var table = new Plottable.Components.Table([

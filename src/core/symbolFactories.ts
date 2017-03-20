@@ -24,10 +24,6 @@ export function cross(): SymbolFactory {
   return (symbolSize: number) => d3.symbol().type(d3.symbolCross).size((5 / 9) * Math.pow(symbolSize, 2));
 }
 
-export function cross1() {
-  return d3Shape.symbolCross;
-}
-
 export function diamond(): SymbolFactory {
   return (symbolSize: number) => d3.symbol().type(d3.symbolDiamond).size(Math.tan(Math.PI / 6) * Math.pow(symbolSize, 2) / 2);
 }
