@@ -50,7 +50,7 @@ export class Symbol extends Drawer {
       context.translate(x, y);
 
       context.beginPath();
-      d3Symbol(datum, index, this._dataset).context(context)(datum);
+      d3Symbol(datum, index, this._dataset).context(context)(null);
       context.closePath();
 
       if (resolvedAttrs["fill"]) {

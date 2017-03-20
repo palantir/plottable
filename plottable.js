@@ -11409,7 +11409,7 @@ var Symbol = (function (_super) {
             var _a = resolvedAttrs["transform"], x = _a.x, y = _a.y;
             context.translate(x, y);
             context.beginPath();
-            d3Symbol(datum, index, _this._dataset).context(context)(datum);
+            d3Symbol(datum, index, _this._dataset).context(context)(null);
             context.closePath();
             if (resolvedAttrs["fill"]) {
                 var fillColor = d3.color(resolvedAttrs["fill"]);
