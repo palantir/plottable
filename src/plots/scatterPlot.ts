@@ -3,14 +3,12 @@
  * @license MIT
  */
 
-import * as d3 from "d3";
-import * as d3Shape from "d3-shape";
 import { Dataset } from "../core/dataset";
-import { identity } from "../core/formatters";
-import { Accessor, AttributeToProjector, Bounds, Point, Projector, Range } from "../core/interfaces";
+import { Accessor, AttributeToProjector, Bounds, Point, Range } from "../core/interfaces";
 import * as SymbolFactories from "../core/symbolFactories";
 import { SymbolFactory } from "../core/symbolFactories";
 import { Scale } from "../scales/scale";
+
 import * as Animators from "../animators";
 import * as Drawers from "../drawers";
 import * as Scales from "../scales";
