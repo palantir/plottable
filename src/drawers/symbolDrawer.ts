@@ -4,23 +4,25 @@
  */
 
 import * as d3 from "d3";
-import * as d3Shape from "d3-shape";
 
 import { Dataset } from "../core/dataset";
-import { Accessor } from "../core/interfaces";
 
 import { Drawer } from "./drawer";
 import { AppliedDrawStep } from "./index";
 
 export class Symbol extends Drawer {
-  private _d3SymbolFactory: () => Accessor<d3Shape.Symbol<any, any>>;
+  private _d3SymbolFactory:
+    () => (datum: any, index: number, dataset: Dataset, context: CanvasRenderingContext2D) => string;
 
   /**
    * @param dataset
    * @param _d3SymbolFactory A callback that gives this Symbol Drawer a d3.Symbol object which will be
    * used to draw with.
    */
-  constructor(dataset: Dataset, d3SymbolFactory: () => Accessor<d3Shape.Symbol<any, any>>) {
+  constructor(
+      dataset: Dataset,
+      d3SymbolFactory:
+        () => (datum: any, index: number, dataset: Dataset, context: CanvasRenderingContext2D) => string) {
     super(dataset);
     this._d3SymbolFactory = d3SymbolFactory;
     this._svgElementName = "path";
@@ -50,7 +52,7 @@ export class Symbol extends Drawer {
       context.translate(x, y);
 
       context.beginPath();
-      d3Symbol(datum, index, this._dataset).context(context)(null);
+      d3Symbol(datum, index, this._dataset, context);
       context.closePath();
 
       if (resolvedAttrs["fill"]) {

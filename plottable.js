@@ -4956,35 +4956,70 @@ exports.flush = flush;
 
 var d3 = __webpack_require__(1);
 function circle() {
-    return function (symbolSize) { return d3.symbol().type(d3.symbolCircle).size(Math.PI * Math.pow(symbolSize / 2, 2)); };
+    return function (symbolSize, context) {
+        return d3.symbol()
+            .type(d3.symbolCircle)
+            .size(Math.PI * Math.pow(symbolSize / 2, 2))
+            .context(context)(null);
+    };
 }
 exports.circle = circle;
 function square() {
-    return function (symbolSize) { return d3.symbol().type(d3.symbolSquare).size(Math.pow(symbolSize, 2)); };
+    return function (symbolSize, context) {
+        return d3.symbol()
+            .type(d3.symbolSquare)
+            .size(Math.pow(symbolSize, 2))
+            .context(context)(null);
+    };
 }
 exports.square = square;
 function cross() {
-    return function (symbolSize) { return d3.symbol().type(d3.symbolCross).size((5 / 9) * Math.pow(symbolSize, 2)); };
+    return function (symbolSize, context) {
+        return d3.symbol()
+            .type(d3.symbolCross)
+            .size((5 / 9) * Math.pow(symbolSize, 2))
+            .context(context)(null);
+    };
 }
 exports.cross = cross;
 function diamond() {
-    return function (symbolSize) { return d3.symbol().type(d3.symbolDiamond).size(Math.tan(Math.PI / 6) * Math.pow(symbolSize, 2) / 2); };
+    return function (symbolSize, context) {
+        return d3.symbol()
+            .type(d3.symbolDiamond)
+            .size(Math.tan(Math.PI / 6) * Math.pow(symbolSize, 2) / 2)
+            .context(context)(null);
+    };
 }
 exports.diamond = diamond;
 function triangle() {
-    return function (symbolSize) { return d3.symbol().type(d3.symbolTriangle).size(Math.sqrt(3) * Math.pow(symbolSize / 2, 2)); };
+    return function (symbolSize, context) {
+        return d3.symbol()
+            .type(d3.symbolTriangle)
+            .size(Math.sqrt(3) * Math.pow(symbolSize / 2, 2))
+            .context(context)(null);
+    };
 }
 exports.triangle = triangle;
 // copied from https://github.com/d3/d3-shape/blob/e2e57722004acba754ed9edff020282682450c5c/src/symbol/star.js#L3
 var ka = 0.89081309152928522810;
 function star() {
-    return function (symbolSize) { return d3.symbol().type(d3.symbolStar).size(ka * Math.pow(symbolSize / 2, 2)); };
+    return function (symbolSize, context) {
+        return d3.symbol()
+            .type(d3.symbolStar)
+            .size(ka * Math.pow(symbolSize / 2, 2))
+            .context(context)(null);
+    };
 }
 exports.star = star;
 // copied from https://github.com/d3/d3-shape/blob/c35b2303eb4836aba3171642f01c2653e4228b9c/src/symbol/wye.js#L2
 var a = ((1 / Math.sqrt(12)) / 2 + 1) * 3;
 function wye() {
-    return function (symbolSize) { return d3.symbol().type(d3.symbolWye).size(a * Math.pow(symbolSize / 2.4, 2)); };
+    return function (symbolSize, context) {
+        return d3.symbol()
+            .type(d3.symbolWye)
+            .size(a * Math.pow(symbolSize / 2.4, 2))
+            .context(context)(null);
+    };
 }
 exports.wye = wye;
 
@@ -9951,7 +9986,7 @@ var Legend = (function (_super) {
             entriesEnter.append("path")
                 .attr("d", function (symbolEntryPair, columnIndex) {
                 var symbol = symbolEntryPair[0];
-                return self.symbol()(symbol.data.name, rowIndex)(symbol.height * 0.6)(null);
+                return self.symbol()(symbol.data.name, rowIndex)(symbol.height * 0.6);
             })
                 .attr("transform", function (symbolEntryPair, i) {
                 var symbol = symbolEntryPair[0];
@@ -11409,7 +11444,7 @@ var Symbol = (function (_super) {
             var _a = resolvedAttrs["transform"], x = _a.x, y = _a.y;
             context.translate(x, y);
             context.beginPath();
-            d3Symbol(datum, index, _this._dataset).context(context)(null);
+            d3Symbol(datum, index, _this._dataset, context);
             context.closePath();
             if (resolvedAttrs["fill"]) {
                 var fillColor = d3.color(resolvedAttrs["fill"]);
@@ -13461,14 +13496,14 @@ var Scatter = (function (_super) {
         var symbolProjector = plot_1.Plot._scaledAccessor(this.symbol());
         var sizeProjector = plot_1.Plot._scaledAccessor(this.size());
         return function (datum, index, dataset) {
-            return symbolProjector(datum, index, dataset)(sizeProjector(datum, index, dataset))(null);
+            return symbolProjector(datum, index, dataset)(sizeProjector(datum, index, dataset));
         };
     };
     Scatter.prototype._d3SymbolFactory = function () {
         var symbolProjector = plot_1.Plot._scaledAccessor(this.symbol());
         var sizeProjector = plot_1.Plot._scaledAccessor(this.size());
-        return function (datum, index, dataset) {
-            return symbolProjector(datum, index, dataset)(sizeProjector(datum, index, dataset));
+        return function (datum, index, dataset, context) {
+            return symbolProjector(datum, index, dataset)(sizeProjector(datum, index, dataset), context);
         };
     };
     Scatter.prototype._entityVisibleOnPlot = function (entity, bounds) {

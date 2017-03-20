@@ -324,7 +324,7 @@ describe("Legend", () => {
       const symbolChecker = (d: any, index: number) => {
         assert.strictEqual(index, expectedIndex, "index passed in is correct");
         expectedIndex++;
-        return (size: number) => null as d3Shape.Symbol<any, any>;
+        return (size: number) => "";
       };
       legend.symbol(symbolChecker);
 

@@ -158,15 +158,15 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
     const symbolProjector = Plot._scaledAccessor(this.symbol());
     const sizeProjector = Plot._scaledAccessor(this.size());
     return (datum: any, index: number, dataset: Dataset) => {
-      return symbolProjector(datum, index, dataset)(sizeProjector(datum, index, dataset))(null);
+      return symbolProjector(datum, index, dataset)(sizeProjector(datum, index, dataset));
     };
   }
 
   protected _d3SymbolFactory() {
     const symbolProjector = Plot._scaledAccessor(this.symbol());
     const sizeProjector = Plot._scaledAccessor(this.size());
-    return (datum: any, index: number, dataset: Dataset) => {
-        return symbolProjector(datum, index, dataset)(sizeProjector(datum, index, dataset));
+    return (datum: any, index: number, dataset: Dataset, context: CanvasRenderingContext2D) => {
+        return symbolProjector(datum, index, dataset)(sizeProjector(datum, index, dataset), context);
     };
   }
 
