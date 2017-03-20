@@ -15,6 +15,7 @@ import { Plot } from "./plot";
 export class XYPlot<X, Y> extends Plot {
   protected static _X_KEY = "x";
   protected static _Y_KEY = "y";
+  private static _DEFERRED_RENDERING_DELAY = 200;
 
   private _autoAdjustXScaleDomain = false;
   private _autoAdjustYScaleDomain = false;
@@ -52,7 +53,6 @@ export class XYPlot<X, Y> extends Plot {
     // the Y scale's domain the last time we rendered
     let _lastSeenDomainY: Y[] = [null, null];
     let _timeoutReference = 0;
-    const _deferredRenderingTimeout = 200;
 
     // call this every time the scales change (every pan/zoom event).
     // this method will "render" now by applying a transform, and then
@@ -78,7 +78,7 @@ export class XYPlot<X, Y> extends Plot {
         if (this._canvas != null) {
           this._canvas.style("transform", "translate(0, 0) scale(1, 1)");
         }
-      }, _deferredRenderingTimeout);
+      }, XYPlot._DEFERRED_RENDERING_DELAY);
     };
 
     // calculate the translate and pan that has occurred on this scale since the last time we

@@ -1,5 +1,5 @@
 /*!
- * Plottable 3.0.0-beta.3 (https://github.com/palantir/plottable)
+ * Plottable 3.0.0-beta.4 (https://github.com/palantir/plottable)
  * Copyright 2014-2017 Palantir Technologies
  * Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
  */
@@ -2323,7 +2323,6 @@ var XYPlot = (function (_super) {
         // the Y scale's domain the last time we rendered
         var _lastSeenDomainY = [null, null];
         var _timeoutReference = 0;
-        var _deferredRenderingTimeout = 200;
         // call this every time the scales change (every pan/zoom event).
         // this method will "render" now by applying a transform, and then
         // debounce the true rendering
@@ -2348,7 +2347,7 @@ var XYPlot = (function (_super) {
                 if (_this._canvas != null) {
                     _this._canvas.style("transform", "translate(0, 0) scale(1, 1)");
                 }
-            }, _deferredRenderingTimeout);
+            }, XYPlot._DEFERRED_RENDERING_DELAY);
         };
         // calculate the translate and pan that has occurred on this scale since the last time we
         // rendered with it
@@ -2603,6 +2602,7 @@ var XYPlot = (function (_super) {
 }(plot_1.Plot));
 XYPlot._X_KEY = "x";
 XYPlot._Y_KEY = "y";
+XYPlot._DEFERRED_RENDERING_DELAY = 200;
 exports.XYPlot = XYPlot;
 
 
@@ -7803,7 +7803,7 @@ exports.Dataset = Dataset;
  * real version number during the dist phase for for npm module publishing. Modifying this line should
  * be accompanied by modifying the "sed-version" task in package.json accordingly.
  */
-exports.version = "3.0.0-beta.3";
+exports.version = "3.0.0-beta.4";
 
 
 /***/ }),
