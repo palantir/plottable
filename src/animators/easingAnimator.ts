@@ -8,11 +8,12 @@ import * as d3Ease from "d3-ease";
 
 import { AttributeToAppliedProjector, SimpleSelection } from "../core/interfaces";
 import { coerceExternalD3 } from "../utils/coerceD3";
+import { makeEnum } from "../utils/makeEnum";
 import { Animator } from "./animator";
 
 export type EaseFn = (normalizedTime: number) => number;
 
-const EASE_NAME_MAPPING: { [name: string]: EaseFn } = {
+const EASE_NAME_MAPPING: { [P in EaseName]: EaseFn } = {
   linear: d3Ease.easeLinear,
   quad: d3Ease.easeQuad,
   quadIn: d3Ease.easeQuadIn,
@@ -52,47 +53,50 @@ const EASE_NAME_MAPPING: { [name: string]: EaseFn } = {
   elasticInOut: d3Ease.easeElasticInOut,
 };
 
+export const EaseName = makeEnum([
+  "linear",
+  "quad",
+  "quadIn",
+  "quadOut",
+  "quadInOut",
+  "cubic",
+  "cubicIn",
+  "cubicOut",
+  "cubicInOut",
+  "poly",
+  "polyIn",
+  "polyOut",
+  "polyInOut",
+  "sin",
+  "sinIn",
+  "sinOut",
+  "sinInOut",
+  "exp",
+  "expIn",
+  "expOut",
+  "expInOut",
+  "circle",
+  "circleIn",
+  "circleOut",
+  "circleInOut",
+  "bounce",
+  "bounceIn",
+  "bounceOut",
+  "bounceInOut",
+  "back",
+  "backIn",
+  "backOut",
+  "backInOut",
+  "elastic",
+  "elasticIn",
+  "elasticOut",
+  "elasticInOut",
+]);
+
 /**
  * Known ease types that animator's .ease() methods understand
  */
-export type EaseName =
-"linear" |
-"quad" |
-"quadIn" |
-"quadOut" |
-"quadInOut" |
-"cubic" |
-"cubicIn" |
-"cubicOut" |
-"cubicInOut" |
-"poly" |
-"polyIn" |
-"polyOut" |
-"polyInOut" |
-"sin" |
-"sinIn" |
-"sinOut" |
-"sinInOut" |
-"exp" |
-"expIn" |
-"expOut" |
-"expInOut" |
-"circle" |
-"circleIn" |
-"circleOut" |
-"circleInOut" |
-"bounce" |
-"bounceIn" |
-"bounceOut" |
-"bounceInOut" |
-"back" |
-"backIn" |
-"backOut" |
-"backInOut" |
-"elastic" |
-"elasticIn" |
-"elasticOut" |
-"elasticInOut";
+export type EaseName = keyof typeof EaseName;
 
 /**
  * An Animator with easing and configurable durations and delays.

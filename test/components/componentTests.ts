@@ -542,18 +542,18 @@ describe("Component", () => {
     });
 
     it("defaults to a top and left alignment", () => {
-      assert.strictEqual(c.xAlignment(), Plottable.Components.Alignment.LEFT, "x alignment defaults to \"left\"");
-      assert.strictEqual(c.yAlignment(), Plottable.Components.Alignment.TOP, "y alignment defaults to \"top\"");
+      assert.strictEqual(c.xAlignment(), Plottable.XAlignment.left, "x alignment defaults to \"left\"");
+      assert.strictEqual(c.yAlignment(), Plottable.YAlignment.top, "y alignment defaults to \"top\"");
       c.destroy();
       div.remove();
     });
 
     it("can set the alignment", () => {
-      let xAlignment = Plottable.Components.Alignment.RIGHT;
+      const xAlignment = Plottable.XAlignment.right;
       assert.strictEqual(c.xAlignment(xAlignment), c, "returns calling object");
       assert.strictEqual(c.xAlignment(), xAlignment, "x alignment has been set");
 
-      let yAlignment = Plottable.Components.Alignment.BOTTOM;
+      const yAlignment = Plottable.YAlignment.bottom;
       assert.strictEqual(c.yAlignment(yAlignment), c, "returns calling object");
       assert.strictEqual(c.yAlignment(), yAlignment, "y alignment has been set");
       c.destroy();
@@ -561,7 +561,7 @@ describe("Component", () => {
     });
 
     it("throws errors on bad alignments", () => {
-      let invalidAlignment = "foo";
+      let invalidAlignment = "foo" as any;
       // HACKHACK: https://github.com/palantir/plottable/issues/2661 Cannot assert errors being thrown with description
       (<any> assert).throws(() => c.xAlignment(invalidAlignment), Error,
         "Unsupported alignment", "cannot set an invalid x alignment");
@@ -586,20 +586,20 @@ describe("Component", () => {
     });
 
     it("translates the origin in accordance with alignment", () => {
-      c.xAlignment(Plottable.Components.Alignment.LEFT)
-        .yAlignment(Plottable.Components.Alignment.TOP);
+      c.xAlignment(Plottable.XAlignment.left)
+        .yAlignment(Plottable.YAlignment.top);
       c.computeLayout();
       let expectedOrigin = {x: 0, y: 0};
       assert.deepEqual(c.origin(), expectedOrigin, "top-left component aligns correctly");
 
-      c.xAlignment(Plottable.Components.Alignment.CENTER)
-        .yAlignment(Plottable.Components.Alignment.CENTER);
+      c.xAlignment(Plottable.XAlignment.center)
+        .yAlignment(Plottable.YAlignment.center);
       c.computeLayout();
       expectedOrigin = {x: DIV_WIDTH / 2 - fixedWidth / 2, y: DIV_HEIGHT / 2 - fixedHeight / 2};
       assert.deepEqual(c.origin(), expectedOrigin, "center component aligns correctly");
 
-      c.xAlignment(Plottable.Components.Alignment.RIGHT)
-        .yAlignment(Plottable.Components.Alignment.BOTTOM);
+      c.xAlignment(Plottable.XAlignment.right)
+        .yAlignment(Plottable.YAlignment.bottom);
       c.computeLayout();
       expectedOrigin = {x: DIV_WIDTH - fixedWidth, y: DIV_HEIGHT - fixedHeight};
       assert.deepEqual(c.origin(), expectedOrigin, "bottom-right component aligns correctly");
@@ -728,7 +728,7 @@ describe("Component", () => {
     });
 
     afterEach(() => {
-      Plottable.RenderController.renderPolicy(Plottable.RenderController.Policy.IMMEDIATE);
+      Plottable.RenderController.renderPolicy(Plottable.RenderController.Policy.immediate);
     });
 
     it("renders to a DOM node involves anchoring, layout computing, and actual rendering", () => {
@@ -743,7 +743,7 @@ describe("Component", () => {
 
     it("only computes layout once", (done) => {
       // use async rendering so flushing doesn't happen immediately
-      Plottable.RenderController.renderPolicy(Plottable.RenderController.Policy.ANIMATION_FRAME);
+      Plottable.RenderController.renderPolicy(Plottable.RenderController.Policy.animationFrame);
       // set up a bar plot with a color scale
       const colorScale = new Plottable.Scales.Color();
       const xScale = new Plottable.Scales.Linear();

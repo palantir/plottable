@@ -6,6 +6,7 @@ import { assert } from "chai";
 import * as Plottable from "../../src";
 
 import * as TestMethods from "../testMethods";
+import { TierLabelPosition } from "../../src/axes/timeAxis";
 
 describe("TimeAxis", () => {
 
@@ -124,7 +125,7 @@ describe("TimeAxis", () => {
     });
   }
 
-  let tierLabelPositions = ["center", "between"];
+  let tierLabelPositions: TierLabelPosition[] = ["center", "between"];
   orientations.forEach((orientation) => {
     tierLabelPositions.forEach((tierLabelPosition) => {
       it(`does not overlap labels with tick marks when label position is ${tierLabelPosition} and orientation ${orientation}`, () => {
