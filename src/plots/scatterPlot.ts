@@ -122,7 +122,7 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
       const attrToProjector = this._generateAttrToProjector();
 
       const symbolProjector = Plot._scaledAccessor(this.symbol());
-      attrToProjector["d"] = (datum: any, index: number, dataset: Dataset) => symbolProjector(datum, index, dataset)(0)(null);
+      attrToProjector["d"] = (datum: any, index: number, dataset: Dataset) => symbolProjector(datum, index, dataset)(0);
       drawSteps.push({ attrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
     }
 

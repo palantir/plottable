@@ -1,13 +1,11 @@
-import { SimpleSelection } from "../../src/core/interfaces";
-import * as d3Shape from "d3-shape";
 import * as d3 from "d3";
 
 import { assert } from "chai";
 
 import * as Plottable from "../../src";
-
-import * as TestMethods from "../testMethods";
 import { getTranslateValues } from "../../src/utils/domUtils";
+import * as TestMethods from "../testMethods";
+
 
 describe("Legend", () => {
   const ENTRY_SELECTOR = "." + Plottable.Components.Legend.LEGEND_ENTRY_CLASS;

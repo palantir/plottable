@@ -2,7 +2,7 @@ function makeData() {
   "use strict";
 
   // makes 10k points
-  return Array.apply(null, Array(10000)).map((_) => ({
+  return Array.apply(null, Array(10000)).map(() => ({
     x: Math.random(),
     y: Math.random(),
   }));
@@ -19,8 +19,8 @@ function run(div, data, Plottable) {
   var plot = new Plottable.Plots.Scatter().addDataset(new Plottable.Dataset(data))
     .x((d) => d.x, xScale)
     .y((d) => d.y, yScale)
-    .size((d) => 5)
-    .symbol((d) => new Plottable.SymbolFactories.cross());
+    .size(() => 5)
+    .symbol(() => new Plottable.SymbolFactories.cross());
 
   var table = new Plottable.Components.Table([
     [yAxis, plot],
@@ -29,7 +29,8 @@ function run(div, data, Plottable) {
 
   new Plottable.Interactions.PanZoom(xScale, yScale)
     .attachTo(plot)
-    .setMinMaxDomainValuesTo(xScale);
+    .setMinMaxDomainValuesTo(xScale)
+    .setMinMaxDomainValuesTo(yScale);
 
   table.renderTo(div);
   window.addEventListener("resize", () => {

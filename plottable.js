@@ -13465,7 +13465,7 @@ var Scatter = (function (_super) {
         if (this._animateOnNextRender()) {
             var attrToProjector = this._generateAttrToProjector();
             var symbolProjector_1 = plot_1.Plot._scaledAccessor(this.symbol());
-            attrToProjector["d"] = function (datum, index, dataset) { return symbolProjector_1(datum, index, dataset)(0)(null); };
+            attrToProjector["d"] = function (datum, index, dataset) { return symbolProjector_1(datum, index, dataset)(0); };
             drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
         }
         drawSteps.push({
