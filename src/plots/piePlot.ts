@@ -16,6 +16,10 @@ import * as Scales from "../scales";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
 
+import { ArcSVGDrawer } from "../drawers/arcDrawer";
+import { ArcOutlineSVGDrawer } from "../drawers/arcOutlineDrawer";
+import { CanvasDrawer, Drawer } from "../drawers/drawer";
+import { warn } from "../utils/windowUtils";
 import { AccessorScaleBinding, PlotEntity } from "./";
 import { Plot } from "./plot";
 
@@ -34,7 +38,7 @@ export class Pie extends Plot {
   private _endAngles: number[];
   private _labelFormatter: Formatter = Formatters.identity();
   private _labelsEnabled = false;
-  private _strokeDrawers: Utils.Map<Dataset, Drawers.ArcOutline>;
+  private _strokeDrawers: Utils.Map<Dataset, Drawer>;
 
   /**
    * @constructor
@@ -49,12 +53,12 @@ export class Pie extends Plot {
     this.addClass("pie-plot");
     this.attr("fill", (d, i) => String(i), new Scales.Color());
 
-    this._strokeDrawers = new Utils.Map<Dataset, Drawers.ArcOutline>();
+    this._strokeDrawers = new Utils.Map<Dataset, Drawer>();
   }
 
   protected _setup() {
     super._setup();
-    this._strokeDrawers.forEach((d) => d.renderArea(this._renderArea.append("g")));
+    this._strokeDrawers.forEach((d) => d.useSVG(this._renderArea));
   }
 
   public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
@@ -85,9 +89,11 @@ export class Pie extends Plot {
       return this;
     }
     this._updatePieAngles();
-    const strokeDrawer = new Drawers.ArcOutline(dataset);
+    const strokeDrawer = new Drawer(dataset, new ArcOutlineSVGDrawer(), new CanvasDrawer(() => {
+      warn("canvas renderer not supported on Pie Plot!");
+    }));
     if (this._isSetup) {
-      strokeDrawer.renderArea(this._renderArea.append("g"));
+      strokeDrawer.useSVG(this._renderArea);
     }
     this._strokeDrawers.set(dataset, strokeDrawer);
     super._addDataset(dataset);
@@ -118,9 +124,7 @@ export class Pie extends Plot {
       if (drawer == null) {
         return;
       }
-      drawer.renderArea().selectAll(drawer.selector()).each(function () {
-        allSelections.push(this);
-      });
+      allSelections.push(...drawer.selection().nodes());
     });
     return d3.selectAll(allSelections);
   }
@@ -131,8 +135,10 @@ export class Pie extends Plot {
     this.render();
   }
 
-  protected _createDrawer(dataset: Dataset): Drawers.Arc {
-    return new Drawers.Arc(dataset);
+  protected _createDrawer(dataset: Dataset) {
+    return new Drawer(dataset, new ArcSVGDrawer(), new CanvasDrawer(() => {
+      warn("canvas renderer is not supported on Pie Plot!");
+    }));
   }
 
   public entities(datasets = this.datasets()): PiePlotEntity[] {

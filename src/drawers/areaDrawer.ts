@@ -5,21 +5,15 @@
 
 import * as d3 from "d3";
 
-import { Dataset } from "../core/dataset";
-
 import { SimpleSelection } from "../core/interfaces";
-import { Drawer } from "./drawer";
+import { SVGDrawer } from "./drawer";
 
-export class Area extends Drawer {
-
-  constructor(dataset: Dataset) {
-    super(dataset);
-    this._className = "area";
-    this._svgElementName = "path";
+export class AreaSVGDrawer extends SVGDrawer {
+  constructor() {
+    super("path", "area");
   }
 
   protected _applyDefaultAttributes(selection: SimpleSelection<any>) {
-    super._applyDefaultAttributes(selection);
     selection.style("stroke", "none");
   }
 

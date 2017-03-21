@@ -12,12 +12,13 @@ import { Formatter } from "../core/formatters";
 import * as Formatters from "../core/formatters";
 import { Accessor, Bounds, Point, Range, SimpleSelection } from "../core/interfaces";
 import * as Drawers from "../drawers";
-import { Drawer } from "../drawers/drawer";
+import { CanvasDrawer, Drawer } from "../drawers/drawer";
 import * as Scales from "../scales";
 import { QuantitativeScale } from "../scales/quantitativeScale";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
 
+import { RectangleCanvasDrawStep, RectangleSVGDrawer } from "../drawers/rectangleDrawer";
 import { makeEnum } from "../utils/makeEnum";
 import * as Plots from "./";
 import { PlotEntity } from "./";
@@ -129,8 +130,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     return this;
   }
 
-  protected _createDrawer(dataset: Dataset): Drawers.Rectangle {
-    return new Drawers.Rectangle(dataset);
+  protected _createDrawer(dataset: Dataset) {
+    return new Drawer(dataset, new RectangleSVGDrawer(Bar._BAR_AREA_CLASS), new CanvasDrawer(RectangleCanvasDrawStep));
   }
 
   protected _setup() {
@@ -261,9 +262,6 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
 
   protected _createNodesForDataset(dataset: Dataset): Drawer {
     const drawer = super._createNodesForDataset(dataset);
-    if (drawer.renderArea() != null) {
-      drawer.renderArea().classed(Bar._BAR_AREA_CLASS, true);
-    }
     const labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
     const context = new Typesetter.SvgContext(labelArea.node() as SVGElement);
     const measurer = new Typesetter.CacheMeasurer(context);

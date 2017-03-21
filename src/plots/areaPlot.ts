@@ -12,13 +12,17 @@ import * as Scales from "../scales";
 import { QuantitativeScale } from "../scales/quantitativeScale";
 import * as Utils from "../utils";
 
+import { AreaSVGDrawer } from "../drawers/areaDrawer";
+import { CanvasDrawer, Drawer } from "../drawers/drawer";
+import { LineSVGDrawer, makeLineCanvasDrawStep } from "../drawers/lineDrawer";
+import { warn } from "../utils/windowUtils";
 import * as Plots from "./";
 import { Line } from "./linePlot";
 import { Plot } from "./plot";
 
 export class Area<X> extends Line<X> {
   private static _Y0_KEY = "y0";
-  private _lineDrawers: Utils.Map<Dataset, Drawers.Line>;
+  private _lineDrawers: Utils.Map<Dataset, Drawer>;
   private _constantBaselineValueProvider: () => number[];
 
   /**
@@ -33,12 +37,12 @@ export class Area<X> extends Line<X> {
     this.attr("fill-opacity", 0.25);
     this.attr("fill", new Scales.Color().range()[0]);
 
-    this._lineDrawers = new Utils.Map<Dataset, Drawers.Line>();
+    this._lineDrawers = new Utils.Map<Dataset, Drawer>();
   }
 
   protected _setup() {
     super._setup();
-    this._lineDrawers.forEach((d) => d.renderArea(this._renderArea.append("g")));
+    this._lineDrawers.forEach((d) => d.useSVG(this._renderArea));
   }
 
   public y(): Plots.TransformableAccessorScaleBinding<number, number>;
@@ -100,9 +104,13 @@ export class Area<X> extends Line<X> {
   }
 
   protected _addDataset(dataset: Dataset) {
-    const lineDrawer = new Drawers.Line(dataset, () => this._d3LineFactory(dataset));
+    const lineDrawer = new Drawer(
+      dataset,
+      new LineSVGDrawer(),
+      new CanvasDrawer(makeLineCanvasDrawStep(() => this._d3LineFactory(dataset))),
+    );
     if (this._isSetup) {
-      lineDrawer.renderArea(this._renderArea.append("g"));
+      lineDrawer.useSVG(this._renderArea);
     }
     this._lineDrawers.set(dataset, lineDrawer);
     super._addDataset(dataset);
@@ -140,8 +148,10 @@ export class Area<X> extends Line<X> {
     return lineAttrToProjector;
   }
 
-  protected _createDrawer(dataset: Dataset): Drawers.Area {
-    return new Drawers.Area(dataset);
+  protected _createDrawer(dataset: Dataset) {
+    return new Drawer(dataset, new AreaSVGDrawer(), new CanvasDrawer(() => {
+      warn("canvas renderer not implemented on Area Plot!");
+    }));
   }
 
   protected _generateDrawSteps(): Drawers.DrawStep[] {

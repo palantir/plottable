@@ -3,21 +3,18 @@
  * @license MIT
  */
 
-import { Dataset } from "../core/dataset";
+
 
 import { SimpleSelection } from "../core/interfaces";
-import { Drawer } from "./drawer";
+import { SVGDrawer } from "./drawer";
 
-export class ArcOutline extends Drawer {
+export class ArcOutlineSVGDrawer extends SVGDrawer {
 
-  constructor(dataset: Dataset) {
-    super(dataset);
-    this._className = "arc outline";
-    this._svgElementName = "path";
+  constructor() {
+    super("path", "arc outline");
   }
 
   protected _applyDefaultAttributes(selection: SimpleSelection<any>) {
-    super._applyDefaultAttributes(selection);
     selection.style("fill", "none");
   }
 }

@@ -14,6 +14,8 @@ import * as Scales from "../scales";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
 
+import { CanvasDrawer, Drawer } from "../drawers/drawer";
+import { RectangleCanvasDrawStep, RectangleSVGDrawer } from "../drawers/rectangleDrawer";
 import * as Plots from "./";
 import { PlotEntity } from "./";
 import { Plot } from "./plot";
@@ -44,8 +46,8 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
     this.attr("fill", new Scales.Color().range()[0]);
   }
 
-  protected _createDrawer(dataset: Dataset): Drawers.Rectangle {
-    return new Drawers.Rectangle(dataset);
+  protected _createDrawer(dataset: Dataset) {
+    return new Drawer(dataset, new RectangleSVGDrawer(), new CanvasDrawer(RectangleCanvasDrawStep));
   }
 
   protected _generateAttrToProjector() {

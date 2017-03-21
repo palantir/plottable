@@ -3,13 +3,10 @@
  * @license MIT
  */
 
-import { Dataset } from "../core/dataset";
+import { SVGDrawer } from "./drawer";
 
-import { Drawer } from "./drawer";
-
-export class Segment extends Drawer {
-  constructor(dataset: Dataset) {
-    super(dataset);
-    this._svgElementName = "line";
+export class SegmentSVGDrawer extends SVGDrawer {
+  constructor() {
+    super("line", "");
   }
 }

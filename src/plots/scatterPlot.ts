@@ -13,6 +13,9 @@ import * as Scales from "../scales";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
 
+import { CanvasDrawer, Drawer } from "../drawers/drawer";
+import { SymbolSVGDrawer } from "../drawers/symbolDrawer";
+import { warn } from "../utils/windowUtils";
 import * as Plots from "./";
 import { AccessorScaleBinding, LightweightPlotEntity, PlotEntity, TransformableAccessorScaleBinding } from "./";
 import { Plot } from "./plot";
@@ -61,8 +64,10 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
     });
   }
 
-  protected _createDrawer(dataset: Dataset): Drawers.Symbol {
-    return new Drawers.Symbol(dataset);
+  protected _createDrawer(dataset: Dataset) {
+    return new Drawer(dataset, new SymbolSVGDrawer(), new CanvasDrawer(() => {
+      warn("canvas renderer is not supported on Scatter Plot!");
+    }));
   }
 
   /**

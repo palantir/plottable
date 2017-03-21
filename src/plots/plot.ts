@@ -171,15 +171,15 @@ export class Plot extends Component {
   protected _createNodesForDataset(dataset: Dataset) {
     const drawer = this._datasetToDrawer.get(dataset);
     if (this.renderer() === "svg") {
-      drawer.renderArea(this._renderArea.append("g"));
+      drawer.useSVG(this._renderArea);
     } else {
-      drawer.canvas(this._canvas);
+      drawer.useCanvas(this._canvas);
     }
     return drawer;
   }
 
   protected _createDrawer(dataset: Dataset): Drawer {
-    return new Drawer(dataset);
+    throw new Error("subclasses must override _createDrawer");
   }
 
   protected _getAnimator(key: string): Animator {
@@ -458,17 +458,14 @@ export class Plot extends Component {
           this.element().node().appendChild(this._canvas.node());
         }
         this._datasetToDrawer.forEach((drawer) => {
-          if (drawer.renderArea() != null) {
-            drawer.renderArea().remove();
-          }
-          drawer.canvas(this._canvas);
+          drawer.useCanvas(this._canvas);
         });
         this.render();
       } else if (this._canvas != null && renderer == "svg") {
         this._canvas.remove();
         this._canvas = null;
         this._datasetToDrawer.forEach((drawer) => {
-          drawer.renderArea(this._renderArea.append("g"));
+          drawer.useSVG(this._renderArea);
         });
         this.render();
       }
@@ -608,7 +605,7 @@ export class Plot extends Component {
     }
     this.datasets().forEach((ds, i) => drawers[i].draw(dataToDraw.get(ds), drawSteps));
 
-    const times = this.datasets().map((ds, i) => drawers[i].totalDrawTime(dataToDraw.get(ds), drawSteps));
+    const times = this.datasets().map((ds, i) => Plot.getTotalDrawTime(dataToDraw.get(ds), drawSteps));
     const maxTime = Utils.Math.max(times, 0);
     this._additionalPaint(maxTime);
   }
@@ -631,9 +628,8 @@ export class Plot extends Component {
         if (drawer == null) {
           return;
         }
-        drawer.renderArea().selectAll(drawer.selector()).each(function () {
-          selections.push(this);
-        });
+        const maybeSelection = drawer.selection();
+        selections.push(...maybeSelection.nodes());
       });
 
       return d3.selectAll(selections);
@@ -751,5 +747,9 @@ export class Plot extends Component {
 
   protected _animateOnNextRender() {
     return this._animate && this._dataChanged;
+  }
+
+  private static getTotalDrawTime(data: any[], drawSteps: Drawers.DrawStep[]) {
+    return drawSteps.reduce((time, drawStep) => time + drawStep.animator.totalTime(data.length), 0);
   }
 }

@@ -10,112 +10,86 @@ import * as Utils from "../utils";
 import { Dataset } from "../core/dataset";
 import { AttributeToAppliedProjector, AttributeToProjector, SimpleSelection } from "../core/interfaces";
 
-import { coerceExternalD3 } from "../utils/coerceD3";
 import * as Drawers from "./";
 
+function applyProjectorsWithDataset(attrToProjector: AttributeToProjector, dataset: Dataset): AttributeToAppliedProjector {
+  const modifiedAttrToProjector: AttributeToAppliedProjector = {};
+  Object.keys(attrToProjector).forEach((attr: string) => {
+    modifiedAttrToProjector[attr] =
+      (datum: any, index: number) => attrToProjector[attr](datum, index, dataset);
+  });
+
+  return modifiedAttrToProjector;
+}
+
 /**
- * A Drawer is responsible for actually committing the DrawSteps to the DOM. You first pass a renderArea
- * to the Drawer, which is the root DOM node holding all the drawing elements. Subclasses set an _svgElementName
- * which is an HTML/SVG tag name. Then you call .draw() with the DrawSteps to draw, and the Drawer will draw
- * to the DOM by clearing old DOM elements, adding new DOM elements, and then passing those DOM elements to
- * the animator, which will set the appropriate attributes on the DOM.
+ * An SVGDrawer "draws" data by creating DOM elements and setting specific attributes on them
+ * to accurately reflect the data being passed in.
  *
- * "Drawing" in Plottable really means either:
- * (a) "making the DOM elements and their attributes correctly reflect the data being passed in", using SVG.
- * (b) "making draw commands to the Canvas element", using Canvas.
+ * This class is immutable (but has internal state) and shouldn't be extended.
  */
-export class Drawer {
-  private _renderArea: SimpleSelection<void>;
-  private _canvas: d3.Selection<HTMLCanvasElement, any, any, any>;
-
-  protected _svgElementName: string;
+export class SVGDrawer {
   protected _className: string;
-  protected _dataset: Dataset;
+  protected _svgElementName: string;
 
-  private _cachedSelectionValid = false;
-  private _cachedSelection: SimpleSelection<any>;
+  /**
+   * All of the DOM elements from the last draw.
+   */
+  private _selection: SimpleSelection<any>;
+  /**
+   * Cache of the _selection.nodes().
+   */
   private _cachedSelectionNodes: d3.BaseType[];
 
   /**
-   * A Drawer draws svg elements based on the input Dataset.
-   *
-   * @constructor
-   * @param {Dataset} dataset The dataset associated with this Drawer
+   * @param svgElementName an HTML/SVG tag name to be created one per data.
+   * @param className CSS classes to be applied to the drawn primitives.
+   * @param applyDefaultAttributes
    */
-  constructor(dataset: Dataset) {
-    this._dataset = dataset;
-    this._svgElementName = "path";
-  }
-
-  public canvas(): d3.Selection<HTMLCanvasElement, any, any, any>;
-  /**
-   * Sets the renderArea() to null and tells this Drawer to draw to the specified canvas instead.
-   * @param canvas
-   */
-  public canvas(canvas: d3.Selection<HTMLCanvasElement, any, any, any>): this;
-  public canvas(canvas?: d3.Selection<HTMLCanvasElement, any, any, any>): any {
-    if (canvas === undefined) {
-      return this._canvas;
-    }
-    canvas = coerceExternalD3(canvas);
-    this._canvas = canvas;
-    this._renderArea = null;
-    this._cachedSelectionValid = false;
-    return this;
+  constructor(svgElementName: string, className: string) {
+    this._className = className;
+    this._svgElementName = svgElementName;
   }
 
   /**
-   * Retrieves the renderArea selection for the Drawer.
+   * Draws to the given root element.
+   * @param root
+   * @param data
+   * @param appliedDrawSteps
    */
-  public renderArea(): SimpleSelection<void>;
-  /**
-   * Sets the canvas() to null and tells this Drawer to draw to the specified SVG area instead.
-   *
-   * @param {d3.Selection} Selection containing the <g> to render to.
-   * @returns {Drawer} The calling Drawer.
-   */
-  public renderArea(area: SimpleSelection<void>): this;
-  public renderArea(area?: SimpleSelection<void>): any {
-    if (area === undefined) {
-      return this._renderArea;
-    }
-    area = coerceExternalD3(area);
-    this._renderArea = area;
-    this._canvas = null;
-    this._cachedSelectionValid = false;
-    return this;
+  public draw(root: d3.Selection<SVGGElement, any, any, any>, data: any[], appliedDrawSteps: Drawers.AppliedDrawStep[]) {
+    /*
+     * Draw to the DOM by clearing old DOM elements, adding new DOM elements,
+     * and then passing those DOM elements to the animator, which will set the
+     * appropriate attributes on the DOM.
+     */
+    this._createAndDestroyDOMElements(root, data);
+
+    let delay = 0;
+    appliedDrawSteps.forEach((drawStep, i) => {
+      Utils.Window.setTimeout(() => this._drawStep(drawStep), delay);
+      delay += drawStep.animator.totalTime(data.length);
+    });
   }
 
-  /**
-   * Removes the Drawer and its renderArea
-   */
-  public remove() {
-    if (this.renderArea() != null) {
-      this.renderArea().remove();
-    }
-  }
-
-  /**
-   * Binds data to selection
-   *
-   * @param{any[]} data The data to be drawn
-   */
-  private _bindSelectionData(data: any[]) {
-    const dataElementsUpdate = this.selection().data(data);
-    const dataElements =
+  private _createAndDestroyDOMElements(root: d3.Selection<SVGGElement, any, any, any>, data: any[]) {
+    const dataElementsUpdate = root.selectAll(this.selector()).data(data);
+    this._selection =
       dataElementsUpdate
         .enter()
         .append(this._svgElementName)
         .merge(dataElementsUpdate);
     dataElementsUpdate.exit().remove();
+    this._cachedSelectionNodes = null;
 
-    this._applyDefaultAttributes(dataElements);
+    if (this._className != null) {
+      this._selection.classed(this._className, true);
+    }
+    this._applyDefaultAttributes(this._selection);
   }
 
   protected _applyDefaultAttributes(selection: SimpleSelection<any>) {
-    if (this._className != null) {
-      selection.classed(this._className, true);
-    }
+    // subclasses may override
   }
 
   /**
@@ -124,87 +98,20 @@ export class Drawer {
    * @param{AppliedDrawStep} step The step, how data should be drawn.
    */
   private _drawStep(step: Drawers.AppliedDrawStep) {
-    const selection = this.selection();
     const colorAttributes = ["fill", "stroke"];
     colorAttributes.forEach((colorAttribute) => {
       if (step.attrToAppliedProjector[colorAttribute] != null) {
-        selection.attr(colorAttribute, step.attrToAppliedProjector[colorAttribute]);
+        this._selection.attr(colorAttribute, step.attrToAppliedProjector[colorAttribute]);
       }
     });
-    step.animator.animate(selection, step.attrToAppliedProjector);
+    step.animator.animate(this._selection, step.attrToAppliedProjector);
     if (this._className != null) {
       this.selection().classed(this._className, true);
     }
   }
 
-  protected _drawStepCanvas(data: any[], step: Drawers.AppliedDrawStep) {
-    Utils.Window.warn("canvas rendering not yet implemented on " + (<any> this.constructor).name);
-  }
-
-  private _appliedProjectors(attrToProjector: AttributeToProjector): AttributeToAppliedProjector {
-    const modifiedAttrToProjector: AttributeToAppliedProjector = {};
-    Object.keys(attrToProjector).forEach((attr: string) => {
-      modifiedAttrToProjector[attr] =
-        (datum: any, index: number) => attrToProjector[attr](datum, index, this._dataset);
-    });
-
-    return modifiedAttrToProjector;
-  }
-
-  /**
-   * Calculates the total time it takes to use the input drawSteps to draw the input data
-   *
-   * @param {any[]} data The data that would have been drawn
-   * @param {Drawers.DrawStep[]} drawSteps The DrawSteps to use
-   * @returns {number} The total time it takes to draw
-   */
-  public totalDrawTime(data: any[], drawSteps: Drawers.DrawStep[]) {
-    let delay = 0;
-    drawSteps.forEach((drawStep, i) => {
-      delay += drawStep.animator.totalTime(data.length);
-    });
-
-    return delay;
-  }
-
-  /**
-   * Draws the data into the renderArea using the spefic steps and metadata
-   *
-   * @param{any[]} data The data to be drawn
-   * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
-   */
-  public draw(data: any[], drawSteps: Drawers.DrawStep[]) {
-    const appliedDrawSteps: Drawers.AppliedDrawStep[] = drawSteps.map((dr: Drawers.DrawStep) => {
-      const attrToAppliedProjector = this._appliedProjectors(dr.attrToProjector);
-      return {
-        attrToAppliedProjector: attrToAppliedProjector,
-        animator: dr.animator,
-      };
-    });
-
-    if (this._renderArea != null) {
-      this._bindSelectionData(data);
-      this._cachedSelectionValid = false;
-
-      let delay = 0;
-      appliedDrawSteps.forEach((drawStep, i) => {
-        Utils.Window.setTimeout(() => this._drawStep(drawStep), delay);
-        delay += drawStep.animator.totalTime(data.length);
-      });
-    } else if (this._canvas != null) {
-      // don't support animations for now; just draw the last draw step immediately
-      const lastDrawStep = appliedDrawSteps[appliedDrawSteps.length - 1];
-      Utils.Window.setTimeout(() => this._drawStepCanvas(data, lastDrawStep), 0);
-    } else {
-      throw new Error("Drawer's canvas and renderArea are both null!");
-    }
-
-    return this;
-  }
-
-  public selection(): SimpleSelection<any> | null {
-    this.maybeRefreshCache();
-    return this._cachedSelection;
+  public selection(): SimpleSelection<any> {
+    return this._selection;
   }
 
   /**
@@ -217,26 +124,135 @@ export class Drawer {
   /**
    * Returns the D3 selection corresponding to the datum with the specified index.
    */
-  public selectionForIndex(index: number): SimpleSelection<any> | null {
-    this.maybeRefreshCache();
-    if (this._cachedSelectionNodes != null) {
-      return d3.select(this._cachedSelectionNodes[index]);
+  public selectionForIndex(index: number): SimpleSelection<any> {
+    if (this._cachedSelectionNodes == null) {
+      this._cachedSelectionNodes = this._selection.nodes();
+    }
+    return d3.select(this._cachedSelectionNodes[index]);
+  }
+}
+
+export type CanvasDrawStep = (
+  context: CanvasRenderingContext2D,
+  data: any[],
+  attrToAppliedProjector: AttributeToAppliedProjector,
+) => void;
+
+/**
+ * A CanvasDrawer draws data onto a supplied Canvas DOM element.
+ *
+ * This class is immutable (but has internal state) and shouldn't be extended.
+ */
+export class CanvasDrawer {
+  private _drawStep: CanvasDrawStep;
+
+  constructor(drawStep: CanvasDrawStep) {
+    this._drawStep = drawStep;
+  }
+
+  public draw(canvas: d3.Selection<HTMLCanvasElement, any, any, any>, data: any[], appliedDrawSteps: Drawers.AppliedDrawStep[]) {
+    // don't support animations for now; just draw the last draw step immediately
+    const lastDrawStep = appliedDrawSteps[appliedDrawSteps.length - 1];
+    const context = canvas.node().getContext("2d");
+    context.save();
+    this._drawStep(context, data, lastDrawStep.attrToAppliedProjector);
+    context.restore();
+  }
+}
+
+/**
+ * A Drawer is a stateful class that holds one SVGDrawer and one CanvasDrawer, and can switch between
+ * the two.
+ */
+export class Drawer {
+  private _canvas: d3.Selection<HTMLCanvasElement, any, any, any>;
+  private _canvasDrawer: CanvasDrawer;
+
+  private _dataset: Dataset;
+
+  private _svgRootG: d3.Selection<SVGGElement, any, any, any>;
+  private _svgDrawer: SVGDrawer;
+
+  /**
+   * A Drawer draws svg elements based on the input Dataset.
+   *
+   * @constructor
+   * @param {Dataset} dataset The dataset associated with this Drawer
+   */
+  constructor(dataset: Dataset, svgDrawer: SVGDrawer, canvasDrawer: CanvasDrawer) {
+    this._canvasDrawer = canvasDrawer;
+    this._dataset = dataset;
+    this._svgDrawer = svgDrawer;
+  }
+
+  /**
+   * Use SVG rendering from now on. This will append a new <g> element to the renderArea and draw
+   * DOM elements into it.
+   */
+  public useSVG(parentRenderArea: SimpleSelection<any>) {
+    this._canvas = null;
+    this._svgRootG = parentRenderArea.append<SVGGElement>("g");
+  }
+
+  /**
+   * Use Canvas rendering from now on. This will remove the <g> element created by useSVG, if it exists.
+   */
+  public useCanvas(canvas: d3.Selection<HTMLCanvasElement, any, any, any>) {
+    if (this._svgRootG != null) {
+      this._svgRootG.remove();
+      this._svgRootG = null;
+    }
+    this._canvas = canvas;
+  }
+
+  /**
+   * Removes this Drawer's renderArea
+   */
+  public remove() {
+    if (this._svgRootG != null) {
+      this._svgRootG.remove();
+    }
+  }
+
+  /**
+   * Draws the data using the drawSteps onto the currently selected drawer.
+   *
+   * @param{any[]} data The data to be drawn
+   * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
+   */
+  public draw(data: any[], drawSteps: Drawers.DrawStep[]) {
+    const appliedDrawSteps: Drawers.AppliedDrawStep[] = drawSteps.map((dr: Drawers.DrawStep) => {
+      const attrToAppliedProjector = applyProjectorsWithDataset(dr.attrToProjector, this._dataset);
+      return {
+        attrToAppliedProjector: attrToAppliedProjector,
+        animator: dr.animator,
+      };
+    });
+
+    if (this._svgRootG != null) {
+      this._svgDrawer.draw(this._svgRootG, data, appliedDrawSteps);
+    } else if (this._canvas != null) {
+      this._canvasDrawer.draw(this._canvas, data, appliedDrawSteps);
+    } else {
+      throw new Error("Must call .useSVG or .useCanvas before drawing!");
+    }
+
+    return this;
+  }
+
+  public selection(): SimpleSelection<any> {
+    if (this._svgRootG != null) {
+      return this._svgDrawer.selection();
     } else {
       return null;
     }
   }
 
-  private maybeRefreshCache() {
-    if (!this._cachedSelectionValid) {
-      if (this._renderArea != null) {
-        this._cachedSelection = this.renderArea().selectAll(this.selector());
-        this._cachedSelectionNodes = this._cachedSelection.nodes();
-      } else {
-        this._cachedSelection = null;
-        this._cachedSelectionNodes = null;
-      }
-      this._cachedSelectionValid = true;
+  public selectionForIndex(index: number): SimpleSelection<any> {
+    if (this._svgRootG != null) {
+      return this._svgDrawer.selectionForIndex(index);
+    } else {
+      return null;
     }
   }
-
 }
