@@ -11,7 +11,7 @@ import { Drawer } from "./drawer";
 import { AppliedDrawStep } from "./index";
 
 export class Symbol extends Drawer {
-  private _d3SymbolGenerator: () => (datum: any, index: number, dataset: Dataset) => d3Shape.Symbol<any, any>;
+  private _d3SymbolGeneratorFactory: () => (datum: any, index: number, dataset: Dataset) => d3Shape.Symbol<any, any>;
 
   /**
    * @param dataset
@@ -20,9 +20,9 @@ export class Symbol extends Drawer {
    */
   constructor(
       dataset: Dataset,
-      d3SymbolGenerator: () => (datum: any, index: number, dataset: Dataset) => d3Shape.Symbol<any, any>) {
+      d3SymbolGeneratorFactory: () => (datum: any, index: number, dataset: Dataset) => d3Shape.Symbol<any, any>) {
     super(dataset);
-    this._d3SymbolGenerator = d3SymbolGenerator;
+    this._d3SymbolGeneratorFactory = d3SymbolGeneratorFactory;
     this._svgElementName = "path";
     this._className = "symbol";
   }
@@ -35,7 +35,7 @@ export class Symbol extends Drawer {
    */
   protected _drawStepCanvas(data: any[], step: AppliedDrawStep) {
     const context = this.canvas().node().getContext("2d");
-    const d3Symbol = this._d3SymbolGenerator();
+    const d3Symbol = this._d3SymbolGeneratorFactory();
 
     const attrToAppliedProjector = step.attrToAppliedProjector;
     const attrs = Object.keys(Drawer._CANVAS_CONTEXT_ATTRIBUTES).concat(["x", "y"]);

@@ -11408,9 +11408,9 @@ var Symbol = (function (_super) {
      * @param _d3SymbolFactory A callback that gives this Symbol Drawer a d3.Symbol object which will be
      * used to draw with.
      */
-    function Symbol(dataset, d3SymbolGenerator) {
+    function Symbol(dataset, d3SymbolGeneratorFactory) {
         var _this = _super.call(this, dataset) || this;
-        _this._d3SymbolGenerator = d3SymbolGenerator;
+        _this._d3SymbolGeneratorFactory = d3SymbolGeneratorFactory;
         _this._svgElementName = "path";
         _this._className = "symbol";
         return _this;
@@ -11424,7 +11424,7 @@ var Symbol = (function (_super) {
     Symbol.prototype._drawStepCanvas = function (data, step) {
         var _this = this;
         var context = this.canvas().node().getContext("2d");
-        var d3Symbol = this._d3SymbolGenerator();
+        var d3Symbol = this._d3SymbolGeneratorFactory();
         var attrToAppliedProjector = step.attrToAppliedProjector;
         var attrs = Object.keys(drawer_1.Drawer._CANVAS_CONTEXT_ATTRIBUTES).concat(["x", "y"]);
         data.forEach(function (datum, index) {
