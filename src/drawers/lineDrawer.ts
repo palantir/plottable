@@ -48,7 +48,7 @@ export class Line extends Drawer {
     const attrToAppliedProjector = step.attrToAppliedProjector;
     const attrs = Object.keys(Drawer._CANVAS_CONTEXT_ATTRIBUTES);
     const resolvedAttrs = Object.keys(attrToAppliedProjector).reduce((obj, attrName) => {
-      // only set if needed for performance
+      // only set if needed, for performance
       if (attrs.indexOf(attrName) !== -1) {
         obj[attrName] = attrToAppliedProjector[attrName](data, 0);
       }

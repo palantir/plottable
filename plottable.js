@@ -11291,7 +11291,7 @@ var Line = (function (_super) {
         var attrToAppliedProjector = step.attrToAppliedProjector;
         var attrs = Object.keys(drawer_1.Drawer._CANVAS_CONTEXT_ATTRIBUTES);
         var resolvedAttrs = Object.keys(attrToAppliedProjector).reduce(function (obj, attrName) {
-            // only set if needed for performance
+            // only set if needed, for performance
             if (attrs.indexOf(attrName) !== -1) {
                 obj[attrName] = attrToAppliedProjector[attrName](data, 0);
             }
@@ -11340,7 +11340,7 @@ var Rectangle = (function (_super) {
         var attrs = Object.keys(drawer_1.Drawer._CANVAS_CONTEXT_ATTRIBUTES).concat(["x", "y", "width", "height"]);
         data.forEach(function (point, index) {
             var resolvedAttrs = Object.keys(attrToAppliedProjector).reduce(function (obj, attrName) {
-                // only set if needed for performance
+                // only set if needed, for performance
                 if (attrs.indexOf(attrName) !== -1) {
                     obj[attrName] = attrToAppliedProjector[attrName](point, index);
                 }
@@ -11405,7 +11405,7 @@ var Symbol = (function (_super) {
     __extends(Symbol, _super);
     /**
      * @param dataset
-     * @param _d3SymbolFactory A callback that gives this Symbol Drawer a d3.Symbol object which will be
+     * @param _d3SymbolGeneratorFactory A callback that gives this Symbol Drawer a d3.Symbol object which will be
      * used to draw with.
      */
     function Symbol(dataset, d3SymbolGeneratorFactory) {
@@ -11429,7 +11429,7 @@ var Symbol = (function (_super) {
         var attrs = Object.keys(drawer_1.Drawer._CANVAS_CONTEXT_ATTRIBUTES).concat(["x", "y"]);
         data.forEach(function (datum, index) {
             var resolvedAttrs = Object.keys(attrToAppliedProjector).reduce(function (obj, attrName) {
-                // only set if needed for performance
+                // only set if needed, for performance
                 if (attrs.indexOf(attrName) !== -1) {
                     obj[attrName] = attrToAppliedProjector[attrName](datum, index);
                 }

@@ -24,7 +24,7 @@ export class Rectangle extends Drawer {
     const attrs = Object.keys(Drawer._CANVAS_CONTEXT_ATTRIBUTES).concat(["x", "y", "width", "height"]);
     data.forEach((point, index) => {
       const resolvedAttrs = Object.keys(attrToAppliedProjector).reduce((obj, attrName) => {
-        // only set if needed for performance
+        // only set if needed, for performance
         if (attrs.indexOf(attrName) !== -1) {
           obj[attrName] = attrToAppliedProjector[attrName](point, index);
         }

@@ -15,7 +15,7 @@ export class Symbol extends Drawer {
 
   /**
    * @param dataset
-   * @param _d3SymbolFactory A callback that gives this Symbol Drawer a d3.Symbol object which will be
+   * @param _d3SymbolGeneratorFactory A callback that gives this Symbol Drawer a d3.Symbol object which will be
    * used to draw with.
    */
   constructor(
@@ -41,7 +41,7 @@ export class Symbol extends Drawer {
     const attrs = Object.keys(Drawer._CANVAS_CONTEXT_ATTRIBUTES).concat(["x", "y"]);
     data.forEach((datum, index) => {
       const resolvedAttrs = Object.keys(attrToAppliedProjector).reduce((obj, attrName) => {
-        // only set if needed for performance
+        // only set if needed, for performance
         if (attrs.indexOf(attrName) !== -1) {
           obj[attrName] = attrToAppliedProjector[attrName](datum, index);
         }

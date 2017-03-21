@@ -1,6 +1,3 @@
-import { SimpleSelection } from "../../src/core/interfaces";
-import * as d3 from "d3";
-
 import { assert } from "chai";
 
 import * as Plottable from "../../src";
@@ -12,7 +9,7 @@ describe("Interactions", () => {
     const DIV_WIDTH = 400;
     const DIV_HEIGHT = 400;
 
-  let clickedPoint: Plottable.Point;
+    let clickedPoint: Plottable.Point;
     let div: d3.Selection<HTMLDivElement, any, any, any>;
     let component: Plottable.Component;
     let clickInteraction: Plottable.Interactions.Click;
