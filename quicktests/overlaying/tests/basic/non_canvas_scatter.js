@@ -19,7 +19,7 @@ function run(div, data, Plottable) {
   var plot = new Plottable.Plots.Scatter().addDataset(new Plottable.Dataset(data))
     .x((d) => d.x, xScale)
     .y((d) => d.y, yScale)
-    .size(() => 5)
+    .size(() => 20)
     .symbol(() => new Plottable.SymbolFactories.cross());
 
   var table = new Plottable.Components.Table([

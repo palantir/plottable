@@ -62,7 +62,7 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
   }
 
   protected _createDrawer(dataset: Dataset): Drawers.Symbol {
-    return new Drawers.Symbol(dataset, () => this._d3SymbolFactory());
+    return new Drawers.Symbol(dataset, () => this._constructSymbolGenerator(false));
   }
 
   /**
@@ -136,37 +136,24 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
   protected _propertyProjectors(): AttributeToProjector {
     const propertyToProjectors = super._propertyProjectors();
 
-    propertyToProjectors["transform"] = this._constructTransformProjector();
-    if (this.renderer() === "svg") {
-      propertyToProjectors["d"] = this._constructSymbolProjector();
-    }
+    const xProjector = Plot._scaledAccessor(this.x());
+    const yProjector = Plot._scaledAccessor(this.y());
+    propertyToProjectors["x"] = xProjector;
+    propertyToProjectors["y"] = yProjector;
+    propertyToProjectors["transform"] = (datum: any, index: number, dataset: Dataset) => {
+        return "translate(" + xProjector(datum, index, dataset) + "," + yProjector(datum, index, dataset) + ")";
+    };
+    propertyToProjectors["d"] = this._constructSymbolGenerator(true);
 
     return propertyToProjectors;
   }
 
-  protected _constructTransformProjector() {
-    const xProjector = Plot._scaledAccessor(this.x());
-    const yProjector = Plot._scaledAccessor(this.y());
-    return (datum: any, index: number, dataset: Dataset) => {
-      return this.renderer() === "svg"
-        ? "translate(" + xProjector(datum, index, dataset) + "," + yProjector(datum, index, dataset) + ")"
-        : { x: xProjector(datum, index, dataset), y: yProjector(datum, index, dataset) };
-    };
-  }
-
-  protected _constructSymbolProjector() {
+  protected _constructSymbolGenerator(generate: boolean) {
     const symbolProjector = Plot._scaledAccessor(this.symbol());
     const sizeProjector = Plot._scaledAccessor(this.size());
     return (datum: any, index: number, dataset: Dataset) => {
-      return symbolProjector(datum, index, dataset)(sizeProjector(datum, index, dataset));
-    };
-  }
-
-  protected _d3SymbolFactory() {
-    const symbolProjector = Plot._scaledAccessor(this.symbol());
-    const sizeProjector = Plot._scaledAccessor(this.size());
-    return (datum: any, index: number, dataset: Dataset, context: CanvasRenderingContext2D) => {
-        return symbolProjector(datum, index, dataset)(sizeProjector(datum, index, dataset), context);
+      const generator = symbolProjector(datum, index, dataset)(sizeProjector(datum, index, dataset));
+      return generate ? generator(null) : generator;
     };
   }
 

@@ -4956,69 +4956,48 @@ exports.flush = flush;
 
 var d3 = __webpack_require__(1);
 function circle() {
-    return function (symbolSize, context) {
-        return d3.symbol()
-            .type(d3.symbolCircle)
-            .size(Math.PI * Math.pow(symbolSize / 2, 2))
-            .context(context)(null);
+    return function (symbolSize) {
+        return d3.symbol().type(d3.symbolCircle).size(Math.PI * Math.pow(symbolSize / 2, 2));
     };
 }
 exports.circle = circle;
 function square() {
-    return function (symbolSize, context) {
-        return d3.symbol()
-            .type(d3.symbolSquare)
-            .size(Math.pow(symbolSize, 2))
-            .context(context)(null);
+    return function (symbolSize) {
+        return d3.symbol().type(d3.symbolSquare).size(Math.pow(symbolSize, 2));
     };
 }
 exports.square = square;
 function cross() {
-    return function (symbolSize, context) {
-        return d3.symbol()
-            .type(d3.symbolCross)
-            .size((5 / 9) * Math.pow(symbolSize, 2))
-            .context(context)(null);
+    return function (symbolSize) {
+        return d3.symbol().type(d3.symbolCross).size((5 / 9) * Math.pow(symbolSize, 2));
     };
 }
 exports.cross = cross;
 function diamond() {
-    return function (symbolSize, context) {
-        return d3.symbol()
-            .type(d3.symbolDiamond)
-            .size(Math.tan(Math.PI / 6) * Math.pow(symbolSize, 2) / 2)
-            .context(context)(null);
+    return function (symbolSize) {
+        return d3.symbol().type(d3.symbolDiamond).size(Math.tan(Math.PI / 6) * Math.pow(symbolSize, 2) / 2);
     };
 }
 exports.diamond = diamond;
 function triangle() {
-    return function (symbolSize, context) {
-        return d3.symbol()
-            .type(d3.symbolTriangle)
-            .size(Math.sqrt(3) * Math.pow(symbolSize / 2, 2))
-            .context(context)(null);
+    return function (symbolSize) {
+        return d3.symbol().type(d3.symbolTriangle).size(Math.sqrt(3) * Math.pow(symbolSize / 2, 2));
     };
 }
 exports.triangle = triangle;
 // copied from https://github.com/d3/d3-shape/blob/e2e57722004acba754ed9edff020282682450c5c/src/symbol/star.js#L3
 var ka = 0.89081309152928522810;
 function star() {
-    return function (symbolSize, context) {
-        return d3.symbol()
-            .type(d3.symbolStar)
-            .size(ka * Math.pow(symbolSize / 2, 2))
-            .context(context)(null);
+    return function (symbolSize) {
+        return d3.symbol().type(d3.symbolStar).size(ka * Math.pow(symbolSize / 2, 2));
     };
 }
 exports.star = star;
 // copied from https://github.com/d3/d3-shape/blob/c35b2303eb4836aba3171642f01c2653e4228b9c/src/symbol/wye.js#L2
 var a = ((1 / Math.sqrt(12)) / 2 + 1) * 3;
 function wye() {
-    return function (symbolSize, context) {
-        return d3.symbol()
-            .type(d3.symbolWye)
-            .size(a * Math.pow(symbolSize / 2.4, 2))
-            .context(context)(null);
+    return function (symbolSize) {
+        return d3.symbol().type(d3.symbolWye).size(a * Math.pow(symbolSize / 2.4, 2));
     };
 }
 exports.wye = wye;
@@ -9986,7 +9965,7 @@ var Legend = (function (_super) {
             entriesEnter.append("path")
                 .attr("d", function (symbolEntryPair, columnIndex) {
                 var symbol = symbolEntryPair[0];
-                return self.symbol()(symbol.data.name, rowIndex)(symbol.height * 0.6);
+                return self.symbol()(symbol.data.name, rowIndex)(symbol.height * 0.6)(null);
             })
                 .attr("transform", function (symbolEntryPair, i) {
                 var symbol = symbolEntryPair[0];
@@ -11417,9 +11396,11 @@ var Symbol = (function (_super) {
      * @param _d3SymbolFactory A callback that gives this Symbol Drawer a d3.Symbol object which will be
      * used to draw with.
      */
-    function Symbol(dataset, d3SymbolFactory) {
+    function Symbol(dataset, d3SymbolGenerator) {
         var _this = _super.call(this, dataset) || this;
-        _this._d3SymbolFactory = d3SymbolFactory;
+        // Filter to used attributes for performance.
+        _this.FILTERED_ATTRIBUTES = ["x", "y", "fill", "opacity"];
+        _this._d3SymbolGenerator = d3SymbolGenerator;
         _this._svgElementName = "path";
         _this._className = "symbol";
         return _this;
@@ -11433,18 +11414,21 @@ var Symbol = (function (_super) {
     Symbol.prototype._drawStepCanvas = function (data, step) {
         var _this = this;
         var context = this.canvas().node().getContext("2d");
-        var d3Symbol = this._d3SymbolFactory();
+        var d3Symbol = this._d3SymbolGenerator();
         var attrToAppliedProjector = step.attrToAppliedProjector;
         data.forEach(function (datum, index) {
             var resolvedAttrs = Object.keys(attrToAppliedProjector).reduce(function (obj, attrName) {
-                obj[attrName] = attrToAppliedProjector[attrName](datum, index);
+                if (_this.FILTERED_ATTRIBUTES.indexOf(attrName) !== -1) {
+                    obj[attrName] = attrToAppliedProjector[attrName](datum, index);
+                }
                 return obj;
             }, {});
             context.save();
-            var _a = resolvedAttrs["transform"], x = _a.x, y = _a.y;
+            var x = resolvedAttrs["x"];
+            var y = resolvedAttrs["y"];
             context.translate(x, y);
             context.beginPath();
-            d3Symbol(datum, index, _this._dataset, context);
+            d3Symbol(datum, index, _this._dataset).context(context)(null);
             context.closePath();
             if (resolvedAttrs["fill"]) {
                 var fillColor = d3.color(resolvedAttrs["fill"]);
@@ -13442,7 +13426,7 @@ var Scatter = (function (_super) {
     };
     Scatter.prototype._createDrawer = function (dataset) {
         var _this = this;
-        return new Drawers.Symbol(dataset, function () { return _this._d3SymbolFactory(); });
+        return new Drawers.Symbol(dataset, function () { return _this._constructSymbolGenerator(false); });
     };
     Scatter.prototype.size = function (size, scale) {
         if (size == null) {
@@ -13476,34 +13460,22 @@ var Scatter = (function (_super) {
     };
     Scatter.prototype._propertyProjectors = function () {
         var propertyToProjectors = _super.prototype._propertyProjectors.call(this);
-        propertyToProjectors["transform"] = this._constructTransformProjector();
-        if (this.renderer() === "svg") {
-            propertyToProjectors["d"] = this._constructSymbolProjector();
-        }
-        return propertyToProjectors;
-    };
-    Scatter.prototype._constructTransformProjector = function () {
-        var _this = this;
         var xProjector = plot_1.Plot._scaledAccessor(this.x());
         var yProjector = plot_1.Plot._scaledAccessor(this.y());
-        return function (datum, index, dataset) {
-            return _this.renderer() === "svg"
-                ? "translate(" + xProjector(datum, index, dataset) + "," + yProjector(datum, index, dataset) + ")"
-                : { x: xProjector(datum, index, dataset), y: yProjector(datum, index, dataset) };
+        propertyToProjectors["x"] = xProjector;
+        propertyToProjectors["y"] = yProjector;
+        propertyToProjectors["transform"] = function (datum, index, dataset) {
+            return "translate(" + xProjector(datum, index, dataset) + "," + yProjector(datum, index, dataset) + ")";
         };
+        propertyToProjectors["d"] = this._constructSymbolGenerator(true);
+        return propertyToProjectors;
     };
-    Scatter.prototype._constructSymbolProjector = function () {
+    Scatter.prototype._constructSymbolGenerator = function (generate) {
         var symbolProjector = plot_1.Plot._scaledAccessor(this.symbol());
         var sizeProjector = plot_1.Plot._scaledAccessor(this.size());
         return function (datum, index, dataset) {
-            return symbolProjector(datum, index, dataset)(sizeProjector(datum, index, dataset));
-        };
-    };
-    Scatter.prototype._d3SymbolFactory = function () {
-        var symbolProjector = plot_1.Plot._scaledAccessor(this.symbol());
-        var sizeProjector = plot_1.Plot._scaledAccessor(this.size());
-        return function (datum, index, dataset, context) {
-            return symbolProjector(datum, index, dataset)(sizeProjector(datum, index, dataset), context);
+            var generator = symbolProjector(datum, index, dataset)(sizeProjector(datum, index, dataset));
+            return generate ? generator(null) : generator;
         };
     };
     Scatter.prototype._entityVisibleOnPlot = function (entity, bounds) {

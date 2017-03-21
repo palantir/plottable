@@ -4,6 +4,7 @@
  */
 
 import * as d3 from "d3";
+import * as d3Shape from "d3-shape";
 
 import { Dataset } from "../core/dataset";
 
@@ -11,8 +12,9 @@ import { Drawer } from "./drawer";
 import { AppliedDrawStep } from "./index";
 
 export class Symbol extends Drawer {
-  private _d3SymbolFactory:
-    () => (datum: any, index: number, dataset: Dataset, context: CanvasRenderingContext2D) => string;
+  // Filter to used attributes for performance.
+  private FILTERED_ATTRIBUTES = ["x", "y", "fill", "opacity"];
+  private _d3SymbolGenerator: () => (datum: any, index: number, dataset: Dataset) => d3Shape.Symbol<any, any>;
 
   /**
    * @param dataset
@@ -21,10 +23,9 @@ export class Symbol extends Drawer {
    */
   constructor(
       dataset: Dataset,
-      d3SymbolFactory:
-        () => (datum: any, index: number, dataset: Dataset, context: CanvasRenderingContext2D) => string) {
+      d3SymbolGenerator: () => (datum: any, index: number, dataset: Dataset) => d3Shape.Symbol<any, any>) {
     super(dataset);
-    this._d3SymbolFactory = d3SymbolFactory;
+    this._d3SymbolGenerator = d3SymbolGenerator;
     this._svgElementName = "path";
     this._className = "symbol";
   }
@@ -37,22 +38,25 @@ export class Symbol extends Drawer {
    */
   protected _drawStepCanvas(data: any[], step: AppliedDrawStep) {
     const context = this.canvas().node().getContext("2d");
-    const d3Symbol = this._d3SymbolFactory();
+    const d3Symbol = this._d3SymbolGenerator();
 
     const attrToAppliedProjector = step.attrToAppliedProjector;
     data.forEach((datum, index) => {
       const resolvedAttrs = Object.keys(attrToAppliedProjector).reduce((obj, attrName) => {
-        obj[attrName] = attrToAppliedProjector[attrName](datum, index);
+        if (this.FILTERED_ATTRIBUTES.indexOf(attrName) !== -1) {
+          obj[attrName] = attrToAppliedProjector[attrName](datum, index);
+        }
         return obj;
       }, {} as { [key: string]: any | number | string });
 
       context.save();
 
-      const { x, y } = resolvedAttrs["transform"];
+      const x = resolvedAttrs["x"];
+      const y = resolvedAttrs["y"];
       context.translate(x, y);
 
       context.beginPath();
-      d3Symbol(datum, index, this._dataset, context);
+      d3Symbol(datum, index, this._dataset).context(context)(null);
       context.closePath();
 
       if (resolvedAttrs["fill"]) {
