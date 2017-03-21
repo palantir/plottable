@@ -3,7 +3,6 @@
  * @license MIT
  */
 
-import * as d3 from "d3";
 import * as d3Shape from "d3-shape";
 
 import { Dataset } from "../core/dataset";
