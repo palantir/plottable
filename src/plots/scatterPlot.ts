@@ -1,4 +1,3 @@
-import { Symbol } from "./../drawers/symbolDrawer";
 /**
  * Copyright 2014-present Palantir Technologies
  * @license MIT
@@ -63,7 +62,11 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
   }
 
   protected _createDrawer(dataset: Dataset): Drawers.Symbol {
-    return new Drawers.Symbol(dataset, () => this._constructSymbolGenerator(false));
+    return new Drawers.Symbol(
+      dataset,
+      () => Plot._scaledAccessor(this.symbol()),
+      () => Plot._scaledAccessor(this.size()),
+    );
   }
 
   /**
@@ -144,18 +147,17 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
     propertyToProjectors["transform"] = (datum: any, index: number, dataset: Dataset) => {
         return "translate(" + xProjector(datum, index, dataset) + "," + yProjector(datum, index, dataset) + ")";
     };
-    propertyToProjectors["d"] = this._constructSymbolGenerator(true);
+    propertyToProjectors["d"] = this._constructSymbolGenerator();
 
     return propertyToProjectors;
   }
 
   // When generate is true, callback returns generated symbol, otherwise returns symbol generator
-  protected _constructSymbolGenerator(generate: boolean) {
+  protected _constructSymbolGenerator() {
     const symbolProjector = Plot._scaledAccessor(this.symbol());
     const sizeProjector = Plot._scaledAccessor(this.size());
     return (datum: any, index: number, dataset: Dataset) => {
-      const generator = symbolProjector(datum, index, dataset)(sizeProjector(datum, index, dataset));
-      return generate ? generator(null) : generator;
+      return symbolProjector(datum, index, dataset)(sizeProjector(datum, index, dataset))(null);
     };
   }
 

@@ -16,19 +16,24 @@ describe("Drawers", () => {
       },
     ];
 
-    let d3SymbolGeneratorFactorySpy: sinon.SinonSpy;
+    let symbolProjectorSpy: sinon.SinonSpy;
+    let sizeProjectorSpy: sinon.SinonSpy;
 
     beforeEach(() => {
-      drawer = new Plottable.Drawers.Symbol(null, () => (datum, index, dataset) => d3.symbol());
-      d3SymbolGeneratorFactorySpy = sinon.spy(drawer, "_d3SymbolGeneratorFactory");
+      drawer = new Plottable.Drawers.Symbol(null,
+        () => (datum, index, dataset) => Plottable.SymbolFactories.circle(),
+        () => (datum, index, dataset) => 10,
+      );
+      symbolProjectorSpy = sinon.spy(drawer, "symbolProjector");
+      sizeProjectorSpy = sinon.spy(drawer, "symbolProjector");
     });
 
     it("uses the line factory during canvas drawing", () => {
       const canvas = d3.select(document.createElement("canvas"));
       drawer.canvas(canvas);
-
       drawer.draw(data, drawSteps);
-      assert.isTrue(d3SymbolGeneratorFactorySpy.called, "got a line factory");
+      assert.isTrue(symbolProjectorSpy.called, "called symbol projector");
+      assert.isTrue(sizeProjectorSpy.called, "called size projector");
     });
   });
 });

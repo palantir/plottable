@@ -1,8 +1,7 @@
 function makeData() {
   "use strict";
-
-  // makes 10k points
-  return Array.apply(null, Array(10000)).map(() => ({
+  // makes random points
+  return Array.apply(null, Array(100*1000)).map(() => ({
     x: Math.random(),
     y: Math.random(),
   }));
@@ -16,28 +15,20 @@ function run(div, data, Plottable) {
   var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
+  // using the same symbol factories instead of new instances from each
+  // projector allows us to compare the instances and save a lot of re-rendering
+  var symbols = [
+    new Plottable.SymbolFactories.cross(),
+    new Plottable.SymbolFactories.square(),
+    new Plottable.SymbolFactories.star(),
+  ];
+
   var plot = new Plottable.Plots.Scatter().addDataset(new Plottable.Dataset(data))
     .renderer("canvas")
     .x((d) => d.x, xScale)
     .y((d) => d.y, yScale)
-    .size((d, i) => {
-      if (i % 3 === 0) {
-        return 20;
-      } else if (i % 3 === 1) {
-        return 10;
-      } else {
-        return 30;
-      }
-    })
-    .symbol((d, i) => {
-      if (i % 3 === 0) {
-        return new Plottable.SymbolFactories.cross();
-      } else if (i % 3 === 1) {
-        return new Plottable.SymbolFactories.square();
-      } else {
-        return new Plottable.SymbolFactories.star();
-      }
-    });
+    .size((d, i) => 6 + (Math.floor(i / 100) % 6) * 4)
+    .symbol((d, i) => symbols[Math.floor(i / 100) % 3]);
 
   var table = new Plottable.Components.Table([
     [yAxis, plot],
@@ -50,7 +41,4 @@ function run(div, data, Plottable) {
     .setMinMaxDomainValuesTo(yScale);
 
   table.renderTo(div);
-  // window.addEventListener("resize", () => {
-  //   table.redraw();
-  // });
 }

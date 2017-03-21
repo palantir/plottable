@@ -148,11 +148,13 @@ export class Drawer {
   /**
    * Sets attributes on canvas context
    *
-   * @param {CanvasRenderingContext2D} context Canvas context.
    * @param {{[key: string]: any}} resolvedAttrs Attributes to set on context.
+   * @param {CanvasRenderingContext2D} context Optional canvas context.
    */
-  protected _setCanvasContextStyles(resolvedAttrs: { [key: string]: any }) {
-    const context = this.canvas().node().getContext("2d");
+  protected _setCanvasContextStyles(resolvedAttrs: { [key: string]: any }, context?: CanvasRenderingContext2D) {
+    if (context == null) {
+      context = this.canvas().node().getContext("2d");
+    }
     const { stroke, strokeWidth, fill, opacity } = Drawer._CANVAS_CONTEXT_ATTRIBUTES;
     if (resolvedAttrs[strokeWidth]) {
       context.lineWidth = parseFloat(resolvedAttrs[strokeWidth]);
