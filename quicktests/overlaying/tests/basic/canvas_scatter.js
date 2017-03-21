@@ -20,8 +20,24 @@ function run(div, data, Plottable) {
     .renderer("canvas")
     .x((d) => d.x, xScale)
     .y((d) => d.y, yScale)
-    .size(() => 20)
-    .symbol(() => new Plottable.SymbolFactories.cross());
+    .size((d, i) => {
+      if (i % 3 === 0) {
+        return 20;
+      } else if (i % 3 === 1) {
+        return 10;
+      } else {
+        return 30;
+      }
+    })
+    .symbol((d, i) => {
+      if (i % 3 === 0) {
+        return new Plottable.SymbolFactories.cross();
+      } else if (i % 3 === 1) {
+        return new Plottable.SymbolFactories.square();
+      } else {
+        return new Plottable.SymbolFactories.star();
+      }
+    });
 
   var table = new Plottable.Components.Table([
     [yAxis, plot],
@@ -34,7 +50,7 @@ function run(div, data, Plottable) {
     .setMinMaxDomainValuesTo(yScale);
 
   table.renderTo(div);
-  window.addEventListener("resize", () => {
-    table.redraw();
-  });
+  // window.addEventListener("resize", () => {
+  //   table.redraw();
+  // });
 }
