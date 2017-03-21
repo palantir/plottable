@@ -12,8 +12,6 @@ import { Drawer } from "./drawer";
 import { AppliedDrawStep } from "./index";
 
 export class Symbol extends Drawer {
-  // Filter to used attributes for performance.
-  private FILTERED_ATTRIBUTES = ["x", "y", "fill", "opacity"];
   private _d3SymbolGenerator: () => (datum: any, index: number, dataset: Dataset) => d3Shape.Symbol<any, any>;
 
   /**
@@ -31,8 +29,8 @@ export class Symbol extends Drawer {
   }
 
   /**
-   * @param data Data to draw. The data will be passed through the symbol factory in order to get applied
-   * onto the canvas.
+   * @param data Data to draw. The data will be passed through the symbol generator to set the type and size
+   * in order to get applied onto the canvas.
    * @param step
    * @private
    */
@@ -41,33 +39,24 @@ export class Symbol extends Drawer {
     const d3Symbol = this._d3SymbolGenerator();
 
     const attrToAppliedProjector = step.attrToAppliedProjector;
+    const attrs = Object.keys(Drawer._CANVAS_CONTEXT_ATTRIBUTES).concat(["x", "y"]);
     data.forEach((datum, index) => {
       const resolvedAttrs = Object.keys(attrToAppliedProjector).reduce((obj, attrName) => {
-        if (this.FILTERED_ATTRIBUTES.indexOf(attrName) !== -1) {
+        // only set if needed for performance
+        if (attrs.indexOf(attrName) !== -1) {
           obj[attrName] = attrToAppliedProjector[attrName](datum, index);
         }
         return obj;
-      }, {} as { [key: string]: any | number | string });
+      }, {} as { [key: string]: any });
 
       context.save();
-
-      const x = resolvedAttrs["x"];
-      const y = resolvedAttrs["y"];
-      context.translate(x, y);
+      context.translate(resolvedAttrs["x"], resolvedAttrs["y"]);
 
       context.beginPath();
       d3Symbol(datum, index, this._dataset).context(context)(null);
       context.closePath();
 
-      if (resolvedAttrs["fill"]) {
-        const fillColor = d3.color(resolvedAttrs["fill"]);
-        if (resolvedAttrs["opacity"]) {
-          fillColor.opacity = resolvedAttrs["opacity"];
-        }
-        context.fillStyle = fillColor.rgb().toString();
-      }
-
-      context.fill();
+      this._setCanvasContextStyles(resolvedAttrs);
 
       context.restore();
     });

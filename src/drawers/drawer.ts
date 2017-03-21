@@ -28,6 +28,10 @@ export class Drawer {
   private _renderArea: SimpleSelection<void>;
   private _canvas: d3.Selection<HTMLCanvasElement, any, any, any>;
 
+  // Attributes to style canvas context
+  protected static _CANVAS_CONTEXT_ATTRIBUTES = {
+    strokeWidth: "stroke-width", stroke: "stroke", opacity: "opacity", fill: "fill",
+  };
   protected _svgElementName: string;
   protected _className: string;
   protected _dataset: Dataset;
@@ -121,7 +125,7 @@ export class Drawer {
   /**
    * Draws data using one step
    *
-   * @param{AppliedDrawStep} step The step, how data should be drawn.
+   * @param {AppliedDrawStep} step The step, how data should be drawn.
    */
   private _drawStep(step: Drawers.AppliedDrawStep) {
     const selection = this.selection();
@@ -139,6 +143,36 @@ export class Drawer {
 
   protected _drawStepCanvas(data: any[], step: Drawers.AppliedDrawStep) {
     Utils.Window.warn("canvas rendering not yet implemented on " + (<any> this.constructor).name);
+  }
+
+  /**
+   * Sets attributes on canvas context
+   *
+   * @param {CanvasRenderingContext2D} context Canvas context.
+   * @param {{[key: string]: any}} resolvedAttrs Attributes to set on context.
+   */
+  protected _setCanvasContextStyles(resolvedAttrs: { [key: string]: any }) {
+    const context = this.canvas().node().getContext("2d");
+    const { stroke, strokeWidth, fill, opacity } = Drawer._CANVAS_CONTEXT_ATTRIBUTES;
+    if (resolvedAttrs[strokeWidth]) {
+      context.lineWidth = parseFloat(resolvedAttrs[strokeWidth]);
+    }
+    if (resolvedAttrs[stroke]) {
+      const strokeColor = d3.color(stroke);
+      if (resolvedAttrs[opacity]) {
+        strokeColor.opacity = resolvedAttrs[opacity];
+      }
+      context.strokeStyle = strokeColor.rgb().toString();
+      context.stroke();
+    }
+    if (resolvedAttrs[fill]) {
+      const fillColor = d3.color(resolvedAttrs[fill]);
+      if (resolvedAttrs[opacity]) {
+        fillColor.opacity = resolvedAttrs[opacity];
+      }
+      context.fillStyle = fillColor.rgb().toString();
+      context.fill();
+    }
   }
 
   private _appliedProjectors(attrToProjector: AttributeToProjector): AttributeToAppliedProjector {

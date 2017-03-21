@@ -1416,7 +1416,7 @@ var Drawer = (function () {
     /**
      * Draws data using one step
      *
-     * @param{AppliedDrawStep} step The step, how data should be drawn.
+     * @param {AppliedDrawStep} step The step, how data should be drawn.
      */
     Drawer.prototype._drawStep = function (step) {
         var selection = this.selection();
@@ -1433,6 +1433,35 @@ var Drawer = (function () {
     };
     Drawer.prototype._drawStepCanvas = function (data, step) {
         Utils.Window.warn("canvas rendering not yet implemented on " + this.constructor.name);
+    };
+    /**
+     * Sets attributes on canvas context
+     *
+     * @param {CanvasRenderingContext2D} context Canvas context.
+     * @param {{[key: string]: any}} resolvedAttrs Attributes to set on context.
+     */
+    Drawer.prototype._setCanvasContextStyles = function (resolvedAttrs) {
+        var context = this.canvas().node().getContext("2d");
+        var _a = Drawer._CANVAS_CONTEXT_ATTRIBUTES, stroke = _a.stroke, strokeWidth = _a.strokeWidth, fill = _a.fill, opacity = _a.opacity;
+        if (resolvedAttrs[strokeWidth]) {
+            context.lineWidth = parseFloat(resolvedAttrs[strokeWidth]);
+        }
+        if (resolvedAttrs[stroke]) {
+            var strokeColor = d3.color(stroke);
+            if (resolvedAttrs[opacity]) {
+                strokeColor.opacity = resolvedAttrs[opacity];
+            }
+            context.strokeStyle = strokeColor.rgb().toString();
+            context.stroke();
+        }
+        if (resolvedAttrs[fill]) {
+            var fillColor = d3.color(resolvedAttrs[fill]);
+            if (resolvedAttrs[opacity]) {
+                fillColor.opacity = resolvedAttrs[opacity];
+            }
+            context.fillStyle = fillColor.rgb().toString();
+            context.fill();
+        }
     };
     Drawer.prototype._appliedProjectors = function (attrToProjector) {
         var _this = this;
@@ -1528,6 +1557,10 @@ var Drawer = (function () {
     };
     return Drawer;
 }());
+// Attributes to style canvas context
+Drawer._CANVAS_CONTEXT_ATTRIBUTES = {
+    strokeWidth: "stroke-width", stroke: "stroke", opacity: "opacity", fill: "fill",
+};
 exports.Drawer = Drawer;
 
 
@@ -11256,25 +11289,19 @@ var Line = (function (_super) {
         var context = this.canvas().node().getContext("2d");
         var d3Line = this._d3LineFactory();
         var attrToAppliedProjector = step.attrToAppliedProjector;
+        var attrs = Object.keys(drawer_1.Drawer._CANVAS_CONTEXT_ATTRIBUTES);
         var resolvedAttrs = Object.keys(attrToAppliedProjector).reduce(function (obj, attrName) {
-            obj[attrName] = attrToAppliedProjector[attrName](data, 0);
+            // only set if needed for performance
+            if (attrs.indexOf(attrName) !== -1) {
+                obj[attrName] = attrToAppliedProjector[attrName](data, 0);
+            }
             return obj;
         }, {});
         context.save();
         context.beginPath();
         d3Line.context(context);
         d3Line(data[0]);
-        if (resolvedAttrs["stroke-width"]) {
-            context.lineWidth = parseFloat(resolvedAttrs["stroke-width"]);
-        }
-        if (resolvedAttrs["stroke"]) {
-            var strokeColor = d3.color(resolvedAttrs["stroke"]);
-            if (resolvedAttrs["opacity"]) {
-                strokeColor.opacity = resolvedAttrs["opacity"];
-            }
-            context.strokeStyle = strokeColor.rgb().toString();
-            context.stroke();
-        }
+        this._setCanvasContextStyles(resolvedAttrs);
         context.restore();
     };
     return Line;
@@ -11297,7 +11324,6 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var d3 = __webpack_require__(1);
 var drawer_1 = __webpack_require__(7);
 var Rectangle = (function (_super) {
     __extends(Rectangle, _super);
@@ -11307,35 +11333,22 @@ var Rectangle = (function (_super) {
         return _this;
     }
     Rectangle.prototype._drawStepCanvas = function (data, step) {
+        var _this = this;
         var context = this.canvas().node().getContext("2d");
-        var attrToAppliedProjector = step.attrToAppliedProjector;
         context.save();
+        var attrToAppliedProjector = step.attrToAppliedProjector;
+        var attrs = Object.keys(drawer_1.Drawer._CANVAS_CONTEXT_ATTRIBUTES).concat(["x", "y", "width", "height"]);
         data.forEach(function (point, index) {
             var resolvedAttrs = Object.keys(attrToAppliedProjector).reduce(function (obj, attrName) {
-                obj[attrName] = attrToAppliedProjector[attrName](point, index);
+                // only set if needed for performance
+                if (attrs.indexOf(attrName) !== -1) {
+                    obj[attrName] = attrToAppliedProjector[attrName](point, index);
+                }
                 return obj;
             }, {});
             context.beginPath();
             context.rect(resolvedAttrs["x"], resolvedAttrs["y"], resolvedAttrs["width"], resolvedAttrs["height"]);
-            if (resolvedAttrs["stroke-width"]) {
-                context.lineWidth = resolvedAttrs["stroke-width"];
-            }
-            if (resolvedAttrs["stroke"]) {
-                var strokeColor = d3.color(resolvedAttrs["stroke"]);
-                if (resolvedAttrs["opacity"]) {
-                    strokeColor.opacity = resolvedAttrs["opacity"];
-                }
-                context.strokeStyle = strokeColor.rgb().toString();
-                context.stroke();
-            }
-            if (resolvedAttrs["fill"]) {
-                var fillColor = d3.color(resolvedAttrs["fill"]);
-                if (resolvedAttrs["opacity"]) {
-                    fillColor.opacity = resolvedAttrs["opacity"];
-                }
-                context.fillStyle = fillColor.rgb().toString();
-                context.fill();
-            }
+            _this._setCanvasContextStyles(resolvedAttrs);
         });
         context.restore();
     };
@@ -11387,7 +11400,6 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var d3 = __webpack_require__(1);
 var drawer_1 = __webpack_require__(7);
 var Symbol = (function (_super) {
     __extends(Symbol, _super);
@@ -11398,16 +11410,14 @@ var Symbol = (function (_super) {
      */
     function Symbol(dataset, d3SymbolGenerator) {
         var _this = _super.call(this, dataset) || this;
-        // Filter to used attributes for performance.
-        _this.FILTERED_ATTRIBUTES = ["x", "y", "fill", "opacity"];
         _this._d3SymbolGenerator = d3SymbolGenerator;
         _this._svgElementName = "path";
         _this._className = "symbol";
         return _this;
     }
     /**
-     * @param data Data to draw. The data will be passed through the symbol factory in order to get applied
-     * onto the canvas.
+     * @param data Data to draw. The data will be passed through the symbol generator to set the type and size
+     * in order to get applied onto the canvas.
      * @param step
      * @private
      */
@@ -11416,28 +11426,21 @@ var Symbol = (function (_super) {
         var context = this.canvas().node().getContext("2d");
         var d3Symbol = this._d3SymbolGenerator();
         var attrToAppliedProjector = step.attrToAppliedProjector;
+        var attrs = Object.keys(drawer_1.Drawer._CANVAS_CONTEXT_ATTRIBUTES).concat(["x", "y"]);
         data.forEach(function (datum, index) {
             var resolvedAttrs = Object.keys(attrToAppliedProjector).reduce(function (obj, attrName) {
-                if (_this.FILTERED_ATTRIBUTES.indexOf(attrName) !== -1) {
+                // only set if needed for performance
+                if (attrs.indexOf(attrName) !== -1) {
                     obj[attrName] = attrToAppliedProjector[attrName](datum, index);
                 }
                 return obj;
             }, {});
             context.save();
-            var x = resolvedAttrs["x"];
-            var y = resolvedAttrs["y"];
-            context.translate(x, y);
+            context.translate(resolvedAttrs["x"], resolvedAttrs["y"]);
             context.beginPath();
             d3Symbol(datum, index, _this._dataset).context(context)(null);
             context.closePath();
-            if (resolvedAttrs["fill"]) {
-                var fillColor = d3.color(resolvedAttrs["fill"]);
-                if (resolvedAttrs["opacity"]) {
-                    fillColor.opacity = resolvedAttrs["opacity"];
-                }
-                context.fillStyle = fillColor.rgb().toString();
-            }
-            context.fill();
+            _this._setCanvasContextStyles(resolvedAttrs);
             context.restore();
         });
     };
@@ -13375,10 +13378,6 @@ exports.Rectangle = Rectangle;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -13470,6 +13469,7 @@ var Scatter = (function (_super) {
         propertyToProjectors["d"] = this._constructSymbolGenerator(true);
         return propertyToProjectors;
     };
+    // When generate is true, callback returns generated symbol, otherwise returns symbol generator
     Scatter.prototype._constructSymbolGenerator = function (generate) {
         var symbolProjector = plot_1.Plot._scaledAccessor(this.symbol());
         var sizeProjector = plot_1.Plot._scaledAccessor(this.size());

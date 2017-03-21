@@ -43,14 +43,17 @@ export class Line extends Drawer {
    */
   protected _drawStepCanvas(data: any[][], step: AppliedDrawStep) {
     const context = this.canvas().node().getContext("2d");
-
     const d3Line = this._d3LineFactory();
 
     const attrToAppliedProjector = step.attrToAppliedProjector;
+    const attrs = Object.keys(Drawer._CANVAS_CONTEXT_ATTRIBUTES);
     const resolvedAttrs = Object.keys(attrToAppliedProjector).reduce((obj, attrName) => {
-      obj[attrName] = attrToAppliedProjector[attrName](data, 0);
+      // only set if needed for performance
+      if (attrs.indexOf(attrName) !== -1) {
+        obj[attrName] = attrToAppliedProjector[attrName](data, 0);
+      }
       return obj;
-    }, {} as { [key: string]: any | number | string });
+    }, {} as { [key: string]: any });
 
     context.save();
     context.beginPath();
@@ -58,18 +61,7 @@ export class Line extends Drawer {
     d3Line.context(context);
     d3Line(data[0]);
 
-    if (resolvedAttrs["stroke-width"]) {
-      context.lineWidth = parseFloat(resolvedAttrs["stroke-width"]);
-    }
-
-    if (resolvedAttrs["stroke"]) {
-      const strokeColor = d3.color(resolvedAttrs["stroke"]);
-      if (resolvedAttrs["opacity"]) {
-        strokeColor.opacity = resolvedAttrs["opacity"];
-      }
-      context.strokeStyle = strokeColor.rgb().toString();
-      context.stroke();
-    }
+    this._setCanvasContextStyles(resolvedAttrs);
 
     context.restore();
   }

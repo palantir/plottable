@@ -1,3 +1,4 @@
+import { Symbol } from "./../drawers/symbolDrawer";
 /**
  * Copyright 2014-present Palantir Technologies
  * @license MIT
@@ -148,6 +149,7 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
     return propertyToProjectors;
   }
 
+  // When generate is true, callback returns generated symbol, otherwise returns symbol generator
   protected _constructSymbolGenerator(generate: boolean) {
     const symbolProjector = Plot._scaledAccessor(this.symbol());
     const sizeProjector = Plot._scaledAccessor(this.size());

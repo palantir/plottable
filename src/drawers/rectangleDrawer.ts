@@ -20,36 +20,22 @@ export class Rectangle extends Drawer {
   protected _drawStepCanvas(data: any[], step: AppliedDrawStep) {
     const context = this.canvas().node().getContext("2d");
 
-    const attrToAppliedProjector = step.attrToAppliedProjector;
     context.save();
 
+    const attrToAppliedProjector = step.attrToAppliedProjector;
+    const attrs = Object.keys(Drawer._CANVAS_CONTEXT_ATTRIBUTES).concat(["x", "y", "width", "height"]);
     data.forEach((point, index) => {
       const resolvedAttrs = Object.keys(attrToAppliedProjector).reduce((obj, attrName) => {
-        obj[attrName] = attrToAppliedProjector[attrName](point, index);
+        // only set if needed for performance
+        if (attrs.indexOf(attrName) !== -1) {
+          obj[attrName] = attrToAppliedProjector[attrName](point, index);
+        }
         return obj;
-      }, {} as { [key: string]: any | number | string });
+      }, {} as { [key: string]: any });
 
       context.beginPath();
       context.rect(resolvedAttrs["x"], resolvedAttrs["y"], resolvedAttrs["width"], resolvedAttrs["height"]);
-      if (resolvedAttrs["stroke-width"]) {
-        context.lineWidth = resolvedAttrs["stroke-width"];
-      }
-      if (resolvedAttrs["stroke"]) {
-        const strokeColor = d3.color(resolvedAttrs["stroke"]);
-        if (resolvedAttrs["opacity"]) {
-          strokeColor.opacity = resolvedAttrs["opacity"];
-        }
-        context.strokeStyle = strokeColor.rgb().toString();
-        context.stroke();
-      }
-      if (resolvedAttrs["fill"]) {
-        const fillColor = d3.color(resolvedAttrs["fill"]);
-        if (resolvedAttrs["opacity"]) {
-          fillColor.opacity = resolvedAttrs["opacity"];
-        }
-        context.fillStyle = fillColor.rgb().toString();
-        context.fill();
-      }
+      this._setCanvasContextStyles(resolvedAttrs);
     });
     context.restore();
   }
