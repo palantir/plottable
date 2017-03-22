@@ -29,7 +29,7 @@ describe("Drawers", () => {
     });
 
 
-    it("uses the line factory during canvas drawing", (done) => {
+    it("uses the line factory during canvas drawing", () => {
       const canvas = d3.select(document.createElement("canvas"));
       drawer.canvas(canvas);
       drawer.draw(data, drawSteps);
