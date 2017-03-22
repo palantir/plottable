@@ -52,8 +52,7 @@ export class Symbol extends Drawer {
 
     // lazilly create offscreen buffer of modest size
     if (this.buffer == null) {
-      this.buffer = new CanvasBuffer(10, 10, 1);
-      this.buffer.ctx.translate(5, 5);
+      this.buffer = new CanvasBuffer(0, 0, 1);
     }
 
     let prevAttrs: any = null;
@@ -66,7 +65,7 @@ export class Symbol extends Drawer {
       // check symbol is in viewport
       const attrs = this._resolveAttributesSubset(projector, attrKeys, datum, index);
       const symbolSize = this.sizeProjector()(datum, index, this._dataset);
-      if (!intersectsCanvasBounds(attrs["x"], attrs["y"], symbolSize * 2)) {
+      if (!intersectsCanvasBounds(attrs["x"], attrs["y"], symbolSize)) {
         skipped++;
         continue;
       }
@@ -78,9 +77,8 @@ export class Symbol extends Drawer {
         skipped++;
       } else {
         // make room for bigger symbol if needed
-        if (2*symbolSize > this.buffer.pixelWidth || 2*symbolSize > this.buffer.pixelHeight) {
-          this.buffer.resize(2*symbolSize, 2*symbolSize);
-          this.buffer.ctx.translate(symbolSize, symbolSize);
+        if (symbolSize > this.buffer.pixelWidth || symbolSize > this.buffer.pixelHeight) {
+          this.buffer.resize(symbolSize, symbolSize, true);
         }
 
         // draw actual symbol into buffer

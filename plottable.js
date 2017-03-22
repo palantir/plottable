@@ -11282,17 +11282,26 @@ var CanvasBuffer = (function () {
     CanvasBuffer.prototype.blitCenter = function (ctx, x, y) {
         if (x === void 0) { x = 0; }
         if (y === void 0) { y = 0; }
-        ctx.drawImage(this.canvas, Math.floor(x - this.screenWidth / 2), Math.floor(y - this.screenHeight / 2));
+        this.blit(ctx, Math.floor(x - this.screenWidth / 2), Math.floor(y - this.screenHeight / 2));
     };
     /**
      * Changes the size of the underlying canvas in screen space, respecting the
-     * current devicePixelRatio
+     * current devicePixelRatio.
+     *
+     * @param center - optionally enable a translate transformation moving the
+     *                 origin to the center of the canvas.
      */
-    CanvasBuffer.prototype.resize = function (screenWidth, screenHeight) {
+    CanvasBuffer.prototype.resize = function (screenWidth, screenHeight, center) {
+        if (center === void 0) { center = false; }
         var devicePixelRatio = this.devicePixelRatio;
+        this.screenWidth = screenWidth;
+        this.screenHeight = screenHeight;
         this.pixelWidth = screenWidth * devicePixelRatio;
         this.pixelHeight = screenHeight * devicePixelRatio;
         CanvasBuffer.sizePixels(this.ctx, screenWidth, screenHeight, devicePixelRatio);
+        if (center) {
+            this.ctx.translate(screenWidth / 2, screenWidth / 2);
+        }
         return this;
     };
     /**
@@ -11517,8 +11526,7 @@ var Symbol = (function (_super) {
         };
         // lazilly create offscreen buffer of modest size
         if (this.buffer == null) {
-            this.buffer = new canvasBuffer_1.CanvasBuffer(10, 10, 1);
-            this.buffer.ctx.translate(5, 5);
+            this.buffer = new canvasBuffer_1.CanvasBuffer(0, 0, 1);
         }
         var prevAttrs = null;
         var prevSymbolGenerator = null;
@@ -11529,7 +11537,7 @@ var Symbol = (function (_super) {
             // check symbol is in viewport
             var attrs = this._resolveAttributesSubset(projector, attrKeys, datum, index);
             var symbolSize = this.sizeProjector()(datum, index, this._dataset);
-            if (!intersectsCanvasBounds(attrs["x"], attrs["y"], symbolSize * 2)) {
+            if (!intersectsCanvasBounds(attrs["x"], attrs["y"], symbolSize)) {
                 skipped++;
                 continue;
             }
@@ -11541,9 +11549,8 @@ var Symbol = (function (_super) {
             }
             else {
                 // make room for bigger symbol if needed
-                if (2 * symbolSize > this.buffer.pixelWidth || 2 * symbolSize > this.buffer.pixelHeight) {
-                    this.buffer.resize(2 * symbolSize, 2 * symbolSize);
-                    this.buffer.ctx.translate(symbolSize, symbolSize);
+                if (symbolSize > this.buffer.pixelWidth || symbolSize > this.buffer.pixelHeight) {
+                    this.buffer.resize(symbolSize, symbolSize, true);
                 }
                 // draw actual symbol into buffer
                 this.buffer.clear();

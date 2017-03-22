@@ -35,13 +35,13 @@ export class CanvasBuffer {
         CanvasBuffer.sizePixels(this.ctx, screenWidth, screenHeight, devicePixelRatio);
     }
 
-    public blit(ctx: CanvasRenderingContext2D, x = 0, y = 0){
+    public blit(ctx: CanvasRenderingContext2D, x = 0, y = 0) {
         ctx.drawImage(this.canvas, x, y);
     }
 
-    public blitCenter(ctx: CanvasRenderingContext2D, x = 0, y = 0){
-        ctx.drawImage(
-            this.canvas,
+    public blitCenter(ctx: CanvasRenderingContext2D, x = 0, y = 0) {
+        this.blit(
+            ctx,
             Math.floor(x - this.screenWidth / 2),
             Math.floor(y - this.screenHeight / 2),
         );
@@ -49,13 +49,21 @@ export class CanvasBuffer {
 
     /**
      * Changes the size of the underlying canvas in screen space, respecting the
-     * current devicePixelRatio
+     * current devicePixelRatio.
+     *
+     * @param center - optionally enable a translate transformation moving the
+     *                 origin to the center of the canvas.
      */
-    public resize(screenWidth: number, screenHeight: number) {
+    public resize(screenWidth: number, screenHeight: number, center = false) {
         const { devicePixelRatio } = this;
+        this.screenWidth = screenWidth;
+        this.screenHeight = screenHeight;
         this.pixelWidth = screenWidth * devicePixelRatio;
         this.pixelHeight = screenHeight * devicePixelRatio;
         CanvasBuffer.sizePixels(this.ctx, screenWidth, screenHeight, devicePixelRatio);
+        if (center) {
+            this.ctx.translate(screenWidth / 2, screenWidth / 2);
+        }
         return this;
     }
 
