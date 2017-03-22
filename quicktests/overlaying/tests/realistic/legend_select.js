@@ -16,7 +16,7 @@ function run(svg, data, Plottable) {
   cs.range(["#ff0000", "#009900", "#0000ff"]);
   cs.domain(["red", "green", "blue"]);
   var legend = new Plottable.Components.Legend(cs);
-  legend.symbol(function (data, index, dataset) {
+  legend.symbol(function (_data, index) {
     return index === 0 ? new Plottable.SymbolFactories.cross() : new Plottable.SymbolFactories.square();
   });
 
