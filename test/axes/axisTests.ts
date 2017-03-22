@@ -687,7 +687,7 @@ describe("Axis", () => {
       // force multiline
       const domain = ["albatross long long long long long long long long long long long long title"];
       setup(domain);
-      const labelTextLineElement = div.select(`.text-line`).node() as Element;
+      const labelTextLineElement = div.select(".text-line").node() as Element;
       assert.equal(axis.tickLabelDataOnElement(labelTextLineElement), domain[0]);
       cleanup();
     });
@@ -695,7 +695,7 @@ describe("Axis", () => {
     it("returns undefined when no ancestor has tick label class", () => {
       const domain = ["label1", "label2"];
       setup(domain);
-      const contentElement = div.select(`.content`).node() as Element;
+      const contentElement = div.select(".content").node() as Element;
       assert.isUndefined(axis.tickLabelDataOnElement(contentElement));
       cleanup();
     });
