@@ -1,7 +1,7 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
+import * as sinon from "sinon";
 
 import * as Plottable from "../../src";
 
@@ -822,6 +822,38 @@ describe("Plots", () => {
         TestMethods.assertPathEqualToDataPoints(path, expectedRenderedData, xScale, yScale);
 
         div.remove();
+      });
+    });
+
+    describe("canvas rendering", () => {
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
+      let plot: Plottable.Plots.Line<number>;
+
+      let xScale: Plottable.Scales.Linear;
+      let yScale: Plottable.Scales.Linear;
+
+      beforeEach(() => {
+        div = TestMethods.generateDiv();
+        xScale = new Plottable.Scales.Linear();
+        yScale = new Plottable.Scales.Linear();
+        plot = new Plottable.Plots.Line<number>();
+        plot.x((d) => d.x, xScale).y((d) => d.y, yScale);
+        plot.renderer("canvas");
+      });
+
+      afterEach(() => {
+        div.remove();
+      });
+
+      it("passes the right datum to the accessors", () => {
+        const datum = {x: 1, y: 2};
+        const dataset = new Plottable.Dataset([datum]);
+        const attrSpy = sinon.spy();
+
+        plot.datasets([dataset]);
+        plot.attr("foo", attrSpy);
+        plot.renderTo(div);
+        assert.isTrue(attrSpy.calledWith(datum, 0, dataset), "attr is passed individual datum");
       });
     });
   });

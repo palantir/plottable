@@ -12,12 +12,13 @@ import { Formatter } from "../core/formatters";
 import * as Formatters from "../core/formatters";
 import { Accessor, Bounds, Point, Range, SimpleSelection } from "../core/interfaces";
 import * as Drawers from "../drawers";
-import { CanvasDrawer, Drawer } from "../drawers/drawer";
+import { Drawer } from "../drawers/drawer";
 import * as Scales from "../scales";
 import { QuantitativeScale } from "../scales/quantitativeScale";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
 
+import { CanvasDrawer } from "../drawers/canvasDrawer";
 import { RectangleCanvasDrawStep, RectangleSVGDrawer } from "../drawers/rectangleDrawer";
 import { makeEnum } from "../utils/makeEnum";
 import * as Plots from "./";

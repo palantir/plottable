@@ -6,21 +6,20 @@ import * as Plottable from "../../src";
 
 import * as TestMethods from "../testMethods";
 
-describe("Drawers", () => {
+describe("SVGDrawers", () => {
   describe("Arc Drawer", () => {
     it("has a stroke of \"none\"", () => {
-      const drawer = new Plottable.Drawers.Arc(null);
+      const drawer = new Plottable.Drawers.ArcSVGDrawer();
       const svg = TestMethods.generateSVG();
-      drawer.renderArea(svg);
 
       const data = [["A", "B", "C"]]; // arc normally takes single array of data
-      const drawSteps: Plottable.Drawers.DrawStep[] = [
+      const drawSteps: Plottable.Drawers.AppliedDrawStep[] = [
         {
-          attrToProjector: {},
+          attrToAppliedProjector: {},
           animator: new Plottable.Animators.Null(),
         },
       ];
-      drawer.draw(data, drawSteps);
+      drawer.draw(svg, data, drawSteps);
 
       assert.strictEqual(drawer.selection().style("stroke"), "none");
 

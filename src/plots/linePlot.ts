@@ -10,12 +10,13 @@ import * as Animators from "../animators";
 import { Dataset } from "../core/dataset";
 import { Accessor, AttributeToProjector, Bounds, Point, Projector, Range } from "../core/interfaces";
 import * as Drawers from "../drawers";
-import { CanvasDrawer, Drawer } from "../drawers/drawer";
+import { Drawer } from "../drawers/drawer";
 import * as Scales from "../scales";
 import { QuantitativeScale } from "../scales/quantitativeScale";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
 
+import { CanvasDrawer } from "../drawers/canvasDrawer";
 import { LineSVGDrawer, makeLineCanvasDrawStep } from "../drawers/lineDrawer";
 import { makeEnum } from "../utils/makeEnum";
 import * as Plots from "./";

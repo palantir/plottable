@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import { SVGDrawer } from "./drawer";
+import { SVGDrawer } from "./svgDrawer";
 
 export class SymbolSVGDrawer extends SVGDrawer {
   constructor() {

@@ -13,7 +13,8 @@ import { QuantitativeScale } from "../scales/quantitativeScale";
 import * as Utils from "../utils";
 
 import { AreaSVGDrawer } from "../drawers/areaDrawer";
-import { CanvasDrawer, Drawer } from "../drawers/drawer";
+import { CanvasDrawer } from "../drawers/canvasDrawer";
+import { Drawer } from "../drawers/drawer";
 import { LineSVGDrawer, makeLineCanvasDrawStep } from "../drawers/lineDrawer";
 import { warn } from "../utils/windowUtils";
 import * as Plots from "./";

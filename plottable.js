@@ -78,7 +78,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 125);
+/******/ 	return __webpack_require__(__webpack_require__.s = 127);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -94,24 +94,24 @@ return /******/ (function(modules) { // webpackBootstrap
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-var Array = __webpack_require__(95);
+var Array = __webpack_require__(98);
 exports.Array = Array;
-var Color = __webpack_require__(97);
+var Color = __webpack_require__(100);
 exports.Color = Color;
-var DOM = __webpack_require__(98);
+var DOM = __webpack_require__(101);
 exports.DOM = DOM;
-var Math = __webpack_require__(29);
+var Math = __webpack_require__(33);
 exports.Math = Math;
-var Stacking = __webpack_require__(101);
+var Stacking = __webpack_require__(104);
 exports.Stacking = Stacking;
-var Window = __webpack_require__(103);
+var Window = __webpack_require__(20);
 exports.Window = Window;
-__export(__webpack_require__(96));
-__export(__webpack_require__(12));
 __export(__webpack_require__(99));
-__export(__webpack_require__(100));
-__export(__webpack_require__(41));
+__export(__webpack_require__(13));
 __export(__webpack_require__(102));
+__export(__webpack_require__(103));
+__export(__webpack_require__(50));
+__export(__webpack_require__(105));
 
 
 /***/ }),
@@ -140,9 +140,11 @@ var Animators = __webpack_require__(6);
 var component_1 = __webpack_require__(5);
 var drawer_1 = __webpack_require__(7);
 var Utils = __webpack_require__(0);
-var coerceD3_1 = __webpack_require__(12);
-var makeEnum_1 = __webpack_require__(8);
-var Plots = __webpack_require__(38);
+var canvasDrawer_1 = __webpack_require__(8);
+var svgDrawer_1 = __webpack_require__(9);
+var coerceD3_1 = __webpack_require__(13);
+var makeEnum_1 = __webpack_require__(10);
+var Plots = __webpack_require__(47);
 exports.Renderer = makeEnum_1.makeEnum(["svg", "canvas"]);
 var Plot = (function (_super) {
     __extends(Plot, _super);
@@ -185,6 +187,9 @@ var Plot = (function (_super) {
         _this.animator(Plots.Animator.RESET, new Animators.Null());
         return _this;
     }
+    Plot.getTotalDrawTime = function (data, drawSteps) {
+        return drawSteps.reduce(function (time, drawStep) { return time + drawStep.animator.totalTime(data.length); }, 0);
+    };
     Plot.prototype.anchor = function (selection) {
         selection = coerceD3_1.coerceExternalD3(selection);
         _super.prototype.anchor.call(this, selection);
@@ -223,15 +228,15 @@ var Plot = (function (_super) {
     Plot.prototype._createNodesForDataset = function (dataset) {
         var drawer = this._datasetToDrawer.get(dataset);
         if (this.renderer() === "svg") {
-            drawer.renderArea(this._renderArea.append("g"));
+            drawer.useSVG(this._renderArea);
         }
         else {
-            drawer.canvas(this._canvas);
+            drawer.useCanvas(this._canvas);
         }
         return drawer;
     };
     Plot.prototype._createDrawer = function (dataset) {
-        return new drawer_1.Drawer(dataset);
+        return new drawer_1.Drawer(dataset, new svgDrawer_1.SVGDrawer("path", ""), new canvasDrawer_1.CanvasDrawer(function () { }));
     };
     Plot.prototype._getAnimator = function (key) {
         if (this._animateOnNextRender()) {
@@ -430,10 +435,7 @@ var Plot = (function (_super) {
                     this.element().node().appendChild(this._canvas.node());
                 }
                 this._datasetToDrawer.forEach(function (drawer) {
-                    if (drawer.renderArea() != null) {
-                        drawer.renderArea().remove();
-                    }
-                    drawer.canvas(_this._canvas);
+                    drawer.useCanvas(_this._canvas);
                 });
                 this.render();
             }
@@ -441,7 +443,7 @@ var Plot = (function (_super) {
                 this._canvas.remove();
                 this._canvas = null;
                 this._datasetToDrawer.forEach(function (drawer) {
-                    drawer.renderArea(_this._renderArea.append("g"));
+                    drawer.useSVG(_this._renderArea);
                 });
                 this.render();
             }
@@ -562,7 +564,7 @@ var Plot = (function (_super) {
             context_1.clearRect(0, 0, canvas.width, canvas.height);
         }
         this.datasets().forEach(function (ds, i) { return drawers[i].draw(dataToDraw.get(ds), drawSteps); });
-        var times = this.datasets().map(function (ds, i) { return drawers[i].totalDrawTime(dataToDraw.get(ds), drawSteps); });
+        var times = this.datasets().map(function (ds, i) { return Plot.getTotalDrawTime(dataToDraw.get(ds), drawSteps); });
         var maxTime = Utils.Math.max(times, 0);
         this._additionalPaint(maxTime);
     };
@@ -586,9 +588,8 @@ var Plot = (function (_super) {
                 if (drawer == null) {
                     return;
                 }
-                drawer.renderArea().selectAll(drawer.selector()).each(function () {
-                    selections_1.push(this);
-                });
+                var maybeSelection = drawer.selection();
+                selections_1.push.apply(selections_1, maybeSelection.nodes());
             });
             return d3.selectAll(selections_1);
         }
@@ -715,17 +716,17 @@ exports.Plot = Plot;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-var TickGenerators = __webpack_require__(93);
+var TickGenerators = __webpack_require__(96);
 exports.TickGenerators = TickGenerators;
-__export(__webpack_require__(40));
-__export(__webpack_require__(89));
-__export(__webpack_require__(90));
-__export(__webpack_require__(91));
+__export(__webpack_require__(49));
 __export(__webpack_require__(92));
+__export(__webpack_require__(93));
 __export(__webpack_require__(94));
+__export(__webpack_require__(95));
+__export(__webpack_require__(97));
 // ---------------------------------------------------------
-var categoryScale_1 = __webpack_require__(40);
-var quantitativeScale_1 = __webpack_require__(11);
+var categoryScale_1 = __webpack_require__(49);
+var quantitativeScale_1 = __webpack_require__(12);
 /**
  * Type guarded function to check if the scale implements the
  * `TransformableScale` interface. Unfortunately, there is no way to do
@@ -753,12 +754,12 @@ exports.isTransformable = isTransformable;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(42));
-__export(__webpack_require__(45));
-__export(__webpack_require__(118));
-__export(__webpack_require__(19));
-__export(__webpack_require__(47));
-__export(__webpack_require__(49));
+__export(__webpack_require__(51));
+__export(__webpack_require__(54));
+__export(__webpack_require__(120));
+__export(__webpack_require__(21));
+__export(__webpack_require__(56));
+__export(__webpack_require__(58));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
@@ -772,10 +773,10 @@ __export(__webpack_require__(49));
  */
 
 var d3 = __webpack_require__(1);
-var RenderController = __webpack_require__(26);
+var RenderController = __webpack_require__(28);
 var Utils = __webpack_require__(0);
-var coerceD3_1 = __webpack_require__(12);
-var makeEnum_1 = __webpack_require__(8);
+var coerceD3_1 = __webpack_require__(13);
+var makeEnum_1 = __webpack_require__(10);
 exports.XAlignment = makeEnum_1.makeEnum(["left", "center", "right"]);
 exports.YAlignment = makeEnum_1.makeEnum(["top", "center", "bottom"]);
 /**
@@ -1328,8 +1329,8 @@ exports.Component = Component;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(54));
-__export(__webpack_require__(55));
+__export(__webpack_require__(64));
+__export(__webpack_require__(65));
 
 
 /***/ }),
@@ -1342,19 +1343,17 @@ __export(__webpack_require__(55));
  * @license MIT
  */
 
-var d3 = __webpack_require__(1);
-var Utils = __webpack_require__(0);
-var coerceD3_1 = __webpack_require__(12);
+function applyProjectorsWithDataset(attrToProjector, dataset) {
+    var modifiedAttrToProjector = {};
+    Object.keys(attrToProjector).forEach(function (attr) {
+        modifiedAttrToProjector[attr] =
+            function (datum, index) { return attrToProjector[attr](datum, index, dataset); };
+    });
+    return modifiedAttrToProjector;
+}
 /**
- * A Drawer is responsible for actually committing the DrawSteps to the DOM. You first pass a renderArea
- * to the Drawer, which is the root DOM node holding all the drawing elements. Subclasses set an _svgElementName
- * which is an HTML/SVG tag name. Then you call .draw() with the DrawSteps to draw, and the Drawer will draw
- * to the DOM by clearing old DOM elements, adding new DOM elements, and then passing those DOM elements to
- * the animator, which will set the appropriate attributes on the DOM.
- *
- * "Drawing" in Plottable really means either:
- * (a) "making the DOM elements and their attributes correctly reflect the data being passed in", using SVG.
- * (b) "making draw commands to the Canvas element", using Canvas.
+ * A Drawer is a stateful class that holds one SVGDrawer and one CanvasDrawer, and can switch between
+ * the two.
  */
 var Drawer = (function () {
     /**
@@ -1363,169 +1362,89 @@ var Drawer = (function () {
      * @constructor
      * @param {Dataset} dataset The dataset associated with this Drawer
      */
-    function Drawer(dataset) {
-        this._cachedSelectionValid = false;
+    function Drawer(dataset, svgDrawer, canvasDrawer) {
+        this._canvasDrawer = canvasDrawer;
         this._dataset = dataset;
-        this._svgElementName = "path";
+        this._svgDrawer = svgDrawer;
     }
-    Drawer.prototype.canvas = function (canvas) {
-        if (canvas === undefined) {
-            return this._canvas;
-        }
-        canvas = coerceD3_1.coerceExternalD3(canvas);
-        this._canvas = canvas;
-        this._renderArea = null;
-        this._cachedSelectionValid = false;
-        return this;
-    };
-    Drawer.prototype.renderArea = function (area) {
-        if (area === undefined) {
-            return this._renderArea;
-        }
-        area = coerceD3_1.coerceExternalD3(area);
-        this._renderArea = area;
+    /**
+     * Use SVG rendering from now on. This will append a new <g> element to the renderArea and draw
+     * DOM elements into it.
+     */
+    Drawer.prototype.useSVG = function (parentRenderArea) {
         this._canvas = null;
-        this._cachedSelectionValid = false;
-        return this;
+        this._svgRootG = parentRenderArea.append("g");
     };
     /**
-     * Removes the Drawer and its renderArea
+     * Use Canvas rendering from now on. This will remove the <g> element created by useSVG, if it exists.
+     */
+    Drawer.prototype.useCanvas = function (canvas) {
+        if (this._svgRootG != null) {
+            this._svgRootG.remove();
+            this._svgRootG = null;
+        }
+        this._canvas = canvas;
+    };
+    /**
+     * Public for testing
+     */
+    Drawer.prototype.getSvgRootG = function () {
+        return this._svgRootG;
+    };
+    /**
+     * public for testing
+     */
+    Drawer.prototype.getCanvas = function () {
+        return this._canvas;
+    };
+    /**
+     * Removes this Drawer's renderArea
      */
     Drawer.prototype.remove = function () {
-        if (this.renderArea() != null) {
-            this.renderArea().remove();
+        if (this._svgRootG != null) {
+            this._svgRootG.remove();
         }
     };
     /**
-     * Binds data to selection
-     *
-     * @param{any[]} data The data to be drawn
-     */
-    Drawer.prototype._bindSelectionData = function (data) {
-        var dataElementsUpdate = this.selection().data(data);
-        var dataElements = dataElementsUpdate
-            .enter()
-            .append(this._svgElementName)
-            .merge(dataElementsUpdate);
-        dataElementsUpdate.exit().remove();
-        this._applyDefaultAttributes(dataElements);
-    };
-    Drawer.prototype._applyDefaultAttributes = function (selection) {
-        if (this._className != null) {
-            selection.classed(this._className, true);
-        }
-    };
-    /**
-     * Draws data using one step
-     *
-     * @param{AppliedDrawStep} step The step, how data should be drawn.
-     */
-    Drawer.prototype._drawStep = function (step) {
-        var selection = this.selection();
-        var colorAttributes = ["fill", "stroke"];
-        colorAttributes.forEach(function (colorAttribute) {
-            if (step.attrToAppliedProjector[colorAttribute] != null) {
-                selection.attr(colorAttribute, step.attrToAppliedProjector[colorAttribute]);
-            }
-        });
-        step.animator.animate(selection, step.attrToAppliedProjector);
-        if (this._className != null) {
-            this.selection().classed(this._className, true);
-        }
-    };
-    Drawer.prototype._drawStepCanvas = function (data, step) {
-        Utils.Window.warn("canvas rendering not yet implemented on " + this.constructor.name);
-    };
-    Drawer.prototype._appliedProjectors = function (attrToProjector) {
-        var _this = this;
-        var modifiedAttrToProjector = {};
-        Object.keys(attrToProjector).forEach(function (attr) {
-            modifiedAttrToProjector[attr] =
-                function (datum, index) { return attrToProjector[attr](datum, index, _this._dataset); };
-        });
-        return modifiedAttrToProjector;
-    };
-    /**
-     * Calculates the total time it takes to use the input drawSteps to draw the input data
-     *
-     * @param {any[]} data The data that would have been drawn
-     * @param {Drawers.DrawStep[]} drawSteps The DrawSteps to use
-     * @returns {number} The total time it takes to draw
-     */
-    Drawer.prototype.totalDrawTime = function (data, drawSteps) {
-        var delay = 0;
-        drawSteps.forEach(function (drawStep, i) {
-            delay += drawStep.animator.totalTime(data.length);
-        });
-        return delay;
-    };
-    /**
-     * Draws the data into the renderArea using the spefic steps and metadata
+     * Draws the data using the drawSteps onto the currently selected drawer.
      *
      * @param{any[]} data The data to be drawn
      * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
      */
     Drawer.prototype.draw = function (data, drawSteps) {
         var _this = this;
-        var appliedDrawSteps = drawSteps.map(function (dr) {
-            var attrToAppliedProjector = _this._appliedProjectors(dr.attrToProjector);
+        var appliedDrawSteps = drawSteps.map(function (drawStep) {
+            var attrToAppliedProjector = applyProjectorsWithDataset(drawStep.attrToProjector, _this._dataset);
             return {
                 attrToAppliedProjector: attrToAppliedProjector,
-                animator: dr.animator,
+                animator: drawStep.animator,
             };
         });
-        if (this._renderArea != null) {
-            this._bindSelectionData(data);
-            this._cachedSelectionValid = false;
-            var delay_1 = 0;
-            appliedDrawSteps.forEach(function (drawStep, i) {
-                Utils.Window.setTimeout(function () { return _this._drawStep(drawStep); }, delay_1);
-                delay_1 += drawStep.animator.totalTime(data.length);
-            });
+        if (this._svgRootG != null) {
+            this._svgDrawer.draw(this._svgRootG, data, appliedDrawSteps);
         }
         else if (this._canvas != null) {
-            // don't support animations for now; just draw the last draw step immediately
-            var lastDrawStep_1 = appliedDrawSteps[appliedDrawSteps.length - 1];
-            Utils.Window.setTimeout(function () { return _this._drawStepCanvas(data, lastDrawStep_1); }, 0);
+            this._canvasDrawer.draw(this._canvas, data, appliedDrawSteps);
         }
         else {
-            throw new Error("Drawer's canvas and renderArea are both null!");
+            throw new Error("Must call .useSVG or .useCanvas before drawing!");
         }
         return this;
     };
     Drawer.prototype.selection = function () {
-        this.maybeRefreshCache();
-        return this._cachedSelection;
-    };
-    /**
-     * Returns the CSS selector for this Drawer's visual elements.
-     */
-    Drawer.prototype.selector = function () {
-        return this._svgElementName;
-    };
-    /**
-     * Returns the D3 selection corresponding to the datum with the specified index.
-     */
-    Drawer.prototype.selectionForIndex = function (index) {
-        this.maybeRefreshCache();
-        if (this._cachedSelectionNodes != null) {
-            return d3.select(this._cachedSelectionNodes[index]);
+        if (this._svgRootG != null) {
+            return this._svgDrawer.selection();
         }
         else {
             return null;
         }
     };
-    Drawer.prototype.maybeRefreshCache = function () {
-        if (!this._cachedSelectionValid) {
-            if (this._renderArea != null) {
-                this._cachedSelection = this.renderArea().selectAll(this.selector());
-                this._cachedSelectionNodes = this._cachedSelection.nodes();
-            }
-            else {
-                this._cachedSelection = null;
-                this._cachedSelectionNodes = null;
-            }
-            this._cachedSelectionValid = true;
+    Drawer.prototype.selectionForIndex = function (index) {
+        if (this._svgRootG != null) {
+            return this._svgDrawer.selectionForIndex(index);
+        }
+        else {
+            return null;
         }
     };
     return Drawer;
@@ -1535,6 +1454,144 @@ exports.Drawer = Drawer;
 
 /***/ }),
 /* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+/**
+ * A CanvasDrawer draws data onto a supplied Canvas DOM element.
+ *
+ * This class is immutable (but has internal state) and shouldn't be extended.
+ */
+var CanvasDrawer = (function () {
+    function CanvasDrawer(drawStep) {
+        this._drawStep = drawStep;
+    }
+    CanvasDrawer.prototype.draw = function (canvas, data, appliedDrawSteps) {
+        // don't support animations for now; just draw the last draw step immediately
+        var lastDrawStep = appliedDrawSteps[appliedDrawSteps.length - 1];
+        var context = canvas.node().getContext("2d");
+        context.save();
+        this._drawStep(context, data, lastDrawStep.attrToAppliedProjector);
+        context.restore();
+    };
+    return CanvasDrawer;
+}());
+exports.CanvasDrawer = CanvasDrawer;
+
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+var d3 = __webpack_require__(1);
+var Utils = __webpack_require__(0);
+/**
+ * An SVGDrawer "draws" data by creating DOM elements and setting specific attributes on them
+ * to accurately reflect the data being passed in.
+ *
+ * This class is immutable (but has internal state) and shouldn't be extended.
+ */
+var SVGDrawer = (function () {
+    /**
+     * @param svgElementName an HTML/SVG tag name to be created one per data.
+     * @param className CSS classes to be applied to the drawn primitives.
+     * @param applyDefaultAttributes
+     */
+    function SVGDrawer(svgElementName, className) {
+        this._className = className;
+        this._svgElementName = svgElementName;
+    }
+    /**
+     * Draws to the given root element.
+     * @param root
+     * @param data
+     * @param appliedDrawSteps
+     */
+    SVGDrawer.prototype.draw = function (root, data, appliedDrawSteps) {
+        var _this = this;
+        /*
+         * Draw to the DOM by clearing old DOM elements, adding new DOM elements,
+         * and then passing those DOM elements to the animator, which will set the
+         * appropriate attributes on the DOM.
+         */
+        this._createAndDestroyDOMElements(root, data);
+        var delay = 0;
+        appliedDrawSteps.forEach(function (drawStep, i) {
+            Utils.Window.setTimeout(function () { return _this._drawStep(drawStep); }, delay);
+            delay += drawStep.animator.totalTime(data.length);
+        });
+    };
+    SVGDrawer.prototype._createAndDestroyDOMElements = function (root, data) {
+        var dataElementsUpdate = root.selectAll(this.selector()).data(data);
+        this._selection =
+            dataElementsUpdate
+                .enter()
+                .append(this._svgElementName)
+                .merge(dataElementsUpdate);
+        dataElementsUpdate.exit().remove();
+        this._cachedSelectionNodes = null;
+        if (this._className != null) {
+            this._selection.classed(this._className, true);
+        }
+        this._applyDefaultAttributes(this._selection);
+    };
+    SVGDrawer.prototype._applyDefaultAttributes = function (selection) {
+        // subclasses may override
+    };
+    /**
+     * Draws data using one step
+     *
+     * @param{AppliedDrawStep} step The step, how data should be drawn.
+     */
+    SVGDrawer.prototype._drawStep = function (step) {
+        var _this = this;
+        var colorAttributes = ["fill", "stroke"];
+        colorAttributes.forEach(function (colorAttribute) {
+            if (step.attrToAppliedProjector[colorAttribute] != null) {
+                _this._selection.attr(colorAttribute, step.attrToAppliedProjector[colorAttribute]);
+            }
+        });
+        step.animator.animate(this._selection, step.attrToAppliedProjector);
+        if (this._className != null) {
+            this.selection().classed(this._className, true);
+        }
+    };
+    SVGDrawer.prototype.selection = function () {
+        return this._selection;
+    };
+    /**
+     * Returns the CSS selector for this Drawer's visual elements.
+     */
+    SVGDrawer.prototype.selector = function () {
+        return this._svgElementName;
+    };
+    /**
+     * Returns the D3 selection corresponding to the datum with the specified index.
+     */
+    SVGDrawer.prototype.selectionForIndex = function (index) {
+        if (this._cachedSelectionNodes == null) {
+            this._cachedSelectionNodes = this._selection.nodes();
+        }
+        return d3.select(this._cachedSelectionNodes[index]);
+    };
+    return SVGDrawer;
+}());
+exports.SVGDrawer = SVGDrawer;
+
+
+/***/ }),
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1553,7 +1610,7 @@ exports.makeEnum = makeEnum;
 
 
 /***/ }),
-/* 9 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1797,29 +1854,7 @@ function verifyPrecision(precision) {
 
 
 /***/ }),
-/* 10 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
-
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
-__export(__webpack_require__(70));
-__export(__webpack_require__(71));
-__export(__webpack_require__(72));
-__export(__webpack_require__(73));
-__export(__webpack_require__(74));
-__export(__webpack_require__(75));
-__export(__webpack_require__(76));
-
-
-/***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1834,9 +1869,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var Interactions = __webpack_require__(14);
+var Interactions = __webpack_require__(15);
 var Utils = __webpack_require__(0);
-var scale_1 = __webpack_require__(18);
+var scale_1 = __webpack_require__(19);
 var QuantitativeScale = (function (_super) {
     __extends(QuantitativeScale, _super);
     /**
@@ -2090,7 +2125,7 @@ exports.QuantitativeScale = QuantitativeScale;
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2126,24 +2161,6 @@ exports.coerceExternalD3 = coerceExternalD3;
 
 
 /***/ }),
-/* 13 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
-
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
-__export(__webpack_require__(67));
-__export(__webpack_require__(68));
-__export(__webpack_require__(69));
-
-
-/***/ }),
 /* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -2158,13 +2175,31 @@ function __export(m) {
 }
 __export(__webpack_require__(77));
 __export(__webpack_require__(78));
-__export(__webpack_require__(33));
 __export(__webpack_require__(79));
-__export(__webpack_require__(80));
 
 
 /***/ }),
 /* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+__export(__webpack_require__(80));
+__export(__webpack_require__(81));
+__export(__webpack_require__(37));
+__export(__webpack_require__(82));
+__export(__webpack_require__(83));
+
+
+/***/ }),
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2266,7 +2301,7 @@ exports.Interaction = Interaction;
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2581,7 +2616,7 @@ exports.XYPlot = XYPlot;
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2593,22 +2628,22 @@ exports.XYPlot = XYPlot;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(37));
-__export(__webpack_require__(23));
-__export(__webpack_require__(38));
-__export(__webpack_require__(81));
-__export(__webpack_require__(39));
-__export(__webpack_require__(82));
-__export(__webpack_require__(83));
+__export(__webpack_require__(46));
+__export(__webpack_require__(25));
+__export(__webpack_require__(47));
 __export(__webpack_require__(84));
+__export(__webpack_require__(48));
 __export(__webpack_require__(85));
 __export(__webpack_require__(86));
 __export(__webpack_require__(87));
 __export(__webpack_require__(88));
+__export(__webpack_require__(89));
+__export(__webpack_require__(90));
+__export(__webpack_require__(91));
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2765,7 +2800,79 @@ exports.Scale = Scale;
 
 
 /***/ }),
-/* 19 */
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+var Configs = __webpack_require__(23);
+/**
+ * Print a warning message to the console, if it is available.
+ *
+ * @param {string} The warnings to print
+ */
+function warn(warning) {
+    if (!Configs.SHOW_WARNINGS) {
+        return;
+    }
+    /* tslint:disable:no-console */
+    if (window.console != null) {
+        if (window.console.warn != null) {
+            console.warn(warning);
+        }
+        else if (window.console.log != null) {
+            console.log(warning);
+        }
+    }
+    /* tslint:enable:no-console */
+}
+exports.warn = warn;
+/**
+ * Is like setTimeout, but activates synchronously if time=0
+ * We special case 0 because of an observed issue where calling setTimeout causes visible flickering.
+ * We believe this is because when requestAnimationFrame calls into the paint function, as soon as that function finishes
+ * evaluating, the results are painted to the screen. As a result, if we want something to occur immediately but call setTimeout
+ * with time=0, then it is pushed to the call stack and rendered in the next frame, so the component that was rendered via
+ * setTimeout appears out-of-sync with the rest of the plot.
+ */
+function setTimeout(f, time) {
+    var args = [];
+    for (var _i = 2; _i < arguments.length; _i++) {
+        args[_i - 2] = arguments[_i];
+    }
+    if (time === 0) {
+        f(args);
+        return -1;
+    }
+    else {
+        return window.setTimeout(f, time, args);
+    }
+}
+exports.setTimeout = setTimeout;
+/**
+ * Sends a deprecation warning to the console. The warning includes the name of the deprecated method,
+ * version number of the deprecation, and an optional message.
+ *
+ * To be used in the first line of a deprecated method.
+ *
+ * @param {string} callingMethod The name of the method being deprecated
+ * @param {string} version The version when the tagged method became obsolete
+ * @param {string?} message Optional message to be shown with the warning
+ */
+function deprecated(callingMethod, version, message) {
+    if (message === void 0) { message = ""; }
+    warn("Method " + callingMethod + " has been deprecated in version " + version +
+        ". Please refer to the release notes. " + message);
+}
+exports.deprecated = deprecated;
+
+
+/***/ }),
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2778,14 +2885,14 @@ exports.Scale = Scale;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(119));
-__export(__webpack_require__(120));
 __export(__webpack_require__(121));
 __export(__webpack_require__(122));
+__export(__webpack_require__(123));
+__export(__webpack_require__(124));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 20 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2802,9 +2909,9 @@ var __extends = (this && this.__extends) || function (d, b) {
 var d3 = __webpack_require__(1);
 var Typesetter = __webpack_require__(4);
 var component_1 = __webpack_require__(5);
-var Formatters = __webpack_require__(9);
+var Formatters = __webpack_require__(11);
 var Utils = __webpack_require__(0);
-var makeEnum_1 = __webpack_require__(8);
+var makeEnum_1 = __webpack_require__(10);
 exports.AxisOrientation = makeEnum_1.makeEnum(["bottom", "left", "right", "top"]);
 var Axis = (function (_super) {
     __extends(Axis, _super);
@@ -3432,7 +3539,7 @@ exports.Axis = Axis;
 
 
 /***/ }),
-/* 21 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3452,7 +3559,7 @@ exports.ADD_TITLE_ELEMENTS = true;
 
 
 /***/ }),
-/* 22 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3527,7 +3634,7 @@ exports.Dispatcher = Dispatcher;
 
 
 /***/ }),
-/* 23 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3544,15 +3651,17 @@ var __extends = (this && this.__extends) || function (d, b) {
 var d3 = __webpack_require__(1);
 var Typesetter = __webpack_require__(4);
 var Animators = __webpack_require__(6);
-var Formatters = __webpack_require__(9);
-var Drawers = __webpack_require__(10);
+var Formatters = __webpack_require__(11);
+var drawer_1 = __webpack_require__(7);
 var Scales = __webpack_require__(3);
-var quantitativeScale_1 = __webpack_require__(11);
+var quantitativeScale_1 = __webpack_require__(12);
 var Utils = __webpack_require__(0);
-var makeEnum_1 = __webpack_require__(8);
-var Plots = __webpack_require__(17);
+var canvasDrawer_1 = __webpack_require__(8);
+var rectangleDrawer_1 = __webpack_require__(32);
+var makeEnum_1 = __webpack_require__(10);
+var Plots = __webpack_require__(18);
 var plot_1 = __webpack_require__(2);
-var xyPlot_1 = __webpack_require__(16);
+var xyPlot_1 = __webpack_require__(17);
 exports.BarOrientation = makeEnum_1.makeEnum(["vertical", "horizontal"]);
 var Bar = (function (_super) {
     __extends(Bar, _super);
@@ -3625,7 +3734,7 @@ var Bar = (function (_super) {
         return this;
     };
     Bar.prototype._createDrawer = function (dataset) {
-        return new Drawers.Rectangle(dataset);
+        return new drawer_1.Drawer(dataset, new rectangleDrawer_1.RectangleSVGDrawer(Bar._BAR_AREA_CLASS), new canvasDrawer_1.CanvasDrawer(rectangleDrawer_1.RectangleCanvasDrawStep));
     };
     Bar.prototype._setup = function () {
         _super.prototype._setup.call(this);
@@ -3704,9 +3813,6 @@ var Bar = (function (_super) {
     };
     Bar.prototype._createNodesForDataset = function (dataset) {
         var drawer = _super.prototype._createNodesForDataset.call(this, dataset);
-        if (drawer.renderArea() != null) {
-            drawer.renderArea().classed(Bar._BAR_AREA_CLASS, true);
-        }
         var labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
         var context = new Typesetter.SvgContext(labelArea.node());
         var measurer = new Typesetter.CacheMeasurer(context);
@@ -4167,7 +4273,7 @@ exports.Bar = Bar;
 
 
 /***/ }),
-/* 24 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4183,11 +4289,11 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Typesetter = __webpack_require__(4);
-var Formatters = __webpack_require__(9);
+var Formatters = __webpack_require__(11);
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var makeEnum_1 = __webpack_require__(8);
-var axis_1 = __webpack_require__(20);
+var makeEnum_1 = __webpack_require__(10);
+var axis_1 = __webpack_require__(22);
 exports.TimeInterval = makeEnum_1.makeEnum([
     "second",
     "minute",
@@ -4723,7 +4829,7 @@ var _a;
 
 
 /***/ }),
-/* 25 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4737,7 +4843,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var coerceD3_1 = __webpack_require__(12);
+var coerceD3_1 = __webpack_require__(13);
 var component_1 = __webpack_require__(5);
 /*
  * ComponentContainer class encapsulates Table and ComponentGroup's shared functionality.
@@ -4817,7 +4923,7 @@ exports.ComponentContainer = ComponentContainer;
 
 
 /***/ }),
-/* 26 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4827,8 +4933,8 @@ exports.ComponentContainer = ComponentContainer;
  */
 
 var Utils = __webpack_require__(0);
-var makeEnum_1 = __webpack_require__(8);
-var RenderPolicies = __webpack_require__(32);
+var makeEnum_1 = __webpack_require__(10);
+var RenderPolicies = __webpack_require__(36);
 /**
  * The RenderController is responsible for enqueueing and synchronizing
  * layout and render calls for Components.
@@ -4947,7 +5053,7 @@ exports.flush = flush;
 
 
 /***/ }),
-/* 27 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4992,7 +5098,7 @@ exports.wye = wye;
 
 
 /***/ }),
-/* 28 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5006,11 +5112,11 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Interactions = __webpack_require__(14);
+var Interactions = __webpack_require__(15);
 var Utils = __webpack_require__(0);
-var coerceD3_1 = __webpack_require__(12);
-var _1 = __webpack_require__(31);
-var selectionBoxLayer_1 = __webpack_require__(36);
+var coerceD3_1 = __webpack_require__(13);
+var _1 = __webpack_require__(35);
+var selectionBoxLayer_1 = __webpack_require__(40);
 var DragBoxLayer = (function (_super) {
     __extends(DragBoxLayer, _super);
     /**
@@ -5378,7 +5484,137 @@ exports.DragBoxLayer = DragBoxLayer;
 
 
 /***/ }),
-/* 29 */
+/* 31 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var d3 = __webpack_require__(1);
+var svgDrawer_1 = __webpack_require__(9);
+var LineSVGDrawer = (function (_super) {
+    __extends(LineSVGDrawer, _super);
+    function LineSVGDrawer() {
+        return _super.call(this, "path", "line") || this;
+    }
+    LineSVGDrawer.prototype._applyDefaultAttributes = function (selection) {
+        selection.style("fill", "none");
+    };
+    LineSVGDrawer.prototype.selectionForIndex = function (index) {
+        return d3.select(this.selection().node());
+    };
+    return LineSVGDrawer;
+}(svgDrawer_1.SVGDrawer));
+exports.LineSVGDrawer = LineSVGDrawer;
+/**
+ * @param d3LineFactory A callback that gives this Line Drawer a d3.Line object which will be
+ * used to draw with.
+ *
+ * TODO put the d3.Line into the attrToAppliedProjector directly
+ */
+function makeLineCanvasDrawStep(d3LineFactory) {
+    return function (context, data, attrToAppliedProjector) {
+        var d3Line = d3LineFactory();
+        var resolvedAttrs = Object.keys(attrToAppliedProjector).reduce(function (obj, attrName) {
+            if (attrName !== "d") {
+                obj[attrName] = attrToAppliedProjector[attrName](data[0], 0);
+            }
+            return obj;
+        }, {});
+        context.beginPath();
+        d3Line.context(context);
+        d3Line(data[0]);
+        if (resolvedAttrs["stroke-width"]) {
+            context.lineWidth = parseFloat(resolvedAttrs["stroke-width"]);
+        }
+        if (resolvedAttrs["stroke"]) {
+            var strokeColor = d3.color(resolvedAttrs["stroke"]);
+            if (resolvedAttrs["opacity"]) {
+                strokeColor.opacity = resolvedAttrs["opacity"];
+            }
+            context.strokeStyle = strokeColor.rgb().toString();
+            context.stroke();
+        }
+    };
+}
+exports.makeLineCanvasDrawStep = makeLineCanvasDrawStep;
+
+
+/***/ }),
+/* 32 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var d3 = __webpack_require__(1);
+var svgDrawer_1 = __webpack_require__(9);
+var RectangleSVGDrawer = (function (_super) {
+    __extends(RectangleSVGDrawer, _super);
+    function RectangleSVGDrawer(_rootGClassName) {
+        if (_rootGClassName === void 0) { _rootGClassName = null; }
+        var _this = _super.call(this, "rect", "") || this;
+        _this._rootGClassName = _rootGClassName;
+        return _this;
+    }
+    RectangleSVGDrawer.prototype.draw = function (root, data, appliedDrawSteps) {
+        if (this._rootGClassName != null) {
+            root.classed(this._rootGClassName, true);
+        }
+        _super.prototype.draw.call(this, root, data, appliedDrawSteps);
+    };
+    return RectangleSVGDrawer;
+}(svgDrawer_1.SVGDrawer));
+exports.RectangleSVGDrawer = RectangleSVGDrawer;
+exports.RectangleCanvasDrawStep = function (context, data, attrToAppliedProjector) {
+    data.forEach(function (point, index) {
+        var resolvedAttrs = Object.keys(attrToAppliedProjector).reduce(function (obj, attrName) {
+            obj[attrName] = attrToAppliedProjector[attrName](point, index);
+            return obj;
+        }, {});
+        context.beginPath();
+        context.rect(resolvedAttrs["x"], resolvedAttrs["y"], resolvedAttrs["width"], resolvedAttrs["height"]);
+        if (resolvedAttrs["stroke-width"]) {
+            context.lineWidth = resolvedAttrs["stroke-width"];
+        }
+        if (resolvedAttrs["stroke"]) {
+            var strokeColor = d3.color(resolvedAttrs["stroke"]);
+            if (resolvedAttrs["opacity"]) {
+                strokeColor.opacity = resolvedAttrs["opacity"];
+            }
+            context.strokeStyle = strokeColor.rgb().toString();
+            context.stroke();
+        }
+        if (resolvedAttrs["fill"]) {
+            var fillColor = d3.color(resolvedAttrs["fill"]);
+            if (resolvedAttrs["opacity"]) {
+                fillColor.opacity = resolvedAttrs["opacity"];
+            }
+            context.fillStyle = fillColor.rgb().toString();
+            context.fill();
+        }
+    });
+};
+
+
+/***/ }),
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5494,7 +5730,7 @@ exports.within = within;
 
 
 /***/ }),
-/* 30 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5532,7 +5768,7 @@ exports.AbstractMeasurer = AbstractMeasurer;
 //# sourceMappingURL=abstractMeasurer.js.map
 
 /***/ }),
-/* 31 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5544,23 +5780,23 @@ exports.AbstractMeasurer = AbstractMeasurer;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(28));
-__export(__webpack_require__(58));
-__export(__webpack_require__(59));
-__export(__webpack_require__(34));
-__export(__webpack_require__(35));
-__export(__webpack_require__(60));
-__export(__webpack_require__(61));
-__export(__webpack_require__(62));
-__export(__webpack_require__(63));
-__export(__webpack_require__(36));
-__export(__webpack_require__(64));
-__export(__webpack_require__(65));
-__export(__webpack_require__(66));
+__export(__webpack_require__(30));
+__export(__webpack_require__(68));
+__export(__webpack_require__(69));
+__export(__webpack_require__(38));
+__export(__webpack_require__(39));
+__export(__webpack_require__(70));
+__export(__webpack_require__(71));
+__export(__webpack_require__(72));
+__export(__webpack_require__(73));
+__export(__webpack_require__(40));
+__export(__webpack_require__(74));
+__export(__webpack_require__(75));
+__export(__webpack_require__(76));
 
 
 /***/ }),
-/* 32 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5570,7 +5806,7 @@ __export(__webpack_require__(66));
  */
 
 var Utils = __webpack_require__(0);
-var RenderController = __webpack_require__(26);
+var RenderController = __webpack_require__(28);
 /**
  * Renders Components immediately after they are enqueued.
  * Useful for debugging, horrible for performance.
@@ -5615,7 +5851,7 @@ exports.Timeout = Timeout;
 
 
 /***/ }),
-/* 33 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5629,9 +5865,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Dispatchers = __webpack_require__(13);
+var Dispatchers = __webpack_require__(14);
 var Utils = __webpack_require__(0);
-var interaction_1 = __webpack_require__(15);
+var interaction_1 = __webpack_require__(16);
 var Key = (function (_super) {
     __extends(Key, _super);
     function Key() {
@@ -5741,7 +5977,7 @@ exports.Key = Key;
 
 
 /***/ }),
-/* 34 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5756,7 +5992,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(0);
-var componentContainer_1 = __webpack_require__(25);
+var componentContainer_1 = __webpack_require__(27);
 var Group = (function (_super) {
     __extends(Group, _super);
     /**
@@ -5845,7 +6081,7 @@ exports.Group = Group;
 
 
 /***/ }),
-/* 35 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6001,7 +6237,7 @@ exports.GuideLineLayer = GuideLineLayer;
 
 
 /***/ }),
-/* 36 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6230,7 +6466,65 @@ exports.SelectionBoxLayer = SelectionBoxLayer;
 
 
 /***/ }),
-/* 37 */
+/* 41 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var svgDrawer_1 = __webpack_require__(9);
+var ArcSVGDrawer = (function (_super) {
+    __extends(ArcSVGDrawer, _super);
+    function ArcSVGDrawer() {
+        return _super.call(this, "path", "arc fill") || this;
+    }
+    ArcSVGDrawer.prototype._applyDefaultAttributes = function (selection) {
+        selection.style("stroke", "none");
+    };
+    return ArcSVGDrawer;
+}(svgDrawer_1.SVGDrawer));
+exports.ArcSVGDrawer = ArcSVGDrawer;
+
+
+/***/ }),
+/* 42 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var svgDrawer_1 = __webpack_require__(9);
+var ArcOutlineSVGDrawer = (function (_super) {
+    __extends(ArcOutlineSVGDrawer, _super);
+    function ArcOutlineSVGDrawer() {
+        return _super.call(this, "path", "arc outline") || this;
+    }
+    ArcOutlineSVGDrawer.prototype._applyDefaultAttributes = function (selection) {
+        selection.style("fill", "none");
+    };
+    return ArcOutlineSVGDrawer;
+}(svgDrawer_1.SVGDrawer));
+exports.ArcOutlineSVGDrawer = ArcOutlineSVGDrawer;
+
+
+/***/ }),
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6245,11 +6539,100 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var Drawers = __webpack_require__(10);
+var svgDrawer_1 = __webpack_require__(9);
+var AreaSVGDrawer = (function (_super) {
+    __extends(AreaSVGDrawer, _super);
+    function AreaSVGDrawer() {
+        return _super.call(this, "path", "area") || this;
+    }
+    AreaSVGDrawer.prototype._applyDefaultAttributes = function (selection) {
+        selection.style("stroke", "none");
+    };
+    AreaSVGDrawer.prototype.selectionForIndex = function (index) {
+        return d3.select(this.selection().node());
+    };
+    return AreaSVGDrawer;
+}(svgDrawer_1.SVGDrawer));
+exports.AreaSVGDrawer = AreaSVGDrawer;
+
+
+/***/ }),
+/* 44 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var svgDrawer_1 = __webpack_require__(9);
+var SegmentSVGDrawer = (function (_super) {
+    __extends(SegmentSVGDrawer, _super);
+    function SegmentSVGDrawer() {
+        return _super.call(this, "line", "") || this;
+    }
+    return SegmentSVGDrawer;
+}(svgDrawer_1.SVGDrawer));
+exports.SegmentSVGDrawer = SegmentSVGDrawer;
+
+
+/***/ }),
+/* 45 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var svgDrawer_1 = __webpack_require__(9);
+var SymbolSVGDrawer = (function (_super) {
+    __extends(SymbolSVGDrawer, _super);
+    function SymbolSVGDrawer() {
+        return _super.call(this, "path", "symbol") || this;
+    }
+    return SymbolSVGDrawer;
+}(svgDrawer_1.SVGDrawer));
+exports.SymbolSVGDrawer = SymbolSVGDrawer;
+
+
+/***/ }),
+/* 46 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var d3 = __webpack_require__(1);
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var Plots = __webpack_require__(17);
-var linePlot_1 = __webpack_require__(39);
+var areaDrawer_1 = __webpack_require__(43);
+var canvasDrawer_1 = __webpack_require__(8);
+var drawer_1 = __webpack_require__(7);
+var lineDrawer_1 = __webpack_require__(31);
+var windowUtils_1 = __webpack_require__(20);
+var Plots = __webpack_require__(18);
+var linePlot_1 = __webpack_require__(48);
 var plot_1 = __webpack_require__(2);
 var Area = (function (_super) {
     __extends(Area, _super);
@@ -6270,7 +6653,7 @@ var Area = (function (_super) {
     Area.prototype._setup = function () {
         var _this = this;
         _super.prototype._setup.call(this);
-        this._lineDrawers.forEach(function (d) { return d.renderArea(_this._renderArea.append("g")); });
+        this._lineDrawers.forEach(function (d) { return d.useSVG(_this._renderArea); });
     };
     Area.prototype.y = function (y, yScale) {
         if (y == null) {
@@ -6312,9 +6695,9 @@ var Area = (function (_super) {
     };
     Area.prototype._addDataset = function (dataset) {
         var _this = this;
-        var lineDrawer = new Drawers.Line(dataset, function () { return _this._d3LineFactory(dataset); });
+        var lineDrawer = new drawer_1.Drawer(dataset, new lineDrawer_1.LineSVGDrawer(), new canvasDrawer_1.CanvasDrawer(lineDrawer_1.makeLineCanvasDrawStep(function () { return _this._d3LineFactory(dataset); })));
         if (this._isSetup) {
-            lineDrawer.renderArea(this._renderArea.append("g"));
+            lineDrawer.useSVG(this._renderArea);
         }
         this._lineDrawers.set(dataset, lineDrawer);
         _super.prototype._addDataset.call(this, dataset);
@@ -6349,7 +6732,9 @@ var Area = (function (_super) {
         return lineAttrToProjector;
     };
     Area.prototype._createDrawer = function (dataset) {
-        return new Drawers.Area(dataset);
+        return new drawer_1.Drawer(dataset, new areaDrawer_1.AreaSVGDrawer(), new canvasDrawer_1.CanvasDrawer(function () {
+            windowUtils_1.warn("canvas renderer not implemented on Area Plot!");
+        }));
     };
     Area.prototype._generateDrawSteps = function () {
         var drawSteps = [];
@@ -6426,7 +6811,7 @@ exports.Area = Area;
 
 
 /***/ }),
-/* 38 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6443,7 +6828,7 @@ var Animator;
 
 
 /***/ }),
-/* 39 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6459,14 +6844,16 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Animators = __webpack_require__(6);
-var Drawers = __webpack_require__(10);
+var drawer_1 = __webpack_require__(7);
 var Scales = __webpack_require__(3);
-var quantitativeScale_1 = __webpack_require__(11);
+var quantitativeScale_1 = __webpack_require__(12);
 var Utils = __webpack_require__(0);
-var makeEnum_1 = __webpack_require__(8);
-var Plots = __webpack_require__(17);
+var canvasDrawer_1 = __webpack_require__(8);
+var lineDrawer_1 = __webpack_require__(31);
+var makeEnum_1 = __webpack_require__(10);
+var Plots = __webpack_require__(18);
 var plot_1 = __webpack_require__(2);
-var xyPlot_1 = __webpack_require__(16);
+var xyPlot_1 = __webpack_require__(17);
 var CURVE_NAME_MAPPING = {
     linear: d3.curveLinear,
     linearClosed: d3.curveLinearClosed,
@@ -6597,7 +6984,7 @@ var Line = (function (_super) {
     };
     Line.prototype._createDrawer = function (dataset) {
         var _this = this;
-        return new Drawers.Line(dataset, function () { return _this._d3LineFactory(dataset); });
+        return new drawer_1.Drawer(dataset, new lineDrawer_1.LineSVGDrawer(), new canvasDrawer_1.CanvasDrawer(lineDrawer_1.makeLineCanvasDrawStep(function () { return _this._d3LineFactory(dataset); })));
     };
     Line.prototype._extentsForProperty = function (property) {
         var extents = _super.prototype._extentsForProperty.call(this, property);
@@ -6966,7 +7353,7 @@ exports.Line = Line;
 
 
 /***/ }),
-/* 40 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6981,9 +7368,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var Interactions = __webpack_require__(14);
+var Interactions = __webpack_require__(15);
 var Utils = __webpack_require__(0);
-var scale_1 = __webpack_require__(18);
+var scale_1 = __webpack_require__(19);
 var TRANSFORMATION_SPACE = [0, 1];
 var Category = (function (_super) {
     __extends(Category, _super);
@@ -7161,7 +7548,7 @@ exports.Category = Category;
 
 
 /***/ }),
-/* 41 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7233,7 +7620,7 @@ exports.Set = Set;
 
 
 /***/ }),
-/* 42 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7246,12 +7633,12 @@ exports.Set = Set;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(116));
-__export(__webpack_require__(115));
+__export(__webpack_require__(118));
+__export(__webpack_require__(117));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 43 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7266,8 +7653,8 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var utils_1 = __webpack_require__(19);
-var characterMeasurer_1 = __webpack_require__(44);
+var utils_1 = __webpack_require__(21);
+var characterMeasurer_1 = __webpack_require__(53);
 var CacheCharacterMeasurer = (function (_super) {
     __extends(CacheCharacterMeasurer, _super);
     function CacheCharacterMeasurer(ruler, useGuards) {
@@ -7292,7 +7679,7 @@ exports.CacheCharacterMeasurer = CacheCharacterMeasurer;
 //# sourceMappingURL=cacheCharacterMeasurer.js.map
 
 /***/ }),
-/* 44 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7307,7 +7694,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var measurer_1 = __webpack_require__(46);
+var measurer_1 = __webpack_require__(55);
 var CharacterMeasurer = (function (_super) {
     __extends(CharacterMeasurer, _super);
     function CharacterMeasurer() {
@@ -7330,7 +7717,7 @@ exports.CharacterMeasurer = CharacterMeasurer;
 //# sourceMappingURL=characterMeasurer.js.map
 
 /***/ }),
-/* 45 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7343,15 +7730,15 @@ exports.CharacterMeasurer = CharacterMeasurer;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(30));
-__export(__webpack_require__(43));
-__export(__webpack_require__(117));
-__export(__webpack_require__(44));
-__export(__webpack_require__(46));
+__export(__webpack_require__(34));
+__export(__webpack_require__(52));
+__export(__webpack_require__(119));
+__export(__webpack_require__(53));
+__export(__webpack_require__(55));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 46 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7366,7 +7753,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var abstractMeasurer_1 = __webpack_require__(30);
+var abstractMeasurer_1 = __webpack_require__(34);
 var Measurer = (function (_super) {
     __extends(Measurer, _super);
     function Measurer(ruler, useGuards) {
@@ -7411,7 +7798,7 @@ exports.Measurer = Measurer;
 //# sourceMappingURL=measurer.js.map
 
 /***/ }),
-/* 47 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7424,12 +7811,12 @@ exports.Measurer = Measurer;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(123));
-__export(__webpack_require__(48));
+__export(__webpack_require__(125));
+__export(__webpack_require__(57));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 48 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7439,7 +7826,7 @@ __export(__webpack_require__(48));
  * license at https://github.com/palantir/typesettable/blob/develop/LICENSE
  */
 
-var Utils = __webpack_require__(19);
+var Utils = __webpack_require__(21);
 var Wrapper = (function () {
     function Wrapper() {
         this.maxLines(Infinity);
@@ -7656,7 +8043,7 @@ exports.Wrapper = Wrapper;
 //# sourceMappingURL=wrapper.js.map
 
 /***/ }),
-/* 49 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7669,11 +8056,11 @@ exports.Wrapper = Wrapper;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(124));
+__export(__webpack_require__(126));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 50 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7685,13 +8072,13 @@ __export(__webpack_require__(124));
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(56));
-__export(__webpack_require__(57));
-__export(__webpack_require__(24));
+__export(__webpack_require__(66));
+__export(__webpack_require__(67));
+__export(__webpack_require__(26));
 
 
 /***/ }),
-/* 51 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7763,7 +8150,7 @@ exports.Dataset = Dataset;
 
 
 /***/ }),
-/* 52 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7781,7 +8168,31 @@ exports.version = "3.0.0-beta.4";
 
 
 /***/ }),
-/* 53 */
+/* 62 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+__export(__webpack_require__(41));
+__export(__webpack_require__(42));
+__export(__webpack_require__(43));
+__export(__webpack_require__(8));
+__export(__webpack_require__(31));
+__export(__webpack_require__(32));
+__export(__webpack_require__(44));
+__export(__webpack_require__(9));
+__export(__webpack_require__(45));
+
+
+/***/ }),
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7880,7 +8291,7 @@ d3Transition.transition.prototype.styles = transition_styles;
 
 
 /***/ }),
-/* 54 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7889,9 +8300,9 @@ d3Transition.transition.prototype.styles = transition_styles;
  * @license MIT
  */
 
-var d3Ease = __webpack_require__(104);
-var coerceD3_1 = __webpack_require__(12);
-var makeEnum_1 = __webpack_require__(8);
+var d3Ease = __webpack_require__(106);
+var coerceD3_1 = __webpack_require__(13);
+var makeEnum_1 = __webpack_require__(10);
 var EASE_NAME_MAPPING = {
     linear: d3Ease.easeLinear,
     quad: d3Ease.easeQuad,
@@ -8097,7 +8508,7 @@ exports.Easing = Easing;
 
 
 /***/ }),
-/* 55 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8106,7 +8517,7 @@ exports.Easing = Easing;
  * @license MIT
  */
 
-var coerceD3_1 = __webpack_require__(12);
+var coerceD3_1 = __webpack_require__(13);
 /**
  * An animator implementation with no animation. The attributes are
  * immediately set on the selection.
@@ -8127,7 +8538,7 @@ exports.Null = Null;
 
 
 /***/ }),
-/* 56 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8144,7 +8555,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 var d3 = __webpack_require__(1);
 var Typesetter = __webpack_require__(4);
 var Utils = __webpack_require__(0);
-var axis_1 = __webpack_require__(20);
+var axis_1 = __webpack_require__(22);
 var Category = (function (_super) {
     __extends(Category, _super);
     /**
@@ -8500,7 +8911,7 @@ exports.Category = Category;
 
 
 /***/ }),
-/* 57 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8516,9 +8927,9 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Typesetter = __webpack_require__(4);
-var Formatters = __webpack_require__(9);
+var Formatters = __webpack_require__(11);
 var Utils = __webpack_require__(0);
-var axis_1 = __webpack_require__(20);
+var axis_1 = __webpack_require__(22);
 var Numeric = (function (_super) {
     __extends(Numeric, _super);
     /**
@@ -8796,7 +9207,7 @@ exports.Numeric = Numeric;
 
 
 /***/ }),
-/* 58 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8810,8 +9221,8 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var guideLineLayer_1 = __webpack_require__(35);
-var Interactions = __webpack_require__(14);
+var guideLineLayer_1 = __webpack_require__(39);
+var Interactions = __webpack_require__(15);
 var Utils = __webpack_require__(0);
 var DragLineLayer = (function (_super) {
     __extends(DragLineLayer, _super);
@@ -8985,7 +9396,7 @@ exports.DragLineLayer = DragLineLayer;
 
 
 /***/ }),
-/* 59 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8999,7 +9410,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var quantitativeScale_1 = __webpack_require__(11);
+var quantitativeScale_1 = __webpack_require__(12);
 var component_1 = __webpack_require__(5);
 var Gridlines = (function (_super) {
     __extends(Gridlines, _super);
@@ -9096,7 +9507,7 @@ exports.Gridlines = Gridlines;
 
 
 /***/ }),
-/* 60 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9111,8 +9522,8 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Typesetter = __webpack_require__(4);
-var Configs = __webpack_require__(21);
-var Formatters = __webpack_require__(9);
+var Configs = __webpack_require__(23);
+var Formatters = __webpack_require__(11);
 var Utils = __webpack_require__(0);
 var component_1 = __webpack_require__(5);
 var InterpolatedColorLegend = (function (_super) {
@@ -9356,7 +9767,7 @@ exports.InterpolatedColorLegend = InterpolatedColorLegend;
 
 
 /***/ }),
-/* 61 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9525,7 +9936,7 @@ exports.AxisLabel = AxisLabel;
 
 
 /***/ }),
-/* 62 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9541,9 +9952,9 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Typesetter = __webpack_require__(4);
-var Configs = __webpack_require__(21);
-var Formatters = __webpack_require__(9);
-var SymbolFactories = __webpack_require__(27);
+var Configs = __webpack_require__(23);
+var Formatters = __webpack_require__(11);
+var SymbolFactories = __webpack_require__(29);
 var Utils = __webpack_require__(0);
 var component_1 = __webpack_require__(5);
 /**
@@ -10034,7 +10445,7 @@ exports.Legend = Legend;
 
 
 /***/ }),
-/* 63 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10050,7 +10461,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var plot_1 = __webpack_require__(2);
 var Utils = __webpack_require__(0);
-var group_1 = __webpack_require__(34);
+var group_1 = __webpack_require__(38);
 var PlotGroup = (function (_super) {
     __extends(PlotGroup, _super);
     function PlotGroup() {
@@ -10091,7 +10502,7 @@ exports.PlotGroup = PlotGroup;
 
 
 /***/ }),
-/* 64 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10107,7 +10518,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Utils = __webpack_require__(0);
-var componentContainer_1 = __webpack_require__(25);
+var componentContainer_1 = __webpack_require__(27);
 var Table = (function (_super) {
     __extends(Table, _super);
     /**
@@ -10490,7 +10901,7 @@ exports.Table = Table;
 
 
 /***/ }),
-/* 65 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10504,7 +10915,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var dragBoxLayer_1 = __webpack_require__(28);
+var dragBoxLayer_1 = __webpack_require__(30);
 var XDragBoxLayer = (function (_super) {
     __extends(XDragBoxLayer, _super);
     /**
@@ -10557,7 +10968,7 @@ exports.XDragBoxLayer = XDragBoxLayer;
 
 
 /***/ }),
-/* 66 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10571,7 +10982,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var dragBoxLayer_1 = __webpack_require__(28);
+var dragBoxLayer_1 = __webpack_require__(30);
 var YDragBoxLayer = (function (_super) {
     __extends(YDragBoxLayer, _super);
     /**
@@ -10624,7 +11035,7 @@ exports.YDragBoxLayer = YDragBoxLayer;
 
 
 /***/ }),
-/* 67 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10638,7 +11049,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var dispatcher_1 = __webpack_require__(22);
+var dispatcher_1 = __webpack_require__(24);
 var Key = (function (_super) {
     __extends(Key, _super);
     /**
@@ -10720,7 +11131,7 @@ exports.Key = Key;
 
 
 /***/ }),
-/* 68 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10735,7 +11146,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(0);
-var dispatcher_1 = __webpack_require__(22);
+var dispatcher_1 = __webpack_require__(24);
 var Mouse = (function (_super) {
     __extends(Mouse, _super);
     /**
@@ -10919,7 +11330,7 @@ exports.Mouse = Mouse;
 
 
 /***/ }),
-/* 69 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10934,7 +11345,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(0);
-var dispatcher_1 = __webpack_require__(22);
+var dispatcher_1 = __webpack_require__(24);
 var Touch = (function (_super) {
     __extends(Touch, _super);
     /**
@@ -11094,7 +11505,7 @@ exports.Touch = Touch;
 
 
 /***/ }),
-/* 70 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11108,306 +11519,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var drawer_1 = __webpack_require__(7);
-var Arc = (function (_super) {
-    __extends(Arc, _super);
-    function Arc(dataset) {
-        var _this = _super.call(this, dataset) || this;
-        _this._className = "arc fill";
-        _this._svgElementName = "path";
-        return _this;
-    }
-    Arc.prototype._applyDefaultAttributes = function (selection) {
-        _super.prototype._applyDefaultAttributes.call(this, selection);
-        selection.style("stroke", "none");
-    };
-    return Arc;
-}(drawer_1.Drawer));
-exports.Arc = Arc;
-
-
-/***/ }),
-/* 71 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var drawer_1 = __webpack_require__(7);
-var ArcOutline = (function (_super) {
-    __extends(ArcOutline, _super);
-    function ArcOutline(dataset) {
-        var _this = _super.call(this, dataset) || this;
-        _this._className = "arc outline";
-        _this._svgElementName = "path";
-        return _this;
-    }
-    ArcOutline.prototype._applyDefaultAttributes = function (selection) {
-        _super.prototype._applyDefaultAttributes.call(this, selection);
-        selection.style("fill", "none");
-    };
-    return ArcOutline;
-}(drawer_1.Drawer));
-exports.ArcOutline = ArcOutline;
-
-
-/***/ }),
-/* 72 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var d3 = __webpack_require__(1);
-var drawer_1 = __webpack_require__(7);
-var Area = (function (_super) {
-    __extends(Area, _super);
-    function Area(dataset) {
-        var _this = _super.call(this, dataset) || this;
-        _this._className = "area";
-        _this._svgElementName = "path";
-        return _this;
-    }
-    Area.prototype._applyDefaultAttributes = function (selection) {
-        _super.prototype._applyDefaultAttributes.call(this, selection);
-        selection.style("stroke", "none");
-    };
-    Area.prototype.selectionForIndex = function (index) {
-        return d3.select(this.selection().node());
-    };
-    return Area;
-}(drawer_1.Drawer));
-exports.Area = Area;
-
-
-/***/ }),
-/* 73 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var d3 = __webpack_require__(1);
-var drawer_1 = __webpack_require__(7);
-var Line = (function (_super) {
-    __extends(Line, _super);
-    /**
-     * @param dataset
-     * @param _d3LineFactory A callback that gives this Line Drawer a d3.Line object which will be
-     * used to draw with.
-     */
-    function Line(dataset, d3LineFactory) {
-        var _this = _super.call(this, dataset) || this;
-        _this._d3LineFactory = d3LineFactory;
-        _this._className = "line";
-        _this._svgElementName = "path";
-        return _this;
-    }
-    Line.prototype._applyDefaultAttributes = function (selection) {
-        _super.prototype._applyDefaultAttributes.call(this, selection);
-        selection.style("fill", "none");
-    };
-    Line.prototype.selectionForIndex = function (index) {
-        return d3.select(this.selection().node());
-    };
-    /**
-     *
-     * @param data Data to draw. The data will be passed through the line factory in order to get applied
-     * onto the canvas.
-     * @param step
-     * @private
-     */
-    Line.prototype._drawStepCanvas = function (data, step) {
-        var context = this.canvas().node().getContext("2d");
-        var d3Line = this._d3LineFactory();
-        var attrToAppliedProjector = step.attrToAppliedProjector;
-        var resolvedAttrs = Object.keys(attrToAppliedProjector).reduce(function (obj, attrName) {
-            obj[attrName] = attrToAppliedProjector[attrName](data, 0);
-            return obj;
-        }, {});
-        context.save();
-        context.beginPath();
-        d3Line.context(context);
-        d3Line(data[0]);
-        if (resolvedAttrs["stroke-width"]) {
-            context.lineWidth = parseFloat(resolvedAttrs["stroke-width"]);
-        }
-        if (resolvedAttrs["stroke"]) {
-            var strokeColor = d3.color(resolvedAttrs["stroke"]);
-            if (resolvedAttrs["opacity"]) {
-                strokeColor.opacity = resolvedAttrs["opacity"];
-            }
-            context.strokeStyle = strokeColor.rgb().toString();
-            context.stroke();
-        }
-        context.restore();
-    };
-    return Line;
-}(drawer_1.Drawer));
-exports.Line = Line;
-
-
-/***/ }),
-/* 74 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var d3 = __webpack_require__(1);
-var drawer_1 = __webpack_require__(7);
-var Rectangle = (function (_super) {
-    __extends(Rectangle, _super);
-    function Rectangle(dataset) {
-        var _this = _super.call(this, dataset) || this;
-        _this._svgElementName = "rect";
-        return _this;
-    }
-    Rectangle.prototype._drawStepCanvas = function (data, step) {
-        var context = this.canvas().node().getContext("2d");
-        var attrToAppliedProjector = step.attrToAppliedProjector;
-        context.save();
-        data.forEach(function (point, index) {
-            var resolvedAttrs = Object.keys(attrToAppliedProjector).reduce(function (obj, attrName) {
-                obj[attrName] = attrToAppliedProjector[attrName](point, index);
-                return obj;
-            }, {});
-            context.beginPath();
-            context.rect(resolvedAttrs["x"], resolvedAttrs["y"], resolvedAttrs["width"], resolvedAttrs["height"]);
-            if (resolvedAttrs["stroke-width"]) {
-                context.lineWidth = resolvedAttrs["stroke-width"];
-            }
-            if (resolvedAttrs["stroke"]) {
-                var strokeColor = d3.color(resolvedAttrs["stroke"]);
-                if (resolvedAttrs["opacity"]) {
-                    strokeColor.opacity = resolvedAttrs["opacity"];
-                }
-                context.strokeStyle = strokeColor.rgb().toString();
-                context.stroke();
-            }
-            if (resolvedAttrs["fill"]) {
-                var fillColor = d3.color(resolvedAttrs["fill"]);
-                if (resolvedAttrs["opacity"]) {
-                    fillColor.opacity = resolvedAttrs["opacity"];
-                }
-                context.fillStyle = fillColor.rgb().toString();
-                context.fill();
-            }
-        });
-        context.restore();
-    };
-    return Rectangle;
-}(drawer_1.Drawer));
-exports.Rectangle = Rectangle;
-
-
-/***/ }),
-/* 75 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var drawer_1 = __webpack_require__(7);
-var Segment = (function (_super) {
-    __extends(Segment, _super);
-    function Segment(dataset) {
-        var _this = _super.call(this, dataset) || this;
-        _this._svgElementName = "line";
-        return _this;
-    }
-    return Segment;
-}(drawer_1.Drawer));
-exports.Segment = Segment;
-
-
-/***/ }),
-/* 76 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var drawer_1 = __webpack_require__(7);
-var Symbol = (function (_super) {
-    __extends(Symbol, _super);
-    function Symbol(dataset) {
-        var _this = _super.call(this, dataset) || this;
-        _this._svgElementName = "path";
-        _this._className = "symbol";
-        return _this;
-    }
-    return Symbol;
-}(drawer_1.Drawer));
-exports.Symbol = Symbol;
-
-
-/***/ }),
-/* 77 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var Dispatchers = __webpack_require__(13);
+var Dispatchers = __webpack_require__(14);
 var Utils = __webpack_require__(0);
-var interaction_1 = __webpack_require__(15);
+var interaction_1 = __webpack_require__(16);
 var Click = (function (_super) {
     __extends(Click, _super);
     function Click() {
@@ -11525,7 +11639,7 @@ exports.Click = Click;
 
 
 /***/ }),
-/* 78 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11539,9 +11653,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Dispatchers = __webpack_require__(13);
+var Dispatchers = __webpack_require__(14);
 var Utils = __webpack_require__(0);
-var interaction_1 = __webpack_require__(15);
+var interaction_1 = __webpack_require__(16);
 var Drag = (function (_super) {
     __extends(Drag, _super);
     function Drag() {
@@ -11690,7 +11804,7 @@ exports.Drag = Drag;
 
 
 /***/ }),
-/* 79 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11705,11 +11819,11 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var Dispatchers = __webpack_require__(13);
+var Dispatchers = __webpack_require__(14);
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var Interactions = __webpack_require__(14);
-var interaction_1 = __webpack_require__(15);
+var Interactions = __webpack_require__(15);
+var interaction_1 = __webpack_require__(16);
 /**
  * Performs a zoom transformation of the `value` argument scaled by the
  * `zoom` argument about the point defined by the `center` argument.
@@ -12248,7 +12362,7 @@ exports.PanZoom = PanZoom;
 
 
 /***/ }),
-/* 80 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12262,9 +12376,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Dispatchers = __webpack_require__(13);
+var Dispatchers = __webpack_require__(14);
 var Utils = __webpack_require__(0);
-var interaction_1 = __webpack_require__(15);
+var interaction_1 = __webpack_require__(16);
 var Pointer = (function (_super) {
     __extends(Pointer, _super);
     function Pointer() {
@@ -12379,7 +12493,7 @@ exports.Pointer = Pointer;
 
 
 /***/ }),
-/* 81 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12395,7 +12509,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var barPlot_1 = __webpack_require__(23);
+var barPlot_1 = __webpack_require__(25);
 var plot_1 = __webpack_require__(2);
 var ClusteredBar = (function (_super) {
     __extends(ClusteredBar, _super);
@@ -12453,7 +12567,7 @@ exports.ClusteredBar = ClusteredBar;
 
 
 /***/ }),
-/* 82 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12470,10 +12584,14 @@ var __extends = (this && this.__extends) || function (d, b) {
 var d3 = __webpack_require__(1);
 var Typesetter = __webpack_require__(4);
 var Animators = __webpack_require__(6);
-var Formatters = __webpack_require__(9);
-var Drawers = __webpack_require__(10);
+var Formatters = __webpack_require__(11);
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
+var arcDrawer_1 = __webpack_require__(41);
+var arcOutlineDrawer_1 = __webpack_require__(42);
+var canvasDrawer_1 = __webpack_require__(8);
+var drawer_1 = __webpack_require__(7);
+var windowUtils_1 = __webpack_require__(20);
 var plot_1 = __webpack_require__(2);
 var Pie = (function (_super) {
     __extends(Pie, _super);
@@ -12499,7 +12617,7 @@ var Pie = (function (_super) {
     Pie.prototype._setup = function () {
         var _this = this;
         _super.prototype._setup.call(this);
-        this._strokeDrawers.forEach(function (d) { return d.renderArea(_this._renderArea.append("g")); });
+        this._strokeDrawers.forEach(function (d) { return d.useSVG(_this._renderArea); });
     };
     Pie.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
         _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
@@ -12524,9 +12642,11 @@ var Pie = (function (_super) {
             return this;
         }
         this._updatePieAngles();
-        var strokeDrawer = new Drawers.ArcOutline(dataset);
+        var strokeDrawer = new drawer_1.Drawer(dataset, new arcOutlineDrawer_1.ArcOutlineSVGDrawer(), new canvasDrawer_1.CanvasDrawer(function () {
+            windowUtils_1.warn("canvas renderer not supported on Pie Plot!");
+        }));
         if (this._isSetup) {
-            strokeDrawer.renderArea(this._renderArea.append("g"));
+            strokeDrawer.useSVG(this._renderArea);
         }
         this._strokeDrawers.set(dataset, strokeDrawer);
         _super.prototype._addDataset.call(this, dataset);
@@ -12555,9 +12675,7 @@ var Pie = (function (_super) {
             if (drawer == null) {
                 return;
             }
-            drawer.renderArea().selectAll(drawer.selector()).each(function () {
-                allSelections.push(this);
-            });
+            allSelections.push.apply(allSelections, drawer.selection().nodes());
         });
         return d3.selectAll(allSelections);
     };
@@ -12567,7 +12685,9 @@ var Pie = (function (_super) {
         this.render();
     };
     Pie.prototype._createDrawer = function (dataset) {
-        return new Drawers.Arc(dataset);
+        return new drawer_1.Drawer(dataset, new arcDrawer_1.ArcSVGDrawer(), new canvasDrawer_1.CanvasDrawer(function () {
+            windowUtils_1.warn("canvas renderer is not supported on Pie Plot!");
+        }));
     };
     Pie.prototype.entities = function (datasets) {
         var _this = this;
@@ -12949,7 +13069,7 @@ exports.Pie = Pie;
 
 
 /***/ }),
-/* 83 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12966,11 +13086,13 @@ var __extends = (this && this.__extends) || function (d, b) {
 var d3 = __webpack_require__(1);
 var Typesetter = __webpack_require__(4);
 var Animators = __webpack_require__(6);
-var Drawers = __webpack_require__(10);
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
+var canvasDrawer_1 = __webpack_require__(8);
+var drawer_1 = __webpack_require__(7);
+var rectangleDrawer_1 = __webpack_require__(32);
 var plot_1 = __webpack_require__(2);
-var xyPlot_1 = __webpack_require__(16);
+var xyPlot_1 = __webpack_require__(17);
 var Rectangle = (function (_super) {
     __extends(Rectangle, _super);
     /**
@@ -12994,7 +13116,7 @@ var Rectangle = (function (_super) {
         return _this;
     }
     Rectangle.prototype._createDrawer = function (dataset) {
-        return new Drawers.Rectangle(dataset);
+        return new drawer_1.Drawer(dataset, new rectangleDrawer_1.RectangleSVGDrawer(), new canvasDrawer_1.CanvasDrawer(rectangleDrawer_1.RectangleCanvasDrawStep));
     };
     Rectangle.prototype._generateAttrToProjector = function () {
         var _this = this;
@@ -13315,7 +13437,7 @@ exports.Rectangle = Rectangle;
 
 
 /***/ }),
-/* 84 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13330,13 +13452,16 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Animators = __webpack_require__(6);
-var SymbolFactories = __webpack_require__(27);
-var Drawers = __webpack_require__(10);
+var SymbolFactories = __webpack_require__(29);
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var Plots = __webpack_require__(17);
+var canvasDrawer_1 = __webpack_require__(8);
+var drawer_1 = __webpack_require__(7);
+var symbolDrawer_1 = __webpack_require__(45);
+var windowUtils_1 = __webpack_require__(20);
+var Plots = __webpack_require__(18);
 var plot_1 = __webpack_require__(2);
-var xyPlot_1 = __webpack_require__(16);
+var xyPlot_1 = __webpack_require__(17);
 var Scatter = (function (_super) {
     __extends(Scatter, _super);
     /**
@@ -13369,7 +13494,9 @@ var Scatter = (function (_super) {
         });
     };
     Scatter.prototype._createDrawer = function (dataset) {
-        return new Drawers.Symbol(dataset);
+        return new drawer_1.Drawer(dataset, new symbolDrawer_1.SymbolSVGDrawer(), new canvasDrawer_1.CanvasDrawer(function () {
+            windowUtils_1.warn("canvas renderer is not supported on Scatter Plot!");
+        }));
     };
     Scatter.prototype.size = function (size, scale) {
         if (size == null) {
@@ -13477,7 +13604,7 @@ exports.Scatter = Scatter;
 
 
 /***/ }),
-/* 85 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13492,10 +13619,13 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Animators = __webpack_require__(6);
-var Drawers = __webpack_require__(10);
+var canvasDrawer_1 = __webpack_require__(8);
+var drawer_1 = __webpack_require__(7);
+var segmentDrawer_1 = __webpack_require__(44);
 var Scales = __webpack_require__(3);
+var windowUtils_1 = __webpack_require__(20);
 var plot_1 = __webpack_require__(2);
-var xyPlot_1 = __webpack_require__(16);
+var xyPlot_1 = __webpack_require__(17);
 var Segment = (function (_super) {
     __extends(Segment, _super);
     /**
@@ -13511,7 +13641,9 @@ var Segment = (function (_super) {
         return _this;
     }
     Segment.prototype._createDrawer = function (dataset) {
-        return new Drawers.Segment(dataset);
+        return new drawer_1.Drawer(dataset, new segmentDrawer_1.SegmentSVGDrawer(), new canvasDrawer_1.CanvasDrawer(function () {
+            windowUtils_1.warn("canvas renderer is not supported on Segment Plot!");
+        }));
     };
     Segment.prototype._generateDrawSteps = function () {
         return [{ attrToProjector: this._generateAttrToProjector(), animator: new Animators.Null() }];
@@ -13676,7 +13808,7 @@ exports.Segment = Segment;
 
 
 /***/ }),
-/* 86 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13693,7 +13825,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 var d3 = __webpack_require__(1);
 var Animators = __webpack_require__(6);
 var Utils = __webpack_require__(0);
-var areaPlot_1 = __webpack_require__(37);
+var areaPlot_1 = __webpack_require__(46);
 var plot_1 = __webpack_require__(2);
 var StackedArea = (function (_super) {
     __extends(StackedArea, _super);
@@ -13879,7 +14011,7 @@ exports.StackedArea = StackedArea;
 
 
 /***/ }),
-/* 87 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13895,7 +14027,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Typesetter = __webpack_require__(4);
 var Utils = __webpack_require__(0);
-var barPlot_1 = __webpack_require__(23);
+var barPlot_1 = __webpack_require__(25);
 var StackedBar = (function (_super) {
     __extends(StackedBar, _super);
     /**
@@ -14098,7 +14230,7 @@ exports.StackedBar = StackedBar;
 
 
 /***/ }),
-/* 88 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14113,7 +14245,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(0);
-var barPlot_1 = __webpack_require__(23);
+var barPlot_1 = __webpack_require__(25);
 var plot_1 = __webpack_require__(2);
 var Waterfall = (function (_super) {
     __extends(Waterfall, _super);
@@ -14310,7 +14442,7 @@ exports.Waterfall = Waterfall;
 
 
 /***/ }),
-/* 89 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14326,7 +14458,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Utils = __webpack_require__(0);
-var scale_1 = __webpack_require__(18);
+var scale_1 = __webpack_require__(19);
 var Color = (function (_super) {
     __extends(Color, _super);
     /**
@@ -14442,7 +14574,7 @@ exports.Color = Color;
 
 
 /***/ }),
-/* 90 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14458,7 +14590,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Utils = __webpack_require__(0);
-var scale_1 = __webpack_require__(18);
+var scale_1 = __webpack_require__(19);
 var InterpolatedColor = (function (_super) {
     __extends(InterpolatedColor, _super);
     /**
@@ -14609,7 +14741,7 @@ exports.InterpolatedColor = InterpolatedColor;
 
 
 /***/ }),
-/* 91 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14624,7 +14756,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var quantitativeScale_1 = __webpack_require__(11);
+var quantitativeScale_1 = __webpack_require__(12);
 var Linear = (function (_super) {
     __extends(Linear, _super);
     /**
@@ -14689,7 +14821,7 @@ exports.Linear = Linear;
 
 
 /***/ }),
-/* 92 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14706,7 +14838,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 var d3 = __webpack_require__(1);
 var Utils = __webpack_require__(0);
 var Scales = __webpack_require__(3);
-var quantitativeScale_1 = __webpack_require__(11);
+var quantitativeScale_1 = __webpack_require__(12);
 var ModifiedLog = (function (_super) {
     __extends(ModifiedLog, _super);
     /**
@@ -14914,7 +15046,7 @@ exports.ModifiedLog = ModifiedLog;
 
 
 /***/ }),
-/* 93 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14964,7 +15096,7 @@ exports.integerTickGenerator = integerTickGenerator;
 
 
 /***/ }),
-/* 94 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14979,8 +15111,8 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var timeAxis_1 = __webpack_require__(24);
-var quantitativeScale_1 = __webpack_require__(11);
+var timeAxis_1 = __webpack_require__(26);
+var quantitativeScale_1 = __webpack_require__(12);
 var Time = (function (_super) {
     __extends(Time, _super);
     /**
@@ -15101,7 +15233,7 @@ exports.Time = Time;
 
 
 /***/ }),
-/* 95 */
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15171,7 +15303,7 @@ exports.createFilledArray = createFilledArray;
 
 
 /***/ }),
-/* 96 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15185,7 +15317,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var set_1 = __webpack_require__(41);
+var set_1 = __webpack_require__(50);
 /**
  * A set of callbacks which can be all invoked at once.
  * Each callback exists at most once in the set (based on reference equality).
@@ -15213,7 +15345,7 @@ exports.CallbackSet = CallbackSet;
 
 
 /***/ }),
-/* 97 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15296,7 +15428,7 @@ function luminance(color) {
 
 
 /***/ }),
-/* 98 */
+/* 101 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15544,7 +15676,7 @@ function _parseStyleValue(style, property) {
 
 
 /***/ }),
-/* 99 */
+/* 102 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15553,7 +15685,7 @@ function _parseStyleValue(style, property) {
  * @license MIT
  */
 
-var Math = __webpack_require__(29);
+var Math = __webpack_require__(33);
 /**
  * Array-backed implementation of {EntityStore}
  */
@@ -15598,7 +15730,7 @@ exports.EntityArray = EntityArray;
 
 
 /***/ }),
-/* 100 */
+/* 103 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15607,7 +15739,7 @@ exports.EntityArray = EntityArray;
  * @license MIT
  */
 
-var Math = __webpack_require__(29);
+var Math = __webpack_require__(33);
 /**
  * Shim for ES6 map.
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
@@ -15689,7 +15821,7 @@ exports.Map = Map;
 
 
 /***/ }),
-/* 101 */
+/* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15700,7 +15832,7 @@ exports.Map = Map;
 
 var d3 = __webpack_require__(1);
 var Utils = __webpack_require__(0);
-var makeEnum_1 = __webpack_require__(8);
+var makeEnum_1 = __webpack_require__(10);
 /**
  * Option type for stacking direction. By default, stacked bar and area charts
  * put the first data series at the bottom of the axis ("bottomup"), but this
@@ -15822,7 +15954,7 @@ exports.normalizeKey = normalizeKey;
 
 
 /***/ }),
-/* 102 */
+/* 105 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15901,126 +16033,54 @@ exports.Translator = Translator;
 
 
 /***/ }),
-/* 103 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
-
-var Configs = __webpack_require__(21);
-/**
- * Print a warning message to the console, if it is available.
- *
- * @param {string} The warnings to print
- */
-function warn(warning) {
-    if (!Configs.SHOW_WARNINGS) {
-        return;
-    }
-    /* tslint:disable:no-console */
-    if (window.console != null) {
-        if (window.console.warn != null) {
-            console.warn(warning);
-        }
-        else if (window.console.log != null) {
-            console.log(warning);
-        }
-    }
-    /* tslint:enable:no-console */
-}
-exports.warn = warn;
-/**
- * Is like setTimeout, but activates synchronously if time=0
- * We special case 0 because of an observed issue where calling setTimeout causes visible flickering.
- * We believe this is because when requestAnimationFrame calls into the paint function, as soon as that function finishes
- * evaluating, the results are painted to the screen. As a result, if we want something to occur immediately but call setTimeout
- * with time=0, then it is pushed to the call stack and rendered in the next frame, so the component that was rendered via
- * setTimeout appears out-of-sync with the rest of the plot.
- */
-function setTimeout(f, time) {
-    var args = [];
-    for (var _i = 2; _i < arguments.length; _i++) {
-        args[_i - 2] = arguments[_i];
-    }
-    if (time === 0) {
-        f(args);
-        return -1;
-    }
-    else {
-        return window.setTimeout(f, time, args);
-    }
-}
-exports.setTimeout = setTimeout;
-/**
- * Sends a deprecation warning to the console. The warning includes the name of the deprecated method,
- * version number of the deprecation, and an optional message.
- *
- * To be used in the first line of a deprecated method.
- *
- * @param {string} callingMethod The name of the method being deprecated
- * @param {string} version The version when the tagged method became obsolete
- * @param {string?} message Optional message to be shown with the warning
- */
-function deprecated(callingMethod, version, message) {
-    if (message === void 0) { message = ""; }
-    warn("Method " + callingMethod + " has been deprecated in version " + version +
-        ". Please refer to the release notes. " + message);
-}
-exports.deprecated = deprecated;
-
-
-/***/ }),
-/* 104 */
+/* 106 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_linear__ = __webpack_require__(111);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_linear__ = __webpack_require__(113);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeLinear", function() { return __WEBPACK_IMPORTED_MODULE_0__src_linear__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__src_quad__ = __webpack_require__(113);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__src_quad__ = __webpack_require__(115);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeQuad", function() { return __WEBPACK_IMPORTED_MODULE_1__src_quad__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeQuadIn", function() { return __WEBPACK_IMPORTED_MODULE_1__src_quad__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeQuadOut", function() { return __WEBPACK_IMPORTED_MODULE_1__src_quad__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeQuadInOut", function() { return __WEBPACK_IMPORTED_MODULE_1__src_quad__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__src_cubic__ = __webpack_require__(108);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__src_cubic__ = __webpack_require__(110);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCubic", function() { return __WEBPACK_IMPORTED_MODULE_2__src_cubic__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCubicIn", function() { return __WEBPACK_IMPORTED_MODULE_2__src_cubic__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCubicOut", function() { return __WEBPACK_IMPORTED_MODULE_2__src_cubic__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCubicInOut", function() { return __WEBPACK_IMPORTED_MODULE_2__src_cubic__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__src_poly__ = __webpack_require__(112);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__src_poly__ = __webpack_require__(114);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easePoly", function() { return __WEBPACK_IMPORTED_MODULE_3__src_poly__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easePolyIn", function() { return __WEBPACK_IMPORTED_MODULE_3__src_poly__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easePolyOut", function() { return __WEBPACK_IMPORTED_MODULE_3__src_poly__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easePolyInOut", function() { return __WEBPACK_IMPORTED_MODULE_3__src_poly__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__src_sin__ = __webpack_require__(114);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__src_sin__ = __webpack_require__(116);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeSin", function() { return __WEBPACK_IMPORTED_MODULE_4__src_sin__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeSinIn", function() { return __WEBPACK_IMPORTED_MODULE_4__src_sin__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeSinOut", function() { return __WEBPACK_IMPORTED_MODULE_4__src_sin__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeSinInOut", function() { return __WEBPACK_IMPORTED_MODULE_4__src_sin__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__src_exp__ = __webpack_require__(110);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__src_exp__ = __webpack_require__(112);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeExp", function() { return __WEBPACK_IMPORTED_MODULE_5__src_exp__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeExpIn", function() { return __WEBPACK_IMPORTED_MODULE_5__src_exp__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeExpOut", function() { return __WEBPACK_IMPORTED_MODULE_5__src_exp__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeExpInOut", function() { return __WEBPACK_IMPORTED_MODULE_5__src_exp__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__src_circle__ = __webpack_require__(107);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__src_circle__ = __webpack_require__(109);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCircle", function() { return __WEBPACK_IMPORTED_MODULE_6__src_circle__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCircleIn", function() { return __WEBPACK_IMPORTED_MODULE_6__src_circle__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCircleOut", function() { return __WEBPACK_IMPORTED_MODULE_6__src_circle__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCircleInOut", function() { return __WEBPACK_IMPORTED_MODULE_6__src_circle__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__src_bounce__ = __webpack_require__(106);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__src_bounce__ = __webpack_require__(108);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBounce", function() { return __WEBPACK_IMPORTED_MODULE_7__src_bounce__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBounceIn", function() { return __WEBPACK_IMPORTED_MODULE_7__src_bounce__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBounceOut", function() { return __WEBPACK_IMPORTED_MODULE_7__src_bounce__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBounceInOut", function() { return __WEBPACK_IMPORTED_MODULE_7__src_bounce__["c"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__src_back__ = __webpack_require__(105);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__src_back__ = __webpack_require__(107);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBack", function() { return __WEBPACK_IMPORTED_MODULE_8__src_back__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBackIn", function() { return __WEBPACK_IMPORTED_MODULE_8__src_back__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBackOut", function() { return __WEBPACK_IMPORTED_MODULE_8__src_back__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBackInOut", function() { return __WEBPACK_IMPORTED_MODULE_8__src_back__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__src_elastic__ = __webpack_require__(109);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__src_elastic__ = __webpack_require__(111);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeElastic", function() { return __WEBPACK_IMPORTED_MODULE_9__src_elastic__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeElasticIn", function() { return __WEBPACK_IMPORTED_MODULE_9__src_elastic__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeElasticOut", function() { return __WEBPACK_IMPORTED_MODULE_9__src_elastic__["a"]; });
@@ -16047,7 +16107,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /***/ }),
-/* 105 */
+/* 107 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16094,7 +16154,7 @@ var backInOut = (function custom(s) {
 
 
 /***/ }),
-/* 106 */
+/* 108 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16126,7 +16186,7 @@ function bounceInOut(t) {
 
 
 /***/ }),
-/* 107 */
+/* 109 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16147,7 +16207,7 @@ function circleInOut(t) {
 
 
 /***/ }),
-/* 108 */
+/* 110 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16168,7 +16228,7 @@ function cubicInOut(t) {
 
 
 /***/ }),
-/* 109 */
+/* 111 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16222,7 +16282,7 @@ var elasticInOut = (function custom(a, p) {
 
 
 /***/ }),
-/* 110 */
+/* 112 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16243,7 +16303,7 @@ function expInOut(t) {
 
 
 /***/ }),
-/* 111 */
+/* 113 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16254,7 +16314,7 @@ function linear(t) {
 
 
 /***/ }),
-/* 112 */
+/* 114 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16301,7 +16361,7 @@ var polyInOut = (function custom(e) {
 
 
 /***/ }),
-/* 113 */
+/* 115 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16322,7 +16382,7 @@ function quadInOut(t) {
 
 
 /***/ }),
-/* 114 */
+/* 116 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16346,7 +16406,7 @@ function sinInOut(t) {
 
 
 /***/ }),
-/* 115 */
+/* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16420,7 +16480,7 @@ exports.CanvasContext = CanvasContext;
 //# sourceMappingURL=canvas.js.map
 
 /***/ }),
-/* 116 */
+/* 118 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16601,7 +16661,7 @@ exports.SvgContext = SvgContext;
 //# sourceMappingURL=svg.js.map
 
 /***/ }),
-/* 117 */
+/* 119 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16616,9 +16676,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var utils_1 = __webpack_require__(19);
-var abstractMeasurer_1 = __webpack_require__(30);
-var cacheCharacterMeasurer_1 = __webpack_require__(43);
+var utils_1 = __webpack_require__(21);
+var abstractMeasurer_1 = __webpack_require__(34);
+var cacheCharacterMeasurer_1 = __webpack_require__(52);
 var CacheMeasurer = (function (_super) {
     __extends(CacheMeasurer, _super);
     function CacheMeasurer(ruler) {
@@ -16645,7 +16705,7 @@ exports.CacheMeasurer = CacheMeasurer;
 //# sourceMappingURL=cacheMeasurer.js.map
 
 /***/ }),
-/* 118 */
+/* 120 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16655,10 +16715,10 @@ exports.CacheMeasurer = CacheMeasurer;
  * license at https://github.com/palantir/typesettable/blob/develop/LICENSE
  */
 
-var contexts_1 = __webpack_require__(42);
-var measurers_1 = __webpack_require__(45);
-var wrappers_1 = __webpack_require__(47);
-var writers_1 = __webpack_require__(49);
+var contexts_1 = __webpack_require__(51);
+var measurers_1 = __webpack_require__(54);
+var wrappers_1 = __webpack_require__(56);
+var writers_1 = __webpack_require__(58);
 /**
  * This is a convenience interface for typesetting strings using the default
  * measurer/wrapper/writer setup.
@@ -16699,7 +16759,7 @@ exports.Typesetter = Typesetter;
 //# sourceMappingURL=typesetter.js.map
 
 /***/ }),
-/* 119 */
+/* 121 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16747,7 +16807,7 @@ exports.Cache = Cache;
 //# sourceMappingURL=cache.js.map
 
 /***/ }),
-/* 120 */
+/* 122 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16828,7 +16888,7 @@ exports.Methods = Methods;
 //# sourceMappingURL=methods.js.map
 
 /***/ }),
-/* 121 */
+/* 123 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16875,7 +16935,7 @@ exports.StringMethods = StringMethods;
 //# sourceMappingURL=stringMethods.js.map
 
 /***/ }),
-/* 122 */
+/* 124 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16923,7 +16983,7 @@ exports.Tokenizer = Tokenizer;
 //# sourceMappingURL=tokenizer.js.map
 
 /***/ }),
-/* 123 */
+/* 125 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16938,7 +16998,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var wrapper_1 = __webpack_require__(48);
+var wrapper_1 = __webpack_require__(57);
 var SingleLineWrapper = (function (_super) {
     __extends(SingleLineWrapper, _super);
     function SingleLineWrapper() {
@@ -16981,7 +17041,7 @@ exports.SingleLineWrapper = SingleLineWrapper;
 //# sourceMappingURL=singleLineWrapper.js.map
 
 /***/ }),
-/* 124 */
+/* 126 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16991,7 +17051,7 @@ exports.SingleLineWrapper = SingleLineWrapper;
  * license at https://github.com/palantir/typesettable/blob/develop/LICENSE
  */
 
-var utils_1 = __webpack_require__(19);
+var utils_1 = __webpack_require__(21);
 var DEFAULT_WRITE_OPTIONS = {
     textRotation: 0,
     textShear: 0,
@@ -17114,7 +17174,7 @@ exports.Writer = Writer;
 //# sourceMappingURL=writer.js.map
 
 /***/ }),
-/* 125 */
+/* 127 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17125,51 +17185,51 @@ function __export(m) {
 // HACKHACK d3-selection-multi doesn't play well with default "d3" package in a
 // bundler environment (e.g. webpack) - see https://github.com/d3/d3-selection-multi/issues/11
 // we add it manually to the default "d3" bundle
-__webpack_require__(53);
+__webpack_require__(63);
 var Animators = __webpack_require__(6);
 exports.Animators = Animators;
-var Axes = __webpack_require__(50);
+var Axes = __webpack_require__(59);
 exports.Axes = Axes;
-var Components = __webpack_require__(31);
+var Components = __webpack_require__(35);
 exports.Components = Components;
-var Configs = __webpack_require__(21);
+var Configs = __webpack_require__(23);
 exports.Configs = Configs;
-var Formatters = __webpack_require__(9);
+var Formatters = __webpack_require__(11);
 exports.Formatters = Formatters;
-var RenderController = __webpack_require__(26);
+var RenderController = __webpack_require__(28);
 exports.RenderController = RenderController;
-var RenderPolicies = __webpack_require__(32);
+var RenderPolicies = __webpack_require__(36);
 exports.RenderPolicies = RenderPolicies;
-var SymbolFactories = __webpack_require__(27);
+var SymbolFactories = __webpack_require__(29);
 exports.SymbolFactories = SymbolFactories;
-var Dispatchers = __webpack_require__(13);
+var Dispatchers = __webpack_require__(14);
 exports.Dispatchers = Dispatchers;
-var Drawers = __webpack_require__(10);
+var Drawers = __webpack_require__(62);
 exports.Drawers = Drawers;
-var Interactions = __webpack_require__(14);
+var Interactions = __webpack_require__(15);
 exports.Interactions = Interactions;
-var Plots = __webpack_require__(17);
+var Plots = __webpack_require__(18);
 exports.Plots = Plots;
 var Scales = __webpack_require__(3);
 exports.Scales = Scales;
 var Utils = __webpack_require__(0);
 exports.Utils = Utils;
-__export(__webpack_require__(20));
-var timeAxis_1 = __webpack_require__(24);
+__export(__webpack_require__(22));
+var timeAxis_1 = __webpack_require__(26);
 exports.TimeInterval = timeAxis_1.TimeInterval;
 __export(__webpack_require__(5));
-__export(__webpack_require__(25));
-__export(__webpack_require__(51));
-var version_1 = __webpack_require__(52);
+__export(__webpack_require__(27));
+__export(__webpack_require__(60));
+var version_1 = __webpack_require__(61);
 exports.version = version_1.version;
-__export(__webpack_require__(22));
+__export(__webpack_require__(24));
 __export(__webpack_require__(7));
-__export(__webpack_require__(15));
-__export(__webpack_require__(33));
 __export(__webpack_require__(16));
+__export(__webpack_require__(37));
+__export(__webpack_require__(17));
 __export(__webpack_require__(2));
-__export(__webpack_require__(11));
-__export(__webpack_require__(18));
+__export(__webpack_require__(12));
+__export(__webpack_require__(19));
 
 
 /***/ })

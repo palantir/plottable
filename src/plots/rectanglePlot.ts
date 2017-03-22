@@ -14,7 +14,8 @@ import * as Scales from "../scales";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
 
-import { CanvasDrawer, Drawer } from "../drawers/drawer";
+import { CanvasDrawer } from "../drawers/canvasDrawer";
+import { Drawer } from "../drawers/drawer";
 import { RectangleCanvasDrawStep, RectangleSVGDrawer } from "../drawers/rectangleDrawer";
 import * as Plots from "./";
 import { PlotEntity } from "./";

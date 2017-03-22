@@ -3,263 +3,70 @@ import * as sinon from "sinon";
 
 import { assert } from "chai";
 
-import * as Plottable from "../../src";
-import { SimpleSelection } from "../../src/core/interfaces";
-
 import * as TestMethods from "../testMethods";
+import { Drawer } from "../../src/drawers/drawer";
+import { SVGDrawer } from "../../src/drawers/svgDrawer";
+import { CanvasDrawer } from "../../src/drawers/canvasDrawer";
+import { Dataset } from "../../src/core/dataset";
+import { DrawStep } from "../../src/drawers/index";
+import { AttributeToProjector } from "../../src/core/interfaces";
+import { Null } from "../../src/animators/nullAnimator";
 
-describe("Drawers", () => {
-  describe("Drawer", () => {
-    class MockDrawer extends Plottable.Drawer {
-      public static ELEMENT_NAME = "mock";
-      public static CSS_CLASS_NAME = "mock-css";
+describe("Drawer", () => {
+  let drawer: Drawer;
+  let dataset: Dataset;
+  let svgDrawer: SVGDrawer;
+  let canvasDrawer: CanvasDrawer;
 
-      constructor(dataset: Plottable.Dataset) {
-        super(dataset);
-        this._svgElementName = MockDrawer.ELEMENT_NAME;
-        this._className = MockDrawer.CSS_CLASS_NAME;
-      }
-    }
-
-    let drawer: MockDrawer;
-    let dataset: Plottable.Dataset;
-    beforeEach(() => {
-      dataset = new Plottable.Dataset();
-      drawer = new MockDrawer(dataset);
-    });
-
-    it("returns its element name as a selector", () => {
-      assert.strictEqual(drawer.selector(), MockDrawer.ELEMENT_NAME);
-    });
-
-    it("can set and get its renderArea", () => {
-      const svg = TestMethods.generateSVG();
-      assert.strictEqual(drawer.renderArea(svg), drawer, "setter mode returns the calling Drawer");
-      assert.sameMembers(drawer.renderArea().nodes(), svg.nodes(), "getter mode returns the selection");
-      svg.remove();
-    });
-
-    it("can remove its renderArea", () => {
-      const svg = TestMethods.generateSVG();
-      drawer.renderArea(svg);
-      drawer.remove();
-      assert.isFalse(document.body.contains(<any> svg.node()), "renderArea was removed from the DOM");
-    });
-
-    describe("drawing and retrieving elements", () => {
-      const data = ["A", "B", "C"];
-      const propertyName = "property";
-      let svg: SimpleSelection<void>;
-
-      beforeEach(() => {
-        svg = TestMethods.generateSVG();
-        let invocationCount = 0;
-        const validatingProjector = (datum: any, index: number, passedDataset: Plottable.Dataset) => {
-          assert.strictEqual(datum, data[invocationCount], "projector was passed the correct datum");
-          assert.strictEqual(index, invocationCount, "projector was passed the correct index");
-          assert.strictEqual(passedDataset, dataset, "projector was passed the Drawer's dataset");
-          invocationCount++;
-          return datum;
-        };
-        const attrToProjector: Plottable.AttributeToProjector = {};
-        attrToProjector[propertyName] = validatingProjector;
-        const drawSteps = [
-          {
-            attrToProjector: attrToProjector,
-            animator: new Plottable.Animators.Null(),
-          },
-        ];
-        drawer.renderArea(svg);
-        drawer.draw(data, drawSteps);
-      });
-
-      afterEach(function() {
-        if (this.currentTest.state === "passed") {
-          svg.remove();
-        }
-      });
-
-      it("draws elements accoding to a specified DrawStep", () => {
-        const drawn = svg.selectAll<Element, any>(MockDrawer.ELEMENT_NAME);
-        assert.strictEqual(drawn.size(), data.length, "created one element per datum");
-        drawn.each(function(datum, index) {
-          const element = d3.select(this);
-          assert.strictEqual(element.attr(propertyName), data[index], "property was set correctly");
-          assert.isTrue(element.classed(MockDrawer.CSS_CLASS_NAME), "element carries the correct CSS class");
-        });
-      });
-
-      it("can retrieve a selection containing elements it drew", () => {
-        const selection = drawer.selection();
-        assert.strictEqual(selection.size(), data.length, "retrieved one element per datum");
-        const drawn = svg.selectAll<Element, any>(MockDrawer.ELEMENT_NAME);
-        assert.deepEqual(selection.node(), drawn.node(), "retrieved all elements it drew");
-      });
-
-      it("can retrieve the selection for a particular index", () => {
-        const selection = drawer.selection();
-        data.forEach((datum, index) => {
-          const selectionForIndex = drawer.selectionForIndex(index);
-          assert.strictEqual(selectionForIndex.node(), selection.nodes()[index], `retrieves the correct selection for index ${index}`);
-        });
-      });
-    });
-
-    describe("canvas drawing", () => {
-      it("setting the renderArea/canvas clears the other one", () => {
-        const svg = TestMethods.generateSVG();
-        const canvas = d3.select(document.createElement("canvas"));
-        drawer.renderArea(svg);
-        drawer.canvas(canvas);
-
-        assert.isNull(drawer.renderArea(), "setting canvas clears renderArea");
-        assert.strictEqual(drawer.canvas(), canvas, "can get canvas after setting");
-
-        drawer.renderArea(svg);
-
-        assert.isNull(drawer.canvas(), "setting renderArea clears canvas");
-        assert.strictEqual(drawer.renderArea(), svg, "can get renderArea after setting");
-
-        svg.remove();
-      });
-
-      it("draw() calls _drawStepCanvas", () => {
-        const canvas = d3.select(document.createElement("canvas"));
-        drawer.canvas(canvas);
-        const drawStep: Plottable.Drawers.DrawStep = {
-          animator: new Plottable.Animators.Null(),
-          attrToProjector: {}
-        };
-
-        const drawStepCanvasStub = sinon.stub(drawer, "_drawStepCanvas", () => {});
-        const data: any[] = [];
-        drawer.draw(data, [drawStep]);
-        assert.strictEqual(drawStepCanvasStub.args[0][0], data, "_drawStepCanvas is called");
-
-        drawStepCanvasStub.reset();
-
-        const svg = TestMethods.generateSVG();
-        drawer.renderArea(svg);
-        drawer.draw(data, [drawStep]);
-
-        assert.isFalse(drawStepCanvasStub.called, "_drawStepCanvas isn't called in svg land");
-
-        svg.remove();
-      });
-    });
-
-    describe("animation timings", () => {
-      class MockAnimator implements Plottable.Animator {
-        private _time: number;
-        private _callback: Function;
-
-        constructor(time: number, callback?: Function) {
-          this._time = time;
-          this._callback = callback;
-        }
-
-        public totalTime(numberOfIterations: number) {
-          return this._time;
-        }
-
-        public animate(selection: any, attrToProjector: Plottable.AttributeToProjector): any {
-          if (this._callback) {
-            this._callback();
-          }
-          return selection;
-        }
-      }
-
-      let oldTimeout: any;
-      let timings: number[];
-      let svg: SimpleSelection<void>;
-
-      before(() => {
-        oldTimeout = Plottable.Utils.Window.setTimeout;
-        Plottable.Utils.Window.setTimeout = function(f: Function, time: number, ...args: any[]) {
-          timings.push(time);
-          return oldTimeout(f, time, args);
-        };
-      });
-
-      after(() => {
-        Plottable.Utils.Window.setTimeout = oldTimeout;
-      });
-
-      beforeEach(() => {
-        timings = [];
-        svg = TestMethods.generateSVG();
-        drawer = new Plottable.Drawer(null); // HACKHACK #2777: have to create a Plottable.Drawer to avoid "two Plottables" issue
-        (<any> drawer)._svgElementName = MockDrawer.ELEMENT_NAME;
-        drawer.renderArea(svg);
-      });
-
-      afterEach(() => {
-        svg.remove(); // no point keeping it around since we don't draw anything in it anyway
-      });
-
-      it("correctly computes the total draw time", () => {
-        function makeFixedTimeAnimator(totalTime: number) {
-          return <Plottable.Animator> {
-            animate: () => null,
-            totalTime: () => totalTime,
-          };
-        }
-
-        const animationTimes = [10, 20];
-        const drawSteps = animationTimes.map((time) => {
-          return {
-            attrToProjector: <Plottable.AttributeToProjector> {},
-            animator: makeFixedTimeAnimator(time),
-          };
-        });
-        const totalTime = drawer.totalDrawTime([], drawSteps);
-        const expectedTotalTime = d3.sum(animationTimes);
-        assert.strictEqual(totalTime, expectedTotalTime, "returned the total time taken by all Animators");
-      });
-
-      it("computes the correct timings for Null Animators", () => {
-        const a1 = new Plottable.Animators.Null();
-        const a2 = new Plottable.Animators.Null();
-        const ds1: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a1};
-        const ds2: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a2};
-        const steps = [ds1, ds2];
-        drawer.draw([], steps);
-        assert.deepEqual(timings, [0, 0], "setTimeout called twice with 0 time both times");
-      });
-
-      it("computes the correct timings for non-Null Animators", (done) => {
-        let callback1Called = false;
-        const callback1 = () => {
-          callback1Called = true;
-        };
-        const animator1Time = 20;
-        const a1 = new MockAnimator(animator1Time, callback1);
-        const ds1: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a1};
-
-        let callback2Called = false;
-        const callback2 = () => {
-          assert.isTrue(callback1Called, "callback2 called after callback 1");
-          callback2Called = true;
-        };
-        const animator2Time = 10;
-        const a2 = new MockAnimator(animator2Time, callback2);
-        const ds2: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a2};
-
-        const callback3 = () => {
-          assert.isTrue(callback2Called, "callback3 called after callback 2");
-          done();
-        };
-        const animator3Time = 0;
-        const a3 = new MockAnimator(animator3Time, callback3);
-        const ds3: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a3};
-
-        const steps = [ds1, ds2, ds3];
-        drawer.draw([], steps);
-
-        const expectedTimings = [0, animator1Time, animator1Time + animator2Time];
-        assert.deepEqual(timings, expectedTimings, "setTimeout called with appropriate times");
-      });
-    });
+  beforeEach(() => {
+    dataset = new Dataset();
+    svgDrawer = new SVGDrawer("test", "foo");
+    canvasDrawer = new CanvasDrawer(() => {});
+    drawer = new Drawer(dataset, svgDrawer, canvasDrawer);
   });
+
+  it("proxies the draw call to the configured drawer", () => {
+    const svg = TestMethods.generateSVG();
+    const canvas = d3.select(document.createElement("canvas"));
+
+    const data = [1, 2, 3];
+    const attrToProjector: AttributeToProjector = {};
+    const drawSteps: DrawStep[] = [
+      {
+        attrToProjector: attrToProjector,
+        animator: new Null(),
+      }
+    ];
+
+    const svgDrawerStub = sinon.stub(svgDrawer, "draw", () => {});
+    const canvasDrawerStub = sinon.stub(canvasDrawer, "draw", () => {});
+    drawer.useSVG(svg);
+    drawer.draw(data, drawSteps);
+    assert.isTrue(svgDrawerStub.called, "svgDrawer was used");
+    assert.isNotNull(drawer.getSvgRootG(), "svgRootG is not null");
+    assert.isFalse(canvasDrawerStub.called, "canvasDrawer was not used");
+
+    svgDrawerStub.reset();
+    canvasDrawerStub.reset();
+
+    drawer.useCanvas(canvas);
+    drawer.draw(data, drawSteps);
+    assert.isTrue(canvasDrawerStub.called, "canvasDrawer was used");
+    assert.isFalse(svgDrawerStub.called, "svgDrawer was not used");
+    assert.isNull(drawer.getSvgRootG(), "svgRootG is now null");
+
+    svg.remove();
+  });
+
+  it("removes the rootG", () => {
+    const svg = TestMethods.generateSVG();
+    drawer.useSVG(svg);
+    const rootG = drawer.getSvgRootG();
+    assert.isTrue(document.body.contains(rootG.node()), "renderArea is in the DOM");
+    drawer.remove();
+    assert.isFalse(document.body.contains(rootG.node()), "renderArea was removed from the DOM");
+
+    svg.remove();
+  });
+
 });

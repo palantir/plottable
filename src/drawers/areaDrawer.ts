@@ -6,7 +6,7 @@
 import * as d3 from "d3";
 
 import { SimpleSelection } from "../core/interfaces";
-import { SVGDrawer } from "./drawer";
+import { SVGDrawer } from "./svgDrawer";
 
 export class AreaSVGDrawer extends SVGDrawer {
   constructor() {

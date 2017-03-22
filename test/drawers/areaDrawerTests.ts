@@ -7,24 +7,23 @@ import * as Plottable from "../../src";
 
 import * as TestMethods from "../testMethods";
 
-describe("Drawers", () => {
+describe("SVGDrawers", () => {
   describe("Area Drawer", () => {
     const data = [["A", "B", "C"]]; // area normally takes single array of data
-    let svg: SimpleSelection<void>;
-    let drawer: Plottable.Drawers.Area;
+    let svg: d3.Selection<SVGElement, any, any, any>;
+    let drawer: Plottable.Drawers.AreaSVGDrawer;
 
     beforeEach(() => {
       svg = TestMethods.generateSVG();
-      drawer = new Plottable.Drawers.Area(null);
-      drawer.renderArea(svg);
+      drawer = new Plottable.Drawers.AreaSVGDrawer();
 
-      const drawSteps: Plottable.Drawers.DrawStep[] = [
+      const drawSteps: Plottable.Drawers.AppliedDrawStep[] = [
         {
-          attrToProjector: {},
+          attrToAppliedProjector: {},
           animator: new Plottable.Animators.Null(),
         },
       ];
-      drawer.draw(data, drawSteps);
+      drawer.draw(svg, data, drawSteps);
     });
 
     afterEach(function() {

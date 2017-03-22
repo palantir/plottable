@@ -13,7 +13,8 @@ import * as Scales from "../scales";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
 
-import { CanvasDrawer, Drawer } from "../drawers/drawer";
+import { CanvasDrawer } from "../drawers/canvasDrawer";
+import { Drawer } from "../drawers/drawer";
 import { SymbolSVGDrawer } from "../drawers/symbolDrawer";
 import { warn } from "../utils/windowUtils";
 import * as Plots from "./";

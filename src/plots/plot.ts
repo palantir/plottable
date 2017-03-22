@@ -16,6 +16,8 @@ import * as Scales from "../scales";
 import { Scale, ScaleCallback } from "../scales/scale";
 import * as Utils from "../utils";
 
+import { CanvasDrawer } from "../drawers/canvasDrawer";
+import { SVGDrawer } from "../drawers/svgDrawer";
 import { coerceExternalD3 } from "../utils/coerceD3";
 import { makeEnum } from "../utils/makeEnum";
 import * as Plots from "./commons";
@@ -24,6 +26,10 @@ export const Renderer = makeEnum(["svg", "canvas"]);
 export type Renderer = keyof typeof Renderer;
 
 export class Plot extends Component {
+  public static getTotalDrawTime(data: any[], drawSteps: Drawers.DrawStep[]) {
+    return drawSteps.reduce((time, drawStep) => time + drawStep.animator.totalTime(data.length), 0);
+  }
+
   protected static _ANIMATION_MAX_DURATION = 600;
 
   /**
@@ -179,7 +185,7 @@ export class Plot extends Component {
   }
 
   protected _createDrawer(dataset: Dataset): Drawer {
-    throw new Error("subclasses must override _createDrawer");
+    return new Drawer(dataset, new SVGDrawer("path", ""), new CanvasDrawer(() => {}));
   }
 
   protected _getAnimator(key: string): Animator {
@@ -747,9 +753,5 @@ export class Plot extends Component {
 
   protected _animateOnNextRender() {
     return this._animate && this._dataChanged;
-  }
-
-  private static getTotalDrawTime(data: any[], drawSteps: Drawers.DrawStep[]) {
-    return drawSteps.reduce((time, drawStep) => time + drawStep.animator.totalTime(data.length), 0);
   }
 }

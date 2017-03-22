@@ -6,27 +6,24 @@ import * as Plottable from "../../src";
 import { SimpleSelection } from "../../src/core/interfaces";
 
 import * as TestMethods from "../testMethods";
+import { makeLineCanvasDrawStep } from "../../src/drawers/lineDrawer";
 
-describe("Drawers", () => {
+describe("SVGDrawers", () => {
   describe("Line Drawer", () => {
     const data = [["A", "B", "C"]]; // line normally takes single array of data
-    let svg: SimpleSelection<void>;
-    let drawer: Plottable.Drawers.Line;
+    let svg: d3.Selection<SVGElement, any, any, any>;
+    let drawer: Plottable.Drawers.LineSVGDrawer;
 
-    const drawSteps: Plottable.Drawers.DrawStep[] = [
+    const drawSteps: Plottable.Drawers.AppliedDrawStep[] = [
       {
-        attrToProjector: {},
+        attrToAppliedProjector: {},
         animator: new Plottable.Animators.Null(),
       },
     ];
 
-    let d3LineFactorySpy: sinon.SinonSpy;
-
     beforeEach(() => {
       svg = TestMethods.generateSVG();
-      drawer = new Plottable.Drawers.Line(null, () => d3.line());
-      d3LineFactorySpy = sinon.spy(drawer, "_d3LineFactory");
-      drawer.renderArea(svg);
+      drawer = new Plottable.Drawers.LineSVGDrawer();
     });
 
     afterEach(function() {
@@ -36,12 +33,12 @@ describe("Drawers", () => {
     });
 
     it("has a fill of \"none\"", () => {
-      drawer.draw(data, drawSteps);
+      drawer.draw(svg, data, drawSteps);
       assert.strictEqual(drawer.selection().style("fill"), "none");
     });
 
     it("retrieves the same path regardless of requested selection index", () => {
-      drawer.draw(data, drawSteps);
+      drawer.draw(svg, data, drawSteps);
       const expectedSelection = svg.selectAll<Element, any>("path");
       data[0].forEach((datum, index) => {
         const selectionForIndex = drawer.selectionForIndex(index);
@@ -49,13 +46,17 @@ describe("Drawers", () => {
         assert.strictEqual(selectionForIndex.node(), expectedSelection.node(), `selection for index ${index} contains the correct element`);
       });
     });
-
-    it("uses the line factory during canvas drawing", () => {
-      const canvas = d3.select(document.createElement("canvas"));
-      drawer.canvas(canvas);
-
-      drawer.draw(data, drawSteps);
-      assert.isTrue(d3LineFactorySpy.called, "got a line factory");
-    });
   });
 });
+
+describe("LineCanvasDrawStep", () => {
+  const data = [["A", "B", "C"]]; // line normally takes single array of data
+  it("uses the line factory during canvas drawing", () => {
+    const line = d3.line();
+    const lineDrawStep = makeLineCanvasDrawStep(() => line);
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+    lineDrawStep(context, data, {});
+    assert.strictEqual(line.context(), context, "line's context is set");
+  });
+})

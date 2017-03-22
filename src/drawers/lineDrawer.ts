@@ -6,7 +6,8 @@
 import * as d3 from "d3";
 
 import { AttributeToAppliedProjector, SimpleSelection } from "../core/interfaces";
-import { CanvasDrawStep, SVGDrawer } from "./drawer";
+import { CanvasDrawStep } from "./canvasDrawer";
+import { SVGDrawer } from "./svgDrawer";
 
 export class LineSVGDrawer extends SVGDrawer {
   constructor() {

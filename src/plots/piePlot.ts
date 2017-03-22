@@ -18,7 +18,8 @@ import * as Utils from "../utils";
 
 import { ArcSVGDrawer } from "../drawers/arcDrawer";
 import { ArcOutlineSVGDrawer } from "../drawers/arcOutlineDrawer";
-import { CanvasDrawer, Drawer } from "../drawers/drawer";
+import { CanvasDrawer } from "../drawers/canvasDrawer";
+import { Drawer } from "../drawers/drawer";
 import { warn } from "../utils/windowUtils";
 import { AccessorScaleBinding, PlotEntity } from "./";
 import { Plot } from "./plot";

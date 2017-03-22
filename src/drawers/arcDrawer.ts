@@ -4,7 +4,8 @@
  */
 
 import { SimpleSelection } from "../core/interfaces";
-import { SVGDrawer } from "./drawer";
+
+import { SVGDrawer } from "./svgDrawer";
 
 export class ArcSVGDrawer extends SVGDrawer {
 

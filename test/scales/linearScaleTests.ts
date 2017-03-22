@@ -373,9 +373,7 @@ describe("Scales", () => {
 
     describe("Plot interaction", () => {
       function createMockDrawer(dataset: Plottable.Dataset) {
-        let drawer = new Plottable.Drawer(dataset);
-        (<any> drawer)._divElementName = "mock";
-        return drawer;
+        return new Plottable.Drawer(dataset, new Plottable.Drawers.SVGDrawer("mock", ""), null);
       }
 
       let data: any[];

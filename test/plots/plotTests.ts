@@ -1,6 +1,5 @@
-import * as d3 from "d3";
-
 import { assert } from "chai";
+import * as d3 from "d3";
 import * as sinon from "sinon";
 
 import * as Plottable from "../../src";
@@ -213,6 +212,26 @@ describe("Plots", () => {
 
       beforeEach(() => {
         plot = new Plottable.Plot();
+      });
+
+      it("correctly computes the total draw time", () => {
+        function makeFixedTimeAnimator(totalTime: number) {
+          return <Plottable.Animator> {
+            animate: () => null,
+            totalTime: () => totalTime,
+          };
+        }
+
+        const animationTimes = [10, 20];
+        const drawSteps = animationTimes.map((time) => {
+          return {
+            attrToProjector: <Plottable.AttributeToProjector> {},
+            animator: makeFixedTimeAnimator(time),
+          };
+        });
+        const totalTime = Plottable.Plot.getTotalDrawTime([], drawSteps);
+        const expectedTotalTime = d3.sum(animationTimes);
+        assert.strictEqual(totalTime, expectedTotalTime, "returned the total time taken by all Animators");
       });
 
       it("uses a null animator for the reset animator by default", () => {
@@ -433,7 +452,7 @@ describe("Plots", () => {
 
         plot.renderer("canvas");
         (<any> plot)._datasetToDrawer.forEach((drawer: Plottable.Drawer) => {
-          assert.strictEqual(drawer.canvas().node(), div.select("canvas").node(), "drawer's canvas is set");
+          assert.strictEqual(drawer.getCanvas().node(), div.select("canvas").node(), "drawer's canvas is set");
         });
 
         div.remove();

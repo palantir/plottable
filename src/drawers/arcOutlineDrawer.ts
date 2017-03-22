@@ -3,10 +3,8 @@
  * @license MIT
  */
 
-
-
 import { SimpleSelection } from "../core/interfaces";
-import { SVGDrawer } from "./drawer";
+import { SVGDrawer } from "./svgDrawer";
 
 export class ArcOutlineSVGDrawer extends SVGDrawer {
 
