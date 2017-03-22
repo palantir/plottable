@@ -10,7 +10,7 @@ import { Component } from "../components/component";
 import * as Formatters from "../core/formatters";
 import { Formatter } from "../core/formatters";
 import { Point, SimpleSelection, SpaceRequest } from "../core/interfaces";
-import { Scale, ScaleCallback, TransformableScale } from "../scales/scale";
+import { Scale, ScaleCallback } from "../scales/scale";
 import * as Utils from "../utils";
 import { makeEnum } from "../utils/makeEnum";
 
@@ -50,7 +50,7 @@ export class Axis<D> extends Component {
   protected _tickMarkContainer: SimpleSelection<void>;
   protected _tickLabelContainer: SimpleSelection<void>;
   protected _baseline: SimpleSelection<void>;
-  protected _scale: TransformableScale<D, number>;
+  protected _scale: Scale<D, number>;
   private _formatter: Formatter;
   private _orientation: AxisOrientation;
   private _endTickLength = 5;
@@ -81,7 +81,7 @@ export class Axis<D> extends Component {
     if (scale == null || orientation == null) {
       throw new Error("Axis requires a scale and orientation");
     }
-    this._scale = scale as TransformableScale<D, number>;
+    this._scale = scale;
     this.orientation(orientation);
     this._setDefaultAlignment();
     this.addClass("axis");
