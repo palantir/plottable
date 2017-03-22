@@ -29,12 +29,17 @@ describe("Drawers", () => {
     });
 
 
-    it("uses the line factory during canvas drawing", () => {
+    it("uses the line factory during canvas drawing", (done) => {
       const canvas = d3.select(document.createElement("canvas"));
       drawer.canvas(canvas);
       drawer.draw(data, drawSteps);
-      assert.isTrue(symbolProjectorSpy.called, "called symbol projector");
-      assert.isTrue(sizeProjectorSpy.called, "called size projector");
+
+      // rendering itself is actually setTimeout-ed
+      setTimeout(() => {
+        assert.isTrue(symbolProjectorSpy.called, "called symbol projector");
+        assert.isTrue(sizeProjectorSpy.called, "called size projector");
+        done();
+      }, 10);
     });
   });
 });
