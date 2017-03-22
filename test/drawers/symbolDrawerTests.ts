@@ -33,13 +33,8 @@ describe("Drawers", () => {
       const canvas = d3.select(document.createElement("canvas"));
       drawer.canvas(canvas);
       drawer.draw(data, drawSteps);
-
-      // rendering itself is actually setTimeout-ed
-      setTimeout(() => {
-        assert.isTrue(symbolProjectorSpy.called, "called symbol projector");
-        assert.isTrue(sizeProjectorSpy.called, "called size projector");
-        done();
-      }, 10);
+      assert.isTrue(sizeProjectorSpy.called, "called size projector");
+      assert.isTrue(symbolProjectorSpy.called, "called symbol projector");
     });
   });
 });
