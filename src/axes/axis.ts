@@ -108,9 +108,9 @@ export class Axis<D> extends Component {
   /**
    * Gets the tick label data on a element.
    *
-   * @param {Element} element
+   * @param {SVGElement} element
    */
-  public tickLabelDataInteractedWith(element: SVGElement) {
+  public tickLabelDataOnElement(element: SVGElement) {
     let tickLabel: SVGElement;
     // go up DOM tree to find tick label element in ancestor elements
     while ((element !== null) && (element.classList) && (tickLabel === undefined)) {

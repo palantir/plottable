@@ -37,8 +37,8 @@ function run(svg, data, Plottable){
 
   [xAxis, yAxis].forEach((axis) => {
     var clickInteraction = new Plottable.Interactions.Click();
-    clickInteraction.onClick((point) => {
-        const label = JSON.stringify(axis.tickLabelDataAt(point));
+    clickInteraction.onClick((point, event) => {
+        const label = JSON.stringify(axis.tickLabelDataOnElement(event.target));
         title.text(label ? label : "no label");
     });
     clickInteraction.attachTo(axis);

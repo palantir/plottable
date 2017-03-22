@@ -2833,9 +2833,9 @@ var Axis = (function (_super) {
     /**
      * Gets the tick label data on a element.
      *
-     * @param {Element} element
+     * @param {SVGElement} element
      */
-    Axis.prototype.tickLabelDataInteractedWith = function (element) {
+    Axis.prototype.tickLabelDataOnElement = function (element) {
         var tickLabel;
         // go up DOM tree to find tick label element in ancestor elements
         while ((element !== null) && (element.classList) && (tickLabel === undefined)) {
@@ -7770,14 +7770,12 @@ exports.Dataset = Dataset;
  * @license MIT
  */
 
-// __VERSION__ is a global constant which will be replaced by webpack's DefinePlugin
-var __VERSION__ = "blargh";
 /*
  * WARNING: The js output of this expression is searched by string (yes, I know) and replaced with a
  * real version number during the dist phase for for npm module publishing. Modifying this line should
  * be accompanied by modifying the "sed-version" task in package.json accordingly.
  */
-exports.version = __VERSION__;
+exports.version = "3.0.0-beta.4";
 
 
 /***/ }),
