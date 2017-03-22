@@ -267,8 +267,8 @@ export class Category extends Axis<string> {
    */
   private _drawTicks(stepWidth: number, ticks: SimpleSelection<string>) {
     const self = this;
-    let xAlign: {[s: string]: Typesetter.IXAlign};
-    let yAlign: {[s: string]: Typesetter.IYAlign};
+    let xAlign: {[P in AxisOrientation]: Typesetter.IXAlign};
+    let yAlign: {[P in AxisOrientation]: Typesetter.IYAlign};
     switch (this.tickLabelAngle()) {
       case 0:
         xAlign = { left: "right", right: "left", top: "center", bottom: "center" };

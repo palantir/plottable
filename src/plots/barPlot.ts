@@ -18,6 +18,7 @@ import { QuantitativeScale } from "../scales/quantitativeScale";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
 
+import { makeEnum } from "../utils/makeEnum";
 import * as Plots from "./";
 import { PlotEntity } from "./";
 import { LightweightPlotEntity } from "./commons";
@@ -30,9 +31,10 @@ type LabelConfig = {
   writer: Typesetter.Writer;
 };
 
+export const BarOrientation = makeEnum(["vertical", "horizontal"]);
+export type BarOrientation = keyof typeof BarOrientation;
+
 export class Bar<X, Y> extends XYPlot<X, Y> {
-  public static ORIENTATION_VERTICAL = "vertical";
-  public static ORIENTATION_HORIZONTAL = "horizontal";
   private static _BAR_WIDTH_RATIO = 0.95;
   private static _SINGLE_BAR_DIMENSION_RATIO = 0.4;
   private static _BAR_AREA_CLASS = "bar-area";
@@ -58,13 +60,13 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
    * @constructor
    * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
    */
-  constructor(orientation = Bar.ORIENTATION_VERTICAL) {
+  constructor(orientation: BarOrientation = "vertical") {
     super();
     this.addClass("bar-plot");
-    if (orientation !== Bar.ORIENTATION_VERTICAL && orientation !== Bar.ORIENTATION_HORIZONTAL) {
+    if (orientation !== "vertical" && orientation !== "horizontal") {
       throw new Error(orientation + " is not a valid orientation for Plots.Bar");
     }
-    this._isVertical = orientation === Bar.ORIENTATION_VERTICAL;
+    this._isVertical = orientation === "vertical";
     this.animator("baseline", new Animators.Null());
     this.attr("fill", new Scales.Color().range()[0]);
     this.attr("width", () => this._barPixelWidth);
@@ -116,8 +118,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
    *
    * @return "vertical" | "horizontal"
    */
-  public orientation() {
-    return this._isVertical ? Bar.ORIENTATION_VERTICAL : Bar.ORIENTATION_HORIZONTAL;
+  public orientation(): BarOrientation {
+    return this._isVertical ? "vertical" : "horizontal";
   }
 
   public render() {
@@ -506,8 +508,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       const text = this._labelFormatter(valueAccessor(d, i, dataset));
       const measurement = measurer.measure(text);
 
-      let xAlignment = "center";
-      let yAlignment = "center";
+      let xAlignment: Typesetter.IXAlign = "center";
+      let yAlignment: Typesetter.IYAlign = "center";
       const labelContainerOrigin = {
         x: attrToProjector["x"](d, i, dataset),
         y: attrToProjector["y"](d, i, dataset),
@@ -610,8 +612,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       labelContainer.style("visibility", hideLabel ? "hidden" : "inherit");
 
       const writeOptions = {
-        xAlign: xAlignment as Typesetter.IXAlign,
-        yAlign: yAlignment as Typesetter.IYAlign,
+        xAlign: xAlignment,
+        yAlign: yAlignment,
       };
       writer.write(text, containerWidth, containerHeight, writeOptions, labelContainer.node());
 

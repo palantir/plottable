@@ -141,7 +141,9 @@ var component_1 = __webpack_require__(5);
 var drawer_1 = __webpack_require__(7);
 var Utils = __webpack_require__(0);
 var coerceD3_1 = __webpack_require__(11);
+var makeEnum_1 = __webpack_require__(125);
 var Plots = __webpack_require__(37);
+exports.Renderer = makeEnum_1.makeEnum(["svg", "canvas"]);
 var Plot = (function (_super) {
     __extends(Plot, _super);
     /**
@@ -203,10 +205,12 @@ var Plot = (function (_super) {
     Plot.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
         _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
         if (this._canvas != null) {
-            // update canvas width/height; this will also clear the canvas of any drawn elements so we should
+            // update canvas width/height taking into account retina displays.
+            // This will also clear the canvas of any drawn elements so we should
             // be sure not to computeLayout() without a render() in the future.
-            this._canvas.attr("width", this.width());
-            this._canvas.attr("height", this.height());
+            this._canvas.attr("width", this.width() * window.devicePixelRatio);
+            this._canvas.attr("height", this.height() * window.devicePixelRatio);
+            this._canvas.node().getContext("2d").scale(window.devicePixelRatio, window.devicePixelRatio);
         }
         return this;
     };
@@ -771,6 +775,9 @@ var d3 = __webpack_require__(1);
 var RenderController = __webpack_require__(25);
 var Utils = __webpack_require__(0);
 var coerceD3_1 = __webpack_require__(11);
+var makeEnum_1 = __webpack_require__(125);
+exports.XAlignment = makeEnum_1.makeEnum(["left", "center", "right"]);
+exports.YAlignment = makeEnum_1.makeEnum(["top", "center", "bottom"]);
 /**
  * Components are the core logical units that build Plottable visualizations.
  *
@@ -2778,6 +2785,8 @@ var Typesetter = __webpack_require__(4);
 var component_1 = __webpack_require__(5);
 var Formatters = __webpack_require__(8);
 var Utils = __webpack_require__(0);
+var makeEnum_1 = __webpack_require__(125);
+exports.AxisOrientation = makeEnum_1.makeEnum(["bottom", "left", "right", "top"]);
 var Axis = (function (_super) {
     __extends(Axis, _super);
     /**
@@ -3539,9 +3548,11 @@ var Drawers = __webpack_require__(9);
 var Scales = __webpack_require__(3);
 var quantitativeScale_1 = __webpack_require__(10);
 var Utils = __webpack_require__(0);
+var makeEnum_1 = __webpack_require__(125);
 var Plots = __webpack_require__(16);
 var plot_1 = __webpack_require__(2);
 var xyPlot_1 = __webpack_require__(15);
+exports.BarOrientation = makeEnum_1.makeEnum(["vertical", "horizontal"]);
 var Bar = (function (_super) {
     __extends(Bar, _super);
     /**
@@ -3551,17 +3562,17 @@ var Bar = (function (_super) {
      * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
      */
     function Bar(orientation) {
-        if (orientation === void 0) { orientation = Bar.ORIENTATION_VERTICAL; }
+        if (orientation === void 0) { orientation = "vertical"; }
         var _this = _super.call(this) || this;
         _this._labelFormatter = Formatters.identity();
         _this._labelsEnabled = false;
         _this._hideBarsIfAnyAreTooWide = true;
         _this._barPixelWidth = 0;
         _this.addClass("bar-plot");
-        if (orientation !== Bar.ORIENTATION_VERTICAL && orientation !== Bar.ORIENTATION_HORIZONTAL) {
+        if (orientation !== "vertical" && orientation !== "horizontal") {
             throw new Error(orientation + " is not a valid orientation for Plots.Bar");
         }
-        _this._isVertical = orientation === Bar.ORIENTATION_VERTICAL;
+        _this._isVertical = orientation === "vertical";
         _this.animator("baseline", new Animators.Null());
         _this.attr("fill", new Scales.Color().range()[0]);
         _this.attr("width", function () { return _this._barPixelWidth; });
@@ -3604,7 +3615,7 @@ var Bar = (function (_super) {
      * @return "vertical" | "horizontal"
      */
     Bar.prototype.orientation = function () {
-        return this._isVertical ? Bar.ORIENTATION_VERTICAL : Bar.ORIENTATION_HORIZONTAL;
+        return this._isVertical ? "vertical" : "horizontal";
     };
     Bar.prototype.render = function () {
         this._updateBarPixelWidth();
@@ -4146,8 +4157,6 @@ var Bar = (function (_super) {
     };
     return Bar;
 }(xyPlot_1.XYPlot));
-Bar.ORIENTATION_VERTICAL = "vertical";
-Bar.ORIENTATION_HORIZONTAL = "horizontal";
 Bar._BAR_WIDTH_RATIO = 0.95;
 Bar._SINGLE_BAR_DIMENSION_RATIO = 0.4;
 Bar._BAR_AREA_CLASS = "bar-area";
@@ -4176,17 +4185,22 @@ var Typesetter = __webpack_require__(4);
 var Formatters = __webpack_require__(8);
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
+var makeEnum_1 = __webpack_require__(125);
 var axis_1 = __webpack_require__(19);
-var TimeInterval;
-(function (TimeInterval) {
-    TimeInterval.second = "second";
-    TimeInterval.minute = "minute";
-    TimeInterval.hour = "hour";
-    TimeInterval.day = "day";
-    TimeInterval.week = "week";
-    TimeInterval.month = "month";
-    TimeInterval.year = "year";
-})(TimeInterval = exports.TimeInterval || (exports.TimeInterval = {}));
+exports.TimeInterval = makeEnum_1.makeEnum([
+    "second",
+    "minute",
+    "hour",
+    "day",
+    "week",
+    "month",
+    "year",
+]);
+/**
+ * Possible orientations for a Time Axis.
+ */
+exports.TimeAxisOrientation = makeEnum_1.makeEnum(["top", "bottom"]);
+exports.TierLabelPosition = makeEnum_1.makeEnum(["between", "center"]);
 var Time = (function (_super) {
     __extends(Time, _super);
     /**
@@ -4585,121 +4599,121 @@ var Time = (function (_super) {
  */
 Time.TIME_AXIS_TIER_CLASS = "time-axis-tier";
 Time._SORTED_TIME_INTERVAL_INDEX = (_a = {},
-    _a[TimeInterval.second] = 0,
-    _a[TimeInterval.minute] = 1,
-    _a[TimeInterval.hour] = 2,
-    _a[TimeInterval.day] = 3,
-    _a[TimeInterval.week] = 4,
-    _a[TimeInterval.month] = 5,
-    _a[TimeInterval.year] = 6,
+    _a[exports.TimeInterval.second] = 0,
+    _a[exports.TimeInterval.minute] = 1,
+    _a[exports.TimeInterval.hour] = 2,
+    _a[exports.TimeInterval.day] = 3,
+    _a[exports.TimeInterval.week] = 4,
+    _a[exports.TimeInterval.month] = 5,
+    _a[exports.TimeInterval.year] = 6,
     _a);
 Time._DEFAULT_TIME_AXIS_CONFIGURATIONS = [
     [
-        { interval: TimeInterval.second, step: 1, formatter: Formatters.time("%I:%M:%S %p") },
-        { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+        { interval: exports.TimeInterval.second, step: 1, formatter: Formatters.time("%I:%M:%S %p") },
+        { interval: exports.TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
     ],
     [
-        { interval: TimeInterval.second, step: 5, formatter: Formatters.time("%I:%M:%S %p") },
-        { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+        { interval: exports.TimeInterval.second, step: 5, formatter: Formatters.time("%I:%M:%S %p") },
+        { interval: exports.TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
     ],
     [
-        { interval: TimeInterval.second, step: 10, formatter: Formatters.time("%I:%M:%S %p") },
-        { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+        { interval: exports.TimeInterval.second, step: 10, formatter: Formatters.time("%I:%M:%S %p") },
+        { interval: exports.TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
     ],
     [
-        { interval: TimeInterval.second, step: 15, formatter: Formatters.time("%I:%M:%S %p") },
-        { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+        { interval: exports.TimeInterval.second, step: 15, formatter: Formatters.time("%I:%M:%S %p") },
+        { interval: exports.TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
     ],
     [
-        { interval: TimeInterval.second, step: 30, formatter: Formatters.time("%I:%M:%S %p") },
-        { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+        { interval: exports.TimeInterval.second, step: 30, formatter: Formatters.time("%I:%M:%S %p") },
+        { interval: exports.TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
     ],
     [
-        { interval: TimeInterval.minute, step: 1, formatter: Formatters.time("%I:%M %p") },
-        { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+        { interval: exports.TimeInterval.minute, step: 1, formatter: Formatters.time("%I:%M %p") },
+        { interval: exports.TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
     ],
     [
-        { interval: TimeInterval.minute, step: 5, formatter: Formatters.time("%I:%M %p") },
-        { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+        { interval: exports.TimeInterval.minute, step: 5, formatter: Formatters.time("%I:%M %p") },
+        { interval: exports.TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
     ],
     [
-        { interval: TimeInterval.minute, step: 10, formatter: Formatters.time("%I:%M %p") },
-        { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+        { interval: exports.TimeInterval.minute, step: 10, formatter: Formatters.time("%I:%M %p") },
+        { interval: exports.TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
     ],
     [
-        { interval: TimeInterval.minute, step: 15, formatter: Formatters.time("%I:%M %p") },
-        { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+        { interval: exports.TimeInterval.minute, step: 15, formatter: Formatters.time("%I:%M %p") },
+        { interval: exports.TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
     ],
     [
-        { interval: TimeInterval.minute, step: 30, formatter: Formatters.time("%I:%M %p") },
-        { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+        { interval: exports.TimeInterval.minute, step: 30, formatter: Formatters.time("%I:%M %p") },
+        { interval: exports.TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
     ],
     [
-        { interval: TimeInterval.hour, step: 1, formatter: Formatters.time("%I %p") },
-        { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+        { interval: exports.TimeInterval.hour, step: 1, formatter: Formatters.time("%I %p") },
+        { interval: exports.TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
     ],
     [
-        { interval: TimeInterval.hour, step: 3, formatter: Formatters.time("%I %p") },
-        { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+        { interval: exports.TimeInterval.hour, step: 3, formatter: Formatters.time("%I %p") },
+        { interval: exports.TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
     ],
     [
-        { interval: TimeInterval.hour, step: 6, formatter: Formatters.time("%I %p") },
-        { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+        { interval: exports.TimeInterval.hour, step: 6, formatter: Formatters.time("%I %p") },
+        { interval: exports.TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
     ],
     [
-        { interval: TimeInterval.hour, step: 12, formatter: Formatters.time("%I %p") },
-        { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
+        { interval: exports.TimeInterval.hour, step: 12, formatter: Formatters.time("%I %p") },
+        { interval: exports.TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
     ],
     [
-        { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%a %e") },
-        { interval: TimeInterval.month, step: 1, formatter: Formatters.time("%B %Y") },
+        { interval: exports.TimeInterval.day, step: 1, formatter: Formatters.time("%a %e") },
+        { interval: exports.TimeInterval.month, step: 1, formatter: Formatters.time("%B %Y") },
     ],
     [
-        { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%e") },
-        { interval: TimeInterval.month, step: 1, formatter: Formatters.time("%B %Y") },
+        { interval: exports.TimeInterval.day, step: 1, formatter: Formatters.time("%e") },
+        { interval: exports.TimeInterval.month, step: 1, formatter: Formatters.time("%B %Y") },
     ],
     [
-        { interval: TimeInterval.month, step: 1, formatter: Formatters.time("%B") },
-        { interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y") },
+        { interval: exports.TimeInterval.month, step: 1, formatter: Formatters.time("%B") },
+        { interval: exports.TimeInterval.year, step: 1, formatter: Formatters.time("%Y") },
     ],
     [
-        { interval: TimeInterval.month, step: 1, formatter: Formatters.time("%b") },
-        { interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y") },
+        { interval: exports.TimeInterval.month, step: 1, formatter: Formatters.time("%b") },
+        { interval: exports.TimeInterval.year, step: 1, formatter: Formatters.time("%Y") },
     ],
     [
-        { interval: TimeInterval.month, step: 3, formatter: Formatters.time("%b") },
-        { interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y") },
+        { interval: exports.TimeInterval.month, step: 3, formatter: Formatters.time("%b") },
+        { interval: exports.TimeInterval.year, step: 1, formatter: Formatters.time("%Y") },
     ],
     [
-        { interval: TimeInterval.month, step: 6, formatter: Formatters.time("%b") },
-        { interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y") },
+        { interval: exports.TimeInterval.month, step: 6, formatter: Formatters.time("%b") },
+        { interval: exports.TimeInterval.year, step: 1, formatter: Formatters.time("%Y") },
     ],
     [
-        { interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y") },
+        { interval: exports.TimeInterval.year, step: 1, formatter: Formatters.time("%Y") },
     ],
     [
-        { interval: TimeInterval.year, step: 1, formatter: Formatters.time("%y") },
+        { interval: exports.TimeInterval.year, step: 1, formatter: Formatters.time("%y") },
     ],
     [
-        { interval: TimeInterval.year, step: 5, formatter: Formatters.time("%Y") },
+        { interval: exports.TimeInterval.year, step: 5, formatter: Formatters.time("%Y") },
     ],
     [
-        { interval: TimeInterval.year, step: 25, formatter: Formatters.time("%Y") },
+        { interval: exports.TimeInterval.year, step: 25, formatter: Formatters.time("%Y") },
     ],
     [
-        { interval: TimeInterval.year, step: 50, formatter: Formatters.time("%Y") },
+        { interval: exports.TimeInterval.year, step: 50, formatter: Formatters.time("%Y") },
     ],
     [
-        { interval: TimeInterval.year, step: 100, formatter: Formatters.time("%Y") },
+        { interval: exports.TimeInterval.year, step: 100, formatter: Formatters.time("%Y") },
     ],
     [
-        { interval: TimeInterval.year, step: 200, formatter: Formatters.time("%Y") },
+        { interval: exports.TimeInterval.year, step: 200, formatter: Formatters.time("%Y") },
     ],
     [
-        { interval: TimeInterval.year, step: 500, formatter: Formatters.time("%Y") },
+        { interval: exports.TimeInterval.year, step: 500, formatter: Formatters.time("%Y") },
     ],
     [
-        { interval: TimeInterval.year, step: 1000, formatter: Formatters.time("%Y") },
+        { interval: exports.TimeInterval.year, step: 1000, formatter: Formatters.time("%Y") },
     ],
 ];
 Time._LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
@@ -4812,6 +4826,7 @@ exports.ComponentContainer = ComponentContainer;
  */
 
 var Utils = __webpack_require__(0);
+var makeEnum_1 = __webpack_require__(125);
 var RenderPolicies = __webpack_require__(31);
 /**
  * The RenderController is responsible for enqueueing and synchronizing
@@ -4833,25 +4848,20 @@ var _componentsNeedingRender = new Utils.Set();
 var _componentsNeedingComputeLayout = new Utils.Set();
 var _animationRequested = false;
 var _isCurrentlyFlushing = false;
-var Policy;
-(function (Policy) {
-    Policy.IMMEDIATE = "immediate";
-    Policy.ANIMATION_FRAME = "animationframe";
-    Policy.TIMEOUT = "timeout";
-})(Policy = exports.Policy || (exports.Policy = {}));
+exports.Policy = makeEnum_1.makeEnum(["immediate", "animationFrame", "timeout"]);
 var _renderPolicy = new RenderPolicies.AnimationFrame();
 function renderPolicy(renderPolicy) {
     if (renderPolicy == null) {
         return _renderPolicy;
     }
-    switch (renderPolicy.toLowerCase()) {
-        case Policy.IMMEDIATE:
+    switch (renderPolicy) {
+        case exports.Policy.immediate:
             _renderPolicy = new RenderPolicies.Immediate();
             break;
-        case Policy.ANIMATION_FRAME:
+        case exports.Policy.animationFrame:
             _renderPolicy = new RenderPolicies.AnimationFrame();
             break;
-        case Policy.TIMEOUT:
+        case exports.Policy.timeout:
             _renderPolicy = new RenderPolicies.Timeout();
             break;
         default:
@@ -5546,17 +5556,6 @@ __export(__webpack_require__(35));
 __export(__webpack_require__(63));
 __export(__webpack_require__(64));
 __export(__webpack_require__(65));
-var Alignment = (function () {
-    function Alignment() {
-    }
-    return Alignment;
-}());
-Alignment.TOP = "top";
-Alignment.BOTTOM = "bottom";
-Alignment.LEFT = "left";
-Alignment.RIGHT = "right";
-Alignment.CENTER = "center";
-exports.Alignment = Alignment;
 
 
 /***/ }),
@@ -6463,6 +6462,7 @@ var Drawers = __webpack_require__(9);
 var Scales = __webpack_require__(3);
 var quantitativeScale_1 = __webpack_require__(10);
 var Utils = __webpack_require__(0);
+var makeEnum_1 = __webpack_require__(125);
 var Plots = __webpack_require__(16);
 var plot_1 = __webpack_require__(2);
 var xyPlot_1 = __webpack_require__(15);
@@ -6481,6 +6481,24 @@ var CURVE_NAME_MAPPING = {
     cardinalClosed: d3.curveCardinalClosed,
     monotone: d3.curveMonotoneX,
 };
+/**
+ * Known curve types that line and area plot's .curve() methods understand
+ */
+exports.CurveName = makeEnum_1.makeEnum([
+    "linear",
+    "linearClosed",
+    "step",
+    "stepBefore",
+    "stepAfter",
+    "basis",
+    "basisOpen",
+    "basisClosed",
+    "bundle",
+    "cardinal",
+    "cardinalOpen",
+    "cardinalClosed",
+    "monotone",
+]);
 var Line = (function (_super) {
     __extends(Line, _super);
     /**
@@ -6794,12 +6812,11 @@ var Line = (function (_super) {
      * @private
      */
     Line.prototype._d3LineFactory = function (dataset, xProjector, yProjector) {
-        var _this = this;
         if (xProjector === void 0) { xProjector = plot_1.Plot._scaledAccessor(this.x()); }
         if (yProjector === void 0) { yProjector = plot_1.Plot._scaledAccessor(this.y()); }
         var definedProjector = function (d, i, dataset) {
-            var positionX = plot_1.Plot._scaledAccessor(_this.x())(d, i, dataset);
-            var positionY = plot_1.Plot._scaledAccessor(_this.y())(d, i, dataset);
+            var positionX = xProjector(d, i, dataset);
+            var positionY = yProjector(d, i, dataset);
             return positionX != null && !Utils.Math.isNaN(positionX) &&
                 positionY != null && !Utils.Math.isNaN(positionY);
         };
@@ -7874,6 +7891,7 @@ d3Transition.transition.prototype.styles = transition_styles;
 
 var d3Ease = __webpack_require__(103);
 var coerceD3_1 = __webpack_require__(11);
+var makeEnum_1 = __webpack_require__(125);
 var EASE_NAME_MAPPING = {
     linear: d3Ease.easeLinear,
     quad: d3Ease.easeQuad,
@@ -7913,6 +7931,45 @@ var EASE_NAME_MAPPING = {
     elasticOut: d3Ease.easeElasticOut,
     elasticInOut: d3Ease.easeElasticInOut,
 };
+exports.EaseName = makeEnum_1.makeEnum([
+    "linear",
+    "quad",
+    "quadIn",
+    "quadOut",
+    "quadInOut",
+    "cubic",
+    "cubicIn",
+    "cubicOut",
+    "cubicInOut",
+    "poly",
+    "polyIn",
+    "polyOut",
+    "polyInOut",
+    "sin",
+    "sinIn",
+    "sinOut",
+    "sinInOut",
+    "exp",
+    "expIn",
+    "expOut",
+    "expInOut",
+    "circle",
+    "circleIn",
+    "circleOut",
+    "circleInOut",
+    "bounce",
+    "bounceIn",
+    "bounceOut",
+    "bounceInOut",
+    "back",
+    "backIn",
+    "backOut",
+    "backInOut",
+    "elastic",
+    "elasticIn",
+    "elasticOut",
+    "elasticInOut",
+]);
 /**
  * An Animator with easing and configurable durations and delays.
  */
@@ -12351,7 +12408,7 @@ var ClusteredBar = (function (_super) {
      * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
      */
     function ClusteredBar(orientation) {
-        if (orientation === void 0) { orientation = barPlot_1.Bar.ORIENTATION_VERTICAL; }
+        if (orientation === void 0) { orientation = "vertical"; }
         var _this = _super.call(this, orientation) || this;
         _this._clusterOffsets = new Utils.Map();
         return _this;
@@ -13852,7 +13909,7 @@ var StackedBar = (function (_super) {
      * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
      */
     function StackedBar(orientation) {
-        if (orientation === void 0) { orientation = barPlot_1.Bar.ORIENTATION_VERTICAL; }
+        if (orientation === void 0) { orientation = "vertical"; }
         var _this = _super.call(this, orientation) || this;
         _this.addClass("stacked-bar-plot");
         _this._stackingOrder = "bottomup";
@@ -15643,6 +15700,14 @@ exports.Map = Map;
 
 var d3 = __webpack_require__(1);
 var Utils = __webpack_require__(0);
+var makeEnum_1 = __webpack_require__(125);
+/**
+ * Option type for stacking direction. By default, stacked bar and area charts
+ * put the first data series at the bottom of the axis ("bottomup"), but this
+ * can be reversed with the "topdown" option, which produces a stacking order
+ * that matches the order of series in the legend.
+ */
+exports.IStackingOrder = makeEnum_1.makeEnum(["topdown", "bottomup"]);
 var nativeMath = window.Math;
 /**
  * Computes the StackingResult (value and offset) for each data point in each Dataset.
@@ -17105,6 +17170,25 @@ __export(__webpack_require__(15));
 __export(__webpack_require__(2));
 __export(__webpack_require__(10));
 __export(__webpack_require__(17));
+
+
+/***/ }),
+/* 125 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+function makeEnum(values) {
+    return values.reduce(function (obj, v) {
+        obj[v] = v;
+        return obj;
+    }, {});
+}
+exports.makeEnum = makeEnum;
 
 
 /***/ })

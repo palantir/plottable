@@ -6,6 +6,7 @@
 import { Component } from "../components/component";
 import * as Utils from "../utils";
 
+import { makeEnum } from "../utils/makeEnum";
 import * as RenderPolicies from "./renderPolicy";
 
 /**
@@ -28,27 +29,24 @@ let _componentsNeedingRender = new Utils.Set<Component>();
 let _componentsNeedingComputeLayout = new Utils.Set<Component>();
 let _animationRequested = false;
 let _isCurrentlyFlushing = false;
-export namespace Policy {
-  export let IMMEDIATE = "immediate";
-  export let ANIMATION_FRAME = "animationframe";
-  export let TIMEOUT = "timeout";
-}
+export const Policy = makeEnum(["immediate", "animationFrame", "timeout"]);
+export type Policy = keyof typeof Policy;
 let _renderPolicy: RenderPolicies.RenderPolicy = new RenderPolicies.AnimationFrame();
 
 export function renderPolicy(): RenderPolicies.RenderPolicy;
-export function renderPolicy(renderPolicy: string): void;
-export function renderPolicy(renderPolicy?: string): any {
+export function renderPolicy(renderPolicy: Policy): void;
+export function renderPolicy(renderPolicy?: Policy): any {
   if (renderPolicy == null) {
     return _renderPolicy;
   }
-  switch (renderPolicy.toLowerCase()) {
-    case Policy.IMMEDIATE:
+  switch (renderPolicy) {
+    case Policy.immediate:
       _renderPolicy = new RenderPolicies.Immediate();
       break;
-    case Policy.ANIMATION_FRAME:
+    case Policy.animationFrame:
       _renderPolicy = new RenderPolicies.AnimationFrame();
       break;
-    case Policy.TIMEOUT:
+    case Policy.timeout:
       _renderPolicy = new RenderPolicies.Timeout();
       break;
     default:

@@ -12,8 +12,10 @@ import { Formatter } from "../core/formatters";
 import { Point, SimpleSelection, SpaceRequest } from "../core/interfaces";
 import { Scale, ScaleCallback, TransformableScale } from "../scales/scale";
 import * as Utils from "../utils";
+import { makeEnum } from "../utils/makeEnum";
 
-export type AxisOrientation =  "bottom" | "left" | "right" | "top";
+export const AxisOrientation = makeEnum(["bottom", "left", "right", "top"]);
+export type AxisOrientation = keyof typeof AxisOrientation;
 
 export class Axis<D> extends Component {
   /**

@@ -10,11 +10,18 @@ import * as RenderController from "../core/renderController";
 import * as Utils from "../utils";
 
 import { coerceExternalD3 } from "../utils/coerceD3";
+import { makeEnum } from "../utils/makeEnum";
 import { ComponentContainer } from "./componentContainer";
 
 export type ComponentCallback = (component: Component) => void;
 
 export type IResizeHandler = (size: { height: number, width: number }) => void;
+
+export const XAlignment = makeEnum(["left", "center", "right"]);
+export type XAlignment = keyof typeof XAlignment;
+
+export const YAlignment = makeEnum(["top", "center", "bottom"]);
+export type YAlignment = keyof typeof YAlignment;
 
 /**
  * Components are the core logical units that build Plottable visualizations.
@@ -56,14 +63,14 @@ export class Component {
    * Component is top-level.
    */
   private _parent: ComponentContainer;
-  private _xAlignment: string = "left";
-  private static _xAlignToProportion: { [alignment: string]: number } = {
+  private _xAlignment: XAlignment = "left";
+  private static _xAlignToProportion: { [P in XAlignment]: number } = {
     left: 0,
     center: 0.5,
     right: 1,
   };
-  private _yAlignment: string = "top";
-  private static _yAlignToProportion: { [alignment: string]: number } = {
+  private _yAlignment: YAlignment = "top";
+  private static _yAlignToProportion: { [P in YAlignment]: number } = {
     top: 0,
     center: 0.5,
     bottom: 1,
@@ -353,20 +360,20 @@ export class Component {
   /**
    * Gets the x alignment of the Component.
    */
-  public xAlignment(): string;
+  public xAlignment(): XAlignment;
   /**
    * Sets the x alignment of the Component.
    *
    * @param {string} xAlignment The x alignment of the Component ("left"/"center"/"right").
    * @returns {Component} The calling Component.
    */
-  public xAlignment(xAlignment: string): this;
-  public xAlignment(xAlignment?: string): any {
+  public xAlignment(xAlignment: XAlignment): this;
+  public xAlignment(xAlignment?: XAlignment): any {
     if (xAlignment == null) {
       return this._xAlignment;
     }
 
-    xAlignment = xAlignment.toLowerCase();
+    xAlignment = xAlignment.toLowerCase() as XAlignment;
     if (Component._xAlignToProportion[xAlignment] == null) {
       throw new Error("Unsupported alignment: " + xAlignment);
     }
@@ -378,20 +385,20 @@ export class Component {
   /**
    * Gets the y alignment of the Component.
    */
-  public yAlignment(): string;
+  public yAlignment(): YAlignment;
   /**
    * Sets the y alignment of the Component.
    *
    * @param {string} yAlignment The y alignment of the Component ("top"/"center"/"bottom").
    * @returns {Component} The calling Component.
    */
-  public yAlignment(yAlignment: string): this;
-  public yAlignment(yAlignment?: string): any {
+  public yAlignment(yAlignment: YAlignment): this;
+  public yAlignment(yAlignment?: YAlignment): any {
     if (yAlignment == null) {
       return this._yAlignment;
     }
 
-    yAlignment = yAlignment.toLowerCase();
+    yAlignment = yAlignment.toLowerCase() as YAlignment;
     if (Component._yAlignToProportion[yAlignment] == null) {
       throw new Error("Unsupported alignment: " + yAlignment);
     }

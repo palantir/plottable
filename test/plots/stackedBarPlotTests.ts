@@ -6,6 +6,7 @@ import { assert } from "chai";
 import * as Plottable from "../../src";
 
 import * as TestMethods from "../testMethods";
+import { BarOrientation } from "../../src/plots/barPlot";
 
 describe("Plots", () => {
   describe("Vertical Stacked Bar Plot", () => {
@@ -411,7 +412,7 @@ describe("Plots", () => {
         let dataset1 = new Plottable.Dataset(data1);
         let dataset2 = new Plottable.Dataset(data2);
 
-        stackedBarPlot = new Plottable.Plots.StackedBar<number, string>(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
+        stackedBarPlot = new Plottable.Plots.StackedBar<number, string>(BarOrientation.horizontal);
         stackedBarPlot.addDataset(dataset1);
         stackedBarPlot.addDataset(dataset2);
         stackedBarPlot.x((d) => d.x, xScale);
@@ -518,7 +519,7 @@ describe("Plots", () => {
           {y: "C", x: 7},
         ];
 
-        stackedBarPlot = new Plottable.Plots.StackedBar<number, string>(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
+        stackedBarPlot = new Plottable.Plots.StackedBar<number, string>(BarOrientation.horizontal);
         stackedBarPlot.addDataset(new Plottable.Dataset(data1));
         stackedBarPlot.addDataset(new Plottable.Dataset(data2));
         stackedBarPlot.addDataset(new Plottable.Dataset(data3));
@@ -572,7 +573,7 @@ describe("Plots", () => {
         let xScale = new Plottable.Scales.Linear();
         let yScale = new Plottable.Scales.Category();
 
-        let stackedBarPlot = new Plottable.Plots.StackedBar<number, string>(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
+        let stackedBarPlot = new Plottable.Plots.StackedBar<number, string>(BarOrientation.horizontal);
         let ds1 = new Plottable.Dataset(stringData);
         let ds2 = new Plottable.Dataset(nullData);
         let ds3 = new Plottable.Dataset(undefinedData);

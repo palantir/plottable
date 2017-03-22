@@ -16,6 +16,7 @@ import { QuantitativeScale } from "../scales/quantitativeScale";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
 
+import { makeEnum } from "../utils/makeEnum";
 import * as Plots from "./";
 import { PlotEntity } from "./";
 import { Plot } from "./plot";
@@ -28,7 +29,7 @@ type EdgeIntersections = {
   bottom: Point[],
 };
 
-const CURVE_NAME_MAPPING: { [name: string]: d3.CurveFactory | d3.CurveFactoryLineOnly } = {
+const CURVE_NAME_MAPPING: { [P in CurveName]: d3.CurveFactory | d3.CurveFactoryLineOnly } = {
   linear: d3.curveLinear,
   linearClosed: d3.curveLinearClosed,
   step: d3.curveStep,
@@ -47,20 +48,22 @@ const CURVE_NAME_MAPPING: { [name: string]: d3.CurveFactory | d3.CurveFactoryLin
 /**
  * Known curve types that line and area plot's .curve() methods understand
  */
-export type CurveName =
-"linear" |
-"linearClosed" |
-"step" |
-"stepBefore" |
-"stepAfter" |
-"basis" |
-"basisOpen" |
-"basisClosed" |
-"bundle" |
-"cardinal" |
-"cardinalOpen" |
-"cardinalClosed" |
-"monotone";
+export const CurveName = makeEnum([
+  "linear",
+  "linearClosed",
+  "step",
+  "stepBefore",
+  "stepAfter",
+  "basis",
+  "basisOpen",
+  "basisClosed",
+  "bundle",
+  "cardinal",
+  "cardinalOpen",
+  "cardinalClosed",
+  "monotone",
+]);
+export type CurveName = keyof typeof CurveName;
 
 export class Line<X> extends XYPlot<X, number> {
   private _curve: CurveName | d3.CurveFactory | d3.CurveFactoryLineOnly = "linear";
@@ -490,8 +493,8 @@ export class Line<X> extends XYPlot<X, number> {
     xProjector = Plot._scaledAccessor(this.x()),
     yProjector = Plot._scaledAccessor(this.y())): d3Shape.Line<any> {
     const definedProjector = (d: any, i: number, dataset: Dataset) => {
-      const positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
-      const positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
+      const positionX = xProjector(d, i, dataset);
+      const positionY = yProjector(d, i, dataset);
       return positionX != null && !Utils.Math.isNaN(positionX) &&
         positionY != null && !Utils.Math.isNaN(positionY);
     };
