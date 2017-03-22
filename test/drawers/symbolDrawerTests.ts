@@ -8,7 +8,6 @@ describe("Drawers", () => {
   describe("Symbol Drawer", () => {
     const data = [{ x: 0, y: 0 }, { x: 2, y: 1 }, { x: 3, y: 2 }];
     let drawer: Plottable.Drawers.Symbol;
-
     const drawSteps: Plottable.Drawers.DrawStep[] = [
       {
         attrToProjector: {},
@@ -20,13 +19,15 @@ describe("Drawers", () => {
     let sizeProjectorSpy: sinon.SinonSpy;
 
     beforeEach(() => {
-      drawer = new Plottable.Drawers.Symbol(null,
-        () => (datum, index, dataset) => Plottable.SymbolFactories.circle(),
-        () => (datum, index, dataset) => 10,
+      drawer = new Plottable.Drawers.Symbol(
+        null,
+        () => () => Plottable.SymbolFactories.circle(),
+        () => () => 10,
       );
       symbolProjectorSpy = sinon.spy(drawer, "symbolProjector");
-      sizeProjectorSpy = sinon.spy(drawer, "symbolProjector");
+      sizeProjectorSpy = sinon.spy(drawer, "sizeProjector");
     });
+
 
     it("uses the line factory during canvas drawing", () => {
       const canvas = d3.select(document.createElement("canvas"));
