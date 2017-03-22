@@ -15,6 +15,7 @@ import { Plot } from "./plot";
 export class XYPlot<X, Y> extends Plot {
   protected static _X_KEY = "x";
   protected static _Y_KEY = "y";
+  private static _DEFERRED_RENDERING_DELAY = 200;
 
   private _autoAdjustXScaleDomain = false;
   private _autoAdjustYScaleDomain = false;
@@ -39,22 +40,31 @@ export class XYPlot<X, Y> extends Plot {
     this._adjustYDomainOnChangeFromXCallback = (scale) => this._adjustYDomainOnChangeFromX();
     this._adjustXDomainOnChangeFromYCallback = (scale) => this._adjustXDomainOnChangeFromY();
 
+    // the pixel space X translate that has occurred since the last time we rendered
     let _deltaX = 0;
+    // the pixel space Y translate that has occurred since the last time we rendered
     let _deltaY = 0;
+    // the X scale that has occurred since the last time we rendered
     let _scalingX = 1;
+    // the Y scale that has occurred since the last time we rendered
     let _scalingY = 1;
+    // the X scale's domain the last time we rendered
     let _lastSeenDomainX: X[] = [null, null];
+    // the Y scale's domain the last time we rendered
     let _lastSeenDomainY: Y[] = [null, null];
     let _timeoutReference = 0;
-    const _deferredRenderingTimeout = 500;
 
+    // call this every time the scales change (every pan/zoom event).
+    // this method will "render" now by applying a transform, and then
+    // debounce the true rendering
     const _registerDeferredRendering = () => {
       if (this._renderArea == null) {
         return;
       }
-      this._renderArea.attr("transform",
-        "translate(" + _deltaX + ", " + _deltaY + ")" +
-        "scale(" + _scalingX + ", " + _scalingY + ")");
+      this._renderArea.attr("transform", `translate(${_deltaX}, ${_deltaY}) scale(${_scalingX}, ${_scalingY})`);
+      if (this._canvas != null) {
+        this._canvas.style("transform", `translate(${_deltaX}px, ${_deltaY}px) scale(${_scalingX}, ${_scalingY})`);
+      }
       clearTimeout(_timeoutReference);
       _timeoutReference = setTimeout(() => {
         this._cachedDomainX = _lastSeenDomainX;
@@ -65,9 +75,14 @@ export class XYPlot<X, Y> extends Plot {
         _scalingY = 1;
         this.render();
         this._renderArea.attr("transform", "translate(0, 0) scale(1, 1)");
-      }, _deferredRenderingTimeout);
+        if (this._canvas != null) {
+          this._canvas.style("transform", "translate(0, 0) scale(1, 1)");
+        }
+      }, XYPlot._DEFERRED_RENDERING_DELAY);
     };
 
+    // calculate the translate and pan that has occurred on this scale since the last time we
+    // rendered with it
     const _lazyDomainChangeCallbackX = (scale: Scale<X, any>) => {
       if (!this._isAnchored) {
         return;
@@ -93,6 +108,8 @@ export class XYPlot<X, Y> extends Plot {
     };
 
     this._renderCallback = (scale) => {
+      // instead of rendering immediately when a scale has changed (aka in response to a pan/zoom),
+      // simply register the deferred rendering to take place
       if (this.deferredRendering() && this.x() && this.x().scale === scale) {
         _lazyDomainChangeCallbackX(scale);
       } else if (this.deferredRendering() && this.y() && this.y().scale === scale) {
