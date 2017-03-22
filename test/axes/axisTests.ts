@@ -687,7 +687,7 @@ describe("Axis", () => {
       // force multiline
       const domain = ["albatross long long long long long long long long long long long long title"];
       setup(domain);
-      const labelTextLineElement = div.select(".text-line").node() as Element;
+      const labelTextLineElement = div.select(".text-area").node() as Element;
       assert.equal(axis.tickLabelDataOnElement(labelTextLineElement), domain[0]);
       cleanup();
     });
