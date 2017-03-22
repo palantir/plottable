@@ -33,8 +33,12 @@ describe("Drawers", () => {
       const canvas = d3.select(document.createElement("canvas"));
       drawer.canvas(canvas);
       drawer.draw(data, drawSteps);
+      // we check the size of each symbole
       assert.isTrue(sizeProjectorSpy.called, "called size projector");
-      assert.isTrue(symbolProjectorSpy.called, "called symbol projector");
+      assert.equal(sizeProjectorSpy.callCount, 3, "called size projector 3 times");
+      // all the symbols are culled because they are not within the canvas
+      // bounds, so symbolProjector never gets called, which is good
+      assert.isFalse(symbolProjectorSpy.called, "called symbol projector");
     });
   });
 });
