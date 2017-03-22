@@ -108,20 +108,22 @@ export class Axis<D> extends Component {
   /**
    * Gets the tick label data on a element.
    *
-   * @param {SVGElement} element
+   * @param {Element} element
    */
-  public tickLabelDataOnElement(element: SVGElement) {
-    let tickLabel: SVGElement;
+  public tickLabelDataOnElement(element: Element) {
+    if (element === null || element === undefined) { return undefined; }
+
+    let tickLabel: Element;
     // go up DOM tree to find tick label element in ancestor elements
-    while ((element !== null) && (element.classList) && (tickLabel === undefined)) {
+    while ((element !== undefined) && (element.classList) && (tickLabel === undefined)) {
       if (element.classList.contains(Axis.TICK_LABEL_CLASS)) {
         tickLabel = element;
       } else {
-        element = element.parentNode as SVGElement;
+        element = element.parentNode as Element;
       }
     }
 
-    return d3.select(element).datum();
+    return element === undefined ? element : d3.select(element).datum();
   }
 
   protected _computeWidth() {

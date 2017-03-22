@@ -656,47 +656,53 @@ describe("Axis", () => {
     div.remove();
   });
 
-  describe("tickLabelDataInteractedWith", () => {
-    const TICK_LABEL = "tick-label";
+  describe("tickLabelDataOnElement", () => {
     let div: d3.Selection<HTMLDivElement, void | {}, any, any>;
-    let axis: Plottable.Axis<number>;
-    let scale: Plottable.Scales.Linear;
+    let scale: Plottable.Scales.Category;
+    let axis: Plottable.Axes.Category;
 
-    before(() => {
+    function setup(domain: string[]) {
       div = TestMethods.generateDiv();
-      scale = new Plottable.Scales.Linear();
-      scale.domain([0, 100]);
-      axis = new Plottable.Axes.Numeric(scale, "bottom");
+      scale = new Plottable.Scales.Category().domain(domain);
+      axis = new Plottable.Axes.Category(scale, "bottom");
+      const TICK_LABEL_MAX_WIDTH = 60;
+      axis.tickLabelMaxWidth(TICK_LABEL_MAX_WIDTH);
       axis.renderTo(div);
-    });
+    };
 
-    after(() => {
+    function cleanup() {
       axis.destroy();
       div.remove();
-    });
+    };
 
     it("returns label datum when element has tick label class", () => {
+      const domain = ["label1", "label2"];
+      setup(domain);
+      const tickLabelElement = div.select(`.${Plottable.Axis.TICK_LABEL_CLASS}`).node() as Element;
+      assert.equal(axis.tickLabelDataOnElement(tickLabelElement), domain[0]);
+      cleanup();
     });
 
     it("returns label datum when element in ancestor has tick label class", () => {
-    });
-
-    it("returns undefined when element is null / undefined", () => {
+      // force multiline
+      const domain = ["albatross long long long long long long long long long long long long title", "short"];
+      setup(domain);
+      const labelTextLineElement = div.select(`.text-line`).node() as Element;
+      assert.equal(axis.tickLabelDataOnElement(labelTextLineElement), domain[0]);
+      cleanup();
     });
 
     it("returns undefined when no ancestor has tick label class", () => {
+      const domain = ["label1", "label2"];
+      setup(domain);
+      const contentElement = div.select(`.content`).node() as Element;
+      assert.isUndefined(axis.tickLabelDataOnElement(contentElement));
+      cleanup();
     });
 
-    // it("returns label datum when clicking on label text", () => {
-    //   div.selectAll(".tick-label").nodes().forEach((node, index) => {
-    //     // labels are 0, 10, 20...
-    //     assert.equal(axis.tickLabelDataInteractedWith(node as SVGElement), index * 10);
-    //   });
-    // });
-
-    // it("returns undefined if point is outside of labels", () => {
-    //   const svg = TestMethods.generateSVG() as SVGElement;
-    //   assert.isUndefined(axis.tickLabelDataInteractedWith(svg));
-    // });
+    it("returns undefined when element is null / undefined", () => {
+      assert.isUndefined(axis.tickLabelDataOnElement(undefined));
+      assert.isUndefined(axis.tickLabelDataOnElement(null));
+    });
   });
 });
