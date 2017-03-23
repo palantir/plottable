@@ -7,19 +7,14 @@ import * as d3 from "d3";
 
 import { AttributeToAppliedProjector } from "../core/interfaces";
 import { CanvasDrawStep } from "./canvasDrawer";
-import { AppliedDrawStep } from "./index";
 import { SVGDrawer } from "./svgDrawer";
 
 export class RectangleSVGDrawer extends SVGDrawer {
-  constructor(private _rootGClassName: string = null) {
+  constructor(private _rootClassName: string = null) {
     super("rect", "");
-  }
-
-  public draw(root: d3.Selection<SVGElement, any, any, any>, data: any[], appliedDrawSteps: AppliedDrawStep[]) {
-    if (this._rootGClassName != null) {
-      root.classed(this._rootGClassName, true);
+    if (this._rootClassName != null) {
+      this._root.classed(this._rootClassName, true);
     }
-    super.draw(root, data, appliedDrawSteps);
   }
 }
 

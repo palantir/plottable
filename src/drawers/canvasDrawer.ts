@@ -4,6 +4,7 @@
  */
 
 import { AttributeToAppliedProjector } from "../core/interfaces";
+import { Drawer } from "./drawer";
 import { AppliedDrawStep } from "./index";
 
 export type CanvasDrawStep = (
@@ -13,23 +14,35 @@ export type CanvasDrawStep = (
 ) => void;
 
 /**
- * A CanvasDrawer draws data onto a supplied Canvas DOM element.
+ * A CanvasDrawer draws data onto a supplied Canvas Context.
  *
  * This class is immutable (but has internal state) and shouldn't be extended.
  */
-export class CanvasDrawer {
-  private _drawStep: CanvasDrawStep;
-
-  constructor(drawStep: CanvasDrawStep) {
-    this._drawStep = drawStep;
+export class CanvasDrawer implements Drawer {
+  /**
+   * @param _context The context for a canvas that this drawer will draw to.
+   * @param _drawStep The draw step logic that actually draws.
+   */
+  constructor(private _context: CanvasRenderingContext2D, private _drawStep: CanvasDrawStep) {
   }
 
-  public draw(canvas: d3.Selection<HTMLCanvasElement, any, any, any>, data: any[], appliedDrawSteps: AppliedDrawStep[]) {
+  public draw(data: any[], appliedDrawSteps: AppliedDrawStep[]) {
     // don't support animations for now; just draw the last draw step immediately
     const lastDrawStep = appliedDrawSteps[appliedDrawSteps.length - 1];
-    const context = canvas.node().getContext("2d");
-    context.save();
-    this._drawStep(context, data, lastDrawStep.attrToAppliedProjector);
-    context.restore();
+    this._context.save();
+    this._drawStep(this._context, data, lastDrawStep.attrToAppliedProjector);
+    this._context.restore();
+  }
+
+  public getVisualPrimitives(): Element[] {
+    return [];
+  }
+
+  public getVisualPrimitiveAtIndex(index: number): Element {
+    return null;
+  }
+
+  public remove() {
+    // NO op - canvas element owns the canvas; context is free
   }
 }

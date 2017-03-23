@@ -218,7 +218,7 @@ export class XYPlot<X, Y> extends Plot {
     return this;
   }
 
-  protected _filterForProperty(property: string) {
+  protected _filterForProperty(property: string): Accessor<boolean> {
     if (property === "x" && this._autoAdjustXScaleDomain) {
       return this._makeFilterByProperty("y");
     } else if (property === "y" && this._autoAdjustYScaleDomain) {

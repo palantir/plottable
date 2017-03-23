@@ -41,7 +41,7 @@ describe("SVGDrawers", () => {
       drawer.draw(svg, data, drawSteps);
       const expectedSelection = svg.selectAll<Element, any>("path");
       data[0].forEach((datum, index) => {
-        const selectionForIndex = drawer.selectionForIndex(index);
+        const selectionForIndex = drawer.getVisualPrimitiveAtIndex(index);
         assert.strictEqual(selectionForIndex.size(), 1, `selection for index ${index} contains only one element`);
         assert.strictEqual(selectionForIndex.node(), expectedSelection.node(), `selection for index ${index} contains the correct element`);
       });

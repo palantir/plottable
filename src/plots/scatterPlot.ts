@@ -9,13 +9,11 @@ import { Accessor, AttributeToProjector, Bounds, Point, Range } from "../core/in
 import * as SymbolFactories from "../core/symbolFactories";
 import { SymbolFactory } from "../core/symbolFactories";
 import * as Drawers from "../drawers";
+import { ProxyDrawer } from "../drawers/drawer";
+import { SymbolSVGDrawer } from "../drawers/symbolDrawer";
 import * as Scales from "../scales";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
-
-import { CanvasDrawer } from "../drawers/canvasDrawer";
-import { Drawer } from "../drawers/drawer";
-import { SymbolSVGDrawer } from "../drawers/symbolDrawer";
 import { warn } from "../utils/windowUtils";
 import * as Plots from "./";
 import { AccessorScaleBinding, LightweightPlotEntity, PlotEntity, TransformableAccessorScaleBinding } from "./";
@@ -65,10 +63,10 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
     });
   }
 
-  protected _createDrawer(dataset: Dataset) {
-    return new Drawer(dataset, new SymbolSVGDrawer(), new CanvasDrawer(() => {
+  protected _createDrawer() {
+    return new ProxyDrawer(() => new SymbolSVGDrawer(), () => {
       warn("canvas renderer is not supported on Scatter Plot!");
-    }));
+    });
   }
 
   /**

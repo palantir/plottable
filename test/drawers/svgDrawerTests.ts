@@ -71,7 +71,7 @@ describe("SVGDrawers", () => {
       it("can retrieve the selection for a particular index", () => {
         const selection = drawer.selection();
         data.forEach((datum, index) => {
-          const selectionForIndex = drawer.selectionForIndex(index);
+          const selectionForIndex = drawer.getVisualPrimitiveAtIndex(index);
           assert.strictEqual(selectionForIndex.node(), selection.nodes()[index], `retrieves the correct selection for index ${index}`);
         });
       });

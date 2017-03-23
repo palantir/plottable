@@ -13,9 +13,8 @@ import { QuantitativeScale } from "../scales/quantitativeScale";
 import * as Utils from "../utils";
 
 import { AreaSVGDrawer } from "../drawers/areaDrawer";
-import { CanvasDrawer } from "../drawers/canvasDrawer";
-import { Drawer } from "../drawers/drawer";
-import { LineSVGDrawer, makeLineCanvasDrawStep } from "../drawers/lineDrawer";
+import { ProxyDrawer } from "../drawers/drawer";
+import { LineSVGDrawer } from "../drawers/lineDrawer";
 import { warn } from "../utils/windowUtils";
 import * as Plots from "./";
 import { Line } from "./linePlot";
@@ -23,7 +22,7 @@ import { Plot } from "./plot";
 
 export class Area<X> extends Line<X> {
   private static _Y0_KEY = "y0";
-  private _lineDrawers: Utils.Map<Dataset, Drawer>;
+  private _lineDrawers: Utils.Map<Dataset, LineSVGDrawer>;
   private _constantBaselineValueProvider: () => number[];
 
   /**
@@ -38,12 +37,12 @@ export class Area<X> extends Line<X> {
     this.attr("fill-opacity", 0.25);
     this.attr("fill", new Scales.Color().range()[0]);
 
-    this._lineDrawers = new Utils.Map<Dataset, Drawer>();
+    this._lineDrawers = new Utils.Map<Dataset, LineSVGDrawer>();
   }
 
   protected _setup() {
     super._setup();
-    this._lineDrawers.forEach((d) => d.useSVG(this._renderArea));
+    this._lineDrawers.forEach((lineDrawer) => lineDrawer.attachTo(this._renderArea.node()));
   }
 
   public y(): Plots.TransformableAccessorScaleBinding<number, number>;
@@ -105,13 +104,9 @@ export class Area<X> extends Line<X> {
   }
 
   protected _addDataset(dataset: Dataset) {
-    const lineDrawer = new Drawer(
-      dataset,
-      new LineSVGDrawer(),
-      new CanvasDrawer(makeLineCanvasDrawStep(() => this._d3LineFactory(dataset))),
-    );
+    const lineDrawer = new LineSVGDrawer();
     if (this._isSetup) {
-      lineDrawer.useSVG(this._renderArea);
+      lineDrawer.attachTo(this._renderArea.node());
     }
     this._lineDrawers.set(dataset, lineDrawer);
     super._addDataset(dataset);
@@ -126,7 +121,10 @@ export class Area<X> extends Line<X> {
   protected _additionalPaint() {
     const drawSteps = this._generateLineDrawSteps();
     const dataToDraw = this._getDataToDraw();
-    this.datasets().forEach((dataset) => this._lineDrawers.get(dataset).draw(dataToDraw.get(dataset), drawSteps));
+    this.datasets().forEach((dataset) => {
+      const appliedDrawSteps = Plot.applyDrawSteps(drawSteps, dataset);
+      this._lineDrawers.get(dataset).draw(dataToDraw.get(dataset), appliedDrawSteps);
+    });
   }
 
   private _generateLineDrawSteps() {
@@ -149,10 +147,10 @@ export class Area<X> extends Line<X> {
     return lineAttrToProjector;
   }
 
-  protected _createDrawer(dataset: Dataset) {
-    return new Drawer(dataset, new AreaSVGDrawer(), new CanvasDrawer(() => {
+  protected _createDrawer() {
+    return new ProxyDrawer(() => new AreaSVGDrawer(), () => {
       warn("canvas renderer not implemented on Area Plot!");
-    }));
+    });
   }
 
   protected _generateDrawSteps(): Drawers.DrawStep[] {
@@ -212,7 +210,7 @@ export class Area<X> extends Line<X> {
     const allSelections = super.selections(datasets).nodes();
     const lineDrawers = datasets.map((dataset) => this._lineDrawers.get(dataset))
       .filter((drawer) => drawer != null);
-    lineDrawers.forEach((ld, i) => allSelections.push(ld.selectionForIndex(i).node()));
+    lineDrawers.forEach((ld) => allSelections.push(...ld.getVisualPrimitives()));
     return d3.selectAll(allSelections);
   }
 

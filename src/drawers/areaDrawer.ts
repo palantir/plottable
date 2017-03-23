@@ -3,8 +3,6 @@
  * @license MIT
  */
 
-import * as d3 from "d3";
-
 import { SimpleSelection } from "../core/interfaces";
 import { SVGDrawer } from "./svgDrawer";
 
@@ -17,7 +15,9 @@ export class AreaSVGDrawer extends SVGDrawer {
     selection.style("stroke", "none");
   }
 
-  public selectionForIndex(index: number): SimpleSelection<any> {
-    return d3.select(this.selection().node());
+  public getVisualPrimitiveAtIndex(index: number) {
+    // areas are represented by one single element; always get that element
+    // regardless of the data index.
+    return super.getVisualPrimitiveAtIndex(0);
   }
 }

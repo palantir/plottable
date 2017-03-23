@@ -18,8 +18,8 @@ export class LineSVGDrawer extends SVGDrawer {
     selection.style("fill", "none");
   }
 
-  public selectionForIndex(index: number): SimpleSelection<any> {
-    return d3.select(this.selection().node());
+  public getVisualPrimitiveAtIndex(index: number) {
+    return super.getVisualPrimitiveAtIndex(0);
   }
 }
 

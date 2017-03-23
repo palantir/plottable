@@ -10,13 +10,11 @@ import * as Animators from "../animators";
 import { Dataset } from "../core/dataset";
 import { Accessor, AttributeToProjector, Bounds, Point, Range } from "../core/interfaces";
 import * as Drawers from "../drawers";
+import { ProxyDrawer } from "../drawers/drawer";
+import { RectangleCanvasDrawStep, RectangleSVGDrawer } from "../drawers/rectangleDrawer";
 import * as Scales from "../scales";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
-
-import { CanvasDrawer } from "../drawers/canvasDrawer";
-import { Drawer } from "../drawers/drawer";
-import { RectangleCanvasDrawStep, RectangleSVGDrawer } from "../drawers/rectangleDrawer";
 import * as Plots from "./";
 import { PlotEntity } from "./";
 import { Plot } from "./plot";
@@ -47,8 +45,8 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
     this.attr("fill", new Scales.Color().range()[0]);
   }
 
-  protected _createDrawer(dataset: Dataset) {
-    return new Drawer(dataset, new RectangleSVGDrawer(), new CanvasDrawer(RectangleCanvasDrawStep));
+  protected _createDrawer() {
+    return new ProxyDrawer(() => new RectangleSVGDrawer(), RectangleCanvasDrawStep);
   }
 
   protected _generateAttrToProjector() {
