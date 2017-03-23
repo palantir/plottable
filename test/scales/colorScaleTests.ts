@@ -4,8 +4,6 @@ import { assert } from "chai";
 
 import * as Plottable from "../../src";
 
-import * as TestMethods from "../testMethods";
-
 describe("Scales", () => {
   describe("Color Scale", () => {
 
@@ -80,7 +78,7 @@ describe("Scales", () => {
           "Unloading the CSS should cause color scales fallback to default colors");
       });
 
-       it("caches CSS specified colors unless the cache is invalidated", () => {
+      it("caches CSS specified colors unless the cache is invalidated", () => {
         let style = d3.select("body").append("style");
         style.html(".plottable-colors-0 {background-color: #ff0000 !important; }");
         Plottable.Scales.Color.invalidateColorCache();

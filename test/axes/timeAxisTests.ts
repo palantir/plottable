@@ -1,12 +1,11 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
 
 import * as Plottable from "../../src";
+import { TierLabelPosition } from "../../src/axes/timeAxis";
 
 import * as TestMethods from "../testMethods";
-import { TierLabelPosition } from "../../src/axes/timeAxis";
 
 describe("TimeAxis", () => {
 
@@ -411,7 +410,7 @@ describe("TimeAxis", () => {
       let div = TestMethods.generateDiv();
       let axis = new Plottable.Axes.Time(new Plottable.Scales.Time(), "bottom");
 
-      axis.maxTimeIntervalPrecision("minute")
+      axis.maxTimeIntervalPrecision("minute");
       axis.renderTo(div);
       let config = axis.currentAxisConfiguration();
       assert.strictEqual(config.length, 2, "2 tiers");
@@ -426,7 +425,7 @@ describe("TimeAxis", () => {
       let div = TestMethods.generateDiv();
       let axis = new Plottable.Axes.Time(new Plottable.Scales.Time(), "bottom");
 
-      axis.maxTimeIntervalPrecision("day")
+      axis.maxTimeIntervalPrecision("day");
       axis.renderTo(div);
       let config = axis.currentAxisConfiguration();
       // day/month is most precise valid config after hour/day

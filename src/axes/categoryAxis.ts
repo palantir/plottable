@@ -11,7 +11,7 @@ import * as Scales from "../scales";
 import * as Utils from "../utils";
 import { Axis, AxisOrientation } from "./axis";
 
-export interface DownsampleInfo {
+export interface IDownsampleInfo {
   domain: string[];
   stepWidth: number;
 }
@@ -149,7 +149,7 @@ export class Category extends Axis<string> {
    * @param {Scales.Category} scale - The scale being downsampled. Defaults to this Axis' scale.
    * @return {DownsampleInfo} an object holding the resultant domain and new stepWidth.
    */
-  public getDownsampleInfo(scale: Scales.Category = <Scales.Category> this._scale, domain = scale.invertRange()): DownsampleInfo {
+  public getDownsampleInfo(scale: Scales.Category = <Scales.Category> this._scale, domain = scale.invertRange()): IDownsampleInfo {
     // account for how shearing tightens the space between vertically oriented ticks
     const shearFactor = this._tickLabelAngle === 0 ? 1 : 1 / Math.cos(this._tickLabelShearAngle / 180 * Math.PI);
     const shearedMinimumWidth = Category._MINIMUM_WIDTH_PER_LABEL_PX * shearFactor;

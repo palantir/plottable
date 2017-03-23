@@ -11,7 +11,7 @@ import * as Math from "./mathUtils";
  * EntityStore stores entities and makes them searchable.
  * Valid entities must be positioned in Cartesian space.
  */
-export interface EntityStore<T extends PositionedEntity> {
+export interface IEntityStore<T extends IPositionedEntity> {
   /**
    * Adds an entity to the store
    * @param {T} [entity] Entity to add to the store. Entity must be positionable
@@ -43,14 +43,14 @@ export interface EntityStore<T extends PositionedEntity> {
   forEach(callback: (value: T) => void): void;
 }
 
-export interface PositionedEntity {
+export interface IPositionedEntity {
   position: Point;
 }
 
 /**
  * Array-backed implementation of {EntityStore}
  */
-export class EntityArray<T extends PositionedEntity> implements EntityStore<T> {
+export class EntityArray<T extends IPositionedEntity> implements IEntityStore<T> {
   private _entities: T[];
 
   constructor() {

@@ -1,5 +1,3 @@
-import * as d3 from "d3";
-
 import { assert } from "chai";
 
 import * as Plottable from "../../src";
@@ -17,7 +15,7 @@ describe("Interactions", () => {
         TestMethods.InteractionType.Move,
         component.content(),
         DIV_WIDTH / 2,
-        DIV_HEIGHT / 2
+        DIV_HEIGHT / 2,
       );
     }
 

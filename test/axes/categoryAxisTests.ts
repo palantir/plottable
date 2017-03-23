@@ -1,12 +1,12 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
 
 import * as Plottable from "../../src";
+import { SimpleSelection } from "../../src/core/interfaces";
+import { getRotate, getTranslateValues } from "../../src/utils/domUtils";
 
 import * as TestMethods from "../testMethods";
-import { getTranslateValues, getRotate } from "../../src/utils/domUtils";
 
 describe("Category Axes", () => {
   describe("rendering the tick labels", () => {

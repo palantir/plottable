@@ -1,5 +1,5 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
+import { SimpleSelection } from "../../src/core/interfaces";
 
 import { assert } from "chai";
 

@@ -10,7 +10,7 @@ import { Component } from "../components/component";
 import { Formatter } from "../core/formatters";
 import * as Formatters from "../core/formatters";
 import { Point, SimpleSelection, SpaceRequest } from "../core/interfaces";
-import { Scale, ScaleCallback } from "../scales/scale";
+import { IScaleCallback, Scale } from "../scales/scale";
 import * as Utils from "../utils";
 import { makeEnum } from "../utils/makeEnum";
 
@@ -58,7 +58,7 @@ export class Axis<D> extends Component {
   private _tickLabelPadding = 10;
   private _margin = 15;
   private _showEndTickLabels = false;
-  private _rescaleCallback: ScaleCallback<Scale<D, number>>;
+  private _rescaleCallback: IScaleCallback<Scale<D, number>>;
 
   private _annotatedTicks: D[];
   private _annotationFormatter: Formatter;

@@ -1,12 +1,11 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
 
 import * as Plottable from "../../src";
+import { getScaleValues, getTranslateValues } from "../../src/utils/domUtils";
 
 import * as TestMethods from "../testMethods";
-import { getTranslateValues, getScaleValues } from "../../src/utils/domUtils";
 
 describe("Plots", () => {
   describe("XY Plot", () => {
@@ -41,7 +40,7 @@ describe("Plots", () => {
             y: yTransform(datumNumber),
           };
         });
-      };
+      }
 
       it("can set the autorange mode", () => {
         assert.strictEqual(plot.autorangeMode(), "none", "defaults to no autoranging");

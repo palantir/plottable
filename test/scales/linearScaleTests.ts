@@ -1,5 +1,3 @@
-import * as d3 from "d3";
-
 import { assert } from "chai";
 
 import * as Plottable from "../../src";
@@ -112,7 +110,7 @@ describe("Scales", () => {
         let defaultTicks = scale.ticks();
         assert.strictEqual(defaultTicks.length, 11, "ticks were generated correctly with default generator");
         assert.deepEqual(defaultTicks, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "all numbers from 0 to 10 were generated");
-        scale.tickGenerator((_scale) => scale.defaultTicks().filter(tick => tick % 3 === 0));
+        scale.tickGenerator((_scale) => scale.defaultTicks().filter((tick) => tick % 3 === 0));
         let customTicks = scale.ticks();
         assert.deepEqual(customTicks, [0, 3, 6, 9], "ticks were generated correctly with custom generator");
       });

@@ -1,4 +1,3 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -165,7 +164,7 @@ describe("Component", () => {
     it("overflow: visible by default", () => {
       c.anchor(div);
       const styles = window.getComputedStyle(<Element> c.content().node());
-      assert.strictEqual(styles.getPropertyValue("overflow"), "visible", "content has overflow: visible")
+      assert.strictEqual(styles.getPropertyValue("overflow"), "visible", "content has overflow: visible");
 
       c.destroy();
       div.remove();
@@ -871,7 +870,7 @@ describe("Component", () => {
     it("calculates the bounds relative to the origin", () => {
       assert.deepEqual(c.bounds(), {
         topLeft: c.origin(),
-        bottomRight: { x: DIV_WIDTH, y: DIV_HEIGHT }
+        bottomRight: { x: DIV_WIDTH, y: DIV_HEIGHT },
       });
       c.destroy();
       div.remove();

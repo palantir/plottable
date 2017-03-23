@@ -1,10 +1,6 @@
-import * as d3 from "d3";
-
 import { assert } from "chai";
 
 import * as Plottable from "../../src";
-
-import * as TestMethods from "../testMethods";
 
 describe("Scales", () => {
   describe("Tick generators", () => {
@@ -96,7 +92,7 @@ describe("Scales", () => {
 
     describe("integerTickGenerator() generates integer ticks ", () => {
       let scale: Plottable.Scales.Linear;
-      let integerTickGenerator: Plottable.Scales.TickGenerators.TickGenerator<number>;
+      let integerTickGenerator: Plottable.Scales.TickGenerators.ITickGenerator<number>;
 
       beforeEach(() => {
         scale = new Plottable.Scales.Linear();

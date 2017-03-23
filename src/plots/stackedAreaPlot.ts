@@ -6,9 +6,9 @@
 import * as d3 from "d3";
 
 import * as Animators from "../animators";
-import { Animator } from "../animators/animator";
+import { IAnimator } from "../animators/animator";
 import { Dataset } from "../core/dataset";
-import { Accessor, AttributeToProjector, Point, SimpleSelection } from "../core/interfaces";
+import { AttributeToProjector, IAccessor, Point, SimpleSelection } from "../core/interfaces";
 import { QuantitativeScale } from "../scales/quantitativeScale";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
@@ -56,7 +56,7 @@ export class StackedArea<X> extends Area<X> {
     return super.croppedRenderingEnabled(croppedRendering);
   }
 
-  protected _getAnimator(key: string): Animator {
+  protected _getAnimator(key: string): IAnimator {
     return new Animators.Null();
   }
 
@@ -65,17 +65,17 @@ export class StackedArea<X> extends Area<X> {
     this._baseline = this._renderArea.append("line").classed("baseline", true);
   }
 
-  public x(): Plots.TransformableAccessorScaleBinding<X, number>;
-  public x(x: number | Accessor<number>): this;
-  public x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
-  public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
+  public x(): Plots.ITransformableAccessorScaleBinding<X, number>;
+  public x(x: number | IAccessor<number>): this;
+  public x(x: X | IAccessor<X>, xScale: Scale<X, number>): this;
+  public x(x?: number | IAccessor<number> | X | IAccessor<X>, xScale?: Scale<X, number>): any {
     if (x == null) {
       return super.x();
     }
     if (xScale == null) {
-      super.x(<number | Accessor<number>> x);
+      super.x(<number | IAccessor<number>> x);
     } else {
-      super.x(<X | Accessor<X>> x, xScale);
+      super.x(<X | IAccessor<X>> x, xScale);
     }
 
     this._updateStackExtentsAndOffsets();
@@ -83,17 +83,17 @@ export class StackedArea<X> extends Area<X> {
     return this;
   }
 
-  public y(): Plots.TransformableAccessorScaleBinding<number, number>;
-  public y(y: number | Accessor<number>): this;
-  public y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): this;
-  public y(y?: number | Accessor<number>, yScale?: QuantitativeScale<number>): any {
+  public y(): Plots.ITransformableAccessorScaleBinding<number, number>;
+  public y(y: number | IAccessor<number>): this;
+  public y(y: number | IAccessor<number>, yScale: QuantitativeScale<number>): this;
+  public y(y?: number | IAccessor<number>, yScale?: QuantitativeScale<number>): any {
     if (y == null) {
       return super.y();
     }
     if (yScale == null) {
-      super.y(<number | Accessor<number>> y);
+      super.y(<number | IAccessor<number>> y);
     } else {
-      super.y(<number | Accessor<number>> y, yScale);
+      super.y(<number | IAccessor<number>> y, yScale);
     }
 
     this._updateStackExtentsAndOffsets();
@@ -205,7 +205,7 @@ export class StackedArea<X> extends Area<X> {
     this._stackedExtent = Utils.Stacking.stackedExtent(this._stackingResult, keyAccessor, filter);
   }
 
-  private _checkSameDomain(datasets: Dataset[], keyAccessor: Accessor<any>) {
+  private _checkSameDomain(datasets: Dataset[], keyAccessor: IAccessor<any>) {
     const keySets = datasets.map((dataset) => {
       return d3.set(dataset.data().map((datum, i) => keyAccessor(datum, i, dataset).toString())).values();
     });
@@ -225,7 +225,7 @@ export class StackedArea<X> extends Area<X> {
    * @param {Accessor<any>} keyAccessor The accessor for the key of the data
    * @return {string[]} An array of stringified keys
    */
-  private static _domainKeys(datasets: Dataset[], keyAccessor: Accessor<any>) {
+  private static _domainKeys(datasets: Dataset[], keyAccessor: IAccessor<any>) {
     const domainKeys = d3.set();
     datasets.forEach((dataset) => {
       dataset.data().forEach((datum, index) => {

@@ -1,8 +1,8 @@
-import { SimpleSelection } from "../src/core/interfaces";
 import { assert } from "chai";
 import * as d3 from "d3";
 
 import * as Plottable from "../src";
+import { SimpleSelection } from "../src/core/interfaces";
 import { getTranslateValues } from "../src/utils/domUtils";
 
 export function generateDiv(width = 400, height = 400): d3.Selection<HTMLDivElement, void | {}, any, any> {
@@ -115,8 +115,8 @@ export function assertLineAttrs(line: SimpleSelection<void>,
   assert.closeTo(numAttr(line, "y2"), expectedAttrs.y2, floatingPointError, message + " (y2)");
 }
 
-export function assertEntitiesEqual(actual: Plottable.Entity<Plottable.Component>,
-                                    expected: Plottable.Entity<Plottable.Component>,
+export function assertEntitiesEqual(actual: Plottable.IEntity<Plottable.Component>,
+                                    expected: Plottable.IEntity<Plottable.Component>,
                                     msg: string) {
   assert.deepEqual(actual.datum, expected.datum, msg + " (datum)");
   assertPointsClose(actual.position, expected.position, 0.01, msg);
@@ -127,8 +127,8 @@ export function assertEntitiesEqual(actual: Plottable.Entity<Plottable.Component
   assert.strictEqual(actual.component, expected.component, msg + " (component)");
 }
 
-export function assertPlotEntitiesEqual(actual: Plottable.Plots.PlotEntity,
-                                        expected: Plottable.Plots.PlotEntity,
+export function assertPlotEntitiesEqual(actual: Plottable.Plots.IPlotEntity,
+                                        expected: Plottable.Plots.IPlotEntity,
                                         msg: string) {
   assertEntitiesEqual(actual, expected, msg);
   assert.strictEqual(actual.dataset, expected.dataset, msg + " (dataset)");
@@ -205,7 +205,7 @@ export function triggerFakeDragSequence(target: SimpleSelection<void>, start: Pl
       "mousemove",
       target,
       start.x + (end.x - start.x) * i / numSteps,
-      start.y + (end.y - start.y) * i / numSteps
+      start.y + (end.y - start.y) * i / numSteps,
     );
   }
   triggerFakeMouseEvent("mousemove", target, end.x, end.y);
@@ -270,14 +270,14 @@ export function triggerFakeTouchEvent(type: string, target: SimpleSelection<void
 
 export enum InteractionMode {
   Mouse,
-  Touch
+  Touch,
 }
 ;
 
 export enum InteractionType {
   Start,
   Move,
-  End
+  End,
 }
 
 export function triggerFakeInteractionEvent(mode: InteractionMode,
@@ -366,7 +366,7 @@ function tokenizePathString(pathString: string) {
 export type RGB = {
   red: number,
   green: number,
-  blue: number
+  blue: number,
 };
 
 export function colorHexToRGB(hex: string): RGB {

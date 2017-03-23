@@ -128,7 +128,7 @@ describe("Drawers", () => {
         drawer.canvas(canvas);
         const drawStep: Plottable.Drawers.DrawStep = {
           animator: new Plottable.Animators.Null(),
-          attrToProjector: {}
+          attrToProjector: {},
         };
 
         const drawStepCanvasStub = sinon.stub(drawer, "_drawStepCanvas", () => {});
@@ -149,7 +149,7 @@ describe("Drawers", () => {
     });
 
     describe("animation timings", () => {
-      class MockAnimator implements Plottable.Animator {
+      class MockAnimator implements Plottable.IAnimator {
         private _time: number;
         private _callback: Function;
 
@@ -200,7 +200,7 @@ describe("Drawers", () => {
 
       it("correctly computes the total draw time", () => {
         function makeFixedTimeAnimator(totalTime: number) {
-          return <Plottable.Animator> {
+          return <Plottable.IAnimator> {
             animate: () => null,
             totalTime: () => totalTime,
           };

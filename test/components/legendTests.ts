@@ -1,12 +1,11 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
 
 import * as Plottable from "../../src";
+import { getTranslateValues } from "../../src/utils/domUtils";
 
 import * as TestMethods from "../testMethods";
-import { getTranslateValues } from "../../src/utils/domUtils";
 
 describe("Legend", () => {
   const ENTRY_SELECTOR = "." + Plottable.Components.Legend.LEGEND_ENTRY_CLASS;
@@ -171,7 +170,7 @@ describe("Legend", () => {
       div.remove();
     });
 
-   it("can set maximum width of legend", () => {
+    it("can set maximum width of legend", () => {
       color.domain(["this is a very very very very very very very long"]);
       legend.renderTo(div);
       legend.maxWidth(100);
@@ -192,7 +191,7 @@ describe("Legend", () => {
           const entries = d3.select(this).selectAll<Element, any>(ENTRY_SELECTOR);
           assert.strictEqual(entries.size(), n, "number of entries in row is correct");
         });
-      };
+      }
 
       verifyMaxEntriesInRow(1);
       verifyMaxEntriesInRow(2);
@@ -498,7 +497,7 @@ describe("Legend", () => {
       let entities = legend.entitiesAt({x: 10, y: 10});
       const entries = legend.content().selectAll<Element, any>(ENTRY_SELECTOR);
 
-      let expectedEntity: Plottable.Entity<Plottable.Components.Legend> = {
+      let expectedEntity: Plottable.IEntity<Plottable.Components.Legend> = {
         datum: "AA",
         position: computeExpectedSymbolPosition(0, 0),
         selection: d3.select(entries.nodes()[0]),
@@ -528,7 +527,7 @@ describe("Legend", () => {
       legend.renderTo(div);
       let entities = legend.entitiesAt({x: 10, y: 10});
       const entries = legend.content().selectAll<Element, any>(ENTRY_SELECTOR);
-      let expectedEntity: Plottable.Entity<Plottable.Components.Legend> = {
+      let expectedEntity: Plottable.IEntity<Plottable.Components.Legend> = {
         datum: "AA",
         position: computeExpectedSymbolPosition(0, 0),
         selection: d3.select(entries.nodes()[0]),

@@ -1,6 +1,4 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
-import * as sinon from "sinon";
 
 import { assert } from "chai";
 

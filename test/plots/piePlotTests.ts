@@ -1,4 +1,3 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -513,7 +512,7 @@ describe("Plots", () => {
           {value: 5},
           {value: 5},
           {value: 5},
-          {value: 5}
+          {value: 5},
         ];
         /* tslint:enable no-shadowed-variable */
         dataset.data(data);

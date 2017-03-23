@@ -1,5 +1,5 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
+import { SimpleSelection } from "../../src/core/interfaces";
 
 import { assert } from "chai";
 
@@ -859,14 +859,14 @@ describe("Interactions", () => {
       let xScale: Plottable.QuantitativeScale<number>;
       let panZoomInteraction: Plottable.Interactions.PanZoom;
 
-      interface PanZoomTestCallback {
+      interface IPanZoomTestCallback {
         called: boolean;
         reset: () => void;
         (): void;
       }
 
       function makeCallback () {
-        let callback = <PanZoomTestCallback> function(e: Event) {
+        let callback = <IPanZoomTestCallback> function(e: Event) {
           callback.called = true;
         };
         callback.called = false;

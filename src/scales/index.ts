@@ -28,7 +28,7 @@ import { Scale } from "./scale";
  * @param {Scale} scale
  * @returns {D[]} An array of values that should be included in the Scale.
  */
-export interface IncludedValuesProvider<D> {
+export interface IIncludedValuesProvider<D> {
   (scale: Scale<D, any>): D[];
 }
 
@@ -40,7 +40,7 @@ export interface IncludedValuesProvider<D> {
  * @param {QuantitativeScale} scale
  * @returns {D[]} An array of values that should not be padded.
  */
-export interface PaddingExceptionsProvider<D> {
+export interface IPaddingExceptionsProvider<D> {
   (scale: QuantitativeScale<D>): D[];
 }
 
@@ -53,7 +53,7 @@ export interface PaddingExceptionsProvider<D> {
  * pan/zoom if they implement this interface. See `Category`'s
  * `_d3TransformationScale` for more info.
  */
-export interface TransformableScale {
+export interface ITransformableScale {
   /**
    * Apply the magnification with the floating point `magnifyAmount` centered
    * at the `centerValue` coordinate.
@@ -96,7 +96,7 @@ export interface TransformableScale {
  * runtime interface typechecking, so we have to explicitly list all classes
  * that implement the interface.
  */
-export function isTransformable(scale: any): scale is TransformableScale {
+export function isTransformable(scale: any): scale is ITransformableScale {
   return (scale instanceof QuantitativeScale ||
   scale instanceof Category);
 }

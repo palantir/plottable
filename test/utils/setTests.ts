@@ -1,10 +1,6 @@
-import * as d3 from "d3";
-
 import { assert } from "chai";
 
 import * as Plottable from "../../src";
-
-import * as TestMethods from "../testMethods";
 
 describe("Utils", () => {
   describe("Set", () => {
@@ -57,7 +53,7 @@ describe("Utils", () => {
       let values = [1, "2"];
       set.add(values[0]);
       set.add(values[1]);
-     let index = 0;
+      let index = 0;
       set.forEach((value1: any, value2: any, passedSet: Plottable.Utils.Set<any>) => {
         // HACKHACK: Safari bug #21489317: Safari passes undefined instead of a duplicate value for value2.
         if (value2 !== undefined) {
@@ -80,7 +76,7 @@ describe("Utils", () => {
     it("forEach() can force the this context", () => {
       let set = new Plottable.Utils.Set<number>();
       set.add(1);
-      let thisArg = {"foo": "bar"};
+      let thisArg = {foo: "bar"};
       set.forEach(function(value: number, value2: number, mp: Plottable.Utils.Set<number>) {
         assert.strictEqual(this, thisArg, "The correct this context is forced");
         assert.strictEqual(this.foo, "bar", "The forced context object behaves correctly");

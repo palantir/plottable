@@ -444,7 +444,7 @@ describe("Plots", () => {
         plot.renderer("canvas");
         const div = TestMethods.generateDiv();
         plot.renderTo(div);
-        
+
         assert.isNull(plot.selections(), "no selections on canvas");
         div.remove();
       });

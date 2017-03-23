@@ -1,13 +1,12 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
 import * as Typesetter from "typesettable";
 
 import * as Plottable from "../../src";
+import { getTranslateValues } from "../../src/utils/domUtils";
 
 import * as TestMethods from "../testMethods";
-import { getTranslateValues } from "../../src/utils/domUtils";
 
 describe("Labels", () => {
   const LABEL_CLASS = "label";

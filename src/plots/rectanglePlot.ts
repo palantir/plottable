@@ -8,14 +8,14 @@ import * as Typesetter from "typesettable";
 
 import * as Animators from "../animators";
 import { Dataset } from "../core/dataset";
-import { Accessor, AttributeToProjector, Bounds, Point, Range } from "../core/interfaces";
+import { AttributeToProjector, Bounds, IAccessor, Point, Range } from "../core/interfaces";
 import * as Drawers from "../drawers";
 import * as Scales from "../scales";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
 
 import * as Plots from "./";
-import { PlotEntity } from "./";
+import { IPlotEntity } from "./";
 import { Plot } from "./plot";
 import { XYPlot } from "./xyPlot";
 
@@ -23,7 +23,7 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
   private static _X2_KEY = "x2";
   private static _Y2_KEY = "y2";
   private _labelsEnabled = false;
-  private _label: Accessor<string> = null;
+  private _label: IAccessor<string> = null;
 
   /**
    * A Rectangle Plot displays rectangles based on the data.
@@ -110,14 +110,14 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
   /**
    * Gets the AccessorScaleBinding for X.
    */
-  public x(): Plots.TransformableAccessorScaleBinding<X, number>;
+  public x(): Plots.ITransformableAccessorScaleBinding<X, number>;
   /**
    * Sets X to a constant number or the result of an Accessor<number>.
    *
    * @param {number|Accessor<number>} x
    * @returns {Plots.Rectangle} The calling Rectangle Plot.
    */
-  public x(x: number | Accessor<number>): this;
+  public x(x: number | IAccessor<number>): this;
   /**
    * Sets X to a scaled constant value or scaled result of an Accessor.
    * The provided Scale will account for the values when autoDomain()-ing.
@@ -126,16 +126,16 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
    * @param {Scale<X, number>} xScale
    * @returns {Plots.Rectangle} The calling Rectangle Plot.
    */
-  public x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
-  public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
+  public x(x: X | IAccessor<X>, xScale: Scale<X, number>): this;
+  public x(x?: number | IAccessor<number> | X | IAccessor<X>, xScale?: Scale<X, number>): any {
     if (x == null) {
       return super.x();
     }
 
     if (xScale == null) {
-      super.x(<number | Accessor<number>>x);
+      super.x(<number | IAccessor<number>>x);
     } else {
-      super.x(<X | Accessor<X>>x, xScale);
+      super.x(<X | IAccessor<X>>x, xScale);
     }
 
     if (xScale != null) {
@@ -157,7 +157,7 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
   /**
    * Gets the AccessorScaleBinding for X2.
    */
-  public x2(): Plots.TransformableAccessorScaleBinding<X, number>;
+  public x2(): Plots.ITransformableAccessorScaleBinding<X, number>;
   /**
    * Sets X2 to a constant number or the result of an Accessor.
    * If a Scale has been set for X, it will also be used to scale X2.
@@ -165,8 +165,8 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
    * @param {number|Accessor<number>|X|Accessor<X>} x2
    * @returns {Plots.Rectangle} The calling Rectangle Plot.
    */
-  public x2(x2: number | Accessor<number> | X | Accessor<X>): this;
-  public x2(x2?: number | Accessor<number> | X | Accessor<X>): any {
+  public x2(x2: number | IAccessor<number> | X | IAccessor<X>): this;
+  public x2(x2?: number | IAccessor<number> | X | IAccessor<X>): any {
     if (x2 == null) {
       return this._propertyBindings.get(Rectangle._X2_KEY);
     }
@@ -182,14 +182,14 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
   /**
    * Gets the AccessorScaleBinding for Y.
    */
-  public y(): Plots.TransformableAccessorScaleBinding<Y, number>;
+  public y(): Plots.ITransformableAccessorScaleBinding<Y, number>;
   /**
    * Sets Y to a constant number or the result of an Accessor<number>.
    *
    * @param {number|Accessor<number>} y
    * @returns {Plots.Rectangle} The calling Rectangle Plot.
    */
-  public y(y: number | Accessor<number>): this;
+  public y(y: number | IAccessor<number>): this;
   /**
    * Sets Y to a scaled constant value or scaled result of an Accessor.
    * The provided Scale will account for the values when autoDomain()-ing.
@@ -198,16 +198,16 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
    * @param {Scale<Y, number>} yScale
    * @returns {Plots.Rectangle} The calling Rectangle Plot.
    */
-  public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
-  public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
+  public y(y: Y | IAccessor<Y>, yScale: Scale<Y, number>): this;
+  public y(y?: number | IAccessor<number> | Y | IAccessor<Y>, yScale?: Scale<Y, number>): any {
     if (y == null) {
       return super.y();
     }
 
     if (yScale == null) {
-      super.y(<number | Accessor<number>>y);
+      super.y(<number | IAccessor<number>>y);
     } else {
-      super.y(<Y | Accessor<Y>>y, yScale);
+      super.y(<Y | IAccessor<Y>>y, yScale);
     }
 
     if (yScale != null) {
@@ -229,7 +229,7 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
   /**
    * Gets the AccessorScaleBinding for Y2.
    */
-  public y2(): Plots.TransformableAccessorScaleBinding<Y, number>;
+  public y2(): Plots.ITransformableAccessorScaleBinding<Y, number>;
   /**
    * Sets Y2 to a constant number or the result of an Accessor.
    * If a Scale has been set for Y, it will also be used to scale Y2.
@@ -237,8 +237,8 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
    * @param {number|Accessor<number>|Y|Accessor<Y>} y2
    * @returns {Plots.Rectangle} The calling Rectangle Plot.
    */
-  public y2(y2: number | Accessor<number> | Y | Accessor<Y>): this;
-  public y2(y2?: number | Accessor<number> | Y | Accessor<Y>): any {
+  public y2(y2: number | IAccessor<number> | Y | IAccessor<Y>): this;
+  public y2(y2?: number | IAccessor<number> | Y | IAccessor<Y>): any {
     if (y2 == null) {
       return this._propertyBindings.get(Rectangle._Y2_KEY);
     }
@@ -277,7 +277,7 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
    * @param {Bounds} bounds
    * @returns {PlotEntity[]}
    */
-  public entitiesIn(bounds: Bounds): PlotEntity[];
+  public entitiesIn(bounds: Bounds): IPlotEntity[];
   /**
    * Gets the Entities that intersect the area defined by the ranges.
    *
@@ -285,8 +285,8 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
    * @param {Range} yRange
    * @returns {PlotEntity[]}
    */
-  public entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
-  public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): PlotEntity[] {
+  public entitiesIn(xRange: Range, yRange: Range): IPlotEntity[];
+  public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): IPlotEntity[] {
     let dataXRange: Range;
     let dataYRange: Range;
     if (yRange == null) {
@@ -309,8 +309,8 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
     };
   }
 
-  private _entitiesIntersecting(xValOrRange: number | Range, yValOrRange: number | Range): PlotEntity[] {
-    const intersected: PlotEntity[] = [];
+  private _entitiesIntersecting(xValOrRange: number | Range, yValOrRange: number | Range): IPlotEntity[] {
+    const intersected: IPlotEntity[] = [];
     const attrToProjector = this._generateAttrToProjector();
     this.entities().forEach((entity) => {
       if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange,
@@ -326,15 +326,15 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
    *
    * @returns {Accessor<string>}
    */
-  public label(): Accessor<string>;
+  public label(): IAccessor<string>;
   /**
    * Sets the text of labels to the result of an Accessor.
    *
    * @param {Accessor<string>} label
    * @returns {Plots.Rectangle} The calling Rectangle Plot.
    */
-  public label(label: Accessor<string>): this;
-  public label(label?: Accessor<string>): any {
+  public label(label: IAccessor<string>): this;
+  public label(label?: IAccessor<string>): any {
     if (label == null) {
       return this._label;
     }

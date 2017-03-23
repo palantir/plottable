@@ -1,10 +1,6 @@
-import * as d3 from "d3";
-
 import { assert } from "chai";
 
 import * as Plottable from "../../src";
-
-import * as TestMethods from "../testMethods";
 
 describe("Map", () => {
   it("set() and get()", () => {
@@ -64,7 +60,7 @@ describe("Map", () => {
   it("forEach() can force the this context", () => {
     let map = new Plottable.Utils.Map<number, number>();
     map.set(1, 2);
-    let thisArg = {"foo": "bar"};
+    let thisArg = {foo: "bar"};
     map.forEach(function(value: number, key: number, mp: Plottable.Utils.Map<number, number>) {
       assert.strictEqual(this, thisArg, "The correct this context is forced");
       assert.strictEqual(this.foo, "bar", "The forced context object behaves correctly");

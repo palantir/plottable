@@ -1,4 +1,3 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -139,7 +138,7 @@ describe("Plots", () => {
         stackedAreaPlot.x((d, i) => i);
       });
 
-      function calculateStackedYs(yAccessor: Plottable.Accessor<number>) {
+      function calculateStackedYs(yAccessor: Plottable.IAccessor<number>) {
         let stackedYDataArray: number[][] = [];
         stackedAreaPlot.datasets().forEach((dataset, datasetIndex, datasets) => {
           let stackedYData = dataset.data().map((d, i) => yAccessor(d, i, dataset));

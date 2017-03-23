@@ -1,10 +1,6 @@
-import * as d3 from "d3";
-
 import { assert } from "chai";
 
 import * as Plottable from "../../src";
-
-import * as TestMethods from "../testMethods";
 
 describe("Formatters", () => {
   describe("fixed()", () => {
@@ -35,7 +31,7 @@ describe("Formatters", () => {
       let fixed = Plottable.Formatters.fixed();
       nonNumericValues.forEach((value) =>
         (<any> assert).throws(() => fixed(<any> value), Error,
-          "error message TBD", `${value} is not a valid value for Formatter.fixed`)
+          "error message TBD", `${value} is not a valid value for Formatter.fixed`),
       );
     });
 
@@ -43,13 +39,13 @@ describe("Formatters", () => {
       let nonIntegerValues = [null, 2.1, NaN, "5", "abc"];
       nonIntegerValues.forEach((value) =>
         (<any> assert).throws(() => Plottable.Formatters.fixed(<any> value), Error,
-          "Formatter precision must be an integer", `${value} is not a valid precision value`)
+          "Formatter precision must be an integer", `${value} is not a valid precision value`),
       );
 
       let outOfBoundValues = [-1, 21, -Infinity, Infinity];
       outOfBoundValues.forEach((value) =>
         (<any> assert).throws(() => Plottable.Formatters.fixed(<any> value), Error,
-          "Formatter precision must be between 0 and 20", `${value} is not a valid precision value`)
+          "Formatter precision must be between 0 and 20", `${value} is not a valid precision value`),
       );
     });
   });
@@ -84,7 +80,7 @@ describe("Formatters", () => {
       let nonNumericValues = [null, undefined, Infinity, -Infinity, NaN, "123", "abc"];
       let stringifiedValues = ["null", "undefined", "Infinity", "-Infinity", "NaN", "123", "abc"];
       nonNumericValues.forEach((value, i) =>
-        assert.strictEqual(general(value), stringifiedValues[i], `non-numeric input ${value} is stringified`)
+        assert.strictEqual(general(value), stringifiedValues[i], `non-numeric input ${value} is stringified`),
       );
     });
 
@@ -92,13 +88,13 @@ describe("Formatters", () => {
       let nonIntegerValues = [null, 2.1, NaN, "5", "abc"];
       nonIntegerValues.forEach((value) =>
         (<any> assert).throws(() => Plottable.Formatters.general(<any> value), Error,
-          "Formatter precision must be an integer", `${value} is not a valid precision value`)
+          "Formatter precision must be an integer", `${value} is not a valid precision value`),
       );
 
       let outOfBoundValues = [-1, 21, -Infinity, Infinity];
       outOfBoundValues.forEach((value) =>
         (<any> assert).throws(() => Plottable.Formatters.general(<any> value), Error,
-          "Formatter precision must be between 0 and 20", `${value} is not a valid precision value`)
+          "Formatter precision must be between 0 and 20", `${value} is not a valid precision value`),
       );
     });
   });
@@ -109,7 +105,7 @@ describe("Formatters", () => {
       let values = [1, 0.999999, null, undefined, Infinity, -Infinity, NaN, "123", "abc", ""];
       let stringifiedValues = ["1", "0.999999", "null", "undefined", "Infinity", "-Infinity", "NaN", "123", "abc", ""];
       values.forEach((value, i) =>
-        assert.strictEqual(identity(value), stringifiedValues[i], `${value} is stringified`)
+        assert.strictEqual(identity(value), stringifiedValues[i], `${value} is stringified`),
       );
     });
   });
@@ -139,13 +135,13 @@ describe("Formatters", () => {
       let nonIntegerValues = [null, 2.1, NaN, "5", "abc"];
       nonIntegerValues.forEach((value) =>
         (<any> assert).throws(() => Plottable.Formatters.currency(<any> value), Error,
-          "Formatter precision must be an integer", `${value} is not a valid precision value`)
+          "Formatter precision must be an integer", `${value} is not a valid precision value`),
       );
 
       let outOfBoundValues = [-1, 21, -Infinity, Infinity];
       outOfBoundValues.forEach((value) =>
         (<any> assert).throws(() => Plottable.Formatters.currency(<any> value), Error,
-          "Formatter precision must be between 0 and 20", `${value} is not a valid precision value`)
+          "Formatter precision must be between 0 and 20", `${value} is not a valid precision value`),
       );
     });
 
@@ -155,7 +151,7 @@ describe("Formatters", () => {
       let defaultFormatter = Plottable.Formatters.currency();
       nonNumericValues.forEach((value) =>
         (<any> assert).throws(() => defaultFormatter(<any> value), Error,
-          "error message TBD", `${value} is not a valid value for Formatter.currency`)
+          "error message TBD", `${value} is not a valid value for Formatter.currency`),
       );
     });
 
@@ -180,7 +176,7 @@ describe("Formatters", () => {
       let timeFormatter = Plottable.Formatters.multiTime();
       nonNumericValues.forEach((value) =>
         (<any> assert).throws(() => timeFormatter(<any> value), Error,
-          "error message TBD", `${value} is not a valid value for Formatter.multiTime`)
+          "error message TBD", `${value} is not a valid value for Formatter.multiTime`),
       );
     });
   });
@@ -210,13 +206,13 @@ describe("Formatters", () => {
       let nonIntegerValues = [null, 2.1, NaN, "5", "abc"];
       nonIntegerValues.forEach((value) =>
         (<any> assert).throws(() => Plottable.Formatters.percentage(<any> value), Error,
-          "Formatter precision must be an integer", `${value} is not a valid precision value`)
+          "Formatter precision must be an integer", `${value} is not a valid precision value`),
       );
 
       let outOfBoundValues = [-1, 21, -Infinity, Infinity];
       outOfBoundValues.forEach((value) =>
         (<any> assert).throws(() => Plottable.Formatters.percentage(<any> value), Error,
-          "Formatter precision must be between 0 and 20", `${value} is not a valid precision value`)
+          "Formatter precision must be between 0 and 20", `${value} is not a valid precision value`),
       );
     });
 
@@ -225,7 +221,7 @@ describe("Formatters", () => {
       let percentFormatter = Plottable.Formatters.percentage();
       nonNumericValues.forEach((value) =>
         (<any> assert).throws(() => percentFormatter(<any> value), Error,
-          "error message TBD", `${value} is not a valid value for Formatter.percentage`)
+          "error message TBD", `${value} is not a valid value for Formatter.percentage`),
       );
     });
   });
@@ -256,13 +252,13 @@ describe("Formatters", () => {
       let nonIntegerValues = [null, 2.1, NaN, "5", "abc"];
       nonIntegerValues.forEach((value) =>
         (<any> assert).throws(() => Plottable.Formatters.siSuffix(<any> value), Error,
-          "Formatter precision must be an integer", `${value} is not a valid precision value`)
+          "Formatter precision must be an integer", `${value} is not a valid precision value`),
       );
 
       let outOfBoundValues = [-1, 21, -Infinity, Infinity];
       outOfBoundValues.forEach((value) =>
         (<any> assert).throws(() => Plottable.Formatters.siSuffix(<any> value), Error,
-          "Formatter precision must be between 0 and 20", `${value} is not a valid precision value`)
+          "Formatter precision must be between 0 and 20", `${value} is not a valid precision value`),
       );
     });
 
@@ -271,7 +267,7 @@ describe("Formatters", () => {
       let lnFormatter = Plottable.Formatters.siSuffix();
       nonNumericValues.forEach((value) =>
         (<any> assert).throws(() => lnFormatter(<any> value), Error,
-          "error message TBD", `${value} is not a valid value for Formatter.siSuffix`)
+          "error message TBD", `${value} is not a valid value for Formatter.siSuffix`),
       );
     });
   });
@@ -366,13 +362,13 @@ describe("Formatters", () => {
       let nonIntegerValues = [null, 2.1, NaN, "5", "abc"];
       nonIntegerValues.forEach((value) =>
         (<any> assert).throws(() => Plottable.Formatters.shortScale(<any> value), Error,
-          "Formatter precision must be an integer", `${value} is not a valid precision value`)
+          "Formatter precision must be an integer", `${value} is not a valid precision value`),
       );
 
       let outOfBoundValues = [-1, 21, -Infinity, Infinity];
       outOfBoundValues.forEach((value) =>
         (<any> assert).throws(() => Plottable.Formatters.shortScale(<any> value), Error,
-          "Formatter precision must be between 0 and 20", `${value} is not a valid precision value`)
+          "Formatter precision must be between 0 and 20", `${value} is not a valid precision value`),
       );
     });
   });

@@ -1,12 +1,11 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
 
 import * as Plottable from "../../src";
+import { BarOrientation } from "../../src/plots/barPlot";
 
 import * as TestMethods from "../testMethods";
-import { BarOrientation } from "../../src/plots/barPlot";
 
 describe("Plots", () => {
   describe("Vertical Stacked Bar Plot", () => {
@@ -52,7 +51,7 @@ describe("Plots", () => {
         let dataCount = stackedBarPlot.datasets().length * dataLength;
         assert.strictEqual(bars.size(), dataCount, "same number of bars as data");
 
-        let calculateStackedYs = (yAccessor: Plottable.Accessor<number>) => {
+        let calculateStackedYs = (yAccessor: Plottable.IAccessor<number>) => {
           let stackedYDataArray: number[][] = [];
           stackedBarPlot.datasets().forEach((dataset, datasetIndex) => {
             let yData = dataset.data().map((d, i) => yAccessor(d, i, dataset));
@@ -222,7 +221,7 @@ describe("Plots", () => {
         stackedBarPlot.labelsEnabled(true);
         yScale.domain([-3, 0]);
         const stackedBarLabels = stackedBarPlot.content().selectAll<Element, any>(".stacked-bar-label");
-        assert.strictEqual(stackedBarLabels.size(), 0)
+        assert.strictEqual(stackedBarLabels.size(), 0);
       });
 
       it("doesn't show stacked bar labels when columns are too narrow", () => {
@@ -230,7 +229,7 @@ describe("Plots", () => {
         xScale.range([0, 40]);
         xScale.domain(xScale.domain());
         const stackedBarLabels = stackedBarPlot.content().selectAll<Element, any>(".stacked-bar-label");
-        assert.strictEqual(stackedBarLabels.size(), 0)
+        assert.strictEqual(stackedBarLabels.size(), 0);
       });
 
       it("renders rects offset by previous values", () => {
@@ -240,7 +239,7 @@ describe("Plots", () => {
         let dataCount = stackedBarPlot.datasets().length * dataLength;
         assert.strictEqual(bars.size(), dataCount, "same number of bars as data");
 
-        let calculateStackedYs = (yAccessor: Plottable.Accessor<number>) => {
+        let calculateStackedYs = (yAccessor: Plottable.IAccessor<number>) => {
           let stackedYDataArray: number[][] = [];
           stackedBarPlot.datasets().forEach((dataset, datasetIndex) => {
             let yData = dataset.data().map((d, i) => yAccessor(d, i, dataset));
@@ -441,7 +440,7 @@ describe("Plots", () => {
         xScale.domain([0, 3]);
         stackedBarPlot.labelsEnabled(true);
         const stackedBarLabels = stackedBarPlot.content().selectAll<Element, any>(".stacked-bar-label");
-        assert.strictEqual(stackedBarLabels.size(), 0)
+        assert.strictEqual(stackedBarLabels.size(), 0);
       });
 
       it("doesn't show stacked bar labels when columns are too narrow", () => {
@@ -449,7 +448,7 @@ describe("Plots", () => {
         yScale.range([0, 40]);
         yScale.domain(yScale.domain());
         const stackedBarLabels = stackedBarPlot.content().selectAll<Element, any>(".stacked-bar-label");
-        assert.strictEqual(stackedBarLabels.size(), 0)
+        assert.strictEqual(stackedBarLabels.size(), 0);
       });
 
       it("renders rects offset by previous values", () => {
@@ -459,7 +458,7 @@ describe("Plots", () => {
         let dataCount = stackedBarPlot.datasets().length * dataLength;
         assert.strictEqual(bars.size(), dataCount, "same number of bars as data");
 
-        let calculateStackedXs = (xAccessor: Plottable.Accessor<number>) => {
+        let calculateStackedXs = (xAccessor: Plottable.IAccessor<number>) => {
           let stackedXDataArray: number[][] = [];
           stackedBarPlot.datasets().forEach((dataset, datasetIndex) => {
             let xData = dataset.data().map((d, i) => xAccessor(d, i, dataset));

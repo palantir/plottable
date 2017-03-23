@@ -1,4 +1,3 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -12,7 +11,7 @@ describe("Interactions", () => {
     const DIV_WIDTH = 400;
     const DIV_HEIGHT = 400;
 
-  let clickedPoint: Plottable.Point;
+    let clickedPoint: Plottable.Point;
     let div: d3.Selection<HTMLDivElement, any, any, any>;
     let component: Plottable.Component;
     let clickInteraction: Plottable.Interactions.Click;
@@ -40,7 +39,7 @@ describe("Interactions", () => {
       calledCount: number;
       reset: () => void;
       (p: Plottable.Point): void;
-    }
+    };
 
     function makeClickCallback() {
       let callback = <ClickTestCallback> function(p?: Plottable.Point) {
@@ -103,7 +102,7 @@ describe("Interactions", () => {
         assert.strictEqual(
           clickInteraction.onClick(callback),
           clickInteraction,
-          "registration returns the calling Interaction"
+          "registration returns the calling Interaction",
         );
         clickPoint(clickedPoint);
         runAsserts(() => {
@@ -118,12 +117,12 @@ describe("Interactions", () => {
         assert.strictEqual(
           clickInteraction.offClick(callback),
           clickInteraction,
-          "deregistration returns the calling Interaction"
+          "deregistration returns the calling Interaction",
         );
         clickPoint(clickedPoint);
 
         runAsserts(() => {
-          assert.isFalse(callback.called, "Callback should be disconnected from the Interaction")
+          assert.isFalse(callback.called, "Callback should be disconnected from the Interaction");
         }, done);
       });
 
@@ -162,7 +161,7 @@ describe("Interactions", () => {
         assert.strictEqual(
           clickInteraction.onDoubleClick(callback),
           clickInteraction,
-          "registration returns the calling Interaction"
+          "registration returns the calling Interaction",
         );
         doubleClickPoint(clickedPoint);
         runAsserts(() => {
@@ -177,7 +176,7 @@ describe("Interactions", () => {
         assert.strictEqual(
           clickInteraction.offDoubleClick(callback),
           clickInteraction,
-          "deregistration returns the calling Interaction"
+          "deregistration returns the calling Interaction",
         );
         doubleClickPoint(clickedPoint);
 

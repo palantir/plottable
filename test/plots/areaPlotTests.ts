@@ -1,4 +1,3 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -213,6 +212,6 @@ describe("Plots", () => {
         return { x: x, y: y0 };
       }).reverse();
       return points.concat(bottomPoints);
-    };
+    }
   });
 });

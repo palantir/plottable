@@ -4,8 +4,6 @@ import { assert } from "chai";
 
 import * as Plottable from "../../src";
 
-import * as TestMethods from "../testMethods";
-
 describe("Utils.Color", () => {
   it("lightenColor()", () => {
     let colorHex = "#12fced";

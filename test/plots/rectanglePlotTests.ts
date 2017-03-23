@@ -1,4 +1,3 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -91,8 +90,10 @@ describe("Plots", () => {
         plot.addDataset(new Plottable.Dataset(data));
         plot.renderTo(div);
 
-        const entities = plot.entitiesAt({ x: (xScale.scale(data[2].x) + xScale.scale(data[3].x)) / 2,
-          y: (yScale.scale(data[2].y) + yScale.scale(data[3].y)) / 2, });
+        const entities = plot.entitiesAt({
+          x: (xScale.scale(data[2].x) + xScale.scale(data[3].x)) / 2,
+          y: (yScale.scale(data[2].y) + yScale.scale(data[3].y)) / 2,
+        });
         assert.lengthOf(entities, 1, "found only one entity when querying a point inside a rectangle");
         assert.strictEqual(entities[0].index, 2, "entity retrieved is at index 2");
         div.remove();
@@ -125,9 +126,9 @@ describe("Plots", () => {
 
         const entities = plot.entitiesIn({
           topLeft: { x: (xScale.scale(data[1].x) + xScale.scale(data[2].x)) / 2,
-            y: (yScale.scale(data[2].y) + yScale.scale(data[3].y)) / 2, },
+            y: (yScale.scale(data[2].y) + yScale.scale(data[3].y)) / 2 },
           bottomRight: { x: (xScale.scale(data[2].x) + xScale.scale(data[3].x)) / 2,
-            y: (yScale.scale(data[1].y) + yScale.scale(data[2].y)) / 2, }, });
+            y: (yScale.scale(data[1].y) + yScale.scale(data[2].y)) / 2 } });
         assert.lengthOf(entities, 2, "retrieved 2 entities intersect with the box");
         assert.strictEqual(entities[0].index, 1, "the entity of index 1 is retrieved");
         assert.strictEqual(entities[1].index, 2, "the entity of index 2 is retrieved");
@@ -147,7 +148,7 @@ describe("Plots", () => {
           {
             min: (yScale.scale(data[2].y) + yScale.scale(data[3].y)) / 2,
             max: (yScale.scale(data[1].y) + yScale.scale(data[2].y)) / 2,
-          }
+          },
         );
         assert.lengthOf(entities, 2, "retrieved 2 entities intersect with the box");
         assert.strictEqual(entities[0].index, 1, "the entity of index 1 is retrieved");

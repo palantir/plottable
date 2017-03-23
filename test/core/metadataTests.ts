@@ -3,10 +3,10 @@ import * as d3 from "d3";
 import { assert } from "chai";
 
 import * as Plottable from "../../src";
+import { BarOrientation } from "../../src/plots/barPlot";
+import { getTranslateValues } from "../../src/utils/domUtils";
 
 import * as TestMethods from "../testMethods";
-import { getTranslateValues } from "../../src/utils/domUtils";
-import { BarOrientation } from "../../src/plots/barPlot";
 
 describe("Metadata", () => {
   let xScale: Plottable.Scales.Linear;

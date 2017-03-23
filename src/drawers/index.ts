@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import { Animator } from "../animators/animator";
+import { IAnimator } from "../animators/animator";
 import { AttributeToAppliedProjector, AttributeToProjector } from "../core/interfaces";
 
 export * from "./arcDrawer";
@@ -21,7 +21,7 @@ export * from "./symbolDrawer";
  */
 export type DrawStep = {
   attrToProjector: AttributeToProjector;
-  animator: Animator;
+  animator: IAnimator;
 };
 
 /**
@@ -29,5 +29,5 @@ export type DrawStep = {
  */
 export type AppliedDrawStep = {
   attrToAppliedProjector: AttributeToAppliedProjector;
-  animator: Animator;
+  animator: IAnimator;
 };
