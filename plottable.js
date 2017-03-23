@@ -5520,12 +5520,10 @@ var svgDrawer_1 = __webpack_require__(8);
 var RectangleSVGDrawer = (function (_super) {
     __extends(RectangleSVGDrawer, _super);
     function RectangleSVGDrawer(_rootClassName) {
-        if (_rootClassName === void 0) { _rootClassName = null; }
+        if (_rootClassName === void 0) { _rootClassName = ""; }
         var _this = _super.call(this, "rect", "") || this;
         _this._rootClassName = _rootClassName;
-        if (_this._rootClassName != null) {
-            _this._root.classed(_this._rootClassName, true);
-        }
+        _this._root.classed(_this._rootClassName, true);
         return _this;
     }
     return RectangleSVGDrawer;

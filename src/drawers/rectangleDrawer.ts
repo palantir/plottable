@@ -10,11 +10,9 @@ import { CanvasDrawStep } from "./canvasDrawer";
 import { SVGDrawer } from "./svgDrawer";
 
 export class RectangleSVGDrawer extends SVGDrawer {
-  constructor(private _rootClassName: string = null) {
+  constructor(private _rootClassName: string = "") {
     super("rect", "");
-    if (this._rootClassName != null) {
-      this._root.classed(this._rootClassName, true);
-    }
+    this._root.classed(this._rootClassName, true);
   }
 }
 
