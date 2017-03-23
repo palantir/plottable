@@ -16,41 +16,41 @@
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
-/******/
+
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
-/******/
+
 /******/ 		// Check if module is in cache
 /******/ 		if(installedModules[moduleId])
 /******/ 			return installedModules[moduleId].exports;
-/******/
+
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
 /******/ 			l: false,
 /******/ 			exports: {}
 /******/ 		};
-/******/
+
 /******/ 		// Execute the module function
 /******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/
+
 /******/ 		// Flag the module as loaded
 /******/ 		module.l = true;
-/******/
+
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-/******/
-/******/
+
+
 /******/ 	// expose the modules object (__webpack_modules__)
 /******/ 	__webpack_require__.m = modules;
-/******/
+
 /******/ 	// expose the module cache
 /******/ 	__webpack_require__.c = installedModules;
-/******/
+
 /******/ 	// identity function for calling harmony imports with the correct context
 /******/ 	__webpack_require__.i = function(value) { return value; };
-/******/
+
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
 /******/ 		if(!__webpack_require__.o(exports, name)) {
@@ -61,7 +61,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 			});
 /******/ 		}
 /******/ 	};
-/******/
+
 /******/ 	// getDefaultExport function for compatibility with non-harmony modules
 /******/ 	__webpack_require__.n = function(module) {
 /******/ 		var getter = module && module.__esModule ?
@@ -70,13 +70,13 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 		__webpack_require__.d(getter, 'a', getter);
 /******/ 		return getter;
 /******/ 	};
-/******/
+
 /******/ 	// Object.prototype.hasOwnProperty.call
 /******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-/******/
+
 /******/ 	// __webpack_public_path__
 /******/ 	__webpack_require__.p = "";
-/******/
+
 /******/ 	// Load entry module and return exports
 /******/ 	return __webpack_require__(__webpack_require__.s = 125);
 /******/ })
@@ -2877,6 +2877,43 @@ var Axis = (function (_super) {
         _super.prototype.destroy.call(this);
         this._scale.offUpdate(this._rescaleCallback);
     };
+    /**
+     * Gets the tick label data (including hidden) at a particular point in the direction of the axis.
+     *
+     * @param {Point} point
+     */
+    Axis.prototype.tickLabelDataAt = function (point) {
+        var _this = this;
+        var pointValue = this.isHorizontal() ? point.x : point.y;
+        var tickValues = this._getTickValues();
+        // find the closest label via scaling since it's more performant than getBBox
+        var scaledTickLabels = tickValues.map(function (tickValue) { return _this._scale.scale(tickValue); });
+        var closestTickDistance = Infinity;
+        var closestTickIndex;
+        scaledTickLabels.forEach(function (scaledTickLabel, index) {
+            var distance = Math.abs(scaledTickLabel - pointValue);
+            if (distance < closestTickDistance) {
+                closestTickDistance = distance;
+                closestTickIndex = index;
+            }
+        });
+        // check whether the click point is inside the closest label text
+        var axis = this;
+        var tickLabelData;
+        this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS)
+            .each(function (data, index) {
+            if (index === closestTickIndex) {
+                var labelDimension = axis.isHorizontal() ? this.getBBox().width : this.getBBox().height;
+                var start = scaledTickLabels[index] - (labelDimension / 2);
+                var end = scaledTickLabels[index] + (labelDimension / 2);
+                if (start <= pointValue && pointValue <= end) {
+                    tickLabelData = data;
+                }
+            }
+        });
+        return tickLabelData;
+    };
+    ;
     Axis.prototype._computeWidth = function () {
         // to be overridden by subclass logic
         return this._maxLabelTickLength();
