@@ -10,22 +10,22 @@ import * as TestMethods from "../testMethods";
 describe("Group", () => {
   describe("Basic add/remove/has functionality", () => {
     it("appends Components with append()", () => {
-      let componentGroup = new Plottable.Components.Group();
+      const componentGroup = new Plottable.Components.Group();
 
-      let c1 = new Plottable.Component();
+      const c1 = new Plottable.Component();
       componentGroup.append(c1);
       assert.deepEqual(componentGroup.components(), [c1], "Component 1 was added to the Group");
 
-      let c2 = new Plottable.Component();
+      const c2 = new Plottable.Component();
       componentGroup.append(c2);
       assert.deepEqual(componentGroup.components(), [c1, c2], "appended Component 2 to the Group");
 
       componentGroup.append(c1);
       assert.deepEqual(componentGroup.components(), [c1, c2], "adding an already-added Component does nothing");
 
-      let div = TestMethods.generateDiv();
+      const div = TestMethods.generateDiv();
       componentGroup.renderTo(div);
-      let c3 = new Plottable.Component();
+      const c3 = new Plottable.Component();
       componentGroup.append(c3);
       assert.deepEqual(componentGroup.components(), [c1, c2, c3], "Components can be append()ed after rendering");
 
@@ -33,8 +33,8 @@ describe("Group", () => {
     });
 
     it("can append() null to a Group without failing", () => {
-      let group = new Plottable.Components.Group();
-      let component = new Plottable.Component;
+      const group = new Plottable.Components.Group();
+      const component = new Plottable.Component;
 
       group.append(component);
 
@@ -46,17 +46,17 @@ describe("Group", () => {
     });
 
     it("removes Components using remove()", () => {
-      let c1 = new Plottable.Component();
-      let c2 = new Plottable.Component();
-      let c3 = new Plottable.Component();
+      const c1 = new Plottable.Component();
+      const c2 = new Plottable.Component();
+      const c3 = new Plottable.Component();
 
-      let componentGroup = new Plottable.Components.Group([c1, c2, c3]);
+      const componentGroup = new Plottable.Components.Group([c1, c2, c3]);
       assert.deepEqual(componentGroup.components(), [c1, c2, c3], "Group initialized correctly");
 
       componentGroup.remove(c2);
       assert.deepEqual(componentGroup.components(), [c1, c3], "removing a Component respects the order of the remaining Components");
 
-      let div = TestMethods.generateDiv();
+      const div = TestMethods.generateDiv();
       c2.renderTo(div);
       componentGroup.remove(c2);
       assert.deepEqual(componentGroup.components(), [c1, c3],
@@ -67,8 +67,8 @@ describe("Group", () => {
     });
 
     it("checks for Components using has()", () => {
-      let component = new Plottable.Component();
-      let group = new Plottable.Components.Group([component]);
+      const component = new Plottable.Component();
+      const group = new Plottable.Components.Group([component]);
       assert.isTrue(group.has(component), "correctly checks that Component is in the Group");
       group.remove(component);
       assert.isFalse(group.has(component), "correctly checks that Component is no longer in the Group");
@@ -79,11 +79,11 @@ describe("Group", () => {
 
   describe("Detaching constituent Components", () => {
     it("takes its constutuent Components with it when detach()ed or anchor()ed", () => {
-      let c1 = new Plottable.Component();
-      let c2 = new Plottable.Component();
-      let group = new Plottable.Components.Group([c1, c2]);
+      const c1 = new Plottable.Component();
+      const c2 = new Plottable.Component();
+      const group = new Plottable.Components.Group([c1, c2]);
 
-      let div = TestMethods.generateDiv();
+      const div = TestMethods.generateDiv();
 
       group.renderTo(div);
       assert.isTrue(TestMethods.isInDOM(group), "Group was added to the DOM");
@@ -104,29 +104,29 @@ describe("Group", () => {
     });
 
     it("detach()es Components from their previous location when they are append()ed", () => {
-      let component = new Plottable.Component;
-      let div = TestMethods.generateDiv();
+      const component = new Plottable.Component;
+      const div = TestMethods.generateDiv();
       component.renderTo(div);
-      let group = new Plottable.Components.Group();
+      const group = new Plottable.Components.Group();
       group.append(component);
       assert.isFalse((<Node> div.node()).hasChildNodes(), "Component was detach()ed");
       div.remove();
     });
 
     it("removes Components if detach() is called on them (before rendering)", () => {
-      let component = new Plottable.Component();
-      let group = new Plottable.Components.Group([component]);
+      const component = new Plottable.Component();
+      const group = new Plottable.Components.Group([component]);
       component.detach();
       assert.lengthOf(group.components(), 0, "Component is no longer in the Group");
       assert.isNull(component.parent(), "Component disconnected from Group");
     });
 
     it("removes Components if detach() is called on them (after rendering)", () => {
-      let c1 = new Plottable.Component();
-      let c2 = new Plottable.Component();
-      let group = new Plottable.Components.Group([c1, c2]);
+      const c1 = new Plottable.Component();
+      const c2 = new Plottable.Component();
+      const group = new Plottable.Components.Group([c1, c2]);
 
-      let div = TestMethods.generateDiv();
+      const div = TestMethods.generateDiv();
       group.renderTo(div);
 
       assert.isTrue(TestMethods.isInDOM(c1), "Component 1 was added to the DOM");
@@ -142,11 +142,11 @@ describe("Group", () => {
     });
 
     it("can move Components to other Groups after anchoring", () => {
-      let div = TestMethods.generateDiv();
+      const div = TestMethods.generateDiv();
 
-      let group1 = new Plottable.Components.Group();
-      let group2 = new Plottable.Components.Group();
-      let component = new Plottable.Component();
+      const group1 = new Plottable.Components.Group();
+      const group2 = new Plottable.Components.Group();
+      const component = new Plottable.Component();
 
       group1.append(component);
       group1.renderTo(div);
@@ -165,11 +165,11 @@ describe("Group", () => {
     });
 
     it("destroy()s its Components when destroy()ed", () => {
-      let c1 = new Plottable.Component();
-      let c2 = new Plottable.Component();
-      let group = new Plottable.Components.Group([c1, c2]);
+      const c1 = new Plottable.Component();
+      const c2 = new Plottable.Component();
+      const group = new Plottable.Components.Group([c1, c2]);
 
-      let div = TestMethods.generateDiv();
+      const div = TestMethods.generateDiv();
       group.renderTo(div);
 
       group.destroy();
@@ -182,8 +182,8 @@ describe("Group", () => {
   });
 
   describe("Layout", () => {
-    let DIV_WIDTH = 400;
-    let DIV_HEIGHT = 400;
+    const DIV_WIDTH = 400;
+    const DIV_HEIGHT = 400;
     let div: d3.Selection<HTMLDivElement, any, any, any>;
 
     beforeEach(() => {
@@ -191,9 +191,9 @@ describe("Group", () => {
     });
 
     it("requests no space when empty, but occupies all offered space", () => {
-      let group = new Plottable.Components.Group([]);
+      const group = new Plottable.Components.Group([]);
 
-      let request = group.requestedSpace(DIV_WIDTH, DIV_HEIGHT);
+      const request = group.requestedSpace(DIV_WIDTH, DIV_HEIGHT);
       TestMethods.verifySpaceRequest(request, 0, 0, "empty Group doesn't request any space");
 
       group.renderTo(div);
@@ -203,12 +203,12 @@ describe("Group", () => {
     });
 
     it("requests space correctly when it contains a non-fixed-size Component", () => {
-      let c1 = new Plottable.Component();
-      let c2 = new Plottable.Component();
-      let group = new Plottable.Components.Group([c1, c2]);
+      const c1 = new Plottable.Component();
+      const c2 = new Plottable.Component();
+      const group = new Plottable.Components.Group([c1, c2]);
 
-      let groupRequest = group.requestedSpace(DIV_WIDTH, DIV_HEIGHT);
-      let c1Request = c1.requestedSpace(DIV_WIDTH, DIV_HEIGHT);
+      const groupRequest = group.requestedSpace(DIV_WIDTH, DIV_HEIGHT);
+      const c1Request = c1.requestedSpace(DIV_WIDTH, DIV_HEIGHT);
       assert.deepEqual(groupRequest, c1Request, "request reflects request of sub-component");
       assert.isFalse(group.fixedWidth(), "width is not fixed if subcomponents are not fixed width");
       assert.isFalse(group.fixedHeight(), "height is not fixed if subcomponents are not fixed height");
@@ -220,16 +220,16 @@ describe("Group", () => {
     });
 
     it("requests space correctly when it contains fixed-size Components", () => {
-      let tallComponent = new Mocks.FixedSizeComponent(DIV_WIDTH / 4, DIV_WIDTH / 2);
-      let wideComponent = new Mocks.FixedSizeComponent(DIV_WIDTH / 2, DIV_WIDTH / 4);
+      const tallComponent = new Mocks.FixedSizeComponent(DIV_WIDTH / 4, DIV_WIDTH / 2);
+      const wideComponent = new Mocks.FixedSizeComponent(DIV_WIDTH / 2, DIV_WIDTH / 4);
 
-      let group = new Plottable.Components.Group([tallComponent, wideComponent]);
+      const group = new Plottable.Components.Group([tallComponent, wideComponent]);
 
-      let request = group.requestedSpace(DIV_WIDTH, DIV_HEIGHT);
+      const request = group.requestedSpace(DIV_WIDTH, DIV_HEIGHT);
       assert.strictEqual(request.minWidth, DIV_WIDTH / 2, "requested enough space for widest Component");
       assert.strictEqual(request.minHeight, DIV_HEIGHT / 2, "requested enough space for tallest Component");
 
-      let constrainedRequest = group.requestedSpace(DIV_WIDTH / 10, DIV_HEIGHT / 10);
+      const constrainedRequest = group.requestedSpace(DIV_WIDTH / 10, DIV_HEIGHT / 10);
       assert.strictEqual(constrainedRequest.minWidth, DIV_WIDTH / 2, "requested enough space for widest Component");
       assert.strictEqual(constrainedRequest.minHeight, DIV_HEIGHT / 2, "requested enough space for tallest Component");
 
@@ -240,17 +240,17 @@ describe("Group", () => {
     });
 
     it("allocates space to its Components correctly", () => {
-      let FIXED_COMPONENT_SIZE = DIV_WIDTH / 4;
-      let fixedComponent = new Mocks.FixedSizeComponent(FIXED_COMPONENT_SIZE, FIXED_COMPONENT_SIZE);
+      const FIXED_COMPONENT_SIZE = DIV_WIDTH / 4;
+      const fixedComponent = new Mocks.FixedSizeComponent(FIXED_COMPONENT_SIZE, FIXED_COMPONENT_SIZE);
       fixedComponent.xAlignment("right").yAlignment("bottom");
-      let unfixedComponent = new Plottable.Component();
+      const unfixedComponent = new Plottable.Component();
 
-      let group = new Plottable.Components.Group([fixedComponent, unfixedComponent]);
+      const group = new Plottable.Components.Group([fixedComponent, unfixedComponent]);
       group.renderTo(div);
 
       assert.strictEqual(fixedComponent.width(), FIXED_COMPONENT_SIZE, "fixed-size Component has correct width");
       assert.strictEqual(fixedComponent.height(), FIXED_COMPONENT_SIZE, "fixed-size Component has correct height");
-      let expectedFixedOrigin = {
+      const expectedFixedOrigin = {
         x: DIV_WIDTH - FIXED_COMPONENT_SIZE,
         y: DIV_HEIGHT - FIXED_COMPONENT_SIZE,
       };
@@ -258,7 +258,7 @@ describe("Group", () => {
 
       assert.strictEqual(unfixedComponent.width(), DIV_WIDTH, "non-fixed-size Component has correct width");
       assert.strictEqual(unfixedComponent.height(), DIV_HEIGHT, "non-fixed-size Component has correct height");
-      let expectedUnfixedOrigin = {
+      const expectedUnfixedOrigin = {
         x: 0,
         y: 0,
       };

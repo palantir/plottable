@@ -12,11 +12,11 @@ describe("Scales", () => {
       });
 
       it("generates ticks within domain", () => {
-        let start = 0.5;
-        let end = 4.01;
-        let interval = 1;
+        const start = 0.5;
+        const end = 4.01;
+        const interval = 1;
         scale.domain([start, end]);
-        let ticks = Plottable.Scales.TickGenerators.intervalTickGenerator(interval)(scale);
+        const ticks = Plottable.Scales.TickGenerators.intervalTickGenerator(interval)(scale);
 
         assert.strictEqual(ticks.length, 6, "ticks are generated");
         ticks.forEach((tick) => {
@@ -26,27 +26,27 @@ describe("Scales", () => {
       });
 
       it("generates ticks for a domain crossing 0", () => {
-        let start = -1.5;
-        let end = 1;
-        let interval = 0.5;
+        const start = -1.5;
+        const end = 1;
+        const interval = 0.5;
         scale.domain([start, end]);
-        let ticks = Plottable.Scales.TickGenerators.intervalTickGenerator(interval)(scale);
+        const ticks = Plottable.Scales.TickGenerators.intervalTickGenerator(interval)(scale);
         assert.deepEqual(ticks, [-1.5, -1, -0.5, 0, 0.5, 1], "generated all number divisible by 0.5 in domain");
       });
 
       it("generates ticks with reversed domain", () => {
-        let start = -2.2;
-        let end = -7.6;
-        let interval = 2.5;
+        const start = -2.2;
+        const end = -7.6;
+        const interval = 2.5;
         scale.domain([start, end]);
-        let ticks = Plottable.Scales.TickGenerators.intervalTickGenerator(interval)(scale);
+        const ticks = Plottable.Scales.TickGenerators.intervalTickGenerator(interval)(scale);
         assert.deepEqual(ticks, [-7.6, -7.5, -5, -2.5, -2.2], "generated all ticks between lower and higher value");
       });
 
       it("returns the ends of the domain if interval is NaN or bigger than the domain", () => {
-        let start = 0.5;
-        let end = 10.01;
-        let interval = 11;
+        const start = 0.5;
+        const end = 10.01;
+        const interval = 11;
         scale.domain([start, end]);
         let ticks = Plottable.Scales.TickGenerators.intervalTickGenerator(interval)(scale);
         assert.deepEqual(ticks, [start, end], "no middle ticks were added when interval is 11");
@@ -59,10 +59,10 @@ describe("Scales", () => {
       });
 
       it("works for Scales.ModifiedLog", () => {
-        let logScale = new Plottable.Scales.ModifiedLog(2);
-        let interval = 40;
+        const logScale = new Plottable.Scales.ModifiedLog(2);
+        const interval = 40;
         logScale.domain([0, 100]);
-        let logTicks = Plottable.Scales.TickGenerators.intervalTickGenerator(interval)(logScale);
+        const logTicks = Plottable.Scales.TickGenerators.intervalTickGenerator(interval)(logScale);
         assert.deepEqual(logTicks, [0, 40, 80, 100], "generates ticks for Scales.ModifiedLog");
       });
 
@@ -77,13 +77,13 @@ describe("Scales", () => {
       // HACKHACK #2743: skipping failing test
       // intervalTickGenerator() does not detect invalid scale
       it.skip("rejects non-QuantitativeScale<number> Scales", () => {
-        let interval = 1;
-        let categoryScale: any = new Plottable.Scales.Category();
+        const interval = 1;
+        const categoryScale: any = new Plottable.Scales.Category();
         // HACKHACK #2614: chai-assert.d.ts has the wrong signature
         (<any> assert).throws(() => Plottable.Scales.TickGenerators.intervalTickGenerator(interval)(categoryScale), Error,
           "scale needs to inherit from Scale.QuantitativeScale<number>", "Scales.Category is not a valid parameter for TickGenerators");
 
-        let timeScale: any = new Plottable.Scales.Time();
+        const timeScale: any = new Plottable.Scales.Time();
         (<any> assert).throws(() => Plottable.Scales.TickGenerators.intervalTickGenerator(interval)(timeScale), Error,
           "scale needs to inherit from Scale.QuantitativeScale<number>", "Scales.Time is not a valid parameter for TickGenerators");
       });
@@ -123,21 +123,21 @@ describe("Scales", () => {
       // HACKHACK #2743: skipping failing test
       // integerTickGenerator() returns an array of powers instead of actual value
       it.skip("works for Scales.ModifiedLog", () => {
-        let logScale = new Plottable.Scales.ModifiedLog(2);
+        const logScale = new Plottable.Scales.ModifiedLog(2);
         logScale.domain([-2, 4.5]);
-        let logTicks = integerTickGenerator(logScale);
+        const logTicks = integerTickGenerator(logScale);
         assert.deepEqual(logTicks, [-2, -1, 0, 1, 2, 4, 4.5], "generates interger ticks for Scales.ModifiedLog");
       });
 
       // HACKHACK #2743: skipping failing test
       // integerTickGenerator() does not detect invalids scale
       it.skip("rejects non-QuantitativeScale<number> Scales", () => {
-        let categoryScale: any = new Plottable.Scales.Category();
+        const categoryScale: any = new Plottable.Scales.Category();
         // HACKHACK #2614: chai-assert.d.ts has the wrong signature
         (<any> assert).throws(() => integerTickGenerator(categoryScale), Error,
           "scale needs to inherit from Scale.QuantitativeScale<number>", "Scales.Category is not a valid parameter for TickGenerators");
 
-        let timeScale: any = new Plottable.Scales.Time();
+        const timeScale: any = new Plottable.Scales.Time();
         (<any> assert).throws(() => integerTickGenerator(timeScale), Error,
           "scale needs to inherit from Scale.QuantitativeScale<number>", "Scales.Time is not a valid parameter for TickGenerators");
       });

@@ -246,7 +246,7 @@ describe("Plots", () => {
       it("retrieves undefined from entityNearest when no entities are rendered", () => {
         plot.datasets([new Plottable.Dataset([])]);
         plot.renderTo(div);
-        let closest = plot.entityNearest({
+        const closest = plot.entityNearest({
           x: plot.width() / 2,
           y: plot.height() / 2,
         });

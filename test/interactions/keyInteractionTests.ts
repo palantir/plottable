@@ -45,7 +45,7 @@ describe("Interactions", () => {
 
         beforeEach(() => {
           div = TestMethods.generateDiv();
-          let component = new Plottable.Component().renderTo(div);
+          const component = new Plottable.Component().renderTo(div);
           eventTarget = component.background();
           keyInteraction = new Plottable.Interactions.Key();
           keyInteraction.attachTo(component);
@@ -161,7 +161,7 @@ describe("Interactions", () => {
 
       beforeEach(() => {
         div = TestMethods.generateDiv();
-        let component = new Plottable.Component().renderTo(div);
+        const component = new Plottable.Component().renderTo(div);
         eventTarget = component.background();
         keyInteraction = new Plottable.Interactions.Key();
         keyInteraction.attachTo(component);
@@ -206,7 +206,7 @@ describe("Interactions", () => {
 
       beforeEach(() => {
         div = TestMethods.generateDiv();
-        let component = new Plottable.Component().renderTo(div);
+        const component = new Plottable.Component().renderTo(div);
         eventTarget = component.background();
         keyInteraction = new Plottable.Interactions.Key();
         keyInteraction.attachTo(component);

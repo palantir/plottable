@@ -159,7 +159,7 @@ describe("Plots", () => {
       it("retrieves undefined from entityNearest when no entities are rendered", () => {
         plot.addDataset(new Plottable.Dataset([]));
         plot.renderTo(div);
-        let closest = plot.entityNearest({
+        const closest = plot.entityNearest({
           x: plot.width() / 2,
           y: plot.height() / 2,
         });
@@ -415,26 +415,26 @@ describe("Plots", () => {
       });
 
       it("retrieves all selections with no args", () => {
-        let allCells = plot.selections();
+        const allCells = plot.selections();
         assert.strictEqual(allCells.size(), plot.datasets()[0].data().length, "rect for each datum");
-        let selectionData = allCells.data();
+        const selectionData = allCells.data();
         assert.includeMembers(selectionData, plot.datasets()[0].data(), "data in selection data");
         div.remove();
       });
 
       it("retrieves correct selections", () => {
-        let allCells = plot.selections([plot.datasets()[0]]);
+        const allCells = plot.selections([plot.datasets()[0]]);
         assert.strictEqual(allCells.size(), plot.datasets()[0].data().length, "rect for each datum");
-        let selectionData = allCells.data();
+        const selectionData = allCells.data();
         assert.includeMembers(selectionData, plot.datasets()[0].data(), "data in selection data");
         div.remove();
       });
 
       it("skips invalid Datasets", () => {
-        let dummyDataset = new Plottable.Dataset([]);
-        let allCells = plot.selections([plot.datasets()[0], dummyDataset]);
+        const dummyDataset = new Plottable.Dataset([]);
+        const allCells = plot.selections([plot.datasets()[0], dummyDataset]);
         assert.strictEqual(allCells.size(), plot.datasets()[0].data().length, "rect for each datum");
-        let selectionData = allCells.data();
+        const selectionData = allCells.data();
         assert.includeMembers(selectionData, plot.datasets()[0].data(), "data in selection data");
         div.remove();
       });
@@ -487,7 +487,7 @@ describe("Plots", () => {
       });
 
       it("hides labels when rectangles do not offer enough width", () => {
-        let constrainedWidth = 150;
+        const constrainedWidth = 150;
         div.style("width", constrainedWidth + "px");
         plot.renderTo(div);
         plot.labelsEnabled(true);
@@ -559,7 +559,7 @@ describe("Plots", () => {
         plot.datasets()[0].data(overlappingRectangleData);
         plot.renderTo(div);
 
-        let texts = plot.content().selectAll<Element, any>("text");
+        const texts = plot.content().selectAll<Element, any>("text");
         assert.strictEqual(texts.size(), 1, "only top most label is rendered");
         div.remove();
       });

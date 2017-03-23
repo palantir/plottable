@@ -9,9 +9,9 @@ describe("Scales", () => {
 
     describe("Basic Usage", () => {
       let scale: Plottable.Scales.ModifiedLog;
-      let base = 10;
-      let delta = 0.00001;
-      let epsilon = 0.00001;
+      const base = 10;
+      const delta = 0.00001;
+      const epsilon = 0.00001;
 
       beforeEach(() => {
         scale = new Plottable.Scales.ModifiedLog(base);
@@ -49,7 +49,7 @@ describe("Scales", () => {
       it("can be padded", () => {
         scale.addIncludedValuesProvider(() => [0, base]);
         scale.padProportion(0);
-        let unpaddedDomain = scale.domain();
+        const unpaddedDomain = scale.domain();
         scale.padProportion(0.1);
         assert.operator(scale.domain()[0], "<", unpaddedDomain[0], "left side of domain has been padded");
         assert.operator(unpaddedDomain[1], "<", scale.domain()[1], "right side of domain has been padded");
@@ -58,11 +58,11 @@ describe("Scales", () => {
       it("works on inverted domain", () => {
         scale.domain([200, -100]);
         scale.range([10, 20]);
-        let range = scale.range();
+        const range = scale.range();
         assert.strictEqual(scale.scale(-100), range[1], "minimum value in domain maps to maximum value in range");
         assert.strictEqual(scale.scale(200), range[0], "maximum value in domain maps to minimum value in range");
-        let a = [-100, -10, -3, 0, 1, 3.64, 50, 60, 200];
-        let b = a.map((x) => scale.scale(x));
+        const a = [-100, -10, -3, 0, 1, 3.64, 50, 60, 200];
+        const b = a.map((x) => scale.scale(x));
         assert.deepEqual(b, b.slice().sort().reverse(), "should be decreasing function; reverse is sorted");
       });
 
@@ -70,14 +70,14 @@ describe("Scales", () => {
 
     describe("Scale bases", () => {
       it("uses 10 as the default base", () => {
-        let scale = new Plottable.Scales.ModifiedLog();
+        const scale = new Plottable.Scales.ModifiedLog();
         scale.range([0, 1]);
         assert.strictEqual(scale.scale(10), 1, "10 is base");
         assert.strictEqual(scale.scale(100), 2, "10^2 will result in a double value compared to the base");
       });
 
       it("can scale values using base 2", () => {
-        let scale = new Plottable.Scales.ModifiedLog(2);
+        const scale = new Plottable.Scales.ModifiedLog(2);
         scale.domain([0, 16]);
         scale.range([0, 1]);
 
@@ -95,7 +95,7 @@ describe("Scales", () => {
 
     describe("Auto Domaining", () => {
       let scale: Plottable.Scales.ModifiedLog;
-      let base = 10;
+      const base = 10;
 
       beforeEach(() => {
         scale = new Plottable.Scales.ModifiedLog(base);
@@ -131,15 +131,15 @@ describe("Scales", () => {
       });
 
       it("can force the minimum of the domain with domainMin()", () => {
-        let requestedDomain = [-5, 5];
+        const requestedDomain = [-5, 5];
         scale.addIncludedValuesProvider(() => requestedDomain);
 
-        let minBelowBottom = -10;
+        const minBelowBottom = -10;
         assert.strictEqual(scale.domainMin(minBelowBottom), scale, "the scale is returned by the setter");
         assert.strictEqual(scale.domainMin(), minBelowBottom, "can get the domainMin()");
         assert.deepEqual(scale.domain(), [minBelowBottom, requestedDomain[1]], "lower end of domain was set by domainMin()");
 
-        let minInMiddle = 0;
+        const minInMiddle = 0;
         scale.domainMin(minInMiddle);
         assert.deepEqual(scale.domain(), [minInMiddle, requestedDomain[1]],
           "lower end was set even if requested value cuts off some data");
@@ -148,27 +148,27 @@ describe("Scales", () => {
         assert.deepEqual(scale.domain(), requestedDomain, "calling autoDomain() overrides domainMin()");
         assert.strictEqual(scale.domainMin(), scale.domain()[0], "returns autoDomain()-ed min value after autoDomain()-ing");
 
-        let minEqualTop = scale.domain()[1];
+        const minEqualTop = scale.domain()[1];
         scale.domainMin(minEqualTop);
         assert.deepEqual(scale.domain(), [minEqualTop, minEqualTop * base],
           "domain is set to [min, min * base] if the requested value is >= autoDomain()-ed max value");
 
         scale.domainMin(minInMiddle);
-        let requestedDomain2 = [-10, 10];
+        const requestedDomain2 = [-10, 10];
         scale.addIncludedValuesProvider(() => requestedDomain2);
         assert.deepEqual(scale.domain(), [minInMiddle, requestedDomain2[1]], "adding another ExtentsProvider doesn't change domainMin()");
       });
 
       it("can force the maximum of the domain with domainMax()", () => {
-        let requestedDomain = [-5, 5];
+        const requestedDomain = [-5, 5];
         scale.addIncludedValuesProvider(() => requestedDomain);
 
-        let maxAboveTop = 10;
+        const maxAboveTop = 10;
         assert.strictEqual(scale.domainMax(maxAboveTop), scale, "the scale is returned by the setter");
         assert.strictEqual(scale.domainMax(), maxAboveTop, "can get the domainMax()");
         assert.deepEqual(scale.domain(), [requestedDomain[0], maxAboveTop], "upper end of domain was set by domainMax()");
 
-        let maxInMiddle = 0;
+        const maxInMiddle = 0;
         scale.domainMax(maxInMiddle);
         assert.deepEqual(scale.domain(), [requestedDomain[0], maxInMiddle],
           "upper end was set even if requested value cuts off some data");
@@ -177,30 +177,30 @@ describe("Scales", () => {
         assert.deepEqual(scale.domain(), requestedDomain, "calling autoDomain() overrides domainMax()");
         assert.strictEqual(scale.domainMax(), scale.domain()[1], "returns autoDomain()-ed max value after autoDomain()-ing");
 
-        let maxEqualBottom = scale.domain()[0];
+        const maxEqualBottom = scale.domain()[0];
         scale.domainMax(maxEqualBottom);
         assert.deepEqual(scale.domain(), [maxEqualBottom * base, maxEqualBottom],
           "domain is set to [max * base, max] if the requested value is <= autoDomain()-ed min value and negative");
 
         scale.domainMax(maxInMiddle);
-        let requestedDomain2 = [-10, 10];
+        const requestedDomain2 = [-10, 10];
         scale.addIncludedValuesProvider(() => requestedDomain2);
         assert.deepEqual(scale.domain(), [requestedDomain2[0], maxInMiddle], "adding another ExtentsProvider doesn't change domainMax()");
       });
 
       it("can force the domain by using domainMin() and domainMax() together", () => {
-        let requestedDomain = [-5, 5];
+        const requestedDomain = [-5, 5];
         scale.addIncludedValuesProvider(() => requestedDomain);
 
-        let desiredMin = -10;
-        let desiredMax = 10;
+        const desiredMin = -10;
+        const desiredMax = 10;
         scale.domainMin(desiredMin);
         scale.domainMax(desiredMax);
         assert.deepEqual(scale.domain(), [desiredMin, desiredMax], "setting domainMin() and domainMax() sets the domain");
 
         scale.autoDomain();
-        let bigMin = 10;
-        let smallMax = -10;
+        const bigMin = 10;
+        const smallMax = -10;
         scale.domainMin(bigMin);
         scale.domainMax(smallMax);
         assert.deepEqual(scale.domain(), [bigMin, smallMax], "setting both is allowed even if it reverse the domain");
@@ -210,7 +210,7 @@ describe("Scales", () => {
     describe("Ticks", () => {
 
       let scale: Plottable.Scales.ModifiedLog;
-      let base = 10;
+      const base = 10;
 
       beforeEach(() => {
         scale = new Plottable.Scales.ModifiedLog(base);
@@ -228,9 +228,9 @@ describe("Scales", () => {
         scale.addIncludedValuesProvider(includedValuesProvider);
 
         ticks = scale.ticks();
-        let beforePivot = ticks.filter((x) => x <= -base);
-        let afterPivot = ticks.filter((x) => base <= x);
-        let betweenPivots = ticks.filter((x) => -base < x && x < base);
+        const beforePivot = ticks.filter((x) => x <= -base);
+        const afterPivot = ticks.filter((x) => base <= x);
+        const betweenPivots = ticks.filter((x) => -base < x && x < base);
         assert.operator(beforePivot.length, ">", 0, "there should be ticks before -base");
         assert.operator(afterPivot.length, ">", 0, "there should be ticks after base");
         assert.operator(betweenPivots.length, ">", 0, "there should be ticks between -base and base");
@@ -239,12 +239,12 @@ describe("Scales", () => {
       it("works on inverted domain", () => {
         scale.domain([200, -100]);
 
-        let ticks = scale.ticks();
+        const ticks = scale.ticks();
         assert.deepEqual(ticks, ticks.slice().sort((x, y) => x - y), "ticks should be sorted");
         assert.deepEqual(ticks, Plottable.Utils.Array.uniq(ticks), "ticks should not be repeated");
-        let beforePivot = ticks.filter((x) => x <= -base);
-        let afterPivot = ticks.filter((x) => base <= x);
-        let betweenPivots = ticks.filter((x) => -base < x && x < base);
+        const beforePivot = ticks.filter((x) => x <= -base);
+        const afterPivot = ticks.filter((x) => base <= x);
+        const betweenPivots = ticks.filter((x) => -base < x && x < base);
         assert.operator(beforePivot.length, ">", 0, "should be ticks before -base");
         assert.operator(afterPivot.length, ">", 0, "should be ticks after base");
         assert.operator(betweenPivots.length, ">", 0, "should be ticks between -base and base");
@@ -253,7 +253,7 @@ describe("Scales", () => {
       it("always has more than 2 ticks", () => {
         [null, [2, 9], [0, 1], [1, 2], [0.001, 0.01], [-0.1, 0.1], [-3, -2]].forEach((domain) => {
           scale.domain(domain);
-          let ticks = scale.ticks();
+          const ticks = scale.ticks();
           assert.operator(ticks.length, ">", 2, "there should be at least 2 ticks in domain " + domain);
         });
       });

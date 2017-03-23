@@ -42,7 +42,7 @@ describe("Interactions", () => {
     };
 
     function makeClickCallback() {
-      let callback = <ClickTestCallback> function(p?: Plottable.Point) {
+      const callback = <ClickTestCallback> function(p?: Plottable.Point) {
         callback.lastPoint = p;
         callback.called = true;
         callback.calledCount += 1;

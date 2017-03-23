@@ -41,7 +41,7 @@ describe("Interactions", () => {
     }
 
     function makeDragCallback() {
-      let callback = <IDragTestCallback> function(start: Plottable.Point, end: Plottable.Point) {
+      const callback = <IDragTestCallback> function(start: Plottable.Point, end: Plottable.Point) {
         callback.lastStartPoint = start;
         callback.lastEndPoint = end;
         callback.called = true;
@@ -224,7 +224,7 @@ describe("Interactions", () => {
         });
 
         it("does not continue dragging once the touch is cancelled", () => {
-          let target = component.background();
+          const target = component.background();
           const tenFromEndPoint = {
             x: endPoint.x - 10,
             y: endPoint.y - 10,

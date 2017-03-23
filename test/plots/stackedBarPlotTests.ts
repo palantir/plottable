@@ -20,16 +20,16 @@ describe("Plots", () => {
         xScale = new Plottable.Scales.Category();
         yScale = new Plottable.Scales.Linear();
 
-        let data1 = [
+        const data1 = [
           {x: "A", y: 1},
           {x: "B", y: 2},
         ];
-        let data2 = [
+        const data2 = [
           {x: "A", y: 2},
           {x: "B", y: 1},
         ];
-        let dataset1 = new Plottable.Dataset(data1);
-        let dataset2 = new Plottable.Dataset(data2);
+        const dataset1 = new Plottable.Dataset(data1);
+        const dataset2 = new Plottable.Dataset(data2);
 
         stackedBarPlot = new Plottable.Plots.StackedBar<string, number>();
         stackedBarPlot.addDataset(dataset1);
@@ -45,16 +45,16 @@ describe("Plots", () => {
       });
 
       it("renders rects offset by previous values", () => {
-        let bars = stackedBarPlot.content().selectAll<Element, any>("rect");
+        const bars = stackedBarPlot.content().selectAll<Element, any>("rect");
 
-        let dataLength = stackedBarPlot.datasets()[0].data().length;
-        let dataCount = stackedBarPlot.datasets().length * dataLength;
+        const dataLength = stackedBarPlot.datasets()[0].data().length;
+        const dataCount = stackedBarPlot.datasets().length * dataLength;
         assert.strictEqual(bars.size(), dataCount, "same number of bars as data");
 
-        let calculateStackedYs = (yAccessor: Plottable.IAccessor<number>) => {
-          let stackedYDataArray: number[][] = [];
+        const calculateStackedYs = (yAccessor: Plottable.IAccessor<number>) => {
+          const stackedYDataArray: number[][] = [];
           stackedBarPlot.datasets().forEach((dataset, datasetIndex) => {
-            let yData = dataset.data().map((d, i) => yAccessor(d, i, dataset));
+            const yData = dataset.data().map((d, i) => yAccessor(d, i, dataset));
             if (datasetIndex === 0) {
               stackedYDataArray[datasetIndex] = yData;
               return;
@@ -66,11 +66,11 @@ describe("Plots", () => {
           return stackedYDataArray;
         };
 
-        let stackedYs = calculateStackedYs((d) => d.y);
+        const stackedYs = calculateStackedYs((d) => d.y);
         bars.each(function(d, i) {
-          let bar = d3.select(this);
-          let datasetIndex = Math.floor(i / dataLength);
-          let datumIndex = i % dataLength;
+          const bar = d3.select(this);
+          const datasetIndex = Math.floor(i / dataLength);
+          const datumIndex = i % dataLength;
           assert.closeTo(TestMethods.numAttr(bar, "y"), yScale.scale(stackedYs[datasetIndex][datumIndex]),
             window.Pixel_CloseTo_Requirement, "y attribute offset set correctly");
         });
@@ -80,7 +80,7 @@ describe("Plots", () => {
       it("doesn't show any off-bar labels", () => {
         stackedBarPlot.labelsEnabled(true);
         yScale.domain([0, 30]);
-        let offBarLabels = stackedBarPlot.content().selectAll<Element, any>(".off-bar-label");
+        const offBarLabels = stackedBarPlot.content().selectAll<Element, any>(".off-bar-label");
         assert.operator(offBarLabels.size(), ">", 0, "some off-bar labels are drawn");
         offBarLabels.each(function(d, i) {
           assert.isTrue(d3.select(this).style("visibility") === "hidden", `off-bar label ${i} is hidden`);
@@ -106,20 +106,20 @@ describe("Plots", () => {
         const dateString1 = "2013-09-02T00:00:00.000Z";
         const dateString2 = "2013-09-03T00:00:00.000Z";
 
-        let data1 = [
+        const data1 = [
           { x: new Date(dateString1) , y: 1 },
           { x: new Date(dateString2), y: 2 },
         ];
 
-        let data2 = [
+        const data2 = [
           { x: new Date(dateString1) , y: 2 },
           { x: new Date(dateString2), y: 1 },
         ];
 
-        let dataset1 = new Plottable.Dataset(data1);
-        let dataset2 = new Plottable.Dataset(data2);
+        const dataset1 = new Plottable.Dataset(data1);
+        const dataset2 = new Plottable.Dataset(data2);
 
-        let stackedBar = new Plottable.Plots.StackedBar<Date, number>();
+        const stackedBar = new Plottable.Plots.StackedBar<Date, number>();
 
         stackedBar.addDataset(dataset1);
         stackedBar.addDataset(dataset2);
@@ -159,8 +159,8 @@ describe("Plots", () => {
       });
 
       it("considers lying within a bar's y-range to mean it is closest", () => {
-        let d0 = stackedBarPlot.datasets()[0].data()[0];
-        let d1 = stackedBarPlot.datasets()[1].data()[0];
+        const d0 = stackedBarPlot.datasets()[0].data()[0];
+        const d1 = stackedBarPlot.datasets()[1].data()[0];
 
         let closestEntity = stackedBarPlot.entityNearest({ x: 0, y: yScale.scale(d0.y) + 1 });
         assert.strictEqual(closestEntity.datum, d0, "bottom bar is closest when within its range");
@@ -181,16 +181,16 @@ describe("Plots", () => {
         xScale = new Plottable.Scales.Category();
         yScale = new Plottable.Scales.Linear();
 
-        let data1 = [
+        const data1 = [
           {x: "A", y: -1},
           {x: "B", y: -2},
         ];
-        let data2 = [
+        const data2 = [
           {x: "A", y: -2},
           {x: "B", y: -1},
         ];
-        let dataset1 = new Plottable.Dataset(data1);
-        let dataset2 = new Plottable.Dataset(data2);
+        const dataset1 = new Plottable.Dataset(data1);
+        const dataset2 = new Plottable.Dataset(data2);
 
         stackedBarPlot = new Plottable.Plots.StackedBar<string, number>();
         stackedBarPlot.addDataset(dataset1);
@@ -233,16 +233,16 @@ describe("Plots", () => {
       });
 
       it("renders rects offset by previous values", () => {
-        let bars = stackedBarPlot.content().selectAll<Element, any>("rect");
+        const bars = stackedBarPlot.content().selectAll<Element, any>("rect");
 
-        let dataLength = stackedBarPlot.datasets()[0].data().length;
-        let dataCount = stackedBarPlot.datasets().length * dataLength;
+        const dataLength = stackedBarPlot.datasets()[0].data().length;
+        const dataCount = stackedBarPlot.datasets().length * dataLength;
         assert.strictEqual(bars.size(), dataCount, "same number of bars as data");
 
-        let calculateStackedYs = (yAccessor: Plottable.IAccessor<number>) => {
-          let stackedYDataArray: number[][] = [];
+        const calculateStackedYs = (yAccessor: Plottable.IAccessor<number>) => {
+          const stackedYDataArray: number[][] = [];
           stackedBarPlot.datasets().forEach((dataset, datasetIndex) => {
-            let yData = dataset.data().map((d, i) => yAccessor(d, i, dataset));
+            const yData = dataset.data().map((d, i) => yAccessor(d, i, dataset));
             if (datasetIndex === 0) {
               stackedYDataArray[datasetIndex] = dataset.data().map(() => 0);
             }
@@ -253,11 +253,11 @@ describe("Plots", () => {
           return stackedYDataArray;
         };
 
-        let stackedYs = calculateStackedYs((d) => d.y);
+        const stackedYs = calculateStackedYs((d) => d.y);
         bars.each(function(d, i) {
-          let bar = d3.select(this);
-          let datasetIndex = Math.floor(i / dataLength);
-          let datumIndex = i % dataLength;
+          const bar = d3.select(this);
+          const datasetIndex = Math.floor(i / dataLength);
+          const datumIndex = i % dataLength;
           assert.closeTo(TestMethods.numAttr(bar, "y"), yScale.scale(stackedYs[datasetIndex][datumIndex]),
             window.Pixel_CloseTo_Requirement, "y attribute offset set correctly");
         });
@@ -272,18 +272,18 @@ describe("Plots", () => {
       beforeEach(() => {
         div = TestMethods.generateDiv();
         xScale = new Plottable.Scales.Category();
-        let yScale = new Plottable.Scales.Linear();
+        const yScale = new Plottable.Scales.Linear();
 
-        let data1 = [
+        const data1 = [
           {x: "A", y: 1},
           {x: "B", y: 2},
           {x: "C", y: 1},
         ];
-        let data2 = [
+        const data2 = [
           {x: "A", y: 2},
           {x: "B", y: 3},
         ];
-        let data3 = [
+        const data3 = [
           {x: "B", y: 1},
           {x: "C", y: 7},
         ];
@@ -303,14 +303,14 @@ describe("Plots", () => {
       });
 
       it("draws bars at specified x location and stacks in order of datasets", () => {
-        let bars = stackedBarPlot.content().selectAll<Element, any>("rect");
+        const bars = stackedBarPlot.content().selectAll<Element, any>("rect");
 
-        let datumCount = stackedBarPlot.datasets().reduce((prev, curr) => prev + curr.data().length, 0);
+        const datumCount = stackedBarPlot.datasets().reduce((prev, curr) => prev + curr.data().length, 0);
         assert.strictEqual(bars.size(), datumCount, "draws a bar for each datum");
 
-        let domain = xScale.domain();
+        const domain = xScale.domain();
         domain.forEach((value) => {
-          let domainBarPairs = d3.pairs(bars.filter((d) => d.x === value).nodes());
+          const domainBarPairs = d3.pairs(bars.filter((d) => d.x === value).nodes());
           domainBarPairs.forEach((aBarPair) => {
             assert.closeTo(TestMethods.numAttr(d3.select(aBarPair[0]), "x"), TestMethods.numAttr(d3.select(aBarPair[1]), "x"),
               window.Pixel_CloseTo_Requirement, "bars at same x position");
@@ -324,14 +324,14 @@ describe("Plots", () => {
         // change stacking order
         stackedBarPlot.stackingOrder("topdown");
 
-        let bars = stackedBarPlot.content().selectAll<Element, any>("rect");
+        const bars = stackedBarPlot.content().selectAll<Element, any>("rect");
 
-        let datumCount = stackedBarPlot.datasets().reduce((prev, curr) => prev + curr.data().length, 0);
+        const datumCount = stackedBarPlot.datasets().reduce((prev, curr) => prev + curr.data().length, 0);
         assert.strictEqual(bars.size(), datumCount, "draws a bar for each datum");
 
-        let domain = xScale.domain();
+        const domain = xScale.domain();
         domain.forEach((value) => {
-          let domainBarPairs = d3.pairs(bars.filter((d) => d.x === value).nodes());
+          const domainBarPairs = d3.pairs(bars.filter((d) => d.x === value).nodes());
           domainBarPairs.forEach((aBarPair) => {
             assert.closeTo(TestMethods.numAttr(d3.select(aBarPair[0]), "x"), TestMethods.numAttr(d3.select(aBarPair[1]), "x"),
               window.Pixel_CloseTo_Requirement, "bars at same x position");
@@ -345,31 +345,31 @@ describe("Plots", () => {
     describe("fail safe tests", () => {
 
       it("should default to 0 when calculating stack offsets with non-numbers", () => {
-        let div = TestMethods.generateDiv();
-        let stringData = [
+        const div = TestMethods.generateDiv();
+        const stringData = [
           { x: "A", y: "s"},
         ];
-        let nullData: {x: string, y: number}[] = [
+        const nullData: {x: string, y: number}[] = [
           { x: "A", y: null},
         ];
-        let undefinedData: {x: string, y: number}[] = [
+        const undefinedData: {x: string, y: number}[] = [
           { x: "A", y: undefined},
         ];
-        let naNData = [
+        const naNData = [
           { x: "A", y: NaN},
         ];
-        let validData = [
+        const validData = [
           { x: "A", y: 1},
         ];
-        let xScale = new Plottable.Scales.Category();
-        let yScale = new Plottable.Scales.Linear();
+        const xScale = new Plottable.Scales.Category();
+        const yScale = new Plottable.Scales.Linear();
 
-        let stackedBarPlot = new Plottable.Plots.StackedBar<string, number>();
-        let ds1 = new Plottable.Dataset(stringData);
-        let ds2 = new Plottable.Dataset(nullData);
-        let ds3 = new Plottable.Dataset(undefinedData);
-        let ds4 = new Plottable.Dataset(naNData);
-        let ds5 = new Plottable.Dataset(validData);
+        const stackedBarPlot = new Plottable.Plots.StackedBar<string, number>();
+        const ds1 = new Plottable.Dataset(stringData);
+        const ds2 = new Plottable.Dataset(nullData);
+        const ds3 = new Plottable.Dataset(undefinedData);
+        const ds4 = new Plottable.Dataset(naNData);
+        const ds5 = new Plottable.Dataset(validData);
         stackedBarPlot.addDataset(ds1);
         stackedBarPlot.addDataset(ds2);
         stackedBarPlot.addDataset(ds3);
@@ -378,7 +378,7 @@ describe("Plots", () => {
         stackedBarPlot.x((d: any) => d.x, xScale).y((d: any) => d.y, yScale);
         stackedBarPlot.renderTo(div);
 
-        let validBar = stackedBarPlot.content().selectAll<Element, any>("rect").filter((d) => d.y === 1);
+        const validBar = stackedBarPlot.content().selectAll<Element, any>("rect").filter((d) => d.y === 1);
         assert.closeTo(TestMethods.numAttr(validBar, "y"), yScale.scale(1),
           window.Pixel_CloseTo_Requirement, "bar stacks from 0");
 
@@ -400,16 +400,16 @@ describe("Plots", () => {
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Category();
 
-        let data1 = [
+        const data1 = [
           {x: 1, y: "A"},
           {x: 2, y: "B"},
         ];
-        let data2 = [
+        const data2 = [
           {x: 2, y: "A"},
           {x: 1, y: "B"},
         ];
-        let dataset1 = new Plottable.Dataset(data1);
-        let dataset2 = new Plottable.Dataset(data2);
+        const dataset1 = new Plottable.Dataset(data1);
+        const dataset2 = new Plottable.Dataset(data2);
 
         stackedBarPlot = new Plottable.Plots.StackedBar<number, string>(BarOrientation.horizontal);
         stackedBarPlot.addDataset(dataset1);
@@ -452,16 +452,16 @@ describe("Plots", () => {
       });
 
       it("renders rects offset by previous values", () => {
-        let bars = stackedBarPlot.content().selectAll<Element, any>("rect");
+        const bars = stackedBarPlot.content().selectAll<Element, any>("rect");
 
-        let dataLength = stackedBarPlot.datasets()[0].data().length;
-        let dataCount = stackedBarPlot.datasets().length * dataLength;
+        const dataLength = stackedBarPlot.datasets()[0].data().length;
+        const dataCount = stackedBarPlot.datasets().length * dataLength;
         assert.strictEqual(bars.size(), dataCount, "same number of bars as data");
 
-        let calculateStackedXs = (xAccessor: Plottable.IAccessor<number>) => {
-          let stackedXDataArray: number[][] = [];
+        const calculateStackedXs = (xAccessor: Plottable.IAccessor<number>) => {
+          const stackedXDataArray: number[][] = [];
           stackedBarPlot.datasets().forEach((dataset, datasetIndex) => {
-            let xData = dataset.data().map((d, i) => xAccessor(d, i, dataset));
+            const xData = dataset.data().map((d, i) => xAccessor(d, i, dataset));
             if (datasetIndex === 0) {
               stackedXDataArray[datasetIndex] = dataset.data().map(() => 0);
             }
@@ -472,11 +472,11 @@ describe("Plots", () => {
           return stackedXDataArray;
         };
 
-        let stackedXs = calculateStackedXs((d) => d.x);
+        const stackedXs = calculateStackedXs((d) => d.x);
         bars.each(function(d, i) {
-          let bar = d3.select(this);
-          let datasetIndex = Math.floor(i / dataLength);
-          let datumIndex = i % dataLength;
+          const bar = d3.select(this);
+          const datasetIndex = Math.floor(i / dataLength);
+          const datumIndex = i % dataLength;
           assert.closeTo(TestMethods.numAttr(bar, "x"), xScale.scale(stackedXs[datasetIndex][datumIndex]),
             window.Pixel_CloseTo_Requirement, "x attribute offset correctly");
         });
@@ -486,7 +486,7 @@ describe("Plots", () => {
       it("doesn't show any off-bar labels", () => {
         stackedBarPlot.labelsEnabled(true);
         xScale.domain([0, 50]);
-        let offBarLabels = stackedBarPlot.content().selectAll<Element, any>(".off-bar-label");
+        const offBarLabels = stackedBarPlot.content().selectAll<Element, any>(".off-bar-label");
         assert.operator(offBarLabels.size(), ">", 0, "some off-bar labels are drawn");
         offBarLabels.each(function(d, i) {
           assert.strictEqual(d3.select(this).style("visibility"), "hidden", `off-bar label ${i} is hidden`);
@@ -501,19 +501,19 @@ describe("Plots", () => {
 
       beforeEach(() => {
         div = TestMethods.generateDiv();
-        let xScale = new Plottable.Scales.Linear();
+        const xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Category();
 
-        let data1 = [
+        const data1 = [
           {y: "A", x: 1},
           {y: "B", x: 2},
           {y: "C", x: 1},
         ];
-        let data2 = [
+        const data2 = [
           {y: "A", x: 2},
           {y: "B", x: 3},
         ];
-        let data3 = [
+        const data3 = [
           {y: "B", x: 1},
           {y: "C", x: 7},
         ];
@@ -533,14 +533,14 @@ describe("Plots", () => {
       });
 
       it("draws bars at specified y location and stacks in order of datasets", () => {
-        let bars = stackedBarPlot.content().selectAll<Element, any>("rect");
+        const bars = stackedBarPlot.content().selectAll<Element, any>("rect");
 
-        let datumCount = stackedBarPlot.datasets().reduce((prev, curr) => prev + curr.data().length, 0);
+        const datumCount = stackedBarPlot.datasets().reduce((prev, curr) => prev + curr.data().length, 0);
         assert.strictEqual(bars.size(), datumCount, "draws a bar for each datum");
 
-        let domain = yScale.domain();
+        const domain = yScale.domain();
         domain.forEach((value) => {
-          let domainBarPairs = d3.pairs(bars.filter((d) => d.y === value).nodes());
+          const domainBarPairs = d3.pairs(bars.filter((d) => d.y === value).nodes());
           domainBarPairs.forEach((aBarPair) => {
             assert.closeTo(TestMethods.numAttr(d3.select(aBarPair[0]), "y"), TestMethods.numAttr(d3.select(aBarPair[1]), "y"),
               window.Pixel_CloseTo_Requirement, "bars at same x position");
@@ -553,31 +553,31 @@ describe("Plots", () => {
 
     describe("fail safe tests", () => {
       it("should default to 0 when calculating stack offsets with non-numbers", () => {
-        let div = TestMethods.generateDiv();
-        let stringData = [
+        const div = TestMethods.generateDiv();
+        const stringData = [
           { x: "s", y: "A"},
         ];
-        let nullData: {x: number, y: string}[] = [
+        const nullData: {x: number, y: string}[] = [
           { x: null, y: "A"},
         ];
-        let undefinedData: {x: number, y: string}[] = [
+        const undefinedData: {x: number, y: string}[] = [
           { x: undefined, y: "A"},
         ];
-        let naNData = [
+        const naNData = [
           { x: NaN, y: "A"},
         ];
-        let validData = [
+        const validData = [
           { x: 1, y: "A"},
         ];
-        let xScale = new Plottable.Scales.Linear();
-        let yScale = new Plottable.Scales.Category();
+        const xScale = new Plottable.Scales.Linear();
+        const yScale = new Plottable.Scales.Category();
 
-        let stackedBarPlot = new Plottable.Plots.StackedBar<number, string>(BarOrientation.horizontal);
-        let ds1 = new Plottable.Dataset(stringData);
-        let ds2 = new Plottable.Dataset(nullData);
-        let ds3 = new Plottable.Dataset(undefinedData);
-        let ds4 = new Plottable.Dataset(naNData);
-        let ds5 = new Plottable.Dataset(validData);
+        const stackedBarPlot = new Plottable.Plots.StackedBar<number, string>(BarOrientation.horizontal);
+        const ds1 = new Plottable.Dataset(stringData);
+        const ds2 = new Plottable.Dataset(nullData);
+        const ds3 = new Plottable.Dataset(undefinedData);
+        const ds4 = new Plottable.Dataset(naNData);
+        const ds5 = new Plottable.Dataset(validData);
         stackedBarPlot.addDataset(ds1);
         stackedBarPlot.addDataset(ds2);
         stackedBarPlot.addDataset(ds3);
@@ -586,7 +586,7 @@ describe("Plots", () => {
         stackedBarPlot.x((d: any) => d.x, xScale).y((d: any) => d.y, yScale);
         stackedBarPlot.renderTo(div);
 
-        let validBar = stackedBarPlot.content().selectAll<Element, any>("rect").filter((d) => d.x === 1);
+        const validBar = stackedBarPlot.content().selectAll<Element, any>("rect").filter((d) => d.x === 1);
         assert.closeTo(TestMethods.numAttr(validBar, "x"), xScale.scale(0),
           window.Pixel_CloseTo_Requirement, "bar stacks from 0");
 

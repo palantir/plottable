@@ -14,17 +14,17 @@ describe("Plots", () => {
 
       beforeEach(() => {
         div = TestMethods.generateDiv();
-        let data1 = [
+        const data1 = [
           {x: 1},
           {x: 3},
         ];
-        let dataset1 = new Plottable.Dataset(data1);
+        const dataset1 = new Plottable.Dataset(data1);
         dataset1.metadata({ bar: 7 });
-        let data2 = [
+        const data2 = [
           {x: 1},
           {x: 3},
         ];
-        let dataset2 = new Plottable.Dataset(data2);
+        const dataset2 = new Plottable.Dataset(data2);
         dataset2.metadata({ bar: 10 });
         stackedAreaPlot = new Plottable.Plots.StackedArea<number>();
         stackedAreaPlot.addDataset(dataset1);
@@ -33,22 +33,22 @@ describe("Plots", () => {
       });
 
       it("can set the x property accessor to a constant value", () => {
-        let constantValue = 10;
+        const constantValue = 10;
         assert.strictEqual(stackedAreaPlot.x(constantValue), stackedAreaPlot, "setter returns calling object");
         stackedAreaPlot.renderTo(div);
 
-        let stackedAreas = stackedAreaPlot.content().selectAll<Element, any>("path");
+        const stackedAreas = stackedAreaPlot.content().selectAll<Element, any>("path");
         assert.strictEqual(stackedAreas.size(),
           stackedAreaPlot.datasets().length, "same number of area selections as datasets");
 
         stackedAreas.each(function(data, i) {
-          let stackedAreaSelection = d3.select(this);
-          let areaVertices = TestMethods.areaVertices(stackedAreaSelection);
-          let areaXs = areaVertices.map((areaVertex) => areaVertex.x).slice(0, -2);
+          const stackedAreaSelection = d3.select(this);
+          const areaVertices = TestMethods.areaVertices(stackedAreaSelection);
+          const areaXs = areaVertices.map((areaVertex) => areaVertex.x).slice(0, -2);
           data.forEach((datum: any, index: number) => {
             assert.closeTo(areaXs[index], constantValue, window.Pixel_CloseTo_Requirement, `x pixel value at index ${i} correctly set`);
           });
-          let areaEdgeXs = areaVertices.map((areaVertex) => areaVertex.x).slice(-2).reverse();
+          const areaEdgeXs = areaVertices.map((areaVertex) => areaVertex.x).slice(-2).reverse();
           assert.closeTo(areaEdgeXs[0], constantValue, window.Pixel_CloseTo_Requirement, "left edge x pixel value correctly set");
           assert.closeTo(areaEdgeXs[1], constantValue, window.Pixel_CloseTo_Requirement, "right edge x pixel value correctly set");
         });
@@ -57,24 +57,24 @@ describe("Plots", () => {
       });
 
       it("can set the x property accessor to be dependent on the input data", () => {
-        let accessor = (d: {x: number}, i: number, ds: Plottable.Dataset) => d.x * 100 + i * 10 + ds.metadata().bar;
+        const accessor = (d: {x: number}, i: number, ds: Plottable.Dataset) => d.x * 100 + i * 10 + ds.metadata().bar;
         assert.strictEqual(stackedAreaPlot.x(accessor), stackedAreaPlot, "setter returns calling object");
         assert.strictEqual(stackedAreaPlot.x().accessor, accessor, `property set for datum`);
         stackedAreaPlot.renderTo(div);
 
-        let stackedAreas = stackedAreaPlot.content().selectAll<Element, any>("path");
+        const stackedAreas = stackedAreaPlot.content().selectAll<Element, any>("path");
         assert.strictEqual(stackedAreas.size(),
           stackedAreaPlot.datasets().length, "same number of area selections as datasets");
 
         stackedAreas.each(function(data, i) {
-          let stackedAreaSelection = d3.select(this);
-          let areaVertices = TestMethods.areaVertices(stackedAreaSelection);
-          let areaXs = areaVertices.map((areaVertex) => areaVertex.x).slice(0, -2);
+          const stackedAreaSelection = d3.select(this);
+          const areaVertices = TestMethods.areaVertices(stackedAreaSelection);
+          const areaXs = areaVertices.map((areaVertex) => areaVertex.x).slice(0, -2);
           data.forEach((datum: any, datumIndex: number) => {
-            let x = accessor(datum, datumIndex, stackedAreaPlot.datasets()[i]);
+            const x = accessor(datum, datumIndex, stackedAreaPlot.datasets()[i]);
             assert.closeTo(areaXs[datumIndex], x, window.Pixel_CloseTo_Requirement, `x pixel value at index ${i} correctly set`);
           });
-          let areaEdgeXs = areaVertices.map((areaVertex) => areaVertex.x).slice(-2).reverse();
+          const areaEdgeXs = areaVertices.map((areaVertex) => areaVertex.x).slice(-2).reverse();
           assert.closeTo(areaEdgeXs[0], accessor(data[0], 0, stackedAreaPlot.datasets()[i]),
             window.Pixel_CloseTo_Requirement, "left edge x pixel value correctly set");
           assert.closeTo(areaEdgeXs[1], accessor(data[data.length - 1], data.length - 1, stackedAreaPlot.datasets()[i]),
@@ -85,25 +85,25 @@ describe("Plots", () => {
       });
 
       it("can set the x property scale", () => {
-        let accessor = (d: {x: number}) => d.x;
-        let linearScale = new Plottable.Scales.Linear();
+        const accessor = (d: {x: number}) => d.x;
+        const linearScale = new Plottable.Scales.Linear();
         assert.strictEqual(stackedAreaPlot.x(accessor, linearScale), stackedAreaPlot, "setter returns calling object");
         assert.strictEqual(stackedAreaPlot.x().accessor, accessor, `property set for datum`);
         stackedAreaPlot.renderTo(div);
 
-        let stackedAreas = stackedAreaPlot.content().selectAll<Element, any>("path");
+        const stackedAreas = stackedAreaPlot.content().selectAll<Element, any>("path");
         assert.strictEqual(stackedAreas.size(),
           stackedAreaPlot.datasets().length, "same number of area selections as datasets");
 
         stackedAreas.each(function(data, i) {
-          let stackedAreaSelection = d3.select(this);
-          let areaVertices = TestMethods.areaVertices(stackedAreaSelection);
-          let areaXs = areaVertices.map((areaVertex) => areaVertex.x).slice(0, -2);
+          const stackedAreaSelection = d3.select(this);
+          const areaVertices = TestMethods.areaVertices(stackedAreaSelection);
+          const areaXs = areaVertices.map((areaVertex) => areaVertex.x).slice(0, -2);
           data.forEach((datum: any, index: number) => {
-            let x = linearScale.scale(accessor(datum));
+            const x = linearScale.scale(accessor(datum));
             assert.closeTo(areaXs[index], x, window.Pixel_CloseTo_Requirement, `x pixel value at index ${i} correctly set`);
           });
-          let areaEdgeXs = areaVertices.map((areaVertex) => areaVertex.x).slice(-2).reverse();
+          const areaEdgeXs = areaVertices.map((areaVertex) => areaVertex.x).slice(-2).reverse();
           assert.closeTo(areaEdgeXs[0], linearScale.scale(accessor(data[0])),
             window.Pixel_CloseTo_Requirement, "left edge x pixel value correctly set");
           assert.closeTo(areaEdgeXs[1], linearScale.scale(accessor(data[data.length - 1])),
@@ -120,17 +120,17 @@ describe("Plots", () => {
 
       beforeEach(() => {
         div = TestMethods.generateDiv();
-        let data1 = [
+        const data1 = [
           {y: 1},
           {y: 3},
         ];
-        let dataset1 = new Plottable.Dataset(data1);
+        const dataset1 = new Plottable.Dataset(data1);
         dataset1.metadata({ bar: 7 });
-        let data2 = [
+        const data2 = [
           {y: 5},
           {y: 3},
         ];
-        let dataset2 = new Plottable.Dataset(data2);
+        const dataset2 = new Plottable.Dataset(data2);
         dataset2.metadata({ bar: 10 });
         stackedAreaPlot = new Plottable.Plots.StackedArea<number>();
         stackedAreaPlot.addDataset(dataset1);
@@ -139,9 +139,9 @@ describe("Plots", () => {
       });
 
       function calculateStackedYs(yAccessor: Plottable.IAccessor<number>) {
-        let stackedYDataArray: number[][] = [];
+        const stackedYDataArray: number[][] = [];
         stackedAreaPlot.datasets().forEach((dataset, datasetIndex, datasets) => {
-          let stackedYData = dataset.data().map((d, i) => yAccessor(d, i, dataset));
+          const stackedYData = dataset.data().map((d, i) => yAccessor(d, i, dataset));
           if (datasetIndex === 0) {
             stackedYDataArray[datasetIndex] = stackedYData;
             return;
@@ -154,14 +154,14 @@ describe("Plots", () => {
       }
 
       it("can set to a constant value", () => {
-        let constantValue = 10;
+        const constantValue = 10;
         assert.strictEqual(stackedAreaPlot.y(constantValue), stackedAreaPlot, "setter returns calling object");
         stackedAreaPlot.destroy();
         div.remove();
       });
 
       it("can set to be dependent on the input data", () => {
-        let accessor = (d: {y: number}, i: number, ds: Plottable.Dataset) => d.y * 100 + i * 10 + ds.metadata().bar;
+        const accessor = (d: {y: number}, i: number, ds: Plottable.Dataset) => d.y * 100 + i * 10 + ds.metadata().bar;
         assert.strictEqual(stackedAreaPlot.y(accessor), stackedAreaPlot, "setter returns calling object");
         assert.strictEqual(stackedAreaPlot.y().accessor, accessor, "accessor set");
         stackedAreaPlot.destroy();
@@ -169,26 +169,26 @@ describe("Plots", () => {
       });
 
       it("can set the property scale", () => {
-        let accessor = (d: {y: number}) => d.y;
-        let linearScale = new Plottable.Scales.Linear();
+        const accessor = (d: {y: number}) => d.y;
+        const linearScale = new Plottable.Scales.Linear();
         assert.strictEqual(stackedAreaPlot.y(accessor, linearScale), stackedAreaPlot, "setter returns calling object");
         assert.strictEqual(stackedAreaPlot.y().accessor, accessor, "accessor set");
         stackedAreaPlot.renderTo(div);
 
-        let stackedAreas = stackedAreaPlot.content().selectAll<Element, any>("path");
+        const stackedAreas = stackedAreaPlot.content().selectAll<Element, any>("path");
         assert.strictEqual(stackedAreas.size(),
           stackedAreaPlot.datasets().length, "same number of area selections as datasets");
 
-        let stackedYs = calculateStackedYs(accessor);
+        const stackedYs = calculateStackedYs(accessor);
         stackedAreas.each(function(data, i) {
-          let stackedAreaSelection = d3.select(this);
-          let areaVertices = TestMethods.areaVertices(stackedAreaSelection);
-          let areaYs = areaVertices.map((areaVertex) => areaVertex.y).slice(0, -2);
+          const stackedAreaSelection = d3.select(this);
+          const areaVertices = TestMethods.areaVertices(stackedAreaSelection);
+          const areaYs = areaVertices.map((areaVertex) => areaVertex.y).slice(0, -2);
           data.forEach((datum: any, datumIndex: number) => {
-            let y = linearScale.scale(stackedYs[i][datumIndex]);
+            const y = linearScale.scale(stackedYs[i][datumIndex]);
             assert.closeTo(areaYs[datumIndex], y, window.Pixel_CloseTo_Requirement, `y pixel value at index ${i} correctly set`);
           });
-          let areaEdgeYs = areaVertices.map((areaVertex) => areaVertex.y).slice(-2).reverse();
+          const areaEdgeYs = areaVertices.map((areaVertex) => areaVertex.y).slice(-2).reverse();
           if (i === 0) {
             assert.closeTo(areaEdgeYs[0], linearScale.scale(0),
               window.Pixel_CloseTo_Requirement, "left edge y pixel value correctly set");
@@ -211,17 +211,17 @@ describe("Plots", () => {
       let stackedAreaPlot: Plottable.Plots.StackedArea<number>;
 
       beforeEach(() => {
-        let data1 = [
+        const data1 = [
           {foo: 1},
           {foo: 3},
         ];
-        let dataset1 = new Plottable.Dataset(data1);
+        const dataset1 = new Plottable.Dataset(data1);
         dataset1.metadata({ bar: 7 });
-        let data2 = [
+        const data2 = [
           {foo: 1},
           {foo: 3},
         ];
-        let dataset2 = new Plottable.Dataset(data2);
+        const dataset2 = new Plottable.Dataset(data2);
         dataset2.metadata({ bar: 10 });
         stackedAreaPlot = new Plottable.Plots.StackedArea<number>();
         stackedAreaPlot.addDataset(dataset1);
@@ -236,14 +236,14 @@ describe("Plots", () => {
       });
 
       it("can set the y0 property accessor to a constant value", () => {
-        let constantValue = 10;
+        const constantValue = 10;
         stackedAreaPlot.y0(constantValue);
         assert.strictEqual(stackedAreaPlot.y0().accessor(null, 0, null), constantValue, "property set to constant value");
         stackedAreaPlot.destroy();
       });
 
       it("can set the y0 property accessor to be dependent on the input data", () => {
-        let accessor = (d: {foo: number}, i: number, ds: Plottable.Dataset) => d.foo * 100 + i * 10 + ds.metadata().bar;
+        const accessor = (d: {foo: number}, i: number, ds: Plottable.Dataset) => d.foo * 100 + i * 10 + ds.metadata().bar;
         stackedAreaPlot.y0(accessor);
         assert.strictEqual(stackedAreaPlot.y0().accessor, accessor, `property set for datum`);
         stackedAreaPlot.destroy();
@@ -252,8 +252,8 @@ describe("Plots", () => {
 
     describe("rendering on edge case scenarios", () => {
       it("renders nothing when no data", () => {
-        let div = TestMethods.generateDiv();
-        let stackedAreaPlot = new Plottable.Plots.StackedArea();
+        const div = TestMethods.generateDiv();
+        const stackedAreaPlot = new Plottable.Plots.StackedArea();
         stackedAreaPlot.x(() => null);
         // HACKHACK https://github.com/palantir/plottable/issues/2712 y scale must be set.
         stackedAreaPlot.y(() => null, new Plottable.Scales.Linear());
@@ -264,43 +264,43 @@ describe("Plots", () => {
       });
 
       it("coerces strings to numbers for calculating offsets", () => {
-        let div = TestMethods.generateDiv();
-        let data0 = [
+        const div = TestMethods.generateDiv();
+        const data0 = [
           { x: 2, y: "2" },
           { x: 3, y: 2 },
         ];
-        let data1 = [
+        const data1 = [
           { x: 2, y: "0" },
           { x: 3, y: "2" },
         ];
-        let data2 = [
+        const data2 = [
           { x: 2, y: 2 },
           { x: 3, y: 2 },
         ];
-        let xScale = new Plottable.Scales.Linear();
-        let yScale = new Plottable.Scales.Linear();
+        const xScale = new Plottable.Scales.Linear();
+        const yScale = new Plottable.Scales.Linear();
 
-        let plot = new Plottable.Plots.StackedArea<number>();
-        let dataset0 = new Plottable.Dataset(data0);
+        const plot = new Plottable.Plots.StackedArea<number>();
+        const dataset0 = new Plottable.Dataset(data0);
         plot.addDataset(dataset0);
-        let dataset1 = new Plottable.Dataset(data1);
+        const dataset1 = new Plottable.Dataset(data1);
         plot.addDataset(dataset1);
-        let dataset2 = new Plottable.Dataset(data2);
+        const dataset2 = new Plottable.Dataset(data2);
         plot.addDataset(dataset2);
         plot.x((d: any) => d.x, xScale).y((d: any) => d.y, yScale);
         plot.renderTo(div);
 
-        let stackedAreaSelections = plot.content().selectAll<Element, any>("path");
-        let stackedAreaSelection0 = d3.select(stackedAreaSelections.node());
-        let stackedAreaSelection1 = d3.select(stackedAreaSelections.nodes()[1]);
-        let stackedAreaSelection2 = d3.select(stackedAreaSelections.nodes()[2]);
+        const stackedAreaSelections = plot.content().selectAll<Element, any>("path");
+        const stackedAreaSelection0 = d3.select(stackedAreaSelections.node());
+        const stackedAreaSelection1 = d3.select(stackedAreaSelections.nodes()[1]);
+        const stackedAreaSelection2 = d3.select(stackedAreaSelections.nodes()[2]);
 
-        let areaVertices0 = TestMethods.areaVertices(stackedAreaSelection0);
-        let areaYs0 = areaVertices0.map((areaVertex) => areaVertex.y).slice(0, -2);
-        let areaVertices1 = TestMethods.areaVertices(stackedAreaSelection1);
-        let areaYs1 = areaVertices1.map((areaVertex) => areaVertex.y).slice(0, -2);
-        let areaVertices2 = TestMethods.areaVertices(stackedAreaSelection2);
-        let areaYs2 = areaVertices2.map((areaVertex) => areaVertex.y).slice(0, -2);
+        const areaVertices0 = TestMethods.areaVertices(stackedAreaSelection0);
+        const areaYs0 = areaVertices0.map((areaVertex) => areaVertex.y).slice(0, -2);
+        const areaVertices1 = TestMethods.areaVertices(stackedAreaSelection1);
+        const areaYs1 = areaVertices1.map((areaVertex) => areaVertex.y).slice(0, -2);
+        const areaVertices2 = TestMethods.areaVertices(stackedAreaSelection2);
+        const areaYs2 = areaVertices2.map((areaVertex) => areaVertex.y).slice(0, -2);
 
         assert.closeTo(areaYs0[0], yScale.scale(<any> data0[0].y), window.Pixel_CloseTo_Requirement,
           "dataset0 should have no offset");
@@ -313,43 +313,43 @@ describe("Plots", () => {
       });
 
       it("coerces null to 0 for calculating offsets", () => {
-        let div = TestMethods.generateDiv();
-        let data0 = [
+        const div = TestMethods.generateDiv();
+        const data0 = [
           { x: 2, y: 2 },
           { x: 3, y: 2 },
         ];
-        let data1 = [
+        const data1 = [
           { x: 2, y: null },
           { x: 3, y: 2 },
         ];
-        let data2 = [
+        const data2 = [
           { x: 2, y: 2 },
           { x: 3, y: 2 },
         ];
-        let xScale = new Plottable.Scales.Linear();
-        let yScale = new Plottable.Scales.Linear();
+        const xScale = new Plottable.Scales.Linear();
+        const yScale = new Plottable.Scales.Linear();
 
-        let plot = new Plottable.Plots.StackedArea<number>();
-        let dataset0 = new Plottable.Dataset(data0);
+        const plot = new Plottable.Plots.StackedArea<number>();
+        const dataset0 = new Plottable.Dataset(data0);
         plot.addDataset(dataset0);
-        let dataset1 = new Plottable.Dataset(data1);
+        const dataset1 = new Plottable.Dataset(data1);
         plot.addDataset(dataset1);
-        let dataset2 = new Plottable.Dataset(data2);
+        const dataset2 = new Plottable.Dataset(data2);
         plot.addDataset(dataset2);
         plot.x((d: any) => d.x, xScale).y((d: any) => d.y, yScale);
         plot.renderTo(div);
 
-        let stackedAreaSelections = plot.content().selectAll<Element, any>("path");
-        let stackedAreaSelection0 = d3.select(stackedAreaSelections.node());
-        let stackedAreaSelection1 = d3.select(stackedAreaSelections.nodes()[1]);
-        let stackedAreaSelection2 = d3.select(stackedAreaSelections.nodes()[2]);
+        const stackedAreaSelections = plot.content().selectAll<Element, any>("path");
+        const stackedAreaSelection0 = d3.select(stackedAreaSelections.node());
+        const stackedAreaSelection1 = d3.select(stackedAreaSelections.nodes()[1]);
+        const stackedAreaSelection2 = d3.select(stackedAreaSelections.nodes()[2]);
 
-        let areaVertices0 = TestMethods.areaVertices(stackedAreaSelection0);
-        let areaYs0 = areaVertices0.map((areaVertex) => areaVertex.y).slice(0, -2);
-        let areaVertices1 = TestMethods.areaVertices(stackedAreaSelection1);
-        let areaYs1 = areaVertices1.map((areaVertex) => areaVertex.y).slice(0, -2);
-        let areaVertices2 = TestMethods.areaVertices(stackedAreaSelection2);
-        let areaYs2 = areaVertices2.map((areaVertex) => areaVertex.y).slice(0, -2);
+        const areaVertices0 = TestMethods.areaVertices(stackedAreaSelection0);
+        const areaYs0 = areaVertices0.map((areaVertex) => areaVertex.y).slice(0, -2);
+        const areaVertices1 = TestMethods.areaVertices(stackedAreaSelection1);
+        const areaYs1 = areaVertices1.map((areaVertex) => areaVertex.y).slice(0, -2);
+        const areaVertices2 = TestMethods.areaVertices(stackedAreaSelection2);
+        const areaYs2 = areaVertices2.map((areaVertex) => areaVertex.y).slice(0, -2);
 
         assert.closeTo(areaYs0[0], yScale.scale(data0[0].y), window.Pixel_CloseTo_Requirement,
           "dataset0 should have no offset");
@@ -397,11 +397,11 @@ describe("Plots", () => {
       });
 
       it("stacks bottomup by default", () => {
-        let areas = stackedAreaPlot.content().selectAll<Element, any>("path");
-        let area0 = areas.filter((d) => d === datas[0]);
-        let area1 = areas.filter((d) => d === datas[1]);
-        let areaYs0 = TestMethods.areaVertices(area0).map((areaVertex) => areaVertex.y);
-        let areaYs1 = TestMethods.areaVertices(area1).map((areaVertex) => areaVertex.y);
+        const areas = stackedAreaPlot.content().selectAll<Element, any>("path");
+        const area0 = areas.filter((d) => d === datas[0]);
+        const area1 = areas.filter((d) => d === datas[1]);
+        const areaYs0 = TestMethods.areaVertices(area0).map((areaVertex) => areaVertex.y);
+        const areaYs1 = TestMethods.areaVertices(area1).map((areaVertex) => areaVertex.y);
 
         // note that higher y value means toward bottom of screen
         assert.operator(areaYs0[0], ">", areaYs1[0], "first series below second");
@@ -410,11 +410,11 @@ describe("Plots", () => {
       it("stacks topdown", () => {
         stackedAreaPlot.stackingOrder("topdown");
 
-        let areas = stackedAreaPlot.content().selectAll<Element, any>("path");
-        let area0 = areas.filter((d) => d === datas[0]);
-        let area1 = areas.filter((d) => d === datas[1]);
-        let areaYs0 = TestMethods.areaVertices(area0).map((areaVertex) => areaVertex.y);
-        let areaYs1 = TestMethods.areaVertices(area1).map((areaVertex) => areaVertex.y);;
+        const areas = stackedAreaPlot.content().selectAll<Element, any>("path");
+        const area0 = areas.filter((d) => d === datas[0]);
+        const area1 = areas.filter((d) => d === datas[1]);
+        const areaYs0 = TestMethods.areaVertices(area0).map((areaVertex) => areaVertex.y);
+        const areaYs1 = TestMethods.areaVertices(area1).map((areaVertex) => areaVertex.y);;
 
         // note that higher y value means toward bottom of screen
         assert.operator(areaYs0[0], "<", areaYs1[0], "first series atop second");

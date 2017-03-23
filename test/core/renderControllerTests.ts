@@ -5,8 +5,8 @@ import * as Plottable from "../../src";
 import * as TestMethods from "../testMethods";
 
 describe("RenderController", () => {
-  let DIV_WIDTH = 400;
-  let DIV_HEIGHT = 300;
+  const DIV_WIDTH = 400;
+  const DIV_HEIGHT = 300;
 
   describe("configuring the render policy", () => {
     after(() => {
@@ -21,16 +21,16 @@ describe("RenderController", () => {
     });
 
     it("throws a warning for unrecognized render policies", () => {
-      let unrecognizedRenderPolicy: any = "foo";
+      const unrecognizedRenderPolicy: any = "foo";
       TestMethods.assertWarns(() => Plottable.RenderController.renderPolicy(unrecognizedRenderPolicy),
         "Unrecognized renderPolicy", "warning sent for unrecognized render policy");
     });
   });
 
   it("can queue a component to render", () => {
-    let div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
-    let component = new Plottable.Component();
-    let renderedClass = "rendered";
+    const div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
+    const component = new Plottable.Component();
+    const renderedClass = "rendered";
     component.renderImmediately = () => {
       component.content().append("g").classed(renderedClass, true);
       return component;
@@ -43,9 +43,9 @@ describe("RenderController", () => {
   });
 
   it("can queue a component to undergo layout computation and render", () => {
-    let div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
-    let component = new Plottable.Component();
-    let renderedClass = "rendered";
+    const div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
+    const component = new Plottable.Component();
+    const renderedClass = "rendered";
     component.renderImmediately = () => {
       component.content().append("g").classed(renderedClass, true);
       return component;
@@ -62,11 +62,11 @@ describe("RenderController", () => {
 
   // HACKHACK: https://github.com/palantir/plottable/issues/2083
   it.skip("can render components that are triggered by another component's render", () => {
-    let link1 = new Plottable.Component();
-    let div1 = TestMethods.generateDiv();
+    const link1 = new Plottable.Component();
+    const div1 = TestMethods.generateDiv();
     link1.anchor(div1).computeLayout();
-    let link2 = new Plottable.Component();
-    let div2 = TestMethods.generateDiv();
+    const link2 = new Plottable.Component();
+    const div2 = TestMethods.generateDiv();
     link2.anchor(div2).computeLayout();
 
     (<any> link1).renderImmediately = () => link2.render();

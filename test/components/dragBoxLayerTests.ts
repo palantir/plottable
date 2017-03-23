@@ -256,9 +256,9 @@ describe("SelectionBoxLayer", () => {
         let callbackDragCalled = false;
         let callbackDragEndCalled = false;
 
-        let callbackDragStart = () => callbackDragStartCalled = true;
-        let callbackDrag = () => callbackDragCalled = true;
-        let callbackDragEnd = () => callbackDragEndCalled = true;
+        const callbackDragStart = () => callbackDragStartCalled = true;
+        const callbackDrag = () => callbackDragCalled = true;
+        const callbackDragEnd = () => callbackDragEndCalled = true;
 
         dbl.onDragStart(callbackDragStart);
         dbl.onDrag(callbackDrag);

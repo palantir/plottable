@@ -43,7 +43,7 @@ describe("Components", () => {
     });
 
     it("throws error when appending not plot", () => {
-      let label = new Plottable.Components.Label();
+      const label = new Plottable.Components.Label();
       assert.throw(() => plotGroup.append((<any>label)), Error, "Plot Group only accepts plots");
       div.remove();
     });

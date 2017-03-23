@@ -12,6 +12,7 @@
     "no-unused-variable": true,
     "no-var-keyword": true,
     "object-literal-key-quotes": [true, "as-needed"],
+    "prefer-const": true,
     "quotemark": [true, "double"],
     "semicolon": true,
     "trailing-comma": [true, { "multiline": "always", "singleline": "never" }],

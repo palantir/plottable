@@ -9,19 +9,19 @@ import * as TestMethods from "../testMethods";
 describe("Plots", () => {
   describe("Waterfall", () => {
     describe("rendering growth bars", () => {
-      let numAttr = TestMethods.numAttr;
+      const numAttr = TestMethods.numAttr;
       let div: d3.Selection<HTMLDivElement, any, any, any>;
       let dataset: Plottable.Dataset;
       let xScale: Plottable.Scales.Category;
       let yScale: Plottable.Scales.Linear;
       let plot: Plottable.Plots.Waterfall<string, number>;
-      let growthBarData = [
+      const growthBarData = [
         { x: "A", y: 0 },
         { x: "B", y: 5 },
         { x: "C", y: 10 },
         { x: "D", y: 100},
       ];
-      let growthClass = "waterfall-growth";
+      const growthClass = "waterfall-growth";
 
       beforeEach(() => {
         div = TestMethods.generateDiv();
@@ -37,13 +37,13 @@ describe("Plots", () => {
       });
 
       it("classes growth bars", () => {
-        let bars = plot.content().selectAll<Element, any>("rect");
+        const bars = plot.content().selectAll<Element, any>("rect");
         assert.strictEqual(bars.size(), growthBarData.length, "same number of bars as data points");
         bars.each(function(d, i) {
           if (i === 0) {
             return;
           }
-          let bar = d3.select(this);
+          const bar = d3.select(this);
           assert.isTrue(bar.classed(growthClass), "bar classed as growth bar");
         });
         plot.destroy();
@@ -51,13 +51,13 @@ describe("Plots", () => {
       });
 
       it("places bars at current sum", () => {
-        let bars = plot.content().selectAll<Element, any>(`rect.${growthClass}`);
+        const bars = plot.content().selectAll<Element, any>(`rect.${growthClass}`);
         assert.strictEqual(bars.size(), growthBarData.length - 1, "all bars are growth except for first");
-        let yAccessor = plot.y().accessor;
+        const yAccessor = plot.y().accessor;
         let sum = 0;
         bars.each(function(d, i) {
-          let dataY = yAccessor(d, i, dataset);
-          let bar = d3.select(this);
+          const dataY = yAccessor(d, i, dataset);
+          const bar = d3.select(this);
           assert.closeTo(numAttr(bar, "y") + numAttr(bar, "height"), yScale.scale(sum),
             window.Pixel_CloseTo_Requirement, "growth bar bottom at previous sum");
           sum += dataY;
@@ -71,20 +71,20 @@ describe("Plots", () => {
     });
 
     describe("rendering decline bars", () => {
-      let numAttr = TestMethods.numAttr;
+      const numAttr = TestMethods.numAttr;
       let div: d3.Selection<HTMLDivElement, any, any, any>;
       let dataset: Plottable.Dataset;
       let xScale: Plottable.Scales.Category;
       let yScale: Plottable.Scales.Linear;
       let plot: Plottable.Plots.Waterfall<string, number>;
-      let declineBarData = [
+      const declineBarData = [
         { x: "A", y: 0 },
         { x: "B", y: -5 },
         { x: "C", y: -25 },
         { x: "D", y: -10 },
         { x: "E", y: -15 },
       ];
-      let declineClass = "waterfall-decline";
+      const declineClass = "waterfall-decline";
 
       beforeEach(() => {
         div = TestMethods.generateDiv();
@@ -100,13 +100,13 @@ describe("Plots", () => {
       });
 
       it("classes decline bars", () => {
-        let bars = plot.content().selectAll<Element, any>("rect");
+        const bars = plot.content().selectAll<Element, any>("rect");
         assert.strictEqual(bars.size(), declineBarData.length, "same number of bars as data points");
         bars.each(function(d, i) {
           if (i === 0) {
             return;
           }
-          let bar = d3.select(this);
+          const bar = d3.select(this);
           assert.isTrue(bar.classed(declineClass), "bar classed as decline bars");
         });
         plot.destroy();
@@ -114,13 +114,13 @@ describe("Plots", () => {
       });
 
       it("places bars at current sum", () => {
-        let bars = plot.content().selectAll<Element, any>(`rect.${declineClass}`);
+        const bars = plot.content().selectAll<Element, any>(`rect.${declineClass}`);
         assert.strictEqual(bars.size(), declineBarData.length - 1, "all bars are decline except for first");
-        let yAccessor = plot.y().accessor;
+        const yAccessor = plot.y().accessor;
         let sum = 0;
         bars.each(function(d, i) {
-          let dataY = yAccessor(d, i, dataset);
-          let bar = d3.select(this);
+          const dataY = yAccessor(d, i, dataset);
+          const bar = d3.select(this);
           assert.closeTo(numAttr(bar, "y"), yScale.scale(sum),
             window.Pixel_CloseTo_Requirement, "growth bar top at previous sum");
           sum += dataY;
@@ -139,14 +139,14 @@ describe("Plots", () => {
       let xScale: Plottable.Scales.Category;
       let yScale: Plottable.Scales.Linear;
       let plot: Plottable.Plots.Waterfall<string, number>;
-      let data = [
+      const data = [
         { x: "A", y: 20, t: true },
         { x: "B", y: 5, t: false },
         { x: "C", y: 25, t: true },
         { x: "D", y: -10, t: false },
         { x: "E", y: 15, t: true },
       ];
-      let totalClass = "waterfall-total";
+      const totalClass = "waterfall-total";
 
       beforeEach(() => {
         div = TestMethods.generateDiv();
@@ -159,14 +159,14 @@ describe("Plots", () => {
       });
 
       it("can set the total property", () => {
-        let accessor = (d: any) => d.t;
+        const accessor = (d: any) => d.t;
         assert.strictEqual(plot.total(accessor), plot, "setter returns calling object");
 
         plot.addDataset(dataset);
         plot.renderTo(div);
-        let bars = plot.content().selectAll<Element, any>("rect").filter((d) => accessor(d));
+        const bars = plot.content().selectAll<Element, any>("rect").filter((d) => accessor(d));
         bars.each(function(d) {
-          let totalBar = d3.select(this);
+          const totalBar = d3.select(this);
           assert.isTrue(totalBar.classed(totalClass));
         });
         plot.destroy();
@@ -174,7 +174,7 @@ describe("Plots", () => {
       });
 
       it("can get the total property", () => {
-        let accessor = (d: any) => d.t === "total";
+        const accessor = (d: any) => d.t === "total";
         plot.total(accessor);
         assert.strictEqual(plot.total().accessor, accessor, "can get if connectors are enabled");
         plot.destroy();
@@ -183,13 +183,13 @@ describe("Plots", () => {
     });
 
     describe("enabling connectors", () => {
-      let numAttr = TestMethods.numAttr;
+      const numAttr = TestMethods.numAttr;
       let div: d3.Selection<HTMLDivElement, any, any, any>;
       let dataset: Plottable.Dataset;
       let xScale: Plottable.Scales.Category;
       let yScale: Plottable.Scales.Linear;
       let plot: Plottable.Plots.Waterfall<string, number>;
-      let data = [
+      const data = [
         { x: "A", y: 20, t: true },
         { x: "B", y: 5, t: false },
         { x: "C", y: 25, t: true },
@@ -213,13 +213,13 @@ describe("Plots", () => {
         assert.isFalse(plot.connectorsEnabled(), "no connectors by default");
         assert.strictEqual(plot.connectorsEnabled(true), plot, "setter returns calling object");
         plot.renderTo(div);
-        let bars = plot.content().selectAll<Element, any>("rect");
-        let connectors = plot.content().selectAll<Element, any>("line.connector");
+        const bars = plot.content().selectAll<Element, any>("rect");
+        const connectors = plot.content().selectAll<Element, any>("line.connector");
         assert.strictEqual(bars.size(), connectors.size() + 1, "there is one more bar than number of connectors");
         connectors.each(function(datum, index) {
-          let connector = d3.select(this);
-          let bar = d3.select(bars.nodes()[index]);
-          let connectorOnBottom = bar.classed("waterfall-decline");
+          const connector = d3.select(this);
+          const bar = d3.select(bars.nodes()[index]);
+          const connectorOnBottom = bar.classed("waterfall-decline");
           if (connectorOnBottom) {
             assert.closeTo(numAttr(connector, "y1"), numAttr(bar, "y") + numAttr(bar, "height"),
               window.Pixel_CloseTo_Requirement, "connector on declining bar at bottom");
@@ -234,7 +234,7 @@ describe("Plots", () => {
       });
 
       it("can get if connectors are enabled", () => {
-        let connectorsEnabled = true;
+        const connectorsEnabled = true;
         plot.connectorsEnabled(connectorsEnabled);
         assert.strictEqual(plot.connectorsEnabled(), connectorsEnabled, "can get if connectors are enabled");
         plot.destroy();

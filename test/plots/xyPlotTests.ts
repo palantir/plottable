@@ -14,8 +14,8 @@ describe("Plots", () => {
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let plot: Plottable.XYPlot<number, number>;
-      let xAccessor = (d: any) => d.x;
-      let yAccessor = (d: any) => d.y;
+      const xAccessor = (d: any) => d.x;
+      const yAccessor = (d: any) => d.y;
       const yTransform = (d: number) => Math.pow(d, 2);
       const xTransform = (d: number) => Math.pow(d, 0.5);
 
@@ -59,7 +59,7 @@ describe("Plots", () => {
       });
 
       it("automatically adjusts Y domain over visible points", () => {
-        let oldYDomain = yScale.domain();
+        const oldYDomain = yScale.domain();
         const newXDomain = [2, 3];
         xScale.domain(newXDomain);
         assert.deepEqual(yScale.domain(), oldYDomain, "domain not adjusted to visible points");
