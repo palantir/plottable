@@ -28,6 +28,13 @@ describe("SVGDrawers", () => {
       assert.strictEqual(drawer.selector(), ELEMENT_NAME);
     });
 
+    it("attaches and removes its element", () => {
+      drawer.attachTo(svg);
+      assert.isTrue(document.body.contains(drawer.getRoot().node()), "renderArea is in the DOM");
+      drawer.remove();
+      assert.isFalse(document.body.contains(drawer.getRoot().node()), "renderArea was removed from the DOM");
+    });
+
     describe("drawing and retrieving elements", () => {
       const data = ["A", "B", "C"];
       const propertyName = "property";
@@ -48,7 +55,8 @@ describe("SVGDrawers", () => {
             animator: new Plottable.Animators.Null(),
           },
         ];
-        drawer.draw(svg, data, drawSteps);
+        drawer.attachTo(svg);
+        drawer.draw(data, drawSteps);
       });
 
       it("draws elements accoding to a specified DrawStep", () => {
@@ -61,18 +69,18 @@ describe("SVGDrawers", () => {
         });
       });
 
-      it("can retrieve a selection containing elements it drew", () => {
-        const selection = drawer.selection();
-        assert.strictEqual(selection.size(), data.length, "retrieved one element per datum");
+      it("can retrieve visual primitives of the elements it drew", () => {
+        const visualPrimitives = drawer.getVisualPrimitives();
+        assert.strictEqual(visualPrimitives.length, data.length, "retrieved one element per datum");
         const drawn = svg.selectAll<Element, any>(ELEMENT_NAME);
-        assert.deepEqual(selection.node(), drawn.node(), "retrieved all elements it drew");
+        assert.deepEqual(visualPrimitives, drawn.nodes(), "retrieved all elements it drew");
       });
 
-      it("can retrieve the selection for a particular index", () => {
-        const selection = drawer.selection();
+      it("can retrieve the visual primitive for a particular index", () => {
+        const visualPrimitives = drawer.getVisualPrimitives();
         data.forEach((datum, index) => {
           const selectionForIndex = drawer.getVisualPrimitiveAtIndex(index);
-          assert.strictEqual(selectionForIndex.node(), selection.nodes()[index], `retrieves the correct selection for index ${index}`);
+          assert.strictEqual(selectionForIndex, visualPrimitives[index], `retrieves the correct selection for index ${index}`);
         });
       });
     });
@@ -124,7 +132,7 @@ describe("SVGDrawers", () => {
         const ds1: Plottable.Drawers.AppliedDrawStep = { attrToAppliedProjector: {}, animator: a1 };
         const ds2: Plottable.Drawers.AppliedDrawStep = { attrToAppliedProjector: {}, animator: a2 };
         const steps = [ds1, ds2];
-        drawer.draw(svg, [], steps);
+        drawer.draw([], steps);
         assert.deepEqual(timings, [0, 0], "setTimeout called twice with 0 time both times");
       });
 
@@ -155,7 +163,7 @@ describe("SVGDrawers", () => {
         const ds3: Plottable.Drawers.AppliedDrawStep = { attrToAppliedProjector: {}, animator: a3 };
 
         const steps = [ds1, ds2, ds3];
-        drawer.draw(svg, [], steps);
+        drawer.draw([], steps);
 
         const expectedTimings = [0, animator1Time, animator1Time + animator2Time];
         assert.deepEqual(timings, expectedTimings, "setTimeout called with appropriate times");

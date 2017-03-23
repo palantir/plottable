@@ -16,6 +16,7 @@ describe("SVGDrawers", () => {
     beforeEach(() => {
       svg = TestMethods.generateSVG();
       drawer = new Plottable.Drawers.AreaSVGDrawer();
+      drawer.attachTo(svg);
 
       const drawSteps: Plottable.Drawers.AppliedDrawStep[] = [
         {
@@ -23,7 +24,7 @@ describe("SVGDrawers", () => {
           animator: new Plottable.Animators.Null(),
         },
       ];
-      drawer.draw(svg, data, drawSteps);
+      drawer.draw(data, drawSteps);
     });
 
     afterEach(function() {
@@ -33,13 +34,13 @@ describe("SVGDrawers", () => {
     });
 
     it("has a stroke of \"none\"", () => {
-      assert.strictEqual(drawer.selection().style("stroke"), "none");
+      assert.strictEqual(d3.selectAll(drawer.getVisualPrimitives()).style("stroke"), "none");
     });
 
     it("retrieves the same path regardless of requested selection index", () => {
       const expectedSelection = svg.selectAll<Element, any>("path");
       data[0].forEach((datum, index) => {
-        const selectionForIndex = drawer.getVisualPrimitiveAtIndex(index);
+        const selectionForIndex = d3.select(drawer.getVisualPrimitiveAtIndex(index));
         assert.strictEqual(selectionForIndex.size(), 1, `selection for index ${index} contains only one element`);
         assert.strictEqual(selectionForIndex.node(), expectedSelection.node(), `selection for index ${index} contains the correct element`);
       });

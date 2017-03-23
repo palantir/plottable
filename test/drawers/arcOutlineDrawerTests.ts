@@ -11,6 +11,7 @@ describe("SVGDrawers", () => {
     it("has a fill of \"none\"", () => {
       const drawer = new Plottable.Drawers.ArcOutlineSVGDrawer();
       const svg = TestMethods.generateSVG();
+      drawer.attachTo(svg);
 
       const data = [["A", "B", "C"]]; // arc outline normally takes single array of data
       const drawSteps: Plottable.Drawers.AppliedDrawStep[] = [
@@ -19,9 +20,9 @@ describe("SVGDrawers", () => {
           animator: new Plottable.Animators.Null(),
         },
       ];
-      drawer.draw(svg, data, drawSteps);
+      drawer.draw(data, drawSteps);
 
-      assert.strictEqual(drawer.selection().style("fill"), "none");
+      assert.strictEqual(d3.selectAll(drawer.getVisualPrimitives()).style("fill"), "none");
 
       svg.remove();
     });

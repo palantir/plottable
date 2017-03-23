@@ -63,7 +63,7 @@ export class ProxyDrawer implements Drawer {
       this._currentDrawer.remove();
     }
     const svgDrawer = this._svgDrawerFactory();
-    svgDrawer.attachTo(parent.node());
+    svgDrawer.attachTo(parent);
     this._currentDrawer = svgDrawer;
   }
 
@@ -75,6 +75,11 @@ export class ProxyDrawer implements Drawer {
       this._currentDrawer.remove();
     }
     this._currentDrawer = new CanvasDrawer(canvas.node().getContext("2d"), this._canvasDrawStep);
+  }
+
+  // public for testing
+  public getDrawer() {
+    return this._currentDrawer;
   }
 
   /**

@@ -26,6 +26,11 @@ export class CanvasDrawer implements Drawer {
   constructor(private _context: CanvasRenderingContext2D, private _drawStep: CanvasDrawStep) {
   }
 
+  // public for testing
+  public getDrawStep() {
+    return this._drawStep;
+  }
+
   public draw(data: any[], appliedDrawSteps: AppliedDrawStep[]) {
     // don't support animations for now; just draw the last draw step immediately
     const lastDrawStep = appliedDrawSteps[appliedDrawSteps.length - 1];

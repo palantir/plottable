@@ -373,7 +373,7 @@ describe("Scales", () => {
 
     describe("Plot interaction", () => {
       function createMockDrawer(dataset: Plottable.Dataset) {
-        return new Plottable.Drawer(dataset, new Plottable.Drawers.SVGDrawer("mock", ""), null);
+        return new Plottable.ProxyDrawer(() => new Plottable.Drawers.SVGDrawer("mock", ""), null);
       }
 
       let data: any[];

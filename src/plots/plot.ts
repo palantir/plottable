@@ -656,6 +656,7 @@ export class Plot extends Component {
 
   /**
    * Retrieves the drawn visual elements for the specified Datasets as a d3 Selection.
+   * Not supported on canvas renderer.
    *
    * @param {Dataset[]} [datasets] The Datasets to retrieve the Selections for.
    *   If not provided, Selections will be retrieved for all Datasets on the Plot.
@@ -663,7 +664,7 @@ export class Plot extends Component {
    */
   public selections(datasets = this.datasets()): SimpleSelection<any> {
     if (this.renderer() === "canvas") {
-      return null;
+      return d3.select(null);
     } else {
       const selections: d3.BaseType[] = [];
 

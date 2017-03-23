@@ -78,8 +78,13 @@ export class SVGDrawer implements Drawer {
     this._root.remove();
   }
 
-  public attachTo(parent: SVGElement) {
-    parent.appendChild(this._root.node());
+  public attachTo(parent: d3.Selection<SVGElement, any, any, any>) {
+    parent.node().appendChild(this._root.node());
+  }
+
+  // public for testing
+  public getRoot(): d3.Selection<SVGElement, any, any, any> {
+    return this._root;
   }
 
   /**

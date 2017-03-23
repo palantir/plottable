@@ -24,26 +24,25 @@ describe("SVGDrawers", () => {
     beforeEach(() => {
       svg = TestMethods.generateSVG();
       drawer = new Plottable.Drawers.LineSVGDrawer();
+      drawer.attachTo(svg);
     });
 
-    afterEach(function() {
-      if (this.currentTest.state === "passed") {
-        svg.remove();
-      }
+    afterEach(() => {
+      svg.remove();
     });
 
     it("has a fill of \"none\"", () => {
-      drawer.draw(svg, data, drawSteps);
-      assert.strictEqual(drawer.selection().style("fill"), "none");
+      drawer.draw(data, drawSteps);
+      assert.strictEqual(d3.selectAll(drawer.getVisualPrimitives()).style("fill"), "none");
     });
 
     it("retrieves the same path regardless of requested selection index", () => {
-      drawer.draw(svg, data, drawSteps);
-      const expectedSelection = svg.selectAll<Element, any>("path");
+      drawer.draw(data, drawSteps);
+      const expectedSelection = drawer.getRoot().selectAll<Element, any>("path");
+      assert.strictEqual(expectedSelection.size(), 1, "only one path");
       data[0].forEach((datum, index) => {
         const selectionForIndex = drawer.getVisualPrimitiveAtIndex(index);
-        assert.strictEqual(selectionForIndex.size(), 1, `selection for index ${index} contains only one element`);
-        assert.strictEqual(selectionForIndex.node(), expectedSelection.node(), `selection for index ${index} contains the correct element`);
+        assert.strictEqual(selectionForIndex, expectedSelection.node(), `selection for index ${index} contains the correct element`);
       });
     });
   });
@@ -59,4 +58,4 @@ describe("LineCanvasDrawStep", () => {
     lineDrawStep(context, data, {});
     assert.strictEqual(line.context(), context, "line's context is set");
   });
-})
+});

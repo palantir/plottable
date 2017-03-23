@@ -100,14 +100,14 @@ var Color = __webpack_require__(100);
 exports.Color = Color;
 var DOM = __webpack_require__(101);
 exports.DOM = DOM;
-var Math = __webpack_require__(33);
+var Math = __webpack_require__(32);
 exports.Math = Math;
 var Stacking = __webpack_require__(104);
 exports.Stacking = Stacking;
-var Window = __webpack_require__(20);
+var Window = __webpack_require__(19);
 exports.Window = Window;
 __export(__webpack_require__(99));
-__export(__webpack_require__(13));
+__export(__webpack_require__(12));
 __export(__webpack_require__(102));
 __export(__webpack_require__(103));
 __export(__webpack_require__(50));
@@ -136,14 +136,13 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var Animators = __webpack_require__(6);
+var Animators = __webpack_require__(7);
 var component_1 = __webpack_require__(5);
-var drawer_1 = __webpack_require__(7);
+var drawer_1 = __webpack_require__(6);
+var svgDrawer_1 = __webpack_require__(8);
 var Utils = __webpack_require__(0);
-var canvasDrawer_1 = __webpack_require__(8);
-var svgDrawer_1 = __webpack_require__(9);
-var coerceD3_1 = __webpack_require__(13);
-var makeEnum_1 = __webpack_require__(10);
+var coerceD3_1 = __webpack_require__(12);
+var makeEnum_1 = __webpack_require__(9);
 var Plots = __webpack_require__(47);
 exports.Renderer = makeEnum_1.makeEnum(["svg", "canvas"]);
 var Plot = (function (_super) {
@@ -190,6 +189,21 @@ var Plot = (function (_super) {
     Plot.getTotalDrawTime = function (data, drawSteps) {
         return drawSteps.reduce(function (time, drawStep) { return time + drawStep.animator.totalTime(data.length); }, 0);
     };
+    Plot.applyDrawSteps = function (drawSteps, dataset) {
+        var appliedDrawSteps = drawSteps.map(function (drawStep) {
+            var attrToProjector = drawStep.attrToProjector;
+            var attrToAppliedProjector = {};
+            Object.keys(attrToProjector).forEach(function (attr) {
+                attrToAppliedProjector[attr] =
+                    function (datum, index) { return attrToProjector[attr](datum, index, dataset); };
+            });
+            return {
+                attrToAppliedProjector: attrToAppliedProjector,
+                animator: drawStep.animator,
+            };
+        });
+        return appliedDrawSteps;
+    };
     Plot.prototype.anchor = function (selection) {
         selection = coerceD3_1.coerceExternalD3(selection);
         _super.prototype.anchor.call(this, selection);
@@ -225,6 +239,13 @@ var Plot = (function (_super) {
         this._scales().forEach(function (scale) { return scale.offUpdate(_this._renderCallback); });
         this.datasets([]);
     };
+    /**
+     * Setup the DOM nodes for the given dataset. This is a separate
+     * step from "creating the Drawer" since the element may not be setup yet
+     * (in which case the _renderArea is null because the .element() and .content()
+     * are null). Also because subclasses may do more than just configure one
+     * single drawer (e.g. adding text drawing capabilities).
+     */
     Plot.prototype._createNodesForDataset = function (dataset) {
         var drawer = this._datasetToDrawer.get(dataset);
         if (this.renderer() === "svg") {
@@ -235,8 +256,12 @@ var Plot = (function (_super) {
         }
         return drawer;
     };
+    /**
+     * Create a new Drawer. Subclasses should override this to return
+     * a Drawer that draws the correct shapes for this plot.
+     */
     Plot.prototype._createDrawer = function (dataset) {
-        return new drawer_1.Drawer(dataset, new svgDrawer_1.SVGDrawer("path", ""), new canvasDrawer_1.CanvasDrawer(function () { }));
+        return new drawer_1.ProxyDrawer(function () { return new svgDrawer_1.SVGDrawer("path", ""); }, function () { });
     };
     Plot.prototype._getAnimator = function (key) {
         if (this._animateOnNextRender()) {
@@ -563,13 +588,17 @@ var Plot = (function (_super) {
             var context_1 = canvas.getContext("2d");
             context_1.clearRect(0, 0, canvas.width, canvas.height);
         }
-        this.datasets().forEach(function (ds, i) { return drawers[i].draw(dataToDraw.get(ds), drawSteps); });
+        this.datasets().forEach(function (ds, i) {
+            var appliedDrawSteps = Plot.applyDrawSteps(drawSteps, ds);
+            drawers[i].draw(dataToDraw.get(ds), appliedDrawSteps);
+        });
         var times = this.datasets().map(function (ds, i) { return Plot.getTotalDrawTime(dataToDraw.get(ds), drawSteps); });
         var maxTime = Utils.Math.max(times, 0);
         this._additionalPaint(maxTime);
     };
     /**
      * Retrieves the drawn visual elements for the specified Datasets as a d3 Selection.
+     * Not supported on canvas renderer.
      *
      * @param {Dataset[]} [datasets] The Datasets to retrieve the Selections for.
      *   If not provided, Selections will be retrieved for all Datasets on the Plot.
@@ -579,7 +608,7 @@ var Plot = (function (_super) {
         var _this = this;
         if (datasets === void 0) { datasets = this.datasets(); }
         if (this.renderer() === "canvas") {
-            return null;
+            return d3.select(null);
         }
         else {
             var selections_1 = [];
@@ -588,8 +617,8 @@ var Plot = (function (_super) {
                 if (drawer == null) {
                     return;
                 }
-                var maybeSelection = drawer.selection();
-                selections_1.push.apply(selections_1, maybeSelection.nodes());
+                var visualPrimitives = drawer.getVisualPrimitives();
+                selections_1.push.apply(selections_1, visualPrimitives);
             });
             return d3.selectAll(selections_1);
         }
@@ -636,7 +665,7 @@ var Plot = (function (_super) {
             datasetIndex: entity.datasetIndex,
             index: entity.index,
             component: entity.component,
-            selection: entity.drawer.selectionForIndex(entity.validDatumIndex),
+            selection: d3.select(entity.drawer.getVisualPrimitives()[entity.validDatumIndex]),
         };
         return plotEntity;
     };
@@ -726,7 +755,7 @@ __export(__webpack_require__(95));
 __export(__webpack_require__(97));
 // ---------------------------------------------------------
 var categoryScale_1 = __webpack_require__(49);
-var quantitativeScale_1 = __webpack_require__(12);
+var quantitativeScale_1 = __webpack_require__(11);
 /**
  * Type guarded function to check if the scale implements the
  * `TransformableScale` interface. Unfortunately, there is no way to do
@@ -757,7 +786,7 @@ function __export(m) {
 __export(__webpack_require__(51));
 __export(__webpack_require__(54));
 __export(__webpack_require__(120));
-__export(__webpack_require__(21));
+__export(__webpack_require__(20));
 __export(__webpack_require__(56));
 __export(__webpack_require__(58));
 //# sourceMappingURL=index.js.map
@@ -773,10 +802,10 @@ __export(__webpack_require__(58));
  */
 
 var d3 = __webpack_require__(1);
-var RenderController = __webpack_require__(28);
+var RenderController = __webpack_require__(27);
 var Utils = __webpack_require__(0);
-var coerceD3_1 = __webpack_require__(13);
-var makeEnum_1 = __webpack_require__(10);
+var coerceD3_1 = __webpack_require__(12);
+var makeEnum_1 = __webpack_require__(9);
 exports.XAlignment = makeEnum_1.makeEnum(["left", "center", "right"]);
 exports.YAlignment = makeEnum_1.makeEnum(["top", "center", "bottom"]);
 /**
@@ -1326,11 +1355,67 @@ exports.Component = Component;
  * @license MIT
  */
 
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
-__export(__webpack_require__(64));
-__export(__webpack_require__(65));
+var canvasDrawer_1 = __webpack_require__(43);
+/**
+ * A Drawer is a stateful class that holds one SVGDrawer and one CanvasDrawer, and can switch between
+ * the two.
+ */
+var ProxyDrawer = (function () {
+    /**
+     * A Drawer draws svg elements based on the input Dataset.
+     *
+     * @constructor
+     * @param _svgDrawerFactory A factory that will be invoked to create an SVGDrawer whenever useSVG is called
+     * @param _canvasDrawStep The DrawStep to be fed into a new CanvasDrawer whenever useCanvas is called
+     */
+    function ProxyDrawer(_svgDrawerFactory, _canvasDrawStep) {
+        this._svgDrawerFactory = _svgDrawerFactory;
+        this._canvasDrawStep = _canvasDrawStep;
+    }
+    /**
+     * Remove the old drawer and use SVG rendering from now on.
+     */
+    ProxyDrawer.prototype.useSVG = function (parent) {
+        if (this._currentDrawer != null) {
+            this._currentDrawer.remove();
+        }
+        var svgDrawer = this._svgDrawerFactory();
+        svgDrawer.attachTo(parent);
+        this._currentDrawer = svgDrawer;
+    };
+    /**
+     * Remove the old drawer and use Canvas rendering from now on.
+     */
+    ProxyDrawer.prototype.useCanvas = function (canvas) {
+        if (this._currentDrawer != null) {
+            this._currentDrawer.remove();
+        }
+        this._currentDrawer = new canvasDrawer_1.CanvasDrawer(canvas.node().getContext("2d"), this._canvasDrawStep);
+    };
+    // public for testing
+    ProxyDrawer.prototype.getDrawer = function () {
+        return this._currentDrawer;
+    };
+    /**
+     * Removes this Drawer's renderArea
+     */
+    ProxyDrawer.prototype.remove = function () {
+        if (this._currentDrawer != null) {
+            this._currentDrawer.remove();
+        }
+    };
+    ProxyDrawer.prototype.draw = function (data, drawSteps) {
+        this._currentDrawer.draw(data, drawSteps);
+    };
+    ProxyDrawer.prototype.getVisualPrimitives = function () {
+        return this._currentDrawer.getVisualPrimitives();
+    };
+    ProxyDrawer.prototype.getVisualPrimitiveAtIndex = function (index) {
+        return this._currentDrawer.getVisualPrimitiveAtIndex(index);
+    };
+    return ProxyDrawer;
+}());
+exports.ProxyDrawer = ProxyDrawer;
 
 
 /***/ }),
@@ -1343,113 +1428,11 @@ __export(__webpack_require__(65));
  * @license MIT
  */
 
-function applyProjectorsWithDataset(attrToProjector, dataset) {
-    var modifiedAttrToProjector = {};
-    Object.keys(attrToProjector).forEach(function (attr) {
-        modifiedAttrToProjector[attr] =
-            function (datum, index) { return attrToProjector[attr](datum, index, dataset); };
-    });
-    return modifiedAttrToProjector;
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-/**
- * A Drawer is a stateful class that holds one SVGDrawer and one CanvasDrawer, and can switch between
- * the two.
- */
-var Drawer = (function () {
-    /**
-     * A Drawer draws svg elements based on the input Dataset.
-     *
-     * @constructor
-     * @param {Dataset} dataset The dataset associated with this Drawer
-     */
-    function Drawer(dataset, svgDrawer, canvasDrawer) {
-        this._canvasDrawer = canvasDrawer;
-        this._dataset = dataset;
-        this._svgDrawer = svgDrawer;
-    }
-    /**
-     * Use SVG rendering from now on. This will append a new <g> element to the renderArea and draw
-     * DOM elements into it.
-     */
-    Drawer.prototype.useSVG = function (parentRenderArea) {
-        this._canvas = null;
-        this._svgRootG = parentRenderArea.append("g");
-    };
-    /**
-     * Use Canvas rendering from now on. This will remove the <g> element created by useSVG, if it exists.
-     */
-    Drawer.prototype.useCanvas = function (canvas) {
-        if (this._svgRootG != null) {
-            this._svgRootG.remove();
-            this._svgRootG = null;
-        }
-        this._canvas = canvas;
-    };
-    /**
-     * Public for testing
-     */
-    Drawer.prototype.getSvgRootG = function () {
-        return this._svgRootG;
-    };
-    /**
-     * public for testing
-     */
-    Drawer.prototype.getCanvas = function () {
-        return this._canvas;
-    };
-    /**
-     * Removes this Drawer's renderArea
-     */
-    Drawer.prototype.remove = function () {
-        if (this._svgRootG != null) {
-            this._svgRootG.remove();
-        }
-    };
-    /**
-     * Draws the data using the drawSteps onto the currently selected drawer.
-     *
-     * @param{any[]} data The data to be drawn
-     * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
-     */
-    Drawer.prototype.draw = function (data, drawSteps) {
-        var _this = this;
-        var appliedDrawSteps = drawSteps.map(function (drawStep) {
-            var attrToAppliedProjector = applyProjectorsWithDataset(drawStep.attrToProjector, _this._dataset);
-            return {
-                attrToAppliedProjector: attrToAppliedProjector,
-                animator: drawStep.animator,
-            };
-        });
-        if (this._svgRootG != null) {
-            this._svgDrawer.draw(this._svgRootG, data, appliedDrawSteps);
-        }
-        else if (this._canvas != null) {
-            this._canvasDrawer.draw(this._canvas, data, appliedDrawSteps);
-        }
-        else {
-            throw new Error("Must call .useSVG or .useCanvas before drawing!");
-        }
-        return this;
-    };
-    Drawer.prototype.selection = function () {
-        if (this._svgRootG != null) {
-            return this._svgDrawer.selection();
-        }
-        else {
-            return null;
-        }
-    };
-    Drawer.prototype.selectionForIndex = function (index) {
-        if (this._svgRootG != null) {
-            return this._svgDrawer.selectionForIndex(index);
-        }
-        else {
-            return null;
-        }
-    };
-    return Drawer;
-}());
-exports.Drawer = Drawer;
+__export(__webpack_require__(64));
+__export(__webpack_require__(65));
 
 
 /***/ }),
@@ -1462,92 +1445,80 @@ exports.Drawer = Drawer;
  * @license MIT
  */
 
-/**
- * A CanvasDrawer draws data onto a supplied Canvas DOM element.
- *
- * This class is immutable (but has internal state) and shouldn't be extended.
- */
-var CanvasDrawer = (function () {
-    function CanvasDrawer(drawStep) {
-        this._drawStep = drawStep;
-    }
-    CanvasDrawer.prototype.draw = function (canvas, data, appliedDrawSteps) {
-        // don't support animations for now; just draw the last draw step immediately
-        var lastDrawStep = appliedDrawSteps[appliedDrawSteps.length - 1];
-        var context = canvas.node().getContext("2d");
-        context.save();
-        this._drawStep(context, data, lastDrawStep.attrToAppliedProjector);
-        context.restore();
-    };
-    return CanvasDrawer;
-}());
-exports.CanvasDrawer = CanvasDrawer;
-
-
-/***/ }),
-/* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
-
 var d3 = __webpack_require__(1);
 var Utils = __webpack_require__(0);
 /**
- * An SVGDrawer "draws" data by creating DOM elements and setting specific attributes on them
+ * An SVGDrawer draws data by creating DOM elements and setting specific attributes on them
  * to accurately reflect the data being passed in.
  *
- * This class is immutable (but has internal state) and shouldn't be extended.
+ * This class is immutable (but has internal state).
  */
 var SVGDrawer = (function () {
     /**
-     * @param svgElementName an HTML/SVG tag name to be created one per data.
+     * @param svgElementName an HTML/SVG tag name to be created, one per datum.
      * @param className CSS classes to be applied to the drawn primitives.
      * @param applyDefaultAttributes
      */
     function SVGDrawer(svgElementName, className) {
+        this._root = d3.select(document.createElementNS("http://www.w3.org/2000/svg", "g"));
         this._className = className;
         this._svgElementName = svgElementName;
     }
-    /**
-     * Draws to the given root element.
-     * @param root
-     * @param data
-     * @param appliedDrawSteps
-     */
-    SVGDrawer.prototype.draw = function (root, data, appliedDrawSteps) {
+    SVGDrawer.prototype.draw = function (data, appliedDrawSteps) {
         var _this = this;
         /*
          * Draw to the DOM by clearing old DOM elements, adding new DOM elements,
          * and then passing those DOM elements to the animator, which will set the
          * appropriate attributes on the DOM.
          */
-        this._createAndDestroyDOMElements(root, data);
+        this._createAndDestroyDOMElements(data);
         var delay = 0;
         appliedDrawSteps.forEach(function (drawStep, i) {
             Utils.Window.setTimeout(function () { return _this._drawStep(drawStep); }, delay);
             delay += drawStep.animator.totalTime(data.length);
         });
     };
-    SVGDrawer.prototype._createAndDestroyDOMElements = function (root, data) {
-        var dataElementsUpdate = root.selectAll(this.selector()).data(data);
+    SVGDrawer.prototype.getVisualPrimitives = function () {
+        if (this._cachedVisualPrimitivesNodes == null) {
+            this._cachedVisualPrimitivesNodes = this._selection.nodes();
+        }
+        return this._cachedVisualPrimitivesNodes;
+    };
+    SVGDrawer.prototype.getVisualPrimitiveAtIndex = function (index) {
+        return this.getVisualPrimitives()[index];
+    };
+    SVGDrawer.prototype.remove = function () {
+        this._root.remove();
+    };
+    SVGDrawer.prototype.attachTo = function (parent) {
+        parent.node().appendChild(this._root.node());
+    };
+    // public for testing
+    SVGDrawer.prototype.getRoot = function () {
+        return this._root;
+    };
+    /**
+     * Returns the CSS selector for this Drawer's visual elements.
+     */
+    SVGDrawer.prototype.selector = function () {
+        return this._svgElementName;
+    };
+    SVGDrawer.prototype._applyDefaultAttributes = function (selection) {
+        // subclasses may override
+    };
+    SVGDrawer.prototype._createAndDestroyDOMElements = function (data) {
+        var dataElementsUpdate = this._root.selectAll(this.selector()).data(data);
         this._selection =
             dataElementsUpdate
                 .enter()
                 .append(this._svgElementName)
                 .merge(dataElementsUpdate);
         dataElementsUpdate.exit().remove();
-        this._cachedSelectionNodes = null;
+        this._cachedVisualPrimitivesNodes = null;
         if (this._className != null) {
             this._selection.classed(this._className, true);
         }
         this._applyDefaultAttributes(this._selection);
-    };
-    SVGDrawer.prototype._applyDefaultAttributes = function (selection) {
-        // subclasses may override
     };
     /**
      * Draws data using one step
@@ -1564,26 +1535,8 @@ var SVGDrawer = (function () {
         });
         step.animator.animate(this._selection, step.attrToAppliedProjector);
         if (this._className != null) {
-            this.selection().classed(this._className, true);
+            this._selection.classed(this._className, true);
         }
-    };
-    SVGDrawer.prototype.selection = function () {
-        return this._selection;
-    };
-    /**
-     * Returns the CSS selector for this Drawer's visual elements.
-     */
-    SVGDrawer.prototype.selector = function () {
-        return this._svgElementName;
-    };
-    /**
-     * Returns the D3 selection corresponding to the datum with the specified index.
-     */
-    SVGDrawer.prototype.selectionForIndex = function (index) {
-        if (this._cachedSelectionNodes == null) {
-            this._cachedSelectionNodes = this._selection.nodes();
-        }
-        return d3.select(this._cachedSelectionNodes[index]);
     };
     return SVGDrawer;
 }());
@@ -1591,7 +1544,7 @@ exports.SVGDrawer = SVGDrawer;
 
 
 /***/ }),
-/* 10 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1610,7 +1563,7 @@ exports.makeEnum = makeEnum;
 
 
 /***/ }),
-/* 11 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1854,7 +1807,7 @@ function verifyPrecision(precision) {
 
 
 /***/ }),
-/* 12 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1869,9 +1822,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var Interactions = __webpack_require__(15);
+var Interactions = __webpack_require__(14);
 var Utils = __webpack_require__(0);
-var scale_1 = __webpack_require__(19);
+var scale_1 = __webpack_require__(18);
 var QuantitativeScale = (function (_super) {
     __extends(QuantitativeScale, _super);
     /**
@@ -2125,7 +2078,7 @@ exports.QuantitativeScale = QuantitativeScale;
 
 
 /***/ }),
-/* 13 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2161,7 +2114,7 @@ exports.coerceExternalD3 = coerceExternalD3;
 
 
 /***/ }),
-/* 14 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2179,7 +2132,7 @@ __export(__webpack_require__(79));
 
 
 /***/ }),
-/* 15 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2193,13 +2146,13 @@ function __export(m) {
 }
 __export(__webpack_require__(80));
 __export(__webpack_require__(81));
-__export(__webpack_require__(37));
+__export(__webpack_require__(36));
 __export(__webpack_require__(82));
 __export(__webpack_require__(83));
 
 
 /***/ }),
-/* 16 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2301,7 +2254,7 @@ exports.Interaction = Interaction;
 
 
 /***/ }),
-/* 17 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2616,7 +2569,7 @@ exports.XYPlot = XYPlot;
 
 
 /***/ }),
-/* 18 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2629,7 +2582,7 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 __export(__webpack_require__(46));
-__export(__webpack_require__(25));
+__export(__webpack_require__(24));
 __export(__webpack_require__(47));
 __export(__webpack_require__(84));
 __export(__webpack_require__(48));
@@ -2643,7 +2596,7 @@ __export(__webpack_require__(91));
 
 
 /***/ }),
-/* 19 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2800,7 +2753,7 @@ exports.Scale = Scale;
 
 
 /***/ }),
-/* 20 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2809,7 +2762,7 @@ exports.Scale = Scale;
  * @license MIT
  */
 
-var Configs = __webpack_require__(23);
+var Configs = __webpack_require__(22);
 /**
  * Print a warning message to the console, if it is available.
  *
@@ -2872,7 +2825,7 @@ exports.deprecated = deprecated;
 
 
 /***/ }),
-/* 21 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2892,7 +2845,7 @@ __export(__webpack_require__(124));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 22 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2909,9 +2862,9 @@ var __extends = (this && this.__extends) || function (d, b) {
 var d3 = __webpack_require__(1);
 var Typesetter = __webpack_require__(4);
 var component_1 = __webpack_require__(5);
-var Formatters = __webpack_require__(11);
+var Formatters = __webpack_require__(10);
 var Utils = __webpack_require__(0);
-var makeEnum_1 = __webpack_require__(10);
+var makeEnum_1 = __webpack_require__(9);
 exports.AxisOrientation = makeEnum_1.makeEnum(["bottom", "left", "right", "top"]);
 var Axis = (function (_super) {
     __extends(Axis, _super);
@@ -3539,7 +3492,7 @@ exports.Axis = Axis;
 
 
 /***/ }),
-/* 23 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3559,7 +3512,7 @@ exports.ADD_TITLE_ELEMENTS = true;
 
 
 /***/ }),
-/* 24 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3634,7 +3587,7 @@ exports.Dispatcher = Dispatcher;
 
 
 /***/ }),
-/* 25 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3650,18 +3603,17 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Typesetter = __webpack_require__(4);
-var Animators = __webpack_require__(6);
-var Formatters = __webpack_require__(11);
-var drawer_1 = __webpack_require__(7);
+var Animators = __webpack_require__(7);
+var Formatters = __webpack_require__(10);
+var drawer_1 = __webpack_require__(6);
+var rectangleDrawer_1 = __webpack_require__(31);
 var Scales = __webpack_require__(3);
-var quantitativeScale_1 = __webpack_require__(12);
+var quantitativeScale_1 = __webpack_require__(11);
 var Utils = __webpack_require__(0);
-var canvasDrawer_1 = __webpack_require__(8);
-var rectangleDrawer_1 = __webpack_require__(32);
-var makeEnum_1 = __webpack_require__(10);
-var Plots = __webpack_require__(18);
+var makeEnum_1 = __webpack_require__(9);
+var Plots = __webpack_require__(17);
 var plot_1 = __webpack_require__(2);
-var xyPlot_1 = __webpack_require__(17);
+var xyPlot_1 = __webpack_require__(16);
 exports.BarOrientation = makeEnum_1.makeEnum(["vertical", "horizontal"]);
 var Bar = (function (_super) {
     __extends(Bar, _super);
@@ -3733,8 +3685,8 @@ var Bar = (function (_super) {
         _super.prototype.render.call(this);
         return this;
     };
-    Bar.prototype._createDrawer = function (dataset) {
-        return new drawer_1.Drawer(dataset, new rectangleDrawer_1.RectangleSVGDrawer(Bar._BAR_AREA_CLASS), new canvasDrawer_1.CanvasDrawer(rectangleDrawer_1.RectangleCanvasDrawStep));
+    Bar.prototype._createDrawer = function () {
+        return new drawer_1.ProxyDrawer(function () { return new rectangleDrawer_1.RectangleSVGDrawer(Bar._BAR_AREA_CLASS); }, rectangleDrawer_1.RectangleCanvasDrawStep);
     };
     Bar.prototype._setup = function () {
         _super.prototype._setup.call(this);
@@ -3858,7 +3810,7 @@ var Bar = (function (_super) {
             var secondaryDist = 0;
             var plotPt = _this._pixelPoint(entity.datum, entity.index, entity.dataset);
             // if we're inside a bar, distance in both directions should stay 0
-            var barBBox = Utils.DOM.elementBBox(entity.drawer.selectionForIndex(entity.validDatumIndex));
+            var barBBox = Utils.DOM.elementBBox(d3.select(entity.drawer.getVisualPrimitiveAtIndex(entity.validDatumIndex)));
             if (!Utils.DOM.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
                 var plotPtPrimary = _this._isVertical ? plotPt.x : plotPt.y;
                 primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
@@ -3931,7 +3883,7 @@ var Bar = (function (_super) {
         var _this = this;
         var intersected = [];
         this._getEntityStore().forEach(function (entity) {
-            var selection = entity.drawer.selectionForIndex(entity.validDatumIndex);
+            var selection = d3.select(entity.drawer.getVisualPrimitiveAtIndex(entity.validDatumIndex));
             if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, Utils.DOM.elementBBox(selection))) {
                 intersected.push(_this._lightweightPlotEntityToPlotEntity(entity));
             }
@@ -4273,7 +4225,7 @@ exports.Bar = Bar;
 
 
 /***/ }),
-/* 26 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4289,11 +4241,11 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Typesetter = __webpack_require__(4);
-var Formatters = __webpack_require__(11);
+var Formatters = __webpack_require__(10);
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var makeEnum_1 = __webpack_require__(10);
-var axis_1 = __webpack_require__(22);
+var makeEnum_1 = __webpack_require__(9);
+var axis_1 = __webpack_require__(21);
 exports.TimeInterval = makeEnum_1.makeEnum([
     "second",
     "minute",
@@ -4829,7 +4781,7 @@ var _a;
 
 
 /***/ }),
-/* 27 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4843,7 +4795,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var coerceD3_1 = __webpack_require__(13);
+var coerceD3_1 = __webpack_require__(12);
 var component_1 = __webpack_require__(5);
 /*
  * ComponentContainer class encapsulates Table and ComponentGroup's shared functionality.
@@ -4923,7 +4875,7 @@ exports.ComponentContainer = ComponentContainer;
 
 
 /***/ }),
-/* 28 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4933,8 +4885,8 @@ exports.ComponentContainer = ComponentContainer;
  */
 
 var Utils = __webpack_require__(0);
-var makeEnum_1 = __webpack_require__(10);
-var RenderPolicies = __webpack_require__(36);
+var makeEnum_1 = __webpack_require__(9);
+var RenderPolicies = __webpack_require__(35);
 /**
  * The RenderController is responsible for enqueueing and synchronizing
  * layout and render calls for Components.
@@ -5053,7 +5005,7 @@ exports.flush = flush;
 
 
 /***/ }),
-/* 29 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5098,7 +5050,7 @@ exports.wye = wye;
 
 
 /***/ }),
-/* 30 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5112,11 +5064,11 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Interactions = __webpack_require__(15);
+var Interactions = __webpack_require__(14);
 var Utils = __webpack_require__(0);
-var coerceD3_1 = __webpack_require__(13);
-var _1 = __webpack_require__(35);
-var selectionBoxLayer_1 = __webpack_require__(40);
+var coerceD3_1 = __webpack_require__(12);
+var _1 = __webpack_require__(34);
+var selectionBoxLayer_1 = __webpack_require__(39);
 var DragBoxLayer = (function (_super) {
     __extends(DragBoxLayer, _super);
     /**
@@ -5484,7 +5436,7 @@ exports.DragBoxLayer = DragBoxLayer;
 
 
 /***/ }),
-/* 31 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5499,7 +5451,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var svgDrawer_1 = __webpack_require__(9);
+var svgDrawer_1 = __webpack_require__(8);
 var LineSVGDrawer = (function (_super) {
     __extends(LineSVGDrawer, _super);
     function LineSVGDrawer() {
@@ -5508,8 +5460,8 @@ var LineSVGDrawer = (function (_super) {
     LineSVGDrawer.prototype._applyDefaultAttributes = function (selection) {
         selection.style("fill", "none");
     };
-    LineSVGDrawer.prototype.selectionForIndex = function (index) {
-        return d3.select(this.selection().node());
+    LineSVGDrawer.prototype.getVisualPrimitiveAtIndex = function (index) {
+        return _super.prototype.getVisualPrimitiveAtIndex.call(this, 0);
     };
     return LineSVGDrawer;
 }(svgDrawer_1.SVGDrawer));
@@ -5549,7 +5501,7 @@ exports.makeLineCanvasDrawStep = makeLineCanvasDrawStep;
 
 
 /***/ }),
-/* 32 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5564,21 +5516,18 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var svgDrawer_1 = __webpack_require__(9);
+var svgDrawer_1 = __webpack_require__(8);
 var RectangleSVGDrawer = (function (_super) {
     __extends(RectangleSVGDrawer, _super);
-    function RectangleSVGDrawer(_rootGClassName) {
-        if (_rootGClassName === void 0) { _rootGClassName = null; }
+    function RectangleSVGDrawer(_rootClassName) {
+        if (_rootClassName === void 0) { _rootClassName = null; }
         var _this = _super.call(this, "rect", "") || this;
-        _this._rootGClassName = _rootGClassName;
+        _this._rootClassName = _rootClassName;
+        if (_this._rootClassName != null) {
+            _this._root.classed(_this._rootClassName, true);
+        }
         return _this;
     }
-    RectangleSVGDrawer.prototype.draw = function (root, data, appliedDrawSteps) {
-        if (this._rootGClassName != null) {
-            root.classed(this._rootGClassName, true);
-        }
-        _super.prototype.draw.call(this, root, data, appliedDrawSteps);
-    };
     return RectangleSVGDrawer;
 }(svgDrawer_1.SVGDrawer));
 exports.RectangleSVGDrawer = RectangleSVGDrawer;
@@ -5614,7 +5563,7 @@ exports.RectangleCanvasDrawStep = function (context, data, attrToAppliedProjecto
 
 
 /***/ }),
-/* 33 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5730,7 +5679,7 @@ exports.within = within;
 
 
 /***/ }),
-/* 34 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5768,7 +5717,7 @@ exports.AbstractMeasurer = AbstractMeasurer;
 //# sourceMappingURL=abstractMeasurer.js.map
 
 /***/ }),
-/* 35 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5780,23 +5729,23 @@ exports.AbstractMeasurer = AbstractMeasurer;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(30));
+__export(__webpack_require__(29));
 __export(__webpack_require__(68));
 __export(__webpack_require__(69));
+__export(__webpack_require__(37));
 __export(__webpack_require__(38));
-__export(__webpack_require__(39));
 __export(__webpack_require__(70));
 __export(__webpack_require__(71));
 __export(__webpack_require__(72));
 __export(__webpack_require__(73));
-__export(__webpack_require__(40));
+__export(__webpack_require__(39));
 __export(__webpack_require__(74));
 __export(__webpack_require__(75));
 __export(__webpack_require__(76));
 
 
 /***/ }),
-/* 36 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5806,7 +5755,7 @@ __export(__webpack_require__(76));
  */
 
 var Utils = __webpack_require__(0);
-var RenderController = __webpack_require__(28);
+var RenderController = __webpack_require__(27);
 /**
  * Renders Components immediately after they are enqueued.
  * Useful for debugging, horrible for performance.
@@ -5851,7 +5800,7 @@ exports.Timeout = Timeout;
 
 
 /***/ }),
-/* 37 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5865,9 +5814,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Dispatchers = __webpack_require__(14);
+var Dispatchers = __webpack_require__(13);
 var Utils = __webpack_require__(0);
-var interaction_1 = __webpack_require__(16);
+var interaction_1 = __webpack_require__(15);
 var Key = (function (_super) {
     __extends(Key, _super);
     function Key() {
@@ -5977,7 +5926,7 @@ exports.Key = Key;
 
 
 /***/ }),
-/* 38 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5992,7 +5941,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(0);
-var componentContainer_1 = __webpack_require__(27);
+var componentContainer_1 = __webpack_require__(26);
 var Group = (function (_super) {
     __extends(Group, _super);
     /**
@@ -6081,7 +6030,7 @@ exports.Group = Group;
 
 
 /***/ }),
-/* 39 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6237,7 +6186,7 @@ exports.GuideLineLayer = GuideLineLayer;
 
 
 /***/ }),
-/* 40 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6466,6 +6415,35 @@ exports.SelectionBoxLayer = SelectionBoxLayer;
 
 
 /***/ }),
+/* 40 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var svgDrawer_1 = __webpack_require__(8);
+var ArcSVGDrawer = (function (_super) {
+    __extends(ArcSVGDrawer, _super);
+    function ArcSVGDrawer() {
+        return _super.call(this, "path", "arc fill") || this;
+    }
+    ArcSVGDrawer.prototype._applyDefaultAttributes = function (selection) {
+        selection.style("stroke", "none");
+    };
+    return ArcSVGDrawer;
+}(svgDrawer_1.SVGDrawer));
+exports.ArcSVGDrawer = ArcSVGDrawer;
+
+
+/***/ }),
 /* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -6480,18 +6458,18 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var svgDrawer_1 = __webpack_require__(9);
-var ArcSVGDrawer = (function (_super) {
-    __extends(ArcSVGDrawer, _super);
-    function ArcSVGDrawer() {
-        return _super.call(this, "path", "arc fill") || this;
+var svgDrawer_1 = __webpack_require__(8);
+var ArcOutlineSVGDrawer = (function (_super) {
+    __extends(ArcOutlineSVGDrawer, _super);
+    function ArcOutlineSVGDrawer() {
+        return _super.call(this, "path", "arc outline") || this;
     }
-    ArcSVGDrawer.prototype._applyDefaultAttributes = function (selection) {
-        selection.style("stroke", "none");
+    ArcOutlineSVGDrawer.prototype._applyDefaultAttributes = function (selection) {
+        selection.style("fill", "none");
     };
-    return ArcSVGDrawer;
+    return ArcOutlineSVGDrawer;
 }(svgDrawer_1.SVGDrawer));
-exports.ArcSVGDrawer = ArcSVGDrawer;
+exports.ArcOutlineSVGDrawer = ArcOutlineSVGDrawer;
 
 
 /***/ }),
@@ -6509,18 +6487,23 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var svgDrawer_1 = __webpack_require__(9);
-var ArcOutlineSVGDrawer = (function (_super) {
-    __extends(ArcOutlineSVGDrawer, _super);
-    function ArcOutlineSVGDrawer() {
-        return _super.call(this, "path", "arc outline") || this;
+var svgDrawer_1 = __webpack_require__(8);
+var AreaSVGDrawer = (function (_super) {
+    __extends(AreaSVGDrawer, _super);
+    function AreaSVGDrawer() {
+        return _super.call(this, "path", "area") || this;
     }
-    ArcOutlineSVGDrawer.prototype._applyDefaultAttributes = function (selection) {
-        selection.style("fill", "none");
+    AreaSVGDrawer.prototype._applyDefaultAttributes = function (selection) {
+        selection.style("stroke", "none");
     };
-    return ArcOutlineSVGDrawer;
+    AreaSVGDrawer.prototype.getVisualPrimitiveAtIndex = function (index) {
+        // areas are represented by one single element; always get that element
+        // regardless of the data index.
+        return _super.prototype.getVisualPrimitiveAtIndex.call(this, 0);
+    };
+    return AreaSVGDrawer;
 }(svgDrawer_1.SVGDrawer));
-exports.ArcOutlineSVGDrawer = ArcOutlineSVGDrawer;
+exports.AreaSVGDrawer = AreaSVGDrawer;
 
 
 /***/ }),
@@ -6533,27 +6516,43 @@ exports.ArcOutlineSVGDrawer = ArcOutlineSVGDrawer;
  * @license MIT
  */
 
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var d3 = __webpack_require__(1);
-var svgDrawer_1 = __webpack_require__(9);
-var AreaSVGDrawer = (function (_super) {
-    __extends(AreaSVGDrawer, _super);
-    function AreaSVGDrawer() {
-        return _super.call(this, "path", "area") || this;
+/**
+ * A CanvasDrawer draws data onto a supplied Canvas Context.
+ *
+ * This class is immutable (but has internal state) and shouldn't be extended.
+ */
+var CanvasDrawer = (function () {
+    /**
+     * @param _context The context for a canvas that this drawer will draw to.
+     * @param _drawStep The draw step logic that actually draws.
+     */
+    function CanvasDrawer(_context, _drawStep) {
+        this._context = _context;
+        this._drawStep = _drawStep;
     }
-    AreaSVGDrawer.prototype._applyDefaultAttributes = function (selection) {
-        selection.style("stroke", "none");
+    // public for testing
+    CanvasDrawer.prototype.getDrawStep = function () {
+        return this._drawStep;
     };
-    AreaSVGDrawer.prototype.selectionForIndex = function (index) {
-        return d3.select(this.selection().node());
+    CanvasDrawer.prototype.draw = function (data, appliedDrawSteps) {
+        // don't support animations for now; just draw the last draw step immediately
+        var lastDrawStep = appliedDrawSteps[appliedDrawSteps.length - 1];
+        this._context.save();
+        this._drawStep(this._context, data, lastDrawStep.attrToAppliedProjector);
+        this._context.restore();
     };
-    return AreaSVGDrawer;
-}(svgDrawer_1.SVGDrawer));
-exports.AreaSVGDrawer = AreaSVGDrawer;
+    CanvasDrawer.prototype.getVisualPrimitives = function () {
+        return [];
+    };
+    CanvasDrawer.prototype.getVisualPrimitiveAtIndex = function (index) {
+        return null;
+    };
+    CanvasDrawer.prototype.remove = function () {
+        // NO op - canvas element owns the canvas; context is free
+    };
+    return CanvasDrawer;
+}());
+exports.CanvasDrawer = CanvasDrawer;
 
 
 /***/ }),
@@ -6571,7 +6570,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var svgDrawer_1 = __webpack_require__(9);
+var svgDrawer_1 = __webpack_require__(8);
 var SegmentSVGDrawer = (function (_super) {
     __extends(SegmentSVGDrawer, _super);
     function SegmentSVGDrawer() {
@@ -6597,7 +6596,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var svgDrawer_1 = __webpack_require__(9);
+var svgDrawer_1 = __webpack_require__(8);
 var SymbolSVGDrawer = (function (_super) {
     __extends(SymbolSVGDrawer, _super);
     function SymbolSVGDrawer() {
@@ -6626,12 +6625,11 @@ var __extends = (this && this.__extends) || function (d, b) {
 var d3 = __webpack_require__(1);
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var areaDrawer_1 = __webpack_require__(43);
-var canvasDrawer_1 = __webpack_require__(8);
-var drawer_1 = __webpack_require__(7);
-var lineDrawer_1 = __webpack_require__(31);
-var windowUtils_1 = __webpack_require__(20);
-var Plots = __webpack_require__(18);
+var areaDrawer_1 = __webpack_require__(42);
+var drawer_1 = __webpack_require__(6);
+var lineDrawer_1 = __webpack_require__(30);
+var windowUtils_1 = __webpack_require__(19);
+var Plots = __webpack_require__(17);
 var linePlot_1 = __webpack_require__(48);
 var plot_1 = __webpack_require__(2);
 var Area = (function (_super) {
@@ -6653,7 +6651,7 @@ var Area = (function (_super) {
     Area.prototype._setup = function () {
         var _this = this;
         _super.prototype._setup.call(this);
-        this._lineDrawers.forEach(function (d) { return d.useSVG(_this._renderArea); });
+        this._lineDrawers.forEach(function (lineDrawer) { return lineDrawer.attachTo(_this._renderArea); });
     };
     Area.prototype.y = function (y, yScale) {
         if (y == null) {
@@ -6694,10 +6692,9 @@ var Area = (function (_super) {
         return this;
     };
     Area.prototype._addDataset = function (dataset) {
-        var _this = this;
-        var lineDrawer = new drawer_1.Drawer(dataset, new lineDrawer_1.LineSVGDrawer(), new canvasDrawer_1.CanvasDrawer(lineDrawer_1.makeLineCanvasDrawStep(function () { return _this._d3LineFactory(dataset); })));
+        var lineDrawer = new lineDrawer_1.LineSVGDrawer();
         if (this._isSetup) {
-            lineDrawer.useSVG(this._renderArea);
+            lineDrawer.attachTo(this._renderArea);
         }
         this._lineDrawers.set(dataset, lineDrawer);
         _super.prototype._addDataset.call(this, dataset);
@@ -6711,7 +6708,10 @@ var Area = (function (_super) {
         var _this = this;
         var drawSteps = this._generateLineDrawSteps();
         var dataToDraw = this._getDataToDraw();
-        this.datasets().forEach(function (dataset) { return _this._lineDrawers.get(dataset).draw(dataToDraw.get(dataset), drawSteps); });
+        this.datasets().forEach(function (dataset) {
+            var appliedDrawSteps = plot_1.Plot.applyDrawSteps(drawSteps, dataset);
+            _this._lineDrawers.get(dataset).draw(dataToDraw.get(dataset), appliedDrawSteps);
+        });
     };
     Area.prototype._generateLineDrawSteps = function () {
         var drawSteps = [];
@@ -6731,10 +6731,10 @@ var Area = (function (_super) {
         lineAttrToProjector["d"] = this._constructLineProjector(plot_1.Plot._scaledAccessor(this.x()), plot_1.Plot._scaledAccessor(this.y()));
         return lineAttrToProjector;
     };
-    Area.prototype._createDrawer = function (dataset) {
-        return new drawer_1.Drawer(dataset, new areaDrawer_1.AreaSVGDrawer(), new canvasDrawer_1.CanvasDrawer(function () {
+    Area.prototype._createDrawer = function () {
+        return new drawer_1.ProxyDrawer(function () { return new areaDrawer_1.AreaSVGDrawer(); }, function () {
             windowUtils_1.warn("canvas renderer not implemented on Area Plot!");
-        }));
+        });
     };
     Area.prototype._generateDrawSteps = function () {
         var drawSteps = [];
@@ -6782,7 +6782,7 @@ var Area = (function (_super) {
         var allSelections = _super.prototype.selections.call(this, datasets).nodes();
         var lineDrawers = datasets.map(function (dataset) { return _this._lineDrawers.get(dataset); })
             .filter(function (drawer) { return drawer != null; });
-        lineDrawers.forEach(function (ld, i) { return allSelections.push(ld.selectionForIndex(i).node()); });
+        lineDrawers.forEach(function (ld) { return allSelections.push.apply(allSelections, ld.getVisualPrimitives()); });
         return d3.selectAll(allSelections);
     };
     Area.prototype._constructAreaProjector = function (xProjector, yProjector, y0Projector) {
@@ -6843,17 +6843,16 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var Animators = __webpack_require__(6);
-var drawer_1 = __webpack_require__(7);
+var Animators = __webpack_require__(7);
+var drawer_1 = __webpack_require__(6);
+var lineDrawer_1 = __webpack_require__(30);
 var Scales = __webpack_require__(3);
-var quantitativeScale_1 = __webpack_require__(12);
+var quantitativeScale_1 = __webpack_require__(11);
 var Utils = __webpack_require__(0);
-var canvasDrawer_1 = __webpack_require__(8);
-var lineDrawer_1 = __webpack_require__(31);
-var makeEnum_1 = __webpack_require__(10);
-var Plots = __webpack_require__(18);
+var makeEnum_1 = __webpack_require__(9);
+var Plots = __webpack_require__(17);
 var plot_1 = __webpack_require__(2);
-var xyPlot_1 = __webpack_require__(17);
+var xyPlot_1 = __webpack_require__(16);
 var CURVE_NAME_MAPPING = {
     linear: d3.curveLinear,
     linearClosed: d3.curveLinearClosed,
@@ -6984,7 +6983,7 @@ var Line = (function (_super) {
     };
     Line.prototype._createDrawer = function (dataset) {
         var _this = this;
-        return new drawer_1.Drawer(dataset, new lineDrawer_1.LineSVGDrawer(), new canvasDrawer_1.CanvasDrawer(lineDrawer_1.makeLineCanvasDrawStep(function () { return _this._d3LineFactory(dataset); })));
+        return new drawer_1.ProxyDrawer(function () { return new lineDrawer_1.LineSVGDrawer(); }, lineDrawer_1.makeLineCanvasDrawStep(function () { return _this._d3LineFactory(dataset); }));
     };
     Line.prototype._extentsForProperty = function (property) {
         var extents = _super.prototype._extentsForProperty.call(this, property);
@@ -7368,9 +7367,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var Interactions = __webpack_require__(15);
+var Interactions = __webpack_require__(14);
 var Utils = __webpack_require__(0);
-var scale_1 = __webpack_require__(19);
+var scale_1 = __webpack_require__(18);
 var TRANSFORMATION_SPACE = [0, 1];
 var Category = (function (_super) {
     __extends(Category, _super);
@@ -7653,7 +7652,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var utils_1 = __webpack_require__(21);
+var utils_1 = __webpack_require__(20);
 var characterMeasurer_1 = __webpack_require__(53);
 var CacheCharacterMeasurer = (function (_super) {
     __extends(CacheCharacterMeasurer, _super);
@@ -7730,7 +7729,7 @@ exports.CharacterMeasurer = CharacterMeasurer;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(34));
+__export(__webpack_require__(33));
 __export(__webpack_require__(52));
 __export(__webpack_require__(119));
 __export(__webpack_require__(53));
@@ -7753,7 +7752,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var abstractMeasurer_1 = __webpack_require__(34);
+var abstractMeasurer_1 = __webpack_require__(33);
 var Measurer = (function (_super) {
     __extends(Measurer, _super);
     function Measurer(ruler, useGuards) {
@@ -7826,7 +7825,7 @@ __export(__webpack_require__(57));
  * license at https://github.com/palantir/typesettable/blob/develop/LICENSE
  */
 
-var Utils = __webpack_require__(21);
+var Utils = __webpack_require__(20);
 var Wrapper = (function () {
     function Wrapper() {
         this.maxLines(Infinity);
@@ -8074,7 +8073,7 @@ function __export(m) {
 }
 __export(__webpack_require__(66));
 __export(__webpack_require__(67));
-__export(__webpack_require__(26));
+__export(__webpack_require__(25));
 
 
 /***/ }),
@@ -8180,14 +8179,15 @@ exports.version = "3.0.0-beta.4";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+__export(__webpack_require__(40));
 __export(__webpack_require__(41));
 __export(__webpack_require__(42));
 __export(__webpack_require__(43));
-__export(__webpack_require__(8));
+__export(__webpack_require__(6));
+__export(__webpack_require__(30));
 __export(__webpack_require__(31));
-__export(__webpack_require__(32));
 __export(__webpack_require__(44));
-__export(__webpack_require__(9));
+__export(__webpack_require__(8));
 __export(__webpack_require__(45));
 
 
@@ -8301,8 +8301,8 @@ d3Transition.transition.prototype.styles = transition_styles;
  */
 
 var d3Ease = __webpack_require__(106);
-var coerceD3_1 = __webpack_require__(13);
-var makeEnum_1 = __webpack_require__(10);
+var coerceD3_1 = __webpack_require__(12);
+var makeEnum_1 = __webpack_require__(9);
 var EASE_NAME_MAPPING = {
     linear: d3Ease.easeLinear,
     quad: d3Ease.easeQuad,
@@ -8517,7 +8517,7 @@ exports.Easing = Easing;
  * @license MIT
  */
 
-var coerceD3_1 = __webpack_require__(13);
+var coerceD3_1 = __webpack_require__(12);
 /**
  * An animator implementation with no animation. The attributes are
  * immediately set on the selection.
@@ -8555,7 +8555,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 var d3 = __webpack_require__(1);
 var Typesetter = __webpack_require__(4);
 var Utils = __webpack_require__(0);
-var axis_1 = __webpack_require__(22);
+var axis_1 = __webpack_require__(21);
 var Category = (function (_super) {
     __extends(Category, _super);
     /**
@@ -8927,9 +8927,9 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Typesetter = __webpack_require__(4);
-var Formatters = __webpack_require__(11);
+var Formatters = __webpack_require__(10);
 var Utils = __webpack_require__(0);
-var axis_1 = __webpack_require__(22);
+var axis_1 = __webpack_require__(21);
 var Numeric = (function (_super) {
     __extends(Numeric, _super);
     /**
@@ -9221,8 +9221,8 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var guideLineLayer_1 = __webpack_require__(39);
-var Interactions = __webpack_require__(15);
+var guideLineLayer_1 = __webpack_require__(38);
+var Interactions = __webpack_require__(14);
 var Utils = __webpack_require__(0);
 var DragLineLayer = (function (_super) {
     __extends(DragLineLayer, _super);
@@ -9410,7 +9410,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var quantitativeScale_1 = __webpack_require__(12);
+var quantitativeScale_1 = __webpack_require__(11);
 var component_1 = __webpack_require__(5);
 var Gridlines = (function (_super) {
     __extends(Gridlines, _super);
@@ -9522,8 +9522,8 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Typesetter = __webpack_require__(4);
-var Configs = __webpack_require__(23);
-var Formatters = __webpack_require__(11);
+var Configs = __webpack_require__(22);
+var Formatters = __webpack_require__(10);
 var Utils = __webpack_require__(0);
 var component_1 = __webpack_require__(5);
 var InterpolatedColorLegend = (function (_super) {
@@ -9952,9 +9952,9 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Typesetter = __webpack_require__(4);
-var Configs = __webpack_require__(23);
-var Formatters = __webpack_require__(11);
-var SymbolFactories = __webpack_require__(29);
+var Configs = __webpack_require__(22);
+var Formatters = __webpack_require__(10);
+var SymbolFactories = __webpack_require__(28);
 var Utils = __webpack_require__(0);
 var component_1 = __webpack_require__(5);
 /**
@@ -10461,7 +10461,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var plot_1 = __webpack_require__(2);
 var Utils = __webpack_require__(0);
-var group_1 = __webpack_require__(38);
+var group_1 = __webpack_require__(37);
 var PlotGroup = (function (_super) {
     __extends(PlotGroup, _super);
     function PlotGroup() {
@@ -10518,7 +10518,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Utils = __webpack_require__(0);
-var componentContainer_1 = __webpack_require__(27);
+var componentContainer_1 = __webpack_require__(26);
 var Table = (function (_super) {
     __extends(Table, _super);
     /**
@@ -10915,7 +10915,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var dragBoxLayer_1 = __webpack_require__(30);
+var dragBoxLayer_1 = __webpack_require__(29);
 var XDragBoxLayer = (function (_super) {
     __extends(XDragBoxLayer, _super);
     /**
@@ -10982,7 +10982,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var dragBoxLayer_1 = __webpack_require__(30);
+var dragBoxLayer_1 = __webpack_require__(29);
 var YDragBoxLayer = (function (_super) {
     __extends(YDragBoxLayer, _super);
     /**
@@ -11049,7 +11049,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var dispatcher_1 = __webpack_require__(24);
+var dispatcher_1 = __webpack_require__(23);
 var Key = (function (_super) {
     __extends(Key, _super);
     /**
@@ -11146,7 +11146,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(0);
-var dispatcher_1 = __webpack_require__(24);
+var dispatcher_1 = __webpack_require__(23);
 var Mouse = (function (_super) {
     __extends(Mouse, _super);
     /**
@@ -11345,7 +11345,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(0);
-var dispatcher_1 = __webpack_require__(24);
+var dispatcher_1 = __webpack_require__(23);
 var Touch = (function (_super) {
     __extends(Touch, _super);
     /**
@@ -11519,9 +11519,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Dispatchers = __webpack_require__(14);
+var Dispatchers = __webpack_require__(13);
 var Utils = __webpack_require__(0);
-var interaction_1 = __webpack_require__(16);
+var interaction_1 = __webpack_require__(15);
 var Click = (function (_super) {
     __extends(Click, _super);
     function Click() {
@@ -11653,9 +11653,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Dispatchers = __webpack_require__(14);
+var Dispatchers = __webpack_require__(13);
 var Utils = __webpack_require__(0);
-var interaction_1 = __webpack_require__(16);
+var interaction_1 = __webpack_require__(15);
 var Drag = (function (_super) {
     __extends(Drag, _super);
     function Drag() {
@@ -11819,11 +11819,11 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var Dispatchers = __webpack_require__(14);
+var Dispatchers = __webpack_require__(13);
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var Interactions = __webpack_require__(15);
-var interaction_1 = __webpack_require__(16);
+var Interactions = __webpack_require__(14);
+var interaction_1 = __webpack_require__(15);
 /**
  * Performs a zoom transformation of the `value` argument scaled by the
  * `zoom` argument about the point defined by the `center` argument.
@@ -12376,9 +12376,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Dispatchers = __webpack_require__(14);
+var Dispatchers = __webpack_require__(13);
 var Utils = __webpack_require__(0);
-var interaction_1 = __webpack_require__(16);
+var interaction_1 = __webpack_require__(15);
 var Pointer = (function (_super) {
     __extends(Pointer, _super);
     function Pointer() {
@@ -12509,7 +12509,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var barPlot_1 = __webpack_require__(25);
+var barPlot_1 = __webpack_require__(24);
 var plot_1 = __webpack_require__(2);
 var ClusteredBar = (function (_super) {
     __extends(ClusteredBar, _super);
@@ -12583,15 +12583,14 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Typesetter = __webpack_require__(4);
-var Animators = __webpack_require__(6);
-var Formatters = __webpack_require__(11);
+var Animators = __webpack_require__(7);
+var Formatters = __webpack_require__(10);
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var arcDrawer_1 = __webpack_require__(41);
-var arcOutlineDrawer_1 = __webpack_require__(42);
-var canvasDrawer_1 = __webpack_require__(8);
-var drawer_1 = __webpack_require__(7);
-var windowUtils_1 = __webpack_require__(20);
+var arcDrawer_1 = __webpack_require__(40);
+var arcOutlineDrawer_1 = __webpack_require__(41);
+var drawer_1 = __webpack_require__(6);
+var windowUtils_1 = __webpack_require__(19);
 var plot_1 = __webpack_require__(2);
 var Pie = (function (_super) {
     __extends(Pie, _super);
@@ -12617,7 +12616,7 @@ var Pie = (function (_super) {
     Pie.prototype._setup = function () {
         var _this = this;
         _super.prototype._setup.call(this);
-        this._strokeDrawers.forEach(function (d) { return d.useSVG(_this._renderArea); });
+        this._strokeDrawers.forEach(function (d) { return d.attachTo(_this._renderArea); });
     };
     Pie.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
         _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
@@ -12642,11 +12641,9 @@ var Pie = (function (_super) {
             return this;
         }
         this._updatePieAngles();
-        var strokeDrawer = new drawer_1.Drawer(dataset, new arcOutlineDrawer_1.ArcOutlineSVGDrawer(), new canvasDrawer_1.CanvasDrawer(function () {
-            windowUtils_1.warn("canvas renderer not supported on Pie Plot!");
-        }));
+        var strokeDrawer = new arcOutlineDrawer_1.ArcOutlineSVGDrawer();
         if (this._isSetup) {
-            strokeDrawer.useSVG(this._renderArea);
+            strokeDrawer.attachTo(this._renderArea);
         }
         this._strokeDrawers.set(dataset, strokeDrawer);
         _super.prototype._addDataset.call(this, dataset);
@@ -12675,7 +12672,7 @@ var Pie = (function (_super) {
             if (drawer == null) {
                 return;
             }
-            allSelections.push.apply(allSelections, drawer.selection().nodes());
+            allSelections.push.apply(allSelections, drawer.getVisualPrimitives());
         });
         return d3.selectAll(allSelections);
     };
@@ -12684,10 +12681,10 @@ var Pie = (function (_super) {
         this._updatePieAngles();
         this.render();
     };
-    Pie.prototype._createDrawer = function (dataset) {
-        return new drawer_1.Drawer(dataset, new arcDrawer_1.ArcSVGDrawer(), new canvasDrawer_1.CanvasDrawer(function () {
+    Pie.prototype._createDrawer = function () {
+        return new drawer_1.ProxyDrawer(function () { return new arcDrawer_1.ArcSVGDrawer(); }, function () {
             windowUtils_1.warn("canvas renderer is not supported on Pie Plot!");
-        }));
+        });
     };
     Pie.prototype.entities = function (datasets) {
         var _this = this;
@@ -12696,7 +12693,7 @@ var Pie = (function (_super) {
         return entities.map(function (entity) {
             entity.position.x += _this.width() / 2;
             entity.position.y += _this.height() / 2;
-            var stroke = _this._strokeDrawers.get(entity.dataset).selectionForIndex(entity.index);
+            var stroke = d3.select(_this._strokeDrawers.get(entity.dataset).getVisualPrimitiveAtIndex(entity.index));
             var piePlotEntity = entity;
             piePlotEntity.strokeSelection = stroke;
             return piePlotEntity;
@@ -12977,7 +12974,10 @@ var Pie = (function (_super) {
         }
         var drawSteps = this._generateStrokeDrawSteps();
         var dataToDraw = this._getDataToDraw();
-        this.datasets().forEach(function (dataset) { return _this._strokeDrawers.get(dataset).draw(dataToDraw.get(dataset), drawSteps); });
+        this.datasets().forEach(function (dataset) {
+            var appliedDrawSteps = plot_1.Plot.applyDrawSteps(drawSteps, dataset);
+            _this._strokeDrawers.get(dataset).draw(dataToDraw.get(dataset), appliedDrawSteps);
+        });
     };
     Pie.prototype._generateStrokeDrawSteps = function () {
         var attrToProjector = this._generateAttrToProjector();
@@ -13085,14 +13085,13 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Typesetter = __webpack_require__(4);
-var Animators = __webpack_require__(6);
+var Animators = __webpack_require__(7);
+var drawer_1 = __webpack_require__(6);
+var rectangleDrawer_1 = __webpack_require__(31);
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var canvasDrawer_1 = __webpack_require__(8);
-var drawer_1 = __webpack_require__(7);
-var rectangleDrawer_1 = __webpack_require__(32);
 var plot_1 = __webpack_require__(2);
-var xyPlot_1 = __webpack_require__(17);
+var xyPlot_1 = __webpack_require__(16);
 var Rectangle = (function (_super) {
     __extends(Rectangle, _super);
     /**
@@ -13115,8 +13114,8 @@ var Rectangle = (function (_super) {
         _this.attr("fill", new Scales.Color().range()[0]);
         return _this;
     }
-    Rectangle.prototype._createDrawer = function (dataset) {
-        return new drawer_1.Drawer(dataset, new rectangleDrawer_1.RectangleSVGDrawer(), new canvasDrawer_1.CanvasDrawer(rectangleDrawer_1.RectangleCanvasDrawStep));
+    Rectangle.prototype._createDrawer = function () {
+        return new drawer_1.ProxyDrawer(function () { return new rectangleDrawer_1.RectangleSVGDrawer(); }, rectangleDrawer_1.RectangleCanvasDrawStep);
     };
     Rectangle.prototype._generateAttrToProjector = function () {
         var _this = this;
@@ -13451,17 +13450,16 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Animators = __webpack_require__(6);
-var SymbolFactories = __webpack_require__(29);
+var Animators = __webpack_require__(7);
+var SymbolFactories = __webpack_require__(28);
+var drawer_1 = __webpack_require__(6);
+var symbolDrawer_1 = __webpack_require__(45);
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var canvasDrawer_1 = __webpack_require__(8);
-var drawer_1 = __webpack_require__(7);
-var symbolDrawer_1 = __webpack_require__(45);
-var windowUtils_1 = __webpack_require__(20);
-var Plots = __webpack_require__(18);
+var windowUtils_1 = __webpack_require__(19);
+var Plots = __webpack_require__(17);
 var plot_1 = __webpack_require__(2);
-var xyPlot_1 = __webpack_require__(17);
+var xyPlot_1 = __webpack_require__(16);
 var Scatter = (function (_super) {
     __extends(Scatter, _super);
     /**
@@ -13493,10 +13491,10 @@ var Scatter = (function (_super) {
             return lightweightPlotEntity;
         });
     };
-    Scatter.prototype._createDrawer = function (dataset) {
-        return new drawer_1.Drawer(dataset, new symbolDrawer_1.SymbolSVGDrawer(), new canvasDrawer_1.CanvasDrawer(function () {
+    Scatter.prototype._createDrawer = function () {
+        return new drawer_1.ProxyDrawer(function () { return new symbolDrawer_1.SymbolSVGDrawer(); }, function () {
             windowUtils_1.warn("canvas renderer is not supported on Scatter Plot!");
-        }));
+        });
     };
     Scatter.prototype.size = function (size, scale) {
         if (size == null) {
@@ -13618,14 +13616,13 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Animators = __webpack_require__(6);
-var canvasDrawer_1 = __webpack_require__(8);
-var drawer_1 = __webpack_require__(7);
+var Animators = __webpack_require__(7);
+var drawer_1 = __webpack_require__(6);
 var segmentDrawer_1 = __webpack_require__(44);
 var Scales = __webpack_require__(3);
-var windowUtils_1 = __webpack_require__(20);
+var windowUtils_1 = __webpack_require__(19);
 var plot_1 = __webpack_require__(2);
-var xyPlot_1 = __webpack_require__(17);
+var xyPlot_1 = __webpack_require__(16);
 var Segment = (function (_super) {
     __extends(Segment, _super);
     /**
@@ -13640,10 +13637,10 @@ var Segment = (function (_super) {
         _this.attr("stroke-width", "2px");
         return _this;
     }
-    Segment.prototype._createDrawer = function (dataset) {
-        return new drawer_1.Drawer(dataset, new segmentDrawer_1.SegmentSVGDrawer(), new canvasDrawer_1.CanvasDrawer(function () {
+    Segment.prototype._createDrawer = function () {
+        return new drawer_1.ProxyDrawer(function () { return new segmentDrawer_1.SegmentSVGDrawer(); }, function () {
             windowUtils_1.warn("canvas renderer is not supported on Segment Plot!");
-        }));
+        });
     };
     Segment.prototype._generateDrawSteps = function () {
         return [{ attrToProjector: this._generateAttrToProjector(), animator: new Animators.Null() }];
@@ -13823,7 +13820,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var Animators = __webpack_require__(6);
+var Animators = __webpack_require__(7);
 var Utils = __webpack_require__(0);
 var areaPlot_1 = __webpack_require__(46);
 var plot_1 = __webpack_require__(2);
@@ -14027,7 +14024,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Typesetter = __webpack_require__(4);
 var Utils = __webpack_require__(0);
-var barPlot_1 = __webpack_require__(25);
+var barPlot_1 = __webpack_require__(24);
 var StackedBar = (function (_super) {
     __extends(StackedBar, _super);
     /**
@@ -14245,7 +14242,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(0);
-var barPlot_1 = __webpack_require__(25);
+var barPlot_1 = __webpack_require__(24);
 var plot_1 = __webpack_require__(2);
 var Waterfall = (function (_super) {
     __extends(Waterfall, _super);
@@ -14458,7 +14455,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Utils = __webpack_require__(0);
-var scale_1 = __webpack_require__(19);
+var scale_1 = __webpack_require__(18);
 var Color = (function (_super) {
     __extends(Color, _super);
     /**
@@ -14590,7 +14587,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Utils = __webpack_require__(0);
-var scale_1 = __webpack_require__(19);
+var scale_1 = __webpack_require__(18);
 var InterpolatedColor = (function (_super) {
     __extends(InterpolatedColor, _super);
     /**
@@ -14756,7 +14753,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var quantitativeScale_1 = __webpack_require__(12);
+var quantitativeScale_1 = __webpack_require__(11);
 var Linear = (function (_super) {
     __extends(Linear, _super);
     /**
@@ -14838,7 +14835,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 var d3 = __webpack_require__(1);
 var Utils = __webpack_require__(0);
 var Scales = __webpack_require__(3);
-var quantitativeScale_1 = __webpack_require__(12);
+var quantitativeScale_1 = __webpack_require__(11);
 var ModifiedLog = (function (_super) {
     __extends(ModifiedLog, _super);
     /**
@@ -15111,8 +15108,8 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var timeAxis_1 = __webpack_require__(26);
-var quantitativeScale_1 = __webpack_require__(12);
+var timeAxis_1 = __webpack_require__(25);
+var quantitativeScale_1 = __webpack_require__(11);
 var Time = (function (_super) {
     __extends(Time, _super);
     /**
@@ -15685,7 +15682,7 @@ function _parseStyleValue(style, property) {
  * @license MIT
  */
 
-var Math = __webpack_require__(33);
+var Math = __webpack_require__(32);
 /**
  * Array-backed implementation of {EntityStore}
  */
@@ -15739,7 +15736,7 @@ exports.EntityArray = EntityArray;
  * @license MIT
  */
 
-var Math = __webpack_require__(33);
+var Math = __webpack_require__(32);
 /**
  * Shim for ES6 map.
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
@@ -15832,7 +15829,7 @@ exports.Map = Map;
 
 var d3 = __webpack_require__(1);
 var Utils = __webpack_require__(0);
-var makeEnum_1 = __webpack_require__(10);
+var makeEnum_1 = __webpack_require__(9);
 /**
  * Option type for stacking direction. By default, stacked bar and area charts
  * put the first data series at the bottom of the axis ("bottomup"), but this
@@ -16676,8 +16673,8 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var utils_1 = __webpack_require__(21);
-var abstractMeasurer_1 = __webpack_require__(34);
+var utils_1 = __webpack_require__(20);
+var abstractMeasurer_1 = __webpack_require__(33);
 var cacheCharacterMeasurer_1 = __webpack_require__(52);
 var CacheMeasurer = (function (_super) {
     __extends(CacheMeasurer, _super);
@@ -17051,7 +17048,7 @@ exports.SingleLineWrapper = SingleLineWrapper;
  * license at https://github.com/palantir/typesettable/blob/develop/LICENSE
  */
 
-var utils_1 = __webpack_require__(21);
+var utils_1 = __webpack_require__(20);
 var DEFAULT_WRITE_OPTIONS = {
     textRotation: 0,
     textShear: 0,
@@ -17186,50 +17183,50 @@ function __export(m) {
 // bundler environment (e.g. webpack) - see https://github.com/d3/d3-selection-multi/issues/11
 // we add it manually to the default "d3" bundle
 __webpack_require__(63);
-var Animators = __webpack_require__(6);
+var Animators = __webpack_require__(7);
 exports.Animators = Animators;
 var Axes = __webpack_require__(59);
 exports.Axes = Axes;
-var Components = __webpack_require__(35);
+var Components = __webpack_require__(34);
 exports.Components = Components;
-var Configs = __webpack_require__(23);
+var Configs = __webpack_require__(22);
 exports.Configs = Configs;
-var Formatters = __webpack_require__(11);
+var Formatters = __webpack_require__(10);
 exports.Formatters = Formatters;
-var RenderController = __webpack_require__(28);
+var RenderController = __webpack_require__(27);
 exports.RenderController = RenderController;
-var RenderPolicies = __webpack_require__(36);
+var RenderPolicies = __webpack_require__(35);
 exports.RenderPolicies = RenderPolicies;
-var SymbolFactories = __webpack_require__(29);
+var SymbolFactories = __webpack_require__(28);
 exports.SymbolFactories = SymbolFactories;
-var Dispatchers = __webpack_require__(14);
+var Dispatchers = __webpack_require__(13);
 exports.Dispatchers = Dispatchers;
 var Drawers = __webpack_require__(62);
 exports.Drawers = Drawers;
-var Interactions = __webpack_require__(15);
+var Interactions = __webpack_require__(14);
 exports.Interactions = Interactions;
-var Plots = __webpack_require__(18);
+var Plots = __webpack_require__(17);
 exports.Plots = Plots;
 var Scales = __webpack_require__(3);
 exports.Scales = Scales;
 var Utils = __webpack_require__(0);
 exports.Utils = Utils;
-__export(__webpack_require__(22));
-var timeAxis_1 = __webpack_require__(26);
+__export(__webpack_require__(21));
+var timeAxis_1 = __webpack_require__(25);
 exports.TimeInterval = timeAxis_1.TimeInterval;
 __export(__webpack_require__(5));
-__export(__webpack_require__(27));
+__export(__webpack_require__(26));
 __export(__webpack_require__(60));
 var version_1 = __webpack_require__(61);
 exports.version = version_1.version;
-__export(__webpack_require__(24));
-__export(__webpack_require__(7));
+__export(__webpack_require__(23));
+__export(__webpack_require__(6));
+__export(__webpack_require__(15));
+__export(__webpack_require__(36));
 __export(__webpack_require__(16));
-__export(__webpack_require__(37));
-__export(__webpack_require__(17));
 __export(__webpack_require__(2));
-__export(__webpack_require__(12));
-__export(__webpack_require__(19));
+__export(__webpack_require__(11));
+__export(__webpack_require__(18));
 
 
 /***/ })

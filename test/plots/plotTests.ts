@@ -5,6 +5,8 @@ import * as sinon from "sinon";
 import * as Plottable from "../../src";
 
 import * as TestMethods from "../testMethods";
+import { ProxyDrawer } from "../../src/drawers/drawer";
+import { CanvasDrawer } from "../../src/drawers/canvasDrawer";
 
 describe("Plots", () => {
   describe("Plot", () => {
@@ -451,8 +453,8 @@ describe("Plots", () => {
         plot.anchor(div);
 
         plot.renderer("canvas");
-        (<any> plot)._datasetToDrawer.forEach((drawer: Plottable.Drawer) => {
-          assert.strictEqual(drawer.getCanvas().node(), div.select("canvas").node(), "drawer's canvas is set");
+        (<any> plot)._datasetToDrawer.forEach((drawer: ProxyDrawer) => {
+          assert.isTrue(drawer.getDrawer() instanceof CanvasDrawer, "ProxyDrawer is using a CanvasDrawer");
         });
 
         div.remove();
@@ -464,7 +466,7 @@ describe("Plots", () => {
         const div = TestMethods.generateDiv();
         plot.renderTo(div);
         
-        assert.isNull(plot.selections(), "no selections on canvas");
+        assert.isTrue(plot.selections().empty(), "no selections on canvas");
         div.remove();
       });
     });

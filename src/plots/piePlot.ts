@@ -57,7 +57,7 @@ export class Pie extends Plot {
 
   protected _setup() {
     super._setup();
-    this._strokeDrawers.forEach((d) => d.attachTo(this._renderArea.node()));
+    this._strokeDrawers.forEach((d) => d.attachTo(this._renderArea));
   }
 
   public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
@@ -90,7 +90,7 @@ export class Pie extends Plot {
     this._updatePieAngles();
     const strokeDrawer = new ArcOutlineSVGDrawer();
     if (this._isSetup) {
-      strokeDrawer.attachTo(this._renderArea.node());
+      strokeDrawer.attachTo(this._renderArea);
     }
     this._strokeDrawers.set(dataset, strokeDrawer);
     super._addDataset(dataset);

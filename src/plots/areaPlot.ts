@@ -42,7 +42,7 @@ export class Area<X> extends Line<X> {
 
   protected _setup() {
     super._setup();
-    this._lineDrawers.forEach((lineDrawer) => lineDrawer.attachTo(this._renderArea.node()));
+    this._lineDrawers.forEach((lineDrawer) => lineDrawer.attachTo(this._renderArea));
   }
 
   public y(): Plots.TransformableAccessorScaleBinding<number, number>;
@@ -106,7 +106,7 @@ export class Area<X> extends Line<X> {
   protected _addDataset(dataset: Dataset) {
     const lineDrawer = new LineSVGDrawer();
     if (this._isSetup) {
-      lineDrawer.attachTo(this._renderArea.node());
+      lineDrawer.attachTo(this._renderArea);
     }
     this._lineDrawers.set(dataset, lineDrawer);
     super._addDataset(dataset);
