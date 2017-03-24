@@ -15,13 +15,7 @@ export function warn(warning: string) {
     return;
   }
   /* tslint:disable:no-console */
-  if ((<any> window).console != null) {
-    if ((<any> window).console.warn != null) {
-      console.warn(warning);
-    } else if ((<any> window).console.log != null) {
-      console.log(warning);
-    }
-  }
+  console.warn(warning);
   /* tslint:enable:no-console */
 }
 

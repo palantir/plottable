@@ -341,32 +341,15 @@ describe("TimeAxis", () => {
         .selectAll<Element, any>(`.${Plottable.Axes.Time.TIME_AXIS_TIER_CLASS}`)
         .each(function(d, i) {
           let tier = d3.select(this);
-          let visibility = tier.style("visibility");
-
-          // HACKHACK window.getComputedStyle() is behaving weirdly in IE9. Further investigation required
-          if (visibility === "inherit") {
-            visibility = getStyleInIE9(tier.node());
-          }
           if (isInsideAxisBoundingRect(tier.node().getBoundingClientRect())) {
-            assert.strictEqual(visibility, "visible", `tier ${i} inside axis should be visible`);
+            assert.strictEqual(tier.style("visibility"), "visible", `tier ${i} inside axis should be visible`);
           } else {
-            assert.strictEqual(visibility, "hidden", `tier ${i} outside axis should not be visible`);
+            assert.strictEqual(tier.style("visibility"), "hidden", `tier ${i} outside axis should not be visible`);
           }
         });
 
       div.remove();
       axis.destroy();
-
-      function getStyleInIE9(element: Element) {
-        while (element) {
-          let visibility = window.getComputedStyle(element).visibility;
-          if (visibility !== "inherit") {
-            return visibility;
-          }
-          element = <Element> element.parentNode;
-        }
-        return "visible";
-      }
     });
   });
 
