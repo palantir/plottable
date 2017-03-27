@@ -347,9 +347,9 @@ describe("TimeAxis", () => {
             visibility = getInheritedVisibilityProperty(tier.node());
           }
           if (isInsideAxisBoundingRect(tier.node().getBoundingClientRect())) {
-            assert.strictEqual(tier.style("visibility"), "visible", `tier ${i} inside axis should be visible`);
+            assert.strictEqual(visibility, "visible", `tier ${i} inside axis should be visible`);
           } else {
-            assert.strictEqual(tier.style("visibility"), "hidden", `tier ${i} outside axis should not be visible`);
+            assert.strictEqual(visibility, "hidden", `tier ${i} outside axis should not be visible`);
           }
         });
 
