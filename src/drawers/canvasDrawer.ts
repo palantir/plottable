@@ -4,7 +4,7 @@
  */
 
 import { AttributeToAppliedProjector } from "../core/interfaces";
-import { Drawer } from "./drawer";
+import { IDrawer } from "./drawer";
 import { AppliedDrawStep } from "./index";
 
 export type CanvasDrawStep = (
@@ -18,7 +18,7 @@ export type CanvasDrawStep = (
  *
  * This class is immutable (but has internal state) and shouldn't be extended.
  */
-export class CanvasDrawer implements Drawer {
+export class CanvasDrawer implements IDrawer {
   /**
    * @param _context The context for a canvas that this drawer will draw to.
    * @param _drawStep The draw step logic that actually draws.

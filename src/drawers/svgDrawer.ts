@@ -8,7 +8,7 @@ import * as d3 from "d3";
 import * as Utils from "../utils";
 
 import { SimpleSelection } from "../core/interfaces";
-import { Drawer } from "./drawer";
+import { IDrawer } from "./drawer";
 import { AppliedDrawStep } from "./index";
 
 /**
@@ -17,7 +17,7 @@ import { AppliedDrawStep } from "./index";
  *
  * This class is immutable (but has internal state).
  */
-export class SVGDrawer implements Drawer {
+export class SVGDrawer implements IDrawer {
   protected _className: string;
   protected _svgElementName: string;
 

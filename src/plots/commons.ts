@@ -5,7 +5,7 @@
 
 import { Dataset } from "../core/dataset";
 import { Accessor, Entity, Point } from "../core/interfaces";
-import { Drawer } from "../drawers/drawer";
+import { IDrawer } from "../drawers/drawer";
 import { Plot } from "../plots/plot";
 import { Scale, TransformableScale } from "../scales/scale";
 
@@ -21,7 +21,7 @@ export interface LightweightPlotEntity {
   position: Point;
   index: number;
   component: Plot;
-  drawer: Drawer;
+  drawer: IDrawer;
   validDatumIndex: number;
 }
 

@@ -12,7 +12,7 @@ import { SVGDrawer } from "./svgDrawer";
 /**
  * Drawers draw data onto an output of some sort, usually a DOM element.
  */
-export interface Drawer {
+export interface IDrawer {
   /**
    * Mutate the surface to reflect the data being passed in. This method is responsible
    * for calling the animators at the right time and order.
@@ -32,7 +32,8 @@ export interface Drawer {
   getVisualPrimitiveAtIndex(index: number): Element;
 
   /**
-   * Destroy this Drawer, remove all traces of it from the DOM, etc.
+   * Called when the Drawer is no longer needed - implementors may use this to cleanup
+   * any resources they've created
    */
   remove(): void;
 }
@@ -41,8 +42,8 @@ export interface Drawer {
  * A Drawer is a stateful class that holds one SVGDrawer and one CanvasDrawer, and can switch between
  * the two.
  */
-export class ProxyDrawer implements Drawer {
-  private _currentDrawer: Drawer;
+export class ProxyDrawer implements IDrawer {
+  private _currentDrawer: IDrawer;
   /**
    * A Drawer draws svg elements based on the input Dataset.
    *
