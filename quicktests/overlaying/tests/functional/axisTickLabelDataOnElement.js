@@ -44,7 +44,7 @@ function run(svg, data, Plottable){
     clickInteraction.attachTo(axis);
   });
 
-  new Plottable.Interactions.PanZoom(xScale).attachTo(chart);
+  new Plottable.Interactions.PanZoom(xScale).attachTo(clusteredPlot);
 
   chart.renderTo(svg);
 }

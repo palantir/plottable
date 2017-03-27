@@ -115,7 +115,7 @@ export class Axis<D> extends Component {
 
     let tickLabel: Element;
     // go up DOM tree to find tick label element in ancestor elements
-    while ((element !== undefined) && (element.classList) && (tickLabel === undefined)) {
+    while ((element != null) && (element.classList) && (tickLabel === undefined)) {
       if (element.classList.contains(Axis.TICK_LABEL_CLASS)) {
         tickLabel = element;
       } else {
