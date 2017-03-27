@@ -191,7 +191,7 @@ describe("Plots", () => {
         plot.addDataset(dataset);
         plot.attr("key", (d) => d, categoryScale);
 
-        let div = TestMethods.generateDiv();
+        const div = TestMethods.generateDiv();
         plot.anchor(div);
 
         assert.deepEqual(categoryScale.domain(), data2.concat(data), "extent in the right order");
@@ -444,7 +444,7 @@ describe("Plots", () => {
         plot.renderer("canvas");
         const div = TestMethods.generateDiv();
         plot.renderTo(div);
-        
+
         assert.isNull(plot.selections(), "no selections on canvas");
         div.remove();
       });

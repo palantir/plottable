@@ -6,7 +6,7 @@
 import * as d3 from "d3";
 
 import { Dataset } from "../core/dataset";
-import { Accessor } from "../core/interfaces";
+import { IAccessor } from "../core/interfaces";
 
 import * as Utils from "./";
 import { makeEnum } from "./makeEnum";
@@ -54,8 +54,8 @@ const nativeMath: Math = (<any>window).Math;
  */
 export function stack(
   datasets: Dataset[],
-  keyAccessor: Accessor<any>,
-  valueAccessor: Accessor<number>,
+  keyAccessor: IAccessor<any>,
+  valueAccessor: IAccessor<number>,
   stackingOrder: IStackingOrder = "bottomup",
 ): StackingResult {
   const positiveOffsets = d3.map<number>();
@@ -137,7 +137,7 @@ export function stackedExtents<D>(stackingResult: GenericStackingResult<D>): {
  * @param {Accessor<boolean>} filter A filter for data to be considered when computing the total extent
  * @return {[number, number]} The total extent
  */
-export function stackedExtent(stackingResult: StackingResult, keyAccessor: Accessor<any>, filter: Accessor<boolean>) {
+export function stackedExtent(stackingResult: StackingResult, keyAccessor: IAccessor<any>, filter: IAccessor<boolean>) {
   const extents: number[] = [];
   stackingResult.forEach((stackedDatumMap: Utils.Map<string, StackedDatum>, dataset: Dataset) => {
     dataset.data().forEach((datum, index) => {

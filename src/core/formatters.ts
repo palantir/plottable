@@ -7,7 +7,7 @@ import * as d3 from "d3";
 
 export type Formatter = (d: any) => string;
 
-interface PredicatedFormat {
+interface IPredicatedFormat {
   specifier: string;
   predicate: (d: Date) => boolean;
 }
@@ -173,7 +173,7 @@ export function shortScale(precision = 3) {
 export function multiTime() {
   // Formatter tiers going from shortest time scale to largest - these were taken from d3
   // https://github.com/mbostock/d3/wiki/Time-Formatting#format_multi
-  const candidateFormats: PredicatedFormat[] = [
+  const candidateFormats: IPredicatedFormat[] = [
     {
       specifier: ".%L",
       predicate: (d) => d.getMilliseconds() !== 0,

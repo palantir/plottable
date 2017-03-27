@@ -1,12 +1,11 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
 
 import * as Plottable from "../../src";
+import { getTranslateValues } from "../../src/utils/domUtils";
 
 import * as TestMethods from "../testMethods";
-import { getTranslateValues } from "../../src/utils/domUtils";
 
 describe("Legend", () => {
   const ENTRY_SELECTOR = "." + Plottable.Components.Legend.LEGEND_ENTRY_CLASS;
@@ -28,16 +27,16 @@ describe("Legend", () => {
     it("renders rows with correct text, fill, and opacity", () => {
       color.domain(["foo", "bar", "baz"]);
       legend.renderTo(div);
-      let rows = legend.content().selectAll<Element, any>(ENTRY_SELECTOR);
+      const rows = legend.content().selectAll<Element, any>(ENTRY_SELECTOR);
       assert.strictEqual(rows.size(), color.domain().length, "one entry is created for each item in the domain");
 
       rows.each(function(d: any, i: number) {
         const name = d[0].data.name;
         assert.strictEqual(name, color.domain()[i], "the data is set properly");
-        let row = d3.select(this);
-        let text = row.select("text").text();
+        const row = d3.select(this);
+        const text = row.select("text").text();
         assert.strictEqual(text, name, "the text node has correct text");
-        let symbol = row.select(SYMBOL_SELECTOR);
+        const symbol = row.select(SYMBOL_SELECTOR);
         assert.strictEqual(symbol.attr("fill"), color.scale(name), "the symbol's fill is set properly");
         assert.strictEqual(symbol.attr("opacity"), "1", "the symbol's opacity is set by default to 1");
       });
@@ -58,7 +57,7 @@ describe("Legend", () => {
       color.domain(["foo", "bar", "baz"]);
       const minHeight3 = legend.requestedSpace(400, 400).minHeight;
       assert.operator(minHeight3, ">", minHeight2, "adding to the domain increases the height requested");
-      let actualHeight3 = legend.height();
+      const actualHeight3 = legend.height();
       assert.operator(actualHeight2, "<", actualHeight3, "Changing the domain caused the legend to re-layout with more height");
       assert.strictEqual(legend.content().selectAll<Element, any>(ROW_SELECTOR).size(), 3, "there are 3 rows");
       div.remove();
@@ -81,10 +80,10 @@ describe("Legend", () => {
       color.domain(["foooboooloonoogoorooboopoo"]);
       div.style("width", "100px");
       legend.renderTo(div);
-      let text = legend.content().select("text").text();
+      const text = legend.content().select("text").text();
       assert.notEqual(text, "foooboooloonoogoorooboopoo", "the text was truncated");
-      let rightEdge = (<Element> legend.content().select("text").node()).getBoundingClientRect().right;
-      let rightEdgeBBox = legend.element().node().getBoundingClientRect().right;
+      const rightEdge = (<Element> legend.content().select("text").node()).getBoundingClientRect().right;
+      const rightEdgeBBox = legend.element().node().getBoundingClientRect().right;
       assert.operator(rightEdge, "<=", rightEdgeBBox, "the long text did not overflow the legend");
       div.remove();
     });
@@ -128,9 +127,9 @@ describe("Legend", () => {
       legend.content().selectAll<Element, any>(ENTRY_SELECTOR).each(function(d: any, i: number) {
         const name = d[0].data.name;
         assert.strictEqual(name, newDomain[i], "the data is set correctly");
-        let text = d3.select(this).select("text").text();
+        const text = d3.select(this).select("text").text();
         assert.strictEqual(text, name, "the text was set properly");
-        let fill = d3.select(this).select(SYMBOL_SELECTOR).attr("fill");
+        const fill = d3.select(this).select(SYMBOL_SELECTOR).attr("fill");
         assert.strictEqual(fill, newColorScale.scale(name), "the fill was set properly");
       });
 
@@ -171,7 +170,7 @@ describe("Legend", () => {
       div.remove();
     });
 
-   it("can set maximum width of legend", () => {
+    it("can set maximum width of legend", () => {
       color.domain(["this is a very very very very very very very long"]);
       legend.renderTo(div);
       legend.maxWidth(100);
@@ -192,7 +191,7 @@ describe("Legend", () => {
           const entries = d3.select(this).selectAll<Element, any>(ENTRY_SELECTOR);
           assert.strictEqual(entries.size(), n, "number of entries in row is correct");
         });
-      };
+      }
 
       verifyMaxEntriesInRow(1);
       verifyMaxEntriesInRow(2);
@@ -237,7 +236,7 @@ describe("Legend", () => {
       legend.renderTo(div);
       textEls = legend.content().selectAll<Element, any>("text");
       textEls.each(function(d: any) {
-        let textEl = d3.select(this);
+        const textEl = d3.select(this);
         TestMethods.assertBBoxInclusion(legend.content(), textEl);
       });
 
@@ -336,7 +335,7 @@ describe("Legend", () => {
       color.domain(domain);
 
       let expectedIndex = 0;
-      let symbolOpacityChecker = (d: any, index: number) => {
+      const symbolOpacityChecker = (d: any, index: number) => {
         assert.strictEqual(index, expectedIndex, "index passed in is correct");
         expectedIndex++;
         return 0.5;
@@ -498,7 +497,7 @@ describe("Legend", () => {
       let entities = legend.entitiesAt({x: 10, y: 10});
       const entries = legend.content().selectAll<Element, any>(ENTRY_SELECTOR);
 
-      let expectedEntity: Plottable.Entity<Plottable.Components.Legend> = {
+      let expectedEntity: Plottable.IEntity<Plottable.Components.Legend> = {
         datum: "AA",
         position: computeExpectedSymbolPosition(0, 0),
         selection: d3.select(entries.nodes()[0]),
@@ -528,7 +527,7 @@ describe("Legend", () => {
       legend.renderTo(div);
       let entities = legend.entitiesAt({x: 10, y: 10});
       const entries = legend.content().selectAll<Element, any>(ENTRY_SELECTOR);
-      let expectedEntity: Plottable.Entity<Plottable.Components.Legend> = {
+      let expectedEntity: Plottable.IEntity<Plottable.Components.Legend> = {
         datum: "AA",
         position: computeExpectedSymbolPosition(0, 0),
         selection: d3.select(entries.nodes()[0]),

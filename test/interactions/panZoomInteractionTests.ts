@@ -1,5 +1,5 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
+import { SimpleSelection } from "../../src/core/interfaces";
 
 import { assert } from "chai";
 
@@ -49,8 +49,8 @@ describe("Interactions", () => {
       });
 
       it("can set the xScales in batch", () => {
-        let xScale2 = new Plottable.Scales.Linear();
-        let expectedXScales = [xScale, xScale2];
+        const xScale2 = new Plottable.Scales.Linear();
+        const expectedXScales = [xScale, xScale2];
         panZoomInteraction.addXScale(xScale);
         panZoomInteraction.addXScale(xScale2);
         assert.deepEqual(panZoomInteraction.xScales(), expectedXScales, "interaction contains the 2 xScales added");
@@ -63,8 +63,8 @@ describe("Interactions", () => {
       });
 
       it("can set the yScales in batch", () => {
-        let yScale2 = new Plottable.Scales.Linear();
-        let expectedYScales = [yScale, yScale2];
+        const yScale2 = new Plottable.Scales.Linear();
+        const expectedYScales = [yScale, yScale2];
         panZoomInteraction.addYScale(yScale);
         panZoomInteraction.addYScale(yScale2);
         assert.deepEqual(panZoomInteraction.yScales(), expectedYScales, "interaction contains the 2 yScales added");
@@ -91,8 +91,8 @@ describe("Interactions", () => {
 
     describe("Panning", () => {
       let div: d3.Selection<HTMLDivElement, any, any, any>;
-      let DIV_WIDTH = 400;
-      let DIV_HEIGHT = 500;
+      const DIV_WIDTH = 400;
+      const DIV_HEIGHT = 500;
 
       let eventTarget: SimpleSelection<void>;
 
@@ -108,7 +108,7 @@ describe("Interactions", () => {
 
         div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
 
-        let component = new Plottable.Component();
+        const component = new Plottable.Component();
         component.renderTo(div);
 
         panZoomInteraction = new Plottable.Interactions.PanZoom();
@@ -120,10 +120,10 @@ describe("Interactions", () => {
       });
 
       it("translates the scale correctly on dragging (mouse)", () => {
-        let startPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
-        let endPoint = { x: DIV_WIDTH / 2, y: DIV_HEIGHT * 3 / 4 };
-        let expectedXDomain = domainAfterPan(startPoint, endPoint, xScale, true);
-        let expectedYDomain = domainAfterPan(startPoint, endPoint, yScale, false);
+        const startPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
+        const endPoint = { x: DIV_WIDTH / 2, y: DIV_HEIGHT * 3 / 4 };
+        const expectedXDomain = domainAfterPan(startPoint, endPoint, xScale, true);
+        const expectedYDomain = domainAfterPan(startPoint, endPoint, yScale, false);
         TestMethods.triggerFakeMouseEvent("mousedown", eventTarget, startPoint.x, startPoint.y);
         TestMethods.triggerFakeMouseEvent("mousemove", eventTarget, endPoint.x, endPoint.y);
         TestMethods.triggerFakeMouseEvent("mouseend", eventTarget, endPoint.x, endPoint.y);
@@ -133,10 +133,10 @@ describe("Interactions", () => {
       });
 
       it("translates the scale correctly on dragging to outside of the component (mouse)", () => {
-        let startPoint = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
-        let endPoint = { x: -DIV_WIDTH / 2, y: -DIV_HEIGHT / 2 };
-        let expectedXDomain = domainAfterPan(startPoint, endPoint, xScale, true);
-        let expectedYDomain = domainAfterPan(startPoint, endPoint, yScale, false);
+        const startPoint = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
+        const endPoint = { x: -DIV_WIDTH / 2, y: -DIV_HEIGHT / 2 };
+        const expectedXDomain = domainAfterPan(startPoint, endPoint, xScale, true);
+        const expectedYDomain = domainAfterPan(startPoint, endPoint, yScale, false);
         TestMethods.triggerFakeMouseEvent("mousedown", eventTarget, startPoint.x, startPoint.y);
         TestMethods.triggerFakeMouseEvent("mousemove", eventTarget, endPoint.x, endPoint.y);
         TestMethods.triggerFakeMouseEvent("mouseend", eventTarget, endPoint.x, endPoint.y);
@@ -146,13 +146,13 @@ describe("Interactions", () => {
       });
 
       it("translates multiple scales correctly on dragging (mouse)", () => {
-        let xScale2 = new Plottable.Scales.Linear();
+        const xScale2 = new Plottable.Scales.Linear();
         xScale2.domain([0, 2 * DIV_WIDTH]).range([0, DIV_WIDTH]);
         panZoomInteraction.addXScale(xScale2);
-        let startPoint = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
-        let endPoint = { x: -DIV_WIDTH / 2, y: -DIV_HEIGHT / 2 };
-        let expectedXDomain = domainAfterPan(startPoint, endPoint, xScale, true);
-        let expectedXDomain2 = domainAfterPan(startPoint, endPoint, xScale2, true);
+        const startPoint = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
+        const endPoint = { x: -DIV_WIDTH / 2, y: -DIV_HEIGHT / 2 };
+        const expectedXDomain = domainAfterPan(startPoint, endPoint, xScale, true);
+        const expectedXDomain2 = domainAfterPan(startPoint, endPoint, xScale2, true);
         TestMethods.triggerFakeMouseEvent("mousedown", eventTarget, startPoint.x, startPoint.y);
         TestMethods.triggerFakeMouseEvent("mousemove", eventTarget, endPoint.x, endPoint.y);
         TestMethods.triggerFakeMouseEvent("mouseend", eventTarget, endPoint.x, endPoint.y);
@@ -162,10 +162,10 @@ describe("Interactions", () => {
       });
 
       it("translates the scale correctly on dragging (touch)", () => {
-        let startPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
-        let endPoint = { x: DIV_WIDTH / 2, y: DIV_HEIGHT * 3 / 4 };
-        let expectedXDomain = domainAfterPan(startPoint, endPoint, xScale, true);
-        let expectedYDomain = domainAfterPan(startPoint, endPoint, yScale, false);
+        const startPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
+        const endPoint = { x: DIV_WIDTH / 2, y: DIV_HEIGHT * 3 / 4 };
+        const expectedXDomain = domainAfterPan(startPoint, endPoint, xScale, true);
+        const expectedYDomain = domainAfterPan(startPoint, endPoint, yScale, false);
         TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint]);
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint]);
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint]);
@@ -175,10 +175,10 @@ describe("Interactions", () => {
       });
 
       it("translates the scale correctly on dragging to outside of the component (touch)", () => {
-        let startPoint = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
-        let endPoint = { x: -DIV_WIDTH / 2, y: -DIV_HEIGHT / 2 };
-        let expectedXDomain = domainAfterPan(startPoint, endPoint, xScale, true);
-        let expectedYDomain = domainAfterPan(startPoint, endPoint, yScale, false);
+        const startPoint = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
+        const endPoint = { x: -DIV_WIDTH / 2, y: -DIV_HEIGHT / 2 };
+        const expectedXDomain = domainAfterPan(startPoint, endPoint, xScale, true);
+        const expectedYDomain = domainAfterPan(startPoint, endPoint, yScale, false);
         TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint]);
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint]);
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint]);
@@ -188,13 +188,13 @@ describe("Interactions", () => {
       });
 
       it("translates multiple scales correctly on dragging (touch)", () => {
-        let xScale2 = new Plottable.Scales.Linear();
+        const xScale2 = new Plottable.Scales.Linear();
         xScale2.domain([0, 2 * DIV_WIDTH]).range([0, DIV_WIDTH]);
         panZoomInteraction.addXScale(xScale2);
-        let startPoint = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
-        let endPoint = { x: -DIV_WIDTH / 2, y: -DIV_HEIGHT / 2 };
-        let expectedXDomain = domainAfterPan(startPoint, endPoint, xScale, true);
-        let expectedXDomain2 = domainAfterPan(startPoint, endPoint, xScale2, false);
+        const startPoint = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
+        const endPoint = { x: -DIV_WIDTH / 2, y: -DIV_HEIGHT / 2 };
+        const expectedXDomain = domainAfterPan(startPoint, endPoint, xScale, true);
+        const expectedXDomain2 = domainAfterPan(startPoint, endPoint, xScale2, false);
         TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint]);
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint]);
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint]);
@@ -205,18 +205,18 @@ describe("Interactions", () => {
 
       function domainAfterPan(startPoint: Plottable.Point, endPoint: Plottable.Point,
                               scale: Plottable.QuantitativeScale<number>, isHorizontal: boolean) {
-        let delta = isHorizontal ? endPoint.x - startPoint.x : endPoint.y - startPoint.y;
-        let domain = scale.domain();
-        let range = isHorizontal ? DIV_WIDTH : DIV_HEIGHT;
-        let diff = delta / range * (domain[1] - domain[0]);
+        const delta = isHorizontal ? endPoint.x - startPoint.x : endPoint.y - startPoint.y;
+        const domain = scale.domain();
+        const range = isHorizontal ? DIV_WIDTH : DIV_HEIGHT;
+        const diff = delta / range * (domain[1] - domain[0]);
         return domain.map((v) => v - diff);
       }
     });
 
     describe("Zooming", () => {
       let div: d3.Selection<HTMLDivElement, any, any, any>;
-      let DIV_WIDTH = 400;
-      let DIV_HEIGHT = 500;
+      const DIV_WIDTH = 400;
+      const DIV_HEIGHT = 500;
 
       let component: Plottable.Component;
       let eventTarget: SimpleSelection<void>;
@@ -252,10 +252,10 @@ describe("Interactions", () => {
           return;
         }
 
-        let scrollPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
-        let deltaY = 500;
-        let expectedXDomain = domainAfterWheel(deltaY, scrollPoint, xScale, true);
-        let expectedYDomain = domainAfterWheel(deltaY, scrollPoint, yScale, true);
+        const scrollPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
+        const deltaY = 500;
+        const expectedXDomain = domainAfterWheel(deltaY, scrollPoint, xScale, true);
+        const expectedYDomain = domainAfterWheel(deltaY, scrollPoint, yScale, true);
 
         TestMethods.triggerFakeWheelEvent("wheel", div, scrollPoint.x, scrollPoint.y, deltaY);
 
@@ -271,14 +271,14 @@ describe("Interactions", () => {
           div.remove();
           return;
         }
-        let xScale2 = new Plottable.Scales.Linear();
+        const xScale2 = new Plottable.Scales.Linear();
         xScale2.domain([0, 2 * DIV_WIDTH]).range([0, DIV_WIDTH]);
         panZoomInteraction.addXScale(xScale2);
 
-        let scrollPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
-        let deltaY = 500;
-        let expectedXDomain = domainAfterWheel(deltaY, scrollPoint, xScale, true);
-        let expectedXDomain2 = domainAfterWheel(deltaY, scrollPoint, xScale2, true);
+        const scrollPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
+        const deltaY = 500;
+        const expectedXDomain = domainAfterWheel(deltaY, scrollPoint, xScale, true);
+        const expectedXDomain2 = domainAfterWheel(deltaY, scrollPoint, xScale2, true);
 
         TestMethods.triggerFakeWheelEvent("wheel", div, scrollPoint.x, scrollPoint.y, deltaY );
 
@@ -288,11 +288,11 @@ describe("Interactions", () => {
       });
 
       it("magnifies the scale correctly (pinching)", () => {
-        let startPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
-        let startPoint2 = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
-        let endPoint = { x: DIV_WIDTH * 3 / 4, y: DIV_HEIGHT * 3 / 4 };
-        let expectedXDomain = domainAfterPinch(startPoint, startPoint2, startPoint, endPoint, xScale, true);
-        let expectedYDomain = domainAfterPinch(startPoint, startPoint2, startPoint, endPoint, yScale, true);
+        const startPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
+        const startPoint2 = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
+        const endPoint = { x: DIV_WIDTH * 3 / 4, y: DIV_HEIGHT * 3 / 4 };
+        const expectedXDomain = domainAfterPinch(startPoint, startPoint2, startPoint, endPoint, xScale, true);
+        const expectedYDomain = domainAfterPinch(startPoint, startPoint2, startPoint, endPoint, yScale, true);
 
         TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint, startPoint2], [0, 1] );
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1] );
@@ -303,14 +303,14 @@ describe("Interactions", () => {
       });
 
       it("magnifies multiple scales correctly (pinching)", () => {
-        let xScale2 = new Plottable.Scales.Linear();
+        const xScale2 = new Plottable.Scales.Linear();
         xScale2.domain([0, 2 * DIV_WIDTH]).range([0, DIV_WIDTH]);
         panZoomInteraction.addXScale(xScale2);
-        let startPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
-        let startPoint2 = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
-        let endPoint = { x: DIV_WIDTH * 3 / 4, y: DIV_HEIGHT * 3 / 4 };
-        let expectedXDomain = domainAfterPinch(startPoint, startPoint2, startPoint, endPoint, xScale, true);
-        let expectedXDomain2 = domainAfterPinch(startPoint, startPoint2, startPoint, endPoint, xScale2, true);
+        const startPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
+        const startPoint2 = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
+        const endPoint = { x: DIV_WIDTH * 3 / 4, y: DIV_HEIGHT * 3 / 4 };
+        const expectedXDomain = domainAfterPinch(startPoint, startPoint2, startPoint, endPoint, xScale, true);
+        const expectedXDomain2 = domainAfterPinch(startPoint, startPoint2, startPoint, endPoint, xScale2, true);
 
         TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint, startPoint2], [0, 1] );
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1] );
@@ -321,23 +321,23 @@ describe("Interactions", () => {
       });
 
       it("can pinch inside one component and not affect another component", () => {
-        let xScale2 = new Plottable.Scales.Linear();
-        let initialDomain = [0, DIV_WIDTH / 2];
+        const xScale2 = new Plottable.Scales.Linear();
+        const initialDomain = [0, DIV_WIDTH / 2];
         xScale2.domain(initialDomain).range([0, DIV_WIDTH]);
 
-        let component2 = new Plottable.Component();
+        const component2 = new Plottable.Component();
 
-        let panZoomInteraction2 = new Plottable.Interactions.PanZoom();
+        const panZoomInteraction2 = new Plottable.Interactions.PanZoom();
         panZoomInteraction2.addXScale(xScale2);
         panZoomInteraction2.attachTo(component2);
 
-        let table = new Plottable.Components.Table([[component, component2]]);
+        const table = new Plottable.Components.Table([[component, component2]]);
         table.renderTo(div);
 
-        let startPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 2 };
-        let startPoint2 = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
-        let endPoint = { x: DIV_WIDTH * 3 / 4, y: DIV_HEIGHT / 2 };
-        let expectedXDomain = domainAfterPinch(startPoint, startPoint2, startPoint, endPoint, xScale, true);
+        const startPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 2 };
+        const startPoint2 = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
+        const endPoint = { x: DIV_WIDTH * 3 / 4, y: DIV_HEIGHT / 2 };
+        const expectedXDomain = domainAfterPinch(startPoint, startPoint2, startPoint, endPoint, xScale, true);
 
         TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint, startPoint2], [0, 1] );
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1] );
@@ -350,30 +350,30 @@ describe("Interactions", () => {
       function domainAfterPinch(startPoint: Plottable.Point, startPoint2: Plottable.Point,
                                 endPoint: Plottable.Point, endPoint2: Plottable.Point,
                                 scale: Plottable.QuantitativeScale<number>, isHorizontal: boolean) {
-        let oldDistance = isHorizontal ? startPoint2.x - startPoint.x : startPoint2.y - startPoint.y;
-        let newDistance = isHorizontal ? endPoint2.x - endPoint.x : endPoint2.y - endPoint.y;
-        let delta = isHorizontal ? endPoint2.x - startPoint2.x : endPoint2.y - startPoint2.y;
-        let zoomAmount = oldDistance / newDistance;
+        const oldDistance = isHorizontal ? startPoint2.x - startPoint.x : startPoint2.y - startPoint.y;
+        const newDistance = isHorizontal ? endPoint2.x - endPoint.x : endPoint2.y - endPoint.y;
+        const delta = isHorizontal ? endPoint2.x - startPoint2.x : endPoint2.y - startPoint2.y;
+        const zoomAmount = oldDistance / newDistance;
 
-        let domain = scale.domain();
-        let range = isHorizontal ? DIV_WIDTH : DIV_HEIGHT;
-        let diff = delta / range * (domain[1] - domain[0]);
+        const domain = scale.domain();
+        const range = isHorizontal ? DIV_WIDTH : DIV_HEIGHT;
+        const diff = delta / range * (domain[1] - domain[0]);
         return domain.map((v, i) => (v - domain[0] + diff) * zoomAmount + domain[0]);
       }
 
       function domainAfterWheel(deltaY: number,  scrollPoint: Plottable.Point,
                                 scale: Plottable.QuantitativeScale<number>, isHorizontal: boolean) {
-        let zoomAmount = Math.pow(2, deltaY * .002);
-        let domain = scale.domain();
-        let diff = (isHorizontal ? scrollPoint.x / DIV_WIDTH : scrollPoint.y / DIV_HEIGHT) * (domain[1] - domain[0]);
+        const zoomAmount = Math.pow(2, deltaY * .002);
+        const domain = scale.domain();
+        const diff = (isHorizontal ? scrollPoint.x / DIV_WIDTH : scrollPoint.y / DIV_HEIGHT) * (domain[1] - domain[0]);
         return domain.map(function (v, i) { return (v - domain[0] - diff) * zoomAmount + domain[0] + diff; });
       }
     });
 
     describe("Setting minDomainExtent", () => {
       let div: d3.Selection<HTMLDivElement, any, any, any>;
-      let DIV_WIDTH = 400;
-      let DIV_HEIGHT = 500;
+      const DIV_WIDTH = 400;
+      const DIV_HEIGHT = 500;
 
       let eventTarget: SimpleSelection<void>;
 
@@ -386,7 +386,7 @@ describe("Interactions", () => {
 
         div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
 
-        let component = new Plottable.Component();
+        const component = new Plottable.Component();
         component.renderTo(div);
 
         panZoomInteraction = new Plottable.Interactions.PanZoom();
@@ -397,7 +397,7 @@ describe("Interactions", () => {
       });
 
       it("can set minDomainExtent", () => {
-        let minimumDomainExtent = DIV_WIDTH / 4;
+        const minimumDomainExtent = DIV_WIDTH / 4;
         assert.strictEqual(panZoomInteraction.minDomainExtent(xScale, minimumDomainExtent), panZoomInteraction,
           "setting the minDomainExtent returns the interaction");
 
@@ -415,10 +415,10 @@ describe("Interactions", () => {
       });
 
       it("can't set minDomainExtent() be larger than maxDomainExtent() for the same Scale", () => {
-        let maximumDomainExtent = DIV_WIDTH / 2;
+        const maximumDomainExtent = DIV_WIDTH / 2;
         panZoomInteraction.maxDomainExtent(xScale, maximumDomainExtent);
 
-        let tooBigMinimumDomainExtent = maximumDomainExtent * 2;
+        const tooBigMinimumDomainExtent = maximumDomainExtent * 2;
         // HACKHACK #2661: Cannot assert errors being thrown with description
         (<any> assert).throws(() => panZoomInteraction.minDomainExtent(xScale, tooBigMinimumDomainExtent), Error,
           "minDomainExtent must be smaller than maxDomainExtent for the same Scale",
@@ -434,9 +434,9 @@ describe("Interactions", () => {
           return;
         }
 
-        let minimumDomainExtent = DIV_WIDTH / 4;
-        let scrollPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
-        let deltaY = -3000;
+        const minimumDomainExtent = DIV_WIDTH / 4;
+        const scrollPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
+        const deltaY = -3000;
         TestMethods.triggerFakeWheelEvent("wheel", div, scrollPoint.x, scrollPoint.y, deltaY);
         let domainExtent = Math.abs(xScale.domain()[1] - xScale.domain()[0]);
         assert.operator(domainExtent, "<", minimumDomainExtent, "there is no zoom limit before setting minimun extent via scroll");
@@ -450,14 +450,14 @@ describe("Interactions", () => {
       });
 
       it("cannot go beyond the specified domainExtent (pinching)", () => {
-        let minimumDomainExtent = DIV_WIDTH / 4;
+        const minimumDomainExtent = DIV_WIDTH / 4;
 
-        let startPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
-        let startPoint2 = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
-        let zoomAmount = 6;
-        let endX = (startPoint2.x - startPoint.x) * zoomAmount + startPoint.x;
-        let endY = (startPoint2.y - startPoint.y) * zoomAmount + startPoint.y;
-        let endPoint = { x: endX, y: endY };
+        const startPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
+        const startPoint2 = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
+        const zoomAmount = 6;
+        const endX = (startPoint2.x - startPoint.x) * zoomAmount + startPoint.x;
+        const endY = (startPoint2.y - startPoint.y) * zoomAmount + startPoint.y;
+        const endPoint = { x: endX, y: endY };
 
         TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint, startPoint2], [0, 1]);
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1]);
@@ -479,8 +479,8 @@ describe("Interactions", () => {
 
     describe("Setting maxDomainExtent", () => {
       let div: d3.Selection<HTMLDivElement, any, any, any>;
-      let DIV_WIDTH = 400;
-      let DIV_HEIGHT = 500;
+      const DIV_WIDTH = 400;
+      const DIV_HEIGHT = 500;
 
       let eventTarget: SimpleSelection<void>;
 
@@ -493,7 +493,7 @@ describe("Interactions", () => {
 
         div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
 
-        let component = new Plottable.Component();
+        const component = new Plottable.Component();
         component.renderTo(div);
 
         panZoomInteraction = new Plottable.Interactions.PanZoom();
@@ -504,7 +504,7 @@ describe("Interactions", () => {
       });
 
       it("can set maxDomainExtent", () => {
-        let maximumDomainExtent = DIV_WIDTH;
+        const maximumDomainExtent = DIV_WIDTH;
         assert.strictEqual(panZoomInteraction.maxDomainExtent(xScale, maximumDomainExtent), panZoomInteraction,
           "setting the maxDomainExtent returns the interaction");
 
@@ -525,9 +525,9 @@ describe("Interactions", () => {
       });
 
       it("can't set maxDomainExtent() to be smaller than minDomainExtent() for the same Scale", () => {
-        let minimumDomainExtent = DIV_WIDTH / 2;
+        const minimumDomainExtent = DIV_WIDTH / 2;
         panZoomInteraction.minDomainExtent(xScale, minimumDomainExtent);
-        let tooSmallMaximumDomainExtent = minimumDomainExtent / 2;
+        const tooSmallMaximumDomainExtent = minimumDomainExtent / 2;
         // HACKHACK #2661: Cannot assert errors being thrown with description
         (<any> assert).throws(() => panZoomInteraction.maxDomainExtent(xScale, tooSmallMaximumDomainExtent), Error,
           "maxDomainExtent must be larger than minDomainExtent for the same Scale",
@@ -544,9 +544,9 @@ describe("Interactions", () => {
           return;
         }
 
-        let maximumDomainExtent = DIV_WIDTH;
-        let scrollPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
-        let deltaY = 3000;
+        const maximumDomainExtent = DIV_WIDTH;
+        const scrollPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
+        const deltaY = 3000;
         TestMethods.triggerFakeWheelEvent("wheel", div, scrollPoint.x, scrollPoint.y, deltaY);
         let domainExtent = Math.abs(xScale.domain()[1] - xScale.domain()[0]);
         assert.operator(domainExtent, ">", maximumDomainExtent, "there is no zoom limit before setting maximun extent via scroll");
@@ -561,14 +561,14 @@ describe("Interactions", () => {
       });
 
       it("cannot go beyond the specified domainExtent (pinching)", () => {
-        let maximumDomainExtent = DIV_WIDTH;
+        const maximumDomainExtent = DIV_WIDTH;
 
-        let startPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
-        let startPoint2 = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
-        let zoomAmount = 1 / 6;
-        let endX = (startPoint2.x - startPoint.x) * zoomAmount + startPoint.x;
-        let endY = (startPoint2.y - startPoint.y) * zoomAmount + startPoint.y;
-        let endPoint = { x: endX, y: endY };
+        const startPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
+        const startPoint2 = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
+        const zoomAmount = 1 / 6;
+        const endX = (startPoint2.x - startPoint.x) * zoomAmount + startPoint.x;
+        const endY = (startPoint2.y - startPoint.y) * zoomAmount + startPoint.y;
+        const endPoint = { x: endX, y: endY };
 
         TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint, startPoint2], [0, 1]);
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1]);
@@ -590,8 +590,8 @@ describe("Interactions", () => {
 
     describe("Setting minDomainValue", () => {
       let div: d3.Selection<HTMLDivElement, any, any, any>;
-      let DIV_WIDTH = 400;
-      let DIV_HEIGHT = 500;
+      const DIV_WIDTH = 400;
+      const DIV_HEIGHT = 500;
       let eventTarget: SimpleSelection<void>;
       let xScale: Plottable.QuantitativeScale<number>;
       let panZoomInteraction: Plottable.Interactions.PanZoom;
@@ -602,7 +602,7 @@ describe("Interactions", () => {
 
         div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
 
-        let component = new Plottable.Component();
+        const component = new Plottable.Component();
         component.renderTo(div);
 
         panZoomInteraction = new Plottable.Interactions.PanZoom();
@@ -617,7 +617,7 @@ describe("Interactions", () => {
       });
 
       it("can set minDomainValue", () => {
-        let domainValue = DIV_WIDTH / 4;
+        const domainValue = DIV_WIDTH / 4;
         panZoomInteraction.minDomainValue(xScale, domainValue);
         assert.strictEqual(panZoomInteraction.minDomainValue(xScale), domainValue,
           "returns the correct minDomainValue");
@@ -630,11 +630,11 @@ describe("Interactions", () => {
           return;
         }
 
-        let domainValue = DIV_WIDTH / 4;
+        const domainValue = DIV_WIDTH / 4;
 
         // simulate massive scroll zoom out
-        let scrollPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
-        let deltaY = 3000;
+        const scrollPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
+        const deltaY = 3000;
         TestMethods.triggerFakeWheelEvent("wheel", div, scrollPoint.x, scrollPoint.y, deltaY);
         assert.operator(xScale.domain()[0], "<", domainValue, "no initial limit");
 
@@ -646,14 +646,14 @@ describe("Interactions", () => {
       });
 
       it("cannot go beyond the specified minDomainValue (pinching)", () => {
-        let domainValue = DIV_WIDTH / 4;
+        const domainValue = DIV_WIDTH / 4;
 
-        let startPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
-        let startPoint2 = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
-        let zoomAmount = 1 / 6;
-        let endX = (startPoint2.x - startPoint.x) * zoomAmount + startPoint.x;
-        let endY = (startPoint2.y - startPoint.y) * zoomAmount + startPoint.y;
-        let endPoint = { x: endX, y: endY };
+        const startPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
+        const startPoint2 = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
+        const zoomAmount = 1 / 6;
+        const endX = (startPoint2.x - startPoint.x) * zoomAmount + startPoint.x;
+        const endY = (startPoint2.y - startPoint.y) * zoomAmount + startPoint.y;
+        const endPoint = { x: endX, y: endY };
 
         TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint, startPoint2], [0, 1]);
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1]);
@@ -674,8 +674,8 @@ describe("Interactions", () => {
 
     describe("Setting maxDomainValue", () => {
       let div: d3.Selection<HTMLDivElement, any, any, any>;
-      let DIV_WIDTH = 400;
-      let DIV_HEIGHT = 500;
+      const DIV_WIDTH = 400;
+      const DIV_HEIGHT = 500;
       let eventTarget: SimpleSelection<void>;
       let xScale: Plottable.QuantitativeScale<number>;
       let panZoomInteraction: Plottable.Interactions.PanZoom;
@@ -686,7 +686,7 @@ describe("Interactions", () => {
 
         div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
 
-        let component = new Plottable.Component();
+        const component = new Plottable.Component();
         component.renderTo(div);
 
         panZoomInteraction = new Plottable.Interactions.PanZoom();
@@ -701,7 +701,7 @@ describe("Interactions", () => {
       });
 
       it("can set maxDomainValue", () => {
-        let domainValue = DIV_WIDTH / 4;
+        const domainValue = DIV_WIDTH / 4;
         panZoomInteraction.maxDomainValue(xScale, domainValue);
         assert.strictEqual(panZoomInteraction.maxDomainValue(xScale), domainValue,
           "returns the correct minDomainValue");
@@ -714,11 +714,11 @@ describe("Interactions", () => {
           return;
         }
 
-        let domainValue = DIV_WIDTH / 2;
+        const domainValue = DIV_WIDTH / 2;
 
         // simulate massive scroll zoom out
-        let scrollPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
-        let deltaY = 3000;
+        const scrollPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
+        const deltaY = 3000;
         TestMethods.triggerFakeWheelEvent("wheel", div, scrollPoint.x, scrollPoint.y, deltaY);
         assert.operator(xScale.domain()[1], ">", domainValue, "no initial limit");
 
@@ -730,16 +730,16 @@ describe("Interactions", () => {
       });
 
       it("cannot go beyond the specified maxDomainValue (pinching)", () => {
-        let domainValue = DIV_WIDTH / 2;
+        const domainValue = DIV_WIDTH / 2;
 
-        let fromCenter = (dx: number, dy: number) => {
+        const fromCenter = (dx: number, dy: number) => {
           return { x: DIV_WIDTH / 4 + dx, y: DIV_HEIGHT / 4 + dy };
         };
 
-        let startPoint1 = fromCenter(-60, 0);
-        let startPoint2 = fromCenter(60, 0);
-        let endPoint1 = fromCenter(-10, 0);
-        let endPoint2 = fromCenter(10, 0);
+        const startPoint1 = fromCenter(-60, 0);
+        const startPoint2 = fromCenter(60, 0);
+        const endPoint1 = fromCenter(-10, 0);
+        const endPoint2 = fromCenter(10, 0);
 
         // zoom out pinch
         TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint1, startPoint2], [0, 1]);
@@ -762,8 +762,8 @@ describe("Interactions", () => {
 
     describe("Setting both minDomainValue and maxDomainValue", () => {
       let div: d3.Selection<HTMLDivElement, any, any, any>;
-      let DIV_WIDTH = 400;
-      let DIV_HEIGHT = 500;
+      const DIV_WIDTH = 400;
+      const DIV_HEIGHT = 500;
       let eventTarget: SimpleSelection<void>;
       let xScale: Plottable.QuantitativeScale<number>;
       let panZoomInteraction: Plottable.Interactions.PanZoom;
@@ -774,7 +774,7 @@ describe("Interactions", () => {
 
         div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
 
-        let component = new Plottable.Component();
+        const component = new Plottable.Component();
         component.renderTo(div);
 
         panZoomInteraction = new Plottable.Interactions.PanZoom();
@@ -795,12 +795,12 @@ describe("Interactions", () => {
           return;
         }
 
-        let domainMinValue = DIV_WIDTH / 4;
-        let domainMaxValue = domainMinValue + DIV_WIDTH / 2;
+        const domainMinValue = DIV_WIDTH / 4;
+        const domainMaxValue = domainMinValue + DIV_WIDTH / 2;
 
         // simulate massive scroll zoom out
-        let scrollPoint = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 4 };
-        let deltaY = 3000;
+        const scrollPoint = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 4 };
+        const deltaY = 3000;
         TestMethods.triggerFakeWheelEvent("wheel", div, scrollPoint.x, scrollPoint.y, deltaY);
         assert.operator(xScale.domain()[0], "<", domainMinValue, "no initial min limit");
         assert.operator(xScale.domain()[1], ">", domainMaxValue, "no initial max limit");
@@ -815,17 +815,17 @@ describe("Interactions", () => {
       });
 
       it("cannot go beyond the specified minDomainValue (pinching)", () => {
-        let fromCenter = (dx: number, dy: number) => {
+        const fromCenter = (dx: number, dy: number) => {
           return { x: DIV_WIDTH / 4 + dx, y: DIV_HEIGHT / 4 + dy };
         };
 
-        let domainMinValue = DIV_WIDTH / 4;
-        let domainMaxValue = domainMinValue + DIV_WIDTH / 2;
+        const domainMinValue = DIV_WIDTH / 4;
+        const domainMaxValue = domainMinValue + DIV_WIDTH / 2;
 
-        let startPoint1 = fromCenter(-60, 0);
-        let startPoint2 = fromCenter(60, 0);
-        let endPoint1 = fromCenter(-10, 0);
-        let endPoint2 = fromCenter(10, 0);
+        const startPoint1 = fromCenter(-60, 0);
+        const startPoint2 = fromCenter(60, 0);
+        const endPoint1 = fromCenter(-10, 0);
+        const endPoint2 = fromCenter(10, 0);
 
         // zoom out pinch
         TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint1, startPoint2], [0, 1]);
@@ -851,22 +851,22 @@ describe("Interactions", () => {
 
     describe("Registering and deregistering Pan and Zoom event callbacks", () => {
       let div: d3.Selection<HTMLDivElement, any, any, any>;
-      let DIV_WIDTH = 400;
-      let DIV_HEIGHT = 500;
+      const DIV_WIDTH = 400;
+      const DIV_HEIGHT = 500;
 
       let eventTarget: SimpleSelection<void>;
 
       let xScale: Plottable.QuantitativeScale<number>;
       let panZoomInteraction: Plottable.Interactions.PanZoom;
 
-      interface PanZoomTestCallback {
+      interface IPanZoomTestCallback {
         called: boolean;
         reset: () => void;
         (): void;
       }
 
       function makeCallback () {
-        let callback = <PanZoomTestCallback> function(e: Event) {
+        const callback = <IPanZoomTestCallback> function(e: Event) {
           callback.called = true;
         };
         callback.called = false;
@@ -882,7 +882,7 @@ describe("Interactions", () => {
 
         div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
 
-        let component = new Plottable.Component();
+        const component = new Plottable.Component();
         component.renderTo(div);
 
         panZoomInteraction = new Plottable.Interactions.PanZoom();
@@ -893,9 +893,9 @@ describe("Interactions", () => {
       });
 
       it("registers callback using onPanEnd", () => {
-        let callback = makeCallback();
-        let startPoint = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
-        let endPoint = { x: -DIV_WIDTH / 2, y: -DIV_HEIGHT / 2 };
+        const callback = makeCallback();
+        const startPoint = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
+        const endPoint = { x: -DIV_WIDTH / 2, y: -DIV_HEIGHT / 2 };
 
         assert.strictEqual(panZoomInteraction.onPanEnd(callback), panZoomInteraction, "registration returns the calling Interaction");
 
@@ -916,11 +916,11 @@ describe("Interactions", () => {
       });
 
       it("registers callback using onZoomEnd", () => {
-        let callback = makeCallback();
-        let startPoint = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
-        let endPoint = { x: -DIV_WIDTH / 2, y: -DIV_HEIGHT / 2 };
-        let scrollPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
-        let deltaY = 3000;
+        const callback = makeCallback();
+        const startPoint = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
+        const endPoint = { x: -DIV_WIDTH / 2, y: -DIV_HEIGHT / 2 };
+        const scrollPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
+        const deltaY = 3000;
 
         assert.strictEqual(panZoomInteraction.onZoomEnd(callback), panZoomInteraction, "registration returns the calling Interaction");
 
@@ -951,9 +951,9 @@ describe("Interactions", () => {
       });
 
       it("deregisters callback using offPanEnd", () => {
-        let callback = makeCallback();
-        let startPoint = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
-        let endPoint = { x: -DIV_WIDTH / 2, y: -DIV_HEIGHT / 2 };
+        const callback = makeCallback();
+        const startPoint = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
+        const endPoint = { x: -DIV_WIDTH / 2, y: -DIV_HEIGHT / 2 };
 
         panZoomInteraction.onPanEnd(callback);
 
@@ -968,10 +968,10 @@ describe("Interactions", () => {
       });
 
       it("deregisters callback using offZoomEnd", () => {
-        let callback = makeCallback();
-        let startPoint = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
-        let endPoint = { x: -DIV_WIDTH / 2, y: -DIV_HEIGHT / 2 };
-        let scrollPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
+        const callback = makeCallback();
+        const startPoint = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
+        const endPoint = { x: -DIV_WIDTH / 2, y: -DIV_HEIGHT / 2 };
+        const scrollPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
         panZoomInteraction.onZoomEnd(callback);
 
         assert.strictEqual(panZoomInteraction.offZoomEnd(callback), panZoomInteraction, "deregistration returns the calling Interaction");
@@ -986,10 +986,10 @@ describe("Interactions", () => {
       });
 
       it("can register multiple onPanEnd callbacks", () => {
-        let callback1 = makeCallback();
-        let callback2 = makeCallback();
-        let startPoint = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
-        let endPoint = { x: -DIV_WIDTH / 2, y: -DIV_HEIGHT / 2 };
+        const callback1 = makeCallback();
+        const callback2 = makeCallback();
+        const startPoint = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
+        const endPoint = { x: -DIV_WIDTH / 2, y: -DIV_HEIGHT / 2 };
 
         panZoomInteraction.onPanEnd(callback1);
         panZoomInteraction.onPanEnd(callback2);
@@ -1003,11 +1003,11 @@ describe("Interactions", () => {
       });
 
       it("can register multiple onZoomEnd callbacks", () => {
-        let callback1 = makeCallback();
-        let callback2 = makeCallback();
-        let startPoint = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
-        let endPoint = { x: -DIV_WIDTH / 2, y: -DIV_HEIGHT / 2 };
-        let scrollPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
+        const callback1 = makeCallback();
+        const callback2 = makeCallback();
+        const startPoint = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
+        const endPoint = { x: -DIV_WIDTH / 2, y: -DIV_HEIGHT / 2 };
+        const scrollPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
 
         panZoomInteraction.onZoomEnd(callback1);
         panZoomInteraction.onZoomEnd(callback2);
@@ -1022,10 +1022,10 @@ describe("Interactions", () => {
       });
 
       it("can deregister a onPanEnd callback without affecting the other ones", () => {
-        let callback1 = makeCallback();
-        let callback2 = makeCallback();
-        let startPoint = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
-        let endPoint = { x: -DIV_WIDTH / 2, y: -DIV_HEIGHT / 2 };
+        const callback1 = makeCallback();
+        const callback2 = makeCallback();
+        const startPoint = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
+        const endPoint = { x: -DIV_WIDTH / 2, y: -DIV_HEIGHT / 2 };
 
         panZoomInteraction.onPanEnd(callback1);
         panZoomInteraction.onPanEnd(callback2);
@@ -1040,11 +1040,11 @@ describe("Interactions", () => {
       });
 
       it("can deregister a onZoomEnd callback without affecting the other ones", () => {
-        let callback1 = makeCallback();
-        let callback2 = makeCallback();
-        let startPoint = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
-        let endPoint = { x: -DIV_WIDTH / 2, y: -DIV_HEIGHT / 2 };
-        let scrollPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
+        const callback1 = makeCallback();
+        const callback2 = makeCallback();
+        const startPoint = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
+        const endPoint = { x: -DIV_WIDTH / 2, y: -DIV_HEIGHT / 2 };
+        const scrollPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
 
         panZoomInteraction.onZoomEnd(callback1);
         panZoomInteraction.onZoomEnd(callback2);

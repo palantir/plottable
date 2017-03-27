@@ -1,25 +1,25 @@
-import { SimpleSelection } from "../src/core/interfaces";
 import { assert } from "chai";
 import * as d3 from "d3";
 
 import * as Plottable from "../src";
+import { SimpleSelection } from "../src/core/interfaces";
 import { getTranslateValues } from "../src/utils/domUtils";
 
 export function generateDiv(width = 400, height = 400): d3.Selection<HTMLDivElement, void | {}, any, any> {
-  let parent = getElementParent();
+  const parent = getElementParent();
   return parent.append<HTMLDivElement>("div").style("width", `${width}px`).style("height", `${height}px`).attr("class", "div");
 }
 
 export function generateSVG(width = 400, height = 400): d3.Selection<SVGSVGElement, void | {}, any, any> {
-  let parent = getElementParent();
+  const parent = getElementParent();
   return parent.append<SVGSVGElement>("svg").attr("width", width).attr("height", height).attr("class", "svg");
 }
 
 export function getElementParent(): SimpleSelection<void> {
-  let mocha = d3.select("#mocha-report");
+  const mocha = d3.select("#mocha-report");
   if (mocha.node() != null) {
-    let suites = mocha.selectAll<Element, any>(".suite");
-    let lastSuite = d3.select(suites.nodes()[suites.size() - 1]);
+    const suites = mocha.selectAll<Element, any>(".suite");
+    const lastSuite = d3.select(suites.nodes()[suites.size() - 1]);
     return lastSuite.selectAll<Element, any>("ul");
   } else {
     return d3.select("body");
@@ -27,7 +27,7 @@ export function getElementParent(): SimpleSelection<void> {
 }
 
 export function isInDOM(component: Plottable.Component) {
-  let contentNode = <Element> component.content().node();
+  const contentNode = <Element> component.content().node();
   return contentNode != null && Plottable.Utils.DOM.contains(document.body, contentNode);
 }
 
@@ -58,15 +58,15 @@ export function getTranslate(element: SimpleSelection<void>) {
 }
 
 export function assertBBoxEquivalence(bbox: SVGRect, widthAndHeightPair: number[], message: string) {
-  let width = widthAndHeightPair[0];
-  let height = widthAndHeightPair[1];
+  const width = widthAndHeightPair[0];
+  const height = widthAndHeightPair[1];
   assert.strictEqual(bbox.width, width, "width: " + message);
   assert.strictEqual(bbox.height, height, "height: " + message);
 }
 
 export function assertBBoxInclusion(outerEl: SimpleSelection<void>, innerEl: SimpleSelection<void>) {
-  let outerBox = (<Element> outerEl.node()).getBoundingClientRect();
-  let innerBox = (<Element> innerEl.node()).getBoundingClientRect();
+  const outerBox = (<Element> outerEl.node()).getBoundingClientRect();
+  const innerBox = (<Element> innerEl.node()).getBoundingClientRect();
   assert.operator(Math.floor(outerBox.left), "<=", Math.ceil(innerBox.left) + window.Pixel_CloseTo_Requirement,
     "bounding rect left included");
   assert.operator(Math.floor(outerBox.top), "<=", Math.ceil(innerBox.top) + window.Pixel_CloseTo_Requirement,
@@ -78,10 +78,10 @@ export function assertBBoxInclusion(outerEl: SimpleSelection<void>, innerEl: Sim
 }
 
 export function assertBBoxNonIntersection(firstEl: SimpleSelection<void>, secondEl: SimpleSelection<void>) {
-  let firstBox = (<Element> firstEl.node()).getBoundingClientRect();
-  let secondBox = (<Element> secondEl.node()).getBoundingClientRect();
+  const firstBox = (<Element> firstEl.node()).getBoundingClientRect();
+  const secondBox = (<Element> secondEl.node()).getBoundingClientRect();
 
-  let intersectionBox = {
+  const intersectionBox = {
     left: Math.max(firstBox.left, secondBox.left),
     right: Math.min(firstBox.right, secondBox.right),
     bottom: Math.min(firstBox.bottom, secondBox.bottom),
@@ -98,8 +98,8 @@ export function assertPointsClose(actual: Plottable.Point, expected: Plottable.P
 };
 
 export function assertWidthHeight(el: SimpleSelection<void>, widthExpected: number, heightExpected: number, message: string) {
-  let width = el.attr("width");
-  let height = el.attr("height");
+  const width = el.attr("width");
+  const height = el.attr("height");
   assert.strictEqual(width, String(widthExpected), "width: " + message);
   assert.strictEqual(height, String(heightExpected), "height: " + message);
 }
@@ -107,15 +107,15 @@ export function assertWidthHeight(el: SimpleSelection<void>, widthExpected: numb
 export function assertLineAttrs(line: SimpleSelection<void>,
                                 expectedAttrs: { x1: number, y1: number, x2: number, y2: number },
                                 message: string) {
-  let floatingPointError = 0.000000001;
+  const floatingPointError = 0.000000001;
   assert.closeTo(numAttr(line, "x1"), expectedAttrs.x1, floatingPointError, message + " (x1)");
   assert.closeTo(numAttr(line, "y1"), expectedAttrs.y1, floatingPointError, message + " (y1)");
   assert.closeTo(numAttr(line, "x2"), expectedAttrs.x2, floatingPointError, message + " (x2)");
   assert.closeTo(numAttr(line, "y2"), expectedAttrs.y2, floatingPointError, message + " (y2)");
 }
 
-export function assertEntitiesEqual(actual: Plottable.Entity<Plottable.Component>,
-                                    expected: Plottable.Entity<Plottable.Component>,
+export function assertEntitiesEqual(actual: Plottable.IEntity<Plottable.Component>,
+                                    expected: Plottable.IEntity<Plottable.Component>,
                                     msg: string) {
   assert.deepEqual(actual.datum, expected.datum, msg + " (datum)");
   assertPointsClose(actual.position, expected.position, 0.01, msg);
@@ -126,8 +126,8 @@ export function assertEntitiesEqual(actual: Plottable.Entity<Plottable.Component
   assert.strictEqual(actual.component, expected.component, msg + " (component)");
 }
 
-export function assertPlotEntitiesEqual(actual: Plottable.Plots.PlotEntity,
-                                        expected: Plottable.Plots.PlotEntity,
+export function assertPlotEntitiesEqual(actual: Plottable.Plots.IPlotEntity,
+                                        expected: Plottable.Plots.IPlotEntity,
                                         msg: string) {
   assertEntitiesEqual(actual, expected, msg);
   assert.strictEqual(actual.dataset, expected.dataset, msg + " (dataset)");
@@ -164,8 +164,8 @@ export function normalizePath(pathString: string) {
    * }[]
  */
 export function decomposePath(normalizedPathString: string) {
-  let commands = normalizedPathString.split(/[^A-Z]/).filter((s) => s !== "");
-  let argumentStrings = normalizedPathString.split(/[A-Z]/).slice(1);
+  const commands = normalizedPathString.split(/[^A-Z]/).filter((s) => s !== "");
+  const argumentStrings = normalizedPathString.split(/[A-Z]/).slice(1);
   return commands.map((command, index) => {
     return {
       command: command,
@@ -179,16 +179,16 @@ export function numAttr(s: SimpleSelection<void>, a: string) {
 }
 
 export function triggerFakeUIEvent(type: string, target: SimpleSelection<void>) {
-  let e = <UIEvent> document.createEvent("UIEvents");
+  const e = <UIEvent> document.createEvent("UIEvents");
   e.initUIEvent(type, true, true, window, 1);
   (<HTMLElement> target.node()).dispatchEvent(e);
 }
 
 export function triggerFakeMouseEvent(type: string, target: SimpleSelection<void>, relativeX: number, relativeY: number, button = 0) {
-  let clientRect = (<Element> target.node()).getBoundingClientRect();
-  let xPos = clientRect.left + relativeX;
-  let yPos = clientRect.top + relativeY;
-  let e = <MouseEvent> document.createEvent("MouseEvents");
+  const clientRect = (<Element> target.node()).getBoundingClientRect();
+  const xPos = clientRect.left + relativeX;
+  const yPos = clientRect.top + relativeY;
+  const e = <MouseEvent> document.createEvent("MouseEvents");
   e.initMouseEvent(type, true, true, window, 1,
     xPos, yPos,
     xPos, yPos,
@@ -204,7 +204,7 @@ export function triggerFakeDragSequence(target: SimpleSelection<void>, start: Pl
       "mousemove",
       target,
       start.x + (end.x - start.x) * i / numSteps,
-      start.y + (end.y - start.y) * i / numSteps
+      start.y + (end.y - start.y) * i / numSteps,
     );
   }
   triggerFakeMouseEvent("mousemove", target, end.x, end.y);
@@ -212,14 +212,14 @@ export function triggerFakeDragSequence(target: SimpleSelection<void>, start: Pl
 }
 
 export function isIE() {
-  let userAgent = window.navigator.userAgent;
+  const userAgent = window.navigator.userAgent;
   return userAgent.indexOf("MSIE ") > -1 || userAgent.indexOf("Trident/") > -1;
 }
 
 export function triggerFakeWheelEvent(type: string, target: SimpleSelection<void>, relativeX: number, relativeY: number, deltaY: number) {
-  let clientRect = (<Element> target.node()).getBoundingClientRect();
-  let xPos = clientRect.left + relativeX;
-  let yPos = clientRect.top + relativeY;
+  const clientRect = (<Element> target.node()).getBoundingClientRect();
+  const xPos = clientRect.left + relativeX;
+  const yPos = clientRect.top + relativeY;
   let event: WheelEvent;
   if (isIE()) {
     event = document.createEvent("WheelEvent");
@@ -234,16 +234,16 @@ export function triggerFakeWheelEvent(type: string, target: SimpleSelection<void
 }
 
 export function triggerFakeTouchEvent(type: string, target: SimpleSelection<void>, touchPoints: Plottable.Point[], ids: number[] = []) {
-  let targetNode = <Element> target.node();
-  let clientRect = targetNode.getBoundingClientRect();
-  let e = <TouchEvent> document.createEvent("UIEvent");
+  const targetNode = <Element> target.node();
+  const clientRect = targetNode.getBoundingClientRect();
+  const e = <TouchEvent> document.createEvent("UIEvent");
   e.initUIEvent(type, true, true, window, 1);
-  let fakeTouchList: any = [];
+  const fakeTouchList: any = [];
 
   touchPoints.forEach((touchPoint, i) => {
-    let xPos = clientRect.left + touchPoint.x;
-    let yPos = clientRect.top + touchPoint.y;
-    let identifier = ids[i] == null ? 0 : ids[i];
+    const xPos = clientRect.left + touchPoint.x;
+    const yPos = clientRect.top + touchPoint.y;
+    const identifier = ids[i] == null ? 0 : ids[i];
     fakeTouchList.push({
       identifier: identifier,
       target: targetNode,
@@ -269,14 +269,14 @@ export function triggerFakeTouchEvent(type: string, target: SimpleSelection<void
 
 export enum InteractionMode {
   Mouse,
-  Touch
+  Touch,
 }
 ;
 
 export enum InteractionType {
   Start,
   Move,
-  End
+  End,
 }
 
 export function triggerFakeInteractionEvent(mode: InteractionMode,
@@ -329,7 +329,7 @@ function getInteractionTypeString(mode: InteractionMode, type: InteractionType) 
 /* tslint:enable:no-switch-case-fall-through */
 
 export function triggerFakeKeyboardEvent(type: string, target: SimpleSelection<void>, keyCode: number, options?: {[key: string]: any}) {
-  let event = <KeyboardEvent> document.createEvent("Events");
+  const event = <KeyboardEvent> document.createEvent("Events");
   event.initEvent(type, true, true);
   (event as any).keyCode = keyCode;
   if (options != null) {
@@ -339,18 +339,18 @@ export function triggerFakeKeyboardEvent(type: string, target: SimpleSelection<v
 }
 
 export function assertAreaPathCloseTo(actualPath: string, expectedPath: string, precision: number, msg: string) {
-  let actualAreaPathNumbers = tokenizePathString(actualPath);
-  let expectedAreaPathNumbers = tokenizePathString(expectedPath);
+  const actualAreaPathNumbers = tokenizePathString(actualPath);
+  const expectedAreaPathNumbers = tokenizePathString(expectedPath);
 
   assert.lengthOf(actualAreaPathNumbers, expectedAreaPathNumbers.length, `${msg}: number of numbers in each path should be equal`);
   actualAreaPathNumbers.forEach((actualAreaNumber, i) => {
-    let expectedAreaNumber = expectedAreaPathNumbers[i];
+    const expectedAreaNumber = expectedAreaPathNumbers[i];
     assert.closeTo(+actualAreaNumber, +expectedAreaNumber, 0.1, msg);
   });
 }
 
 function tokenizePathString(pathString: string) {
-  let numbers: string[] = [];
+  const numbers: string[] = [];
   pathString.split("Z").forEach((path) =>
     path.split(/[A-Z]/).forEach((token) =>
       token.split(",").forEach((numberString) =>
@@ -365,7 +365,7 @@ function tokenizePathString(pathString: string) {
 export type RGB = {
   red: number,
   green: number,
-  blue: number
+  blue: number,
 };
 
 export function colorHexToRGB(hex: string): RGB {
@@ -397,7 +397,7 @@ export function colorRGBToHex(rgb: RGB) {
 
 export function assertWarns(fn: Function, warningMessage: string, assertMessage: string) {
   let receivedWarning = "";
-  let oldWarn = Plottable.Utils.Window.warn;
+  const oldWarn = Plottable.Utils.Window.warn;
   Plottable.Utils.Window.warn = (msg: string) => receivedWarning = msg;
   try {
     fn.call(this);
@@ -408,10 +408,10 @@ export function assertWarns(fn: Function, warningMessage: string, assertMessage:
 }
 
 export function areaVertices(areaSelection: SimpleSelection<any>): Plottable.Point[] {
-  let areaPathString = normalizePath(areaSelection.attr("d")).slice(1, -1);
+  const areaPathString = normalizePath(areaSelection.attr("d")).slice(1, -1);
   return areaPathString.split("L")
     .map((d) => {
-      let pointArray = d.trim().split(",");
+      const pointArray = d.trim().split(",");
       return {
         x: +pointArray[0],
         y: +pointArray[1],
@@ -421,12 +421,12 @@ export function areaVertices(areaSelection: SimpleSelection<any>): Plottable.Poi
 
 export function assertPathEqualToDataPoints(path: string, data: {x: number, y: number}[],
                                             xScale: Plottable.QuantitativeScale<any>, yScale: Plottable.QuantitativeScale<any>) {
-  let EPSILON = 0.0001;
-  let lineEdges = normalizePath(path).match(/([MmLl](\-?\d+\.?\d*)(,|\s)(-?\d+\.?\d*)|([HhVv](\-?\d+\.?\d*)))/g);
+  const EPSILON = 0.0001;
+  const lineEdges = normalizePath(path).match(/([MmLl](\-?\d+\.?\d*)(,|\s)(-?\d+\.?\d*)|([HhVv](\-?\d+\.?\d*)))/g);
   assert.strictEqual(lineEdges.length, data.length, "correct number of edges drawn");
   lineEdges.forEach((edge, i) => {
-    let command = edge[0];
-    let coordinates = edge.slice(1).split(/,|\s/);
+    const command = edge[0];
+    const coordinates = edge.slice(1).split(/,|\s/);
     switch (command) {
       case "M":
       case "m":

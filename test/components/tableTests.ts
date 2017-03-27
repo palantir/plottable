@@ -1,12 +1,9 @@
-import * as d3 from "d3";
-
 import { assert } from "chai";
 
 import * as Plottable from "../../src";
 
 import * as Mocks from "../mocks";
 import * as TestMethods from "../testMethods";
-
 
 describe("Tables", () => {
   function assertTableRows(table: Plottable.Components.Table, expectedRows: Plottable.Component[][], message: string) {
@@ -306,7 +303,7 @@ describe("Tables", () => {
     const FIXED_COMPONENT_SIZE = 50;
 
     function verifyOrigins(rows: Plottable.Component[][], rowPadding = 0, columnPadding = 0) {
-      let expectedOrigin = {
+      const expectedOrigin = {
         x: 0,
         y: 0,
       };
@@ -327,7 +324,7 @@ describe("Tables", () => {
 
       const component1 = new Plottable.Component();
       const component2 = new Plottable.Component();
-      let tableRows = [[component1, component2]];
+      const tableRows = [[component1, component2]];
       const table = new Plottable.Components.Table(tableRows);
       table.renderTo(div);
       const twoColumnExpectedWidth = Plottable.Utils.DOM.elementWidth(div) / 2;
@@ -370,7 +367,7 @@ describe("Tables", () => {
 
       const component1 = new Plottable.Component();
       const component2 = new Plottable.Component();
-      let tableRows = [
+      const tableRows = [
         [component1],
         [component2],
       ];

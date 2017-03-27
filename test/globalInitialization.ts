@@ -9,7 +9,7 @@ before(() => {
   // Set the render policy to immediate to make sure ETE tests can check DOM change immediately
   Plottable.RenderController.renderPolicy("immediate");
   // Taken from https://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser
-  let isFirefox = navigator.userAgent.indexOf("Firefox") !== -1;
+  const isFirefox = navigator.userAgent.indexOf("Firefox") !== -1;
   if (window.PHANTOMJS) {
     window.Pixel_CloseTo_Requirement = 2;
     // HACKHACK https://github.com/ariya/phantomjs/issues/13280

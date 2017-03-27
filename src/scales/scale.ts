@@ -6,17 +6,17 @@
 import * as Utils from "../utils";
 import * as Scales from "./";
 
-export type TransformableScale<D, R> = Scale<D, R> & Scales.TransformableScale;
+export type TransformableScale<D, R> = Scale<D, R> & Scales.ITransformableScale;
 
-export interface ScaleCallback<S extends Scale<any, any>> {
+export interface IScaleCallback<S extends Scale<any, any>> {
   (scale: S): any;
 }
 
 export class Scale<D, R> {
-  private _callbacks: Utils.CallbackSet<ScaleCallback<this>>;
+  private _callbacks: Utils.CallbackSet<IScaleCallback<this>>;
   private _autoDomainAutomatically = true;
   private _domainModificationInProgress = false;
-  private _includedValuesProviders: Utils.Set<Scales.IncludedValuesProvider<D>>;
+  private _includedValuesProviders: Utils.Set<Scales.IIncludedValuesProvider<D>>;
 
   /**
    * A Scale is a function (in the mathematical sense) that maps values from a domain to a range.
@@ -24,8 +24,8 @@ export class Scale<D, R> {
    * @constructor
    */
   constructor() {
-    this._callbacks = new Utils.CallbackSet<ScaleCallback<this>>();
-    this._includedValuesProviders = new Utils.Set<Scales.IncludedValuesProvider<D>>();
+    this._callbacks = new Utils.CallbackSet<IScaleCallback<this>>();
+    this._includedValuesProviders = new Utils.Set<Scales.IIncludedValuesProvider<D>>();
   }
 
   /**
@@ -40,7 +40,7 @@ export class Scale<D, R> {
 
   protected _getAllIncludedValues(): D[] {
     let providerArray: D[] = [];
-    this._includedValuesProviders.forEach((provider: Scales.IncludedValuesProvider<D>) => {
+    this._includedValuesProviders.forEach((provider: Scales.IIncludedValuesProvider<D>) => {
       const extents = provider(this);
       providerArray = providerArray.concat(extents);
     });
@@ -57,7 +57,7 @@ export class Scale<D, R> {
    * @param {ScaleCallback} callback.
    * @returns {Scale} The calling Scale.
    */
-  public onUpdate(callback: ScaleCallback<this>) {
+  public onUpdate(callback: IScaleCallback<this>) {
     this._callbacks.add(callback);
     return this;
   }
@@ -68,7 +68,7 @@ export class Scale<D, R> {
    * @param {ScaleCallback} callback.
    * @returns {Scale} The calling Scale.
    */
-  public offUpdate(callback: ScaleCallback<this>) {
+  public offUpdate(callback: IScaleCallback<this>) {
     this._callbacks.delete(callback);
     return this;
   }
@@ -182,7 +182,7 @@ export class Scale<D, R> {
    * @param {Scales.IncludedValuesProvider} provider
    * @returns {Scale} The calling Scale.
    */
-  public addIncludedValuesProvider(provider: Scales.IncludedValuesProvider<D>) {
+  public addIncludedValuesProvider(provider: Scales.IIncludedValuesProvider<D>) {
     this._includedValuesProviders.add(provider);
     this._autoDomainIfAutomaticMode();
     return this;
@@ -194,7 +194,7 @@ export class Scale<D, R> {
    * @param {Scales.IncludedValuesProvider} provider
    * @returns {Scale} The calling Scale.
    */
-  public removeIncludedValuesProvider(provider: Scales.IncludedValuesProvider<D>) {
+  public removeIncludedValuesProvider(provider: Scales.IIncludedValuesProvider<D>) {
     this._includedValuesProviders.delete(provider);
     this._autoDomainIfAutomaticMode();
     return this;
