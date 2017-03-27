@@ -34,10 +34,14 @@ type LabelConfig = {
 export const BarOrientation = makeEnum(["vertical", "horizontal"]);
 export type BarOrientation = keyof typeof BarOrientation;
 
+export const BarAlignment = makeEnum(["start", "middle", "end"]);
+export type BarAlignment = keyof typeof BarAlignment;
+
 export class Bar<X, Y> extends XYPlot<X, Y> {
   private static _BAR_WIDTH_RATIO = 0.95;
   private static _SINGLE_BAR_DIMENSION_RATIO = 0.4;
   private static _BAR_AREA_CLASS = "bar-area";
+  private static _BAR_END_KEY = "barEnd";
 
   protected static _LABEL_AREA_CLASS = "bar-label-text-area";
   protected static _LABEL_PADDING = 10;
@@ -50,6 +54,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   private _hideBarsIfAnyAreTooWide = true;
   private _labelConfig: Utils.Map<Dataset, LabelConfig>;
   private _baselineValueProvider: () => (X|Y)[];
+  private _barAlignment: BarAlignment = "middle";
+  private _fixedWidth = true;
 
   private _barPixelWidth = 0;
   private _updateBarPixelWidthCallback: () => void;
@@ -90,6 +96,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       xScale.onUpdate(this._updateBarPixelWidthCallback);
     }
 
+    this._updateWidthAccesor();
     this._updateValueScale();
     return this;
   }
@@ -110,6 +117,56 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     }
 
     this._updateValueScale();
+    return this;
+  }
+
+  public barEnd(): Plots.TransformableAccessorScaleBinding<X, number>;
+  public barEnd(end: number | Accessor<number>): this;
+  public barEnd(end: X | Accessor<X>, scale: Scale<X, number>): this;
+  /**
+   * Gets/sets the accessor for the bar "end", which is used to compute the
+   * width of vertical bars or the height of horizontal bars.
+   *
+   * Normally, bar width is determined by how many bars can fit in the given
+   * space (minus some padding).
+   *
+   * You can override this behavior and manually set the start and end
+   * coordinates for each bar.
+   *
+   * For example, if the bar chart is "vertical" and this accessor is defined,
+   * then the width of a bar is calculated as `abs(barEnd() - x())`.
+   */
+  public barEnd(end?: number | Accessor<number> | X | Accessor<X>, scale?: Scale<X, number>): any {
+    if (end == null) {
+      return this._propertyBindings.get(Bar._BAR_END_KEY);
+    }
+
+    this._bindProperty(Bar._BAR_END_KEY, end, scale);
+    this._updateWidthAccesor();
+    this._updateValueScale();
+    this.render();
+    return this;
+  }
+
+  public barAlignment(): BarAlignment;
+  public barAlignment(align: BarAlignment): this;
+  /**
+   * Gets/Sets the bar alignment. Valid values are `"start"`, `"middle"`, and
+   * `"end"`, which determines the meaning of the accessor of the bar's scale
+   * coordinate (e.g. "x" for vertical bars).
+   *
+   * For example, a value of "start" means the x coordinate accessor sets the
+   * left hand side of the rect.
+   *
+   * The default value is "middle", which aligns to rect so that it centered on
+   * the x coordinate
+   */
+  public barAlignment(align?: BarAlignment): any {
+    if (align == null) {
+      return this._barAlignment;
+    }
+    this._barAlignment = align;
+    this.render();
     return this;
   }
 
@@ -468,16 +525,37 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     }
 
     const scale = <QuantitativeScale<any>>accScaleBinding.scale;
+    const width = this._barPixelWidth;
 
     // To account for inverted domains
     extents = extents.map((extent) => d3.extent([
-      scale.invert(scale.scale(extent[0]) - this._barPixelWidth / 2),
-      scale.invert(scale.scale(extent[0]) + this._barPixelWidth / 2),
-      scale.invert(scale.scale(extent[1]) - this._barPixelWidth / 2),
-      scale.invert(scale.scale(extent[1]) + this._barPixelWidth / 2),
+      scale.invert(this._getAlignedX(scale.scale(extent[0]), width)),
+      scale.invert(this._getAlignedX(scale.scale(extent[0]), width) + width),
+      scale.invert(this._getAlignedX(scale.scale(extent[1]), width)),
+      scale.invert(this._getAlignedX(scale.scale(extent[1]), width) + width),
     ]));
 
     return extents;
+  }
+
+  protected _getAlignedX(x: number, width: number): number {
+    // account for flipped vertical axis
+    if (!this._isVertical) {
+      x -= width;
+      width *= -1;
+    }
+
+    switch(this._barAlignment) {
+      case "start":
+        return x;
+
+      case "end":
+        return x - width;
+
+      case "middle":
+      default:
+        return x - width / 2;
+    }
   }
 
   protected _drawLabels() {
@@ -662,11 +740,16 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       return Math.abs(scaledBaseline - originalPositionFn(d, i, dataset));
     };
 
-    attrToProjector["width"] = this._isVertical ? widthF : heightF;
-    attrToProjector["height"] = this._isVertical ? heightF : widthF;
+    const gapF = attrToProjector["gap"];
+    const widthMinusGap = gapF == null ? widthF : (d: any, i: number, dataset: Dataset) => {
+      return widthF(d, i, dataset) - gapF(d, i, dataset);
+    };
+    attrToProjector["width"] = this._isVertical ? widthMinusGap : heightF;
+    attrToProjector["height"] = this._isVertical ? heightF : widthMinusGap;
 
-    attrToProjector[secondaryAttr] = (d: any, i: number, dataset: Dataset) =>
-    positionF(d, i, dataset) - widthF(d, i, dataset) / 2;
+    attrToProjector[secondaryAttr] = (d: any, i: number, dataset: Dataset) => {
+      return this._getAlignedX(positionF(d, i, dataset), widthF(d, i, dataset));
+    };
 
     attrToProjector[primaryAttr] = (d: any, i: number, dataset: Dataset) => {
       const originalPos = originalPositionFn(d, i, dataset);
@@ -677,6 +760,25 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     };
 
     return attrToProjector;
+  }
+
+  protected _updateWidthAccesor() {
+    const startProj: Plots.TransformableAccessorScaleBinding<any, number> = this._isVertical ? this.x() : this.y();
+    const endProj = this.barEnd();
+    if (startProj != null && endProj != null) {
+      this._fixedWidth = false;
+      this.attr("width", (d, i, data) => {
+        let v1 = startProj.accessor(d, i, data);
+        let v2 = endProj.accessor(d, i, data);
+        v1 = startProj.scale ? startProj.scale.scale(v1) : v1;
+        v2 = endProj.scale ? endProj.scale.scale(v2) : v2;
+        return Math.abs(v2 - v1);
+      });
+    } else {
+      this._fixedWidth = true;
+      this._updateBarPixelWidth();
+      this.attr("width", () => this._barPixelWidth);
+    }
   }
 
   /**
@@ -719,7 +821,9 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   }
 
   private _updateBarPixelWidth() {
-    this._barPixelWidth = this._getBarPixelWidth();
+    if (this._fixedWidth) {
+      this._barPixelWidth = this._getBarPixelWidth();
+    }
   }
 
   public entities(datasets = this.datasets()): PlotEntity[] {

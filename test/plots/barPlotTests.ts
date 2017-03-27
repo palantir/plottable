@@ -795,5 +795,105 @@ describe("Plots", () => {
       });
     });
 
+    describe("Bar Alignment", () => {
+      const data = [
+        { x0: 0, x1: 10, y: 10 },
+        { x0: 10, x1: 30, y: 20 },
+        { x0: 30, x1: 100, y: 30 },
+      ];
+
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
+      let plot: Plottable.Plots.Bar<number, number>;
+      let xScale: Plottable.Scales.Linear;
+      let yScale: Plottable.Scales.Linear;
+
+      beforeEach(() => {
+        div = TestMethods.generateDiv();
+        xScale = new Plottable.Scales.Linear().domain([0, 100]);
+        yScale = new Plottable.Scales.Linear().domain([0, 30]);
+        plot = new Plottable.Plots.Bar<number, number>()
+          .addDataset(new Plottable.Dataset(data))
+          .x((d) => d.x0, xScale)
+          .y((d) => d.y, yScale)
+          .renderTo(div);
+      });
+
+      afterEach(() => {
+        plot.destroy();
+        div.remove();
+      });
+
+      it("aligns middle by default", () => {
+        const bars = plot.content().select(".bar-area").selectAll<SVGElement, any>("rect").nodes();
+        assert.lengthOf(bars, 3);
+        assert.equal(bars[0].getAttribute("width"), bars[1].getAttribute("width"));
+        assert.equal(bars[1].getAttribute("width"), bars[2].getAttribute("width"));
+
+        const domainWidth = xScale.invert(parseInt(bars[0].getAttribute("width")));
+        assert.closeTo(parseInt(bars[0].getAttribute("x")), xScale.scale(-domainWidth/2), 2);
+      });
+
+      it("aligns at start", () => {
+        plot.barAlignment("start");
+
+        const bars = plot.content().select(".bar-area").selectAll<SVGElement, any>("rect").nodes();
+        assert.lengthOf(bars, 3);
+        assert.equal(bars[0].getAttribute("width"), bars[1].getAttribute("width"));
+        assert.equal(bars[1].getAttribute("width"), bars[2].getAttribute("width"));
+
+        assert.closeTo(parseInt(bars[0].getAttribute("x")), xScale.scale(0), 2);
+      });
+
+      it("aligns at end", () => {
+        plot.barAlignment("end");
+
+        const bars = plot.content().select(".bar-area").selectAll<SVGElement, any>("rect").nodes();
+        assert.lengthOf(bars, 3);
+        assert.equal(bars[0].getAttribute("width"), bars[1].getAttribute("width"));
+        assert.equal(bars[1].getAttribute("width"), bars[2].getAttribute("width"));
+
+        const domainWidth = xScale.invert(parseInt(bars[0].getAttribute("width")));
+        assert.closeTo(parseInt(bars[0].getAttribute("x")), xScale.scale(-domainWidth), 2);
+      });
+    });
+
+    describe("Bar End", () => {
+      const data = [
+        { x0: 0, x1: 10, y: 10 },
+        { x0: 10, x1: 30, y: 20 },
+        { x0: 30, x1: 100, y: 30 },
+      ];
+
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
+      let plot: Plottable.Plots.Bar<number, number>;
+      let xScale: Plottable.Scales.Linear;
+      let yScale: Plottable.Scales.Linear;
+
+      beforeEach(() => {
+        div = TestMethods.generateDiv();
+        xScale = new Plottable.Scales.Linear().domain([0, 100]);
+        yScale = new Plottable.Scales.Linear().domain([0, 30]);
+        plot = new Plottable.Plots.Bar<number, number>()
+          .addDataset(new Plottable.Dataset(data))
+          .x((d) => d.x0, xScale)
+          .y((d) => d.y, yScale)
+          .barEnd((d) => d.x1, xScale)
+          .renderTo(div);
+      });
+
+      afterEach(() => {
+        plot.destroy();
+        div.remove();
+      });
+
+      it("scales width between x and barEnd", () => {
+        const bars = plot.content().select(".bar-area").selectAll<SVGElement, any>("rect").nodes();
+        assert.lengthOf(bars, 3);
+        assert.closeTo(parseInt(bars[0].getAttribute("width")), xScale.scale(10), 2);
+        assert.closeTo(parseInt(bars[1].getAttribute("width")), xScale.scale(20), 2);
+        assert.closeTo(parseInt(bars[2].getAttribute("width")), xScale.scale(70), 2);
+      });
+    });
+
   });
 });

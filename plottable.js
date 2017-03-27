@@ -3582,6 +3582,7 @@ var Plots = __webpack_require__(17);
 var plot_1 = __webpack_require__(2);
 var xyPlot_1 = __webpack_require__(16);
 exports.BarOrientation = makeEnum_1.makeEnum(["vertical", "horizontal"]);
+exports.BarAlignment = makeEnum_1.makeEnum(["start", "middle", "end"]);
 var Bar = (function (_super) {
     __extends(Bar, _super);
     /**
@@ -3596,6 +3597,8 @@ var Bar = (function (_super) {
         _this._labelFormatter = Formatters.identity();
         _this._labelsEnabled = false;
         _this._hideBarsIfAnyAreTooWide = true;
+        _this._barAlignment = "middle";
+        _this._fixedWidth = true;
         _this._barPixelWidth = 0;
         _this.addClass("bar-plot");
         if (orientation !== "vertical" && orientation !== "horizontal") {
@@ -3621,6 +3624,7 @@ var Bar = (function (_super) {
             _super.prototype.x.call(this, x, xScale);
             xScale.onUpdate(this._updateBarPixelWidthCallback);
         }
+        this._updateWidthAccesor();
         this._updateValueScale();
         return this;
     };
@@ -3636,6 +3640,48 @@ var Bar = (function (_super) {
             yScale.onUpdate(this._updateBarPixelWidthCallback);
         }
         this._updateValueScale();
+        return this;
+    };
+    /**
+     * Gets/sets the accessor for the bar "end", which is used to compute the
+     * width of vertical bars or the height of horizontal bars.
+     *
+     * Normally, bar width is determined by how many bars can fit in the given
+     * space (minus some padding).
+     *
+     * You can override this behavior and manually set the start and end
+     * coordinates for each bar.
+     *
+     * For example, if the bar chart is "vertical" and this accessor is defined,
+     * then the width of a bar is calculated as `abs(barEnd() - x())`.
+     */
+    Bar.prototype.barEnd = function (end, scale) {
+        if (end == null) {
+            return this._propertyBindings.get(Bar._BAR_END_KEY);
+        }
+        this._bindProperty(Bar._BAR_END_KEY, end, scale);
+        this._updateWidthAccesor();
+        this._updateValueScale();
+        this.render();
+        return this;
+    };
+    /**
+     * Gets/Sets the bar alignment. Valid values are `"start"`, `"middle"`, and
+     * `"end"`, which determines the meaning of the accessor of the bar's scale
+     * coordinate (e.g. "x" for vertical bars).
+     *
+     * For example, a value of "start" means the x coordinate accessor sets the
+     * left hand side of the rect.
+     *
+     * The default value is "middle", which aligns to rect so that it centered on
+     * the x coordinate
+     */
+    Bar.prototype.barAlignment = function (align) {
+        if (align == null) {
+            return this._barAlignment;
+        }
+        this._barAlignment = align;
+        this.render();
         return this;
     };
     /**
@@ -3907,14 +3953,31 @@ var Bar = (function (_super) {
             return extents;
         }
         var scale = accScaleBinding.scale;
+        var width = this._barPixelWidth;
         // To account for inverted domains
         extents = extents.map(function (extent) { return d3.extent([
-            scale.invert(scale.scale(extent[0]) - _this._barPixelWidth / 2),
-            scale.invert(scale.scale(extent[0]) + _this._barPixelWidth / 2),
-            scale.invert(scale.scale(extent[1]) - _this._barPixelWidth / 2),
-            scale.invert(scale.scale(extent[1]) + _this._barPixelWidth / 2),
+            scale.invert(_this._getAlignedX(scale.scale(extent[0]), width)),
+            scale.invert(_this._getAlignedX(scale.scale(extent[0]), width) + width),
+            scale.invert(_this._getAlignedX(scale.scale(extent[1]), width)),
+            scale.invert(_this._getAlignedX(scale.scale(extent[1]), width) + width),
         ]); });
         return extents;
+    };
+    Bar.prototype._getAlignedX = function (x, width) {
+        // account for flipped vertical axis
+        if (!this._isVertical) {
+            x -= width;
+            width *= -1;
+        }
+        switch (this._barAlignment) {
+            case "start":
+                return x;
+            case "end":
+                return x - width;
+            case "middle":
+            default:
+                return x - width / 2;
+        }
     };
     Bar.prototype._drawLabels = function () {
         var _this = this;
@@ -4076,6 +4139,7 @@ var Bar = (function (_super) {
         return drawSteps;
     };
     Bar.prototype._generateAttrToProjector = function () {
+        var _this = this;
         // Primary scale/direction: the "length" of the bars
         // Secondary scale/direction: the "width" of the bars
         var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
@@ -4089,10 +4153,14 @@ var Bar = (function (_super) {
         var heightF = function (d, i, dataset) {
             return Math.abs(scaledBaseline - originalPositionFn(d, i, dataset));
         };
-        attrToProjector["width"] = this._isVertical ? widthF : heightF;
-        attrToProjector["height"] = this._isVertical ? heightF : widthF;
+        var gapF = attrToProjector["gap"];
+        var widthMinusGap = gapF == null ? widthF : function (d, i, dataset) {
+            return widthF(d, i, dataset) - gapF(d, i, dataset);
+        };
+        attrToProjector["width"] = this._isVertical ? widthMinusGap : heightF;
+        attrToProjector["height"] = this._isVertical ? heightF : widthMinusGap;
         attrToProjector[secondaryAttr] = function (d, i, dataset) {
-            return positionF(d, i, dataset) - widthF(d, i, dataset) / 2;
+            return _this._getAlignedX(positionF(d, i, dataset), widthF(d, i, dataset));
         };
         attrToProjector[primaryAttr] = function (d, i, dataset) {
             var originalPos = originalPositionFn(d, i, dataset);
@@ -4102,6 +4170,26 @@ var Bar = (function (_super) {
             return (originalPos > scaledBaseline) ? scaledBaseline : originalPos;
         };
         return attrToProjector;
+    };
+    Bar.prototype._updateWidthAccesor = function () {
+        var _this = this;
+        var startProj = this._isVertical ? this.x() : this.y();
+        var endProj = this.barEnd();
+        if (startProj != null && endProj != null) {
+            this._fixedWidth = false;
+            this.attr("width", function (d, i, data) {
+                var v1 = startProj.accessor(d, i, data);
+                var v2 = endProj.accessor(d, i, data);
+                v1 = startProj.scale ? startProj.scale.scale(v1) : v1;
+                v2 = endProj.scale ? endProj.scale.scale(v2) : v2;
+                return Math.abs(v2 - v1);
+            });
+        }
+        else {
+            this._fixedWidth = true;
+            this._updateBarPixelWidth();
+            this.attr("width", function () { return _this._barPixelWidth; });
+        }
     };
     /**
      * Computes the barPixelWidth of all the bars in the plot.
@@ -4138,7 +4226,9 @@ var Bar = (function (_super) {
         return barPixelWidth;
     };
     Bar.prototype._updateBarPixelWidth = function () {
-        this._barPixelWidth = this._getBarPixelWidth();
+        if (this._fixedWidth) {
+            this._barPixelWidth = this._getBarPixelWidth();
+        }
     };
     Bar.prototype.entities = function (datasets) {
         if (datasets === void 0) { datasets = this.datasets(); }
@@ -4189,6 +4279,7 @@ var Bar = (function (_super) {
 Bar._BAR_WIDTH_RATIO = 0.95;
 Bar._SINGLE_BAR_DIMENSION_RATIO = 0.4;
 Bar._BAR_AREA_CLASS = "bar-area";
+Bar._BAR_END_KEY = "barEnd";
 Bar._LABEL_AREA_CLASS = "bar-label-text-area";
 Bar._LABEL_PADDING = 10;
 exports.Bar = Bar;
