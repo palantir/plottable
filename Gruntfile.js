@@ -38,15 +38,6 @@ module.exports = function(grunt) {
     }
   };
 
-  var tslintConfig = {
-    options: {
-      configuration: "tslint.json",
-    },
-    files: {
-      src: ["src/**/*.ts", "test/**/*.ts"]
-    }
-  };
-
   var watchConfig = {
     options: {
       livereload: true,
@@ -161,7 +152,6 @@ module.exports = function(grunt) {
     bump: bumpConfig,
     jscs: jscsConfig,
     eslint: eslintConfig,
-    tslint: tslintConfig,
     exec: execConfig,
     watch: watchConfig,
     "blanket_mocha": blanketMochaConfig,
@@ -199,7 +189,7 @@ module.exports = function(grunt) {
     grunt.task.run(["watch"]);
   });
 
-  grunt.registerTask("lint", ["jscs", "eslint", "tslint"]);
+  grunt.registerTask("lint", ["jscs", "eslint"]);
 
   // Disable saucelabs on dev environments by checking if SAUCE_USERNAME is an environment variable
   if (process.env.SAUCE_USERNAME) {

@@ -45,7 +45,6 @@
     "grunt-git": "0.3.7",
     "grunt-jscs": "2.6.0",
     "grunt-saucelabs": "8.6.2",
-    "grunt-tslint": "^4.0.1",
     "jquery": "2.1.0",
     "load-grunt-tasks": "3.4.0",
     "mocha": "2.2.5",
