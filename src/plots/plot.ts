@@ -6,14 +6,14 @@
 import * as d3 from "d3";
 
 import * as Animators from "../animators";
-import { Animator } from "../animators/animator";
+import { IAnimator } from "../animators/animator";
 import { Component } from "../components/component";
 import { Dataset, DatasetCallback } from "../core/dataset";
 import {
-  Accessor,
   AttributeToAppliedProjector,
   AttributeToProjector,
   Bounds,
+  IAccessor,
   Point,
   SimpleSelection,
 } from "../core/interfaces";
@@ -22,7 +22,7 @@ import { ProxyDrawer } from "../drawers/drawer";
 import { AppliedDrawStep, DrawStep } from "../drawers/index";
 import { SVGDrawer } from "../drawers/svgDrawer";
 import * as Scales from "../scales";
-import { Scale, ScaleCallback } from "../scales/scale";
+import { IScaleCallback, Scale } from "../scales/scale";
 import * as Utils from "../utils";
 import { coerceExternalD3 } from "../utils/coerceD3";
 import { makeEnum } from "../utils/makeEnum";
@@ -60,7 +60,7 @@ export class Plot extends Component {
    * may be undefined and shouldn't be accessed directly. Instead, use _getEntityStore
    * to access the entity store.
    */
-  private _cachedEntityStore: Utils.EntityStore<Plots.LightweightPlotEntity>;
+  private _cachedEntityStore: Utils.IEntityStore<Plots.ILightweightPlotEntity>;
   /**
    * Whether the backing datasets have changed since this plot's last render.
    */
@@ -77,7 +77,7 @@ export class Plot extends Component {
   /**
    * Mapping from attribute names to the AccessorScale that defines that attribute.
    */
-  private _attrBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
+  private _attrBindings: d3.Map<Plots.IAccessorScaleBinding<any, any>>;
   /**
    * Mapping from attribute names to the extents ([min, max]) values that that attribute takes on.
    */
@@ -87,7 +87,7 @@ export class Plot extends Component {
    *
    * TODO make this an arrow method instead of re-defining it in constructor()
    */
-  private _includedValuesProvider: Scales.IncludedValuesProvider<any>;
+  private _includedValuesProvider: Scales.IIncludedValuesProvider<any>;
 
   private _animate = false;
   /**
@@ -101,14 +101,14 @@ export class Plot extends Component {
    * all the dots to size 0), and then they do the "main" animation into the correct visualization
    * (e.g. scatter plot dots grow to their specified size).
    */
-  private _animators: {[animator: string]: Animator} = {};
+  private _animators: {[animator: string]: IAnimator} = {};
 
   /**
    * Callback that triggers when any scale that's bound to this plot Updates.
    *
    * TODO make this an arrow method instead of re-defining it in constructor()
    */
-  protected _renderCallback: ScaleCallback<Scale<any, any>>;
+  protected _renderCallback: IScaleCallback<Scale<any, any>>;
   /**
    * Callback that triggers when any Dataset that's bound to this plot Updates.
    *
@@ -125,7 +125,7 @@ export class Plot extends Component {
    * Only subclasses control how they register properties, while attrs can be registered by the user.
    * By default, only attrs are passed to the _generateDrawStep's attrToProjector; properties are not.
    */
-  protected _propertyBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
+  protected _propertyBindings: d3.Map<Plots.IAccessorScaleBinding<any, any>>;
   /**
    * Mapping from property names to the extents ([min, max]) values that that property takes on.
    */
@@ -136,7 +136,7 @@ export class Plot extends Component {
    * renderer. The node may be parent-less (which means that the plot isn't setup yet but is still using the canvas
    * renderer).
    */
-  private _canvas: d3.Selection<HTMLCanvasElement, any, any, any>;
+  protected _canvas: d3.Selection<HTMLCanvasElement, any, any, any>;
 
   /**
    * A Plot draws some visualization of the inputted Datasets.
@@ -148,12 +148,12 @@ export class Plot extends Component {
     this._overflowHidden = true;
     this.addClass("plot");
     this._datasetToDrawer = new Utils.Map<Dataset, ProxyDrawer>();
-    this._attrBindings = d3.map<Plots.AccessorScaleBinding<any, any>>();
+    this._attrBindings = d3.map<Plots.IAccessorScaleBinding<any, any>>();
     this._attrExtents = d3.map<any[]>();
     this._includedValuesProvider = (scale: Scale<any, any>) => this._includedValuesForScale(scale);
     this._renderCallback = (scale) => this.render();
     this._onDatasetUpdateCallback = () => this._onDatasetUpdate();
-    this._propertyBindings = d3.map<Plots.AccessorScaleBinding<any, any>>();
+    this._propertyBindings = d3.map<Plots.IAccessorScaleBinding<any, any>>();
     this._propertyExtents = d3.map<any[]>();
     const mainAnimator = new Animators.Easing().maxTotalDuration(Plot._ANIMATION_MAX_DURATION);
     this.animator(Plots.Animator.MAIN, mainAnimator);
@@ -170,12 +170,23 @@ export class Plot extends Component {
   }
 
   protected _setup() {
+    if (this._isSetup) {
+      return;
+    }
     super._setup();
     if (this._canvas != null) {
-      this.element().node().appendChild(this._canvas.node());
+      this._appendCanvasNode();
     }
     this._renderArea = this.content().append<SVGGElement>("g").classed("render-area", true);
     this.datasets().forEach((dataset) => this._createNodesForDataset(dataset));
+  }
+
+  private _appendCanvasNode() {
+    let canvasContainer = this.element().select<HTMLDivElement>(".plot-canvas-container");
+    if (canvasContainer.empty()) {
+      canvasContainer = this.element().append<HTMLDivElement>("div").classed("plot-canvas-container", true);
+      canvasContainer.node().appendChild(this._canvas.node());
+    }
   }
 
   public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
@@ -222,7 +233,7 @@ export class Plot extends Component {
     return new ProxyDrawer(() => new SVGDrawer("path", ""), () => {});
   }
 
-  protected _getAnimator(key: string): Animator {
+  protected _getAnimator(key: string): IAnimator {
     if (this._animateOnNextRender()) {
       return this._animators[key] || new Animators.Null();
     } else {
@@ -242,7 +253,7 @@ export class Plot extends Component {
    *
    * @param {string} attr
    */
-  public attr<A>(attr: string): Plots.AccessorScaleBinding<A, number | string>;
+  public attr<A>(attr: string): Plots.IAccessorScaleBinding<A, number | string>;
   /**
    * Sets a particular attribute to a constant value or the result of an Accessor.
    *
@@ -250,7 +261,7 @@ export class Plot extends Component {
    * @param {number|string|Accessor<number>|Accessor<string>} attrValue
    * @returns {Plot} The calling Plot.
    */
-  public attr(attr: string, attrValue: number | string | Accessor<number> | Accessor<string>): this;
+  public attr(attr: string, attrValue: number | string | IAccessor<number> | IAccessor<string>): this;
   /**
    * Sets a particular attribute to a scaled constant value or scaled result of an Accessor.
    * The provided Scale will account for the attribute values when autoDomain()-ing.
@@ -260,8 +271,8 @@ export class Plot extends Component {
    * @param {Scale<A, number | string>} scale The Scale used to scale the attrValue.
    * @returns {Plot} The calling Plot.
    */
-  public attr<A>(attr: string, attrValue: A | Accessor<A>, scale: Scale<A, number | string>): this;
-  public attr<A>(attr: string, attrValue?: number | string | Accessor<number> | Accessor<string> | A | Accessor<A>,
+  public attr<A>(attr: string, attrValue: A | IAccessor<A>, scale: Scale<A, number | string>): this;
+  public attr<A>(attr: string, attrValue?: number | string | IAccessor<number> | IAccessor<string> | A | IAccessor<A>,
                  scale?: Scale<A, number | string>): any {
     if (attrValue == null) {
       return this._attrBindings.get(attr);
@@ -391,12 +402,12 @@ export class Plot extends Component {
     this._updateExtentsForKey(property, this._propertyBindings, this._propertyExtents, this._filterForProperty(property));
   }
 
-  protected _filterForProperty(property: string): Accessor<boolean> {
+  protected _filterForProperty(property: string): IAccessor<boolean> {
     return null;
   }
 
-  private _updateExtentsForKey(key: string, bindings: d3.Map<Plots.AccessorScaleBinding<any, any>>,
-                               extents: d3.Map<any[]>, filter: Accessor<boolean>) {
+  private _updateExtentsForKey(key: string, bindings: d3.Map<Plots.IAccessorScaleBinding<any, any>>,
+                               extents: d3.Map<any[]>, filter: IAccessor<boolean>) {
     const accScaleBinding = bindings.get(key);
     if (accScaleBinding == null || accScaleBinding.accessor == null) {
       return;
@@ -404,7 +415,7 @@ export class Plot extends Component {
     extents.set(key, this.datasets().map((dataset) => this._computeExtent(dataset, accScaleBinding, filter)));
   }
 
-  private _computeExtent(dataset: Dataset, accScaleBinding: Plots.AccessorScaleBinding<any, any>, filter: Accessor<boolean>): any[] {
+  private _computeExtent(dataset: Dataset, accScaleBinding: Plots.IAccessorScaleBinding<any, any>, filter: IAccessor<boolean>): any[] {
     const accessor = accScaleBinding.accessor;
     const scale = accScaleBinding.scale;
 
@@ -460,7 +471,7 @@ export class Plot extends Component {
    *
    * @return {Animator}
    */
-  public animator(animatorKey: string): Animator;
+  public animator(animatorKey: string): IAnimator;
   /**
    * Set the Animator associated with the specified Animator key.
    *
@@ -468,8 +479,8 @@ export class Plot extends Component {
    * @param {Animator} animator
    * @returns {Plot} The calling Plot.
    */
-  public animator(animatorKey: string, animator: Animator): this;
-  public animator(animatorKey: string, animator?: Animator): any {
+  public animator(animatorKey: string, animator: IAnimator): this;
+  public animator(animatorKey: string, animator?: IAnimator): any {
     if (animator === undefined) {
       return this._animators[animatorKey];
     } else {
@@ -495,7 +506,7 @@ export class Plot extends Component {
         // construct the canvas, remove drawer's renderAreas, set drawer's canvas
         this._canvas = d3.select(document.createElement("canvas")).classed("plot-canvas", true);
         if (this.element() != null) {
-          this.element().node().appendChild(this._canvas.node());
+          this._appendCanvasNode();
         }
         this._datasetToDrawer.forEach((drawer) => {
           drawer.useCanvas(this._canvas);
@@ -595,7 +606,7 @@ export class Plot extends Component {
    * @param {Dataset[]} [datasets] - datasets comprising this plot
    */
   protected _buildLightweightPlotEntities(datasets: Dataset[]) {
-    const lightweightPlotEntities: Plots.LightweightPlotEntity[] = [];
+    const lightweightPlotEntities: Plots.ILightweightPlotEntity[] = [];
     datasets.forEach((dataset: Dataset, datasetIndex: number) => {
       const drawer = this._datasetToDrawer.get(dataset);
       let validDatumIndex = 0;
@@ -688,7 +699,7 @@ export class Plot extends Component {
    *   If not provided, returns defaults to all Datasets on the Plot.
    * @return {Plots.PlotEntity[]}
    */
-  public entities(datasets?: Dataset[]): Plots.PlotEntity[] {
+  public entities(datasets?: Dataset[]): Plots.IPlotEntity[] {
     return this._getEntityStore(datasets).map((entity) => this._lightweightPlotEntityToPlotEntity(entity));
   }
 
@@ -698,17 +709,17 @@ export class Plot extends Component {
    * @param {Dataset[]} [datasets] - The datasets with which to construct the store. If no datasets
    * are specified all datasets will be used.
    */
-  protected _getEntityStore(datasets?: Dataset[]): Utils.EntityStore<Plots.LightweightPlotEntity> {
+  protected _getEntityStore(datasets?: Dataset[]): Utils.IEntityStore<Plots.ILightweightPlotEntity> {
     if (datasets !== undefined) {
-      const EntityStore = new Utils.EntityArray<Plots.LightweightPlotEntity>();
-      this._buildLightweightPlotEntities(datasets).forEach((entity: Plots.LightweightPlotEntity) => {
+      const EntityStore = new Utils.EntityArray<Plots.ILightweightPlotEntity>();
+      this._buildLightweightPlotEntities(datasets).forEach((entity: Plots.ILightweightPlotEntity) => {
         EntityStore.add(entity);
       });
 
       return EntityStore;
     } else if (this._cachedEntityStore === undefined) {
-      this._cachedEntityStore = new Utils.EntityArray<Plots.LightweightPlotEntity>();
-      this._buildLightweightPlotEntities(this.datasets()).forEach((entity: Plots.LightweightPlotEntity) => {
+      this._cachedEntityStore = new Utils.EntityArray<Plots.ILightweightPlotEntity>();
+      this._buildLightweightPlotEntities(this.datasets()).forEach((entity: Plots.ILightweightPlotEntity) => {
         this._cachedEntityStore.add(entity);
       });
     }
@@ -716,8 +727,8 @@ export class Plot extends Component {
     return this._cachedEntityStore;
   }
 
-  protected _lightweightPlotEntityToPlotEntity(entity: Plots.LightweightPlotEntity) {
-    const plotEntity: Plots.PlotEntity = {
+  protected _lightweightPlotEntityToPlotEntity(entity: Plots.ILightweightPlotEntity) {
+    const plotEntity: Plots.IPlotEntity = {
       datum: entity.datum,
       position: entity.position,
       dataset: entity.dataset,
@@ -740,7 +751,7 @@ export class Plot extends Component {
    * @param {Point} point The point to query.
    * @returns {PlotEntity[]} The PlotEntities at the particular point
    */
-  public entitiesAt(point: Point): Plots.PlotEntity[] {
+  public entitiesAt(point: Point): Plots.IPlotEntity[] {
     throw new Error("plots must implement entitiesAt");
   }
 
@@ -753,15 +764,15 @@ export class Plot extends Component {
    * the chart, relative to the parent.
    * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no {Plots.PlotEntity} can be found.
    */
-  public entityNearest(queryPoint: Point, bounds = this.bounds()): Plots.PlotEntity {
-    const nearest = this._getEntityStore().entityNearest(queryPoint, (entity: Plots.LightweightPlotEntity) => {
+  public entityNearest(queryPoint: Point, bounds = this.bounds()): Plots.IPlotEntity {
+    const nearest = this._getEntityStore().entityNearest(queryPoint, (entity: Plots.ILightweightPlotEntity) => {
       return this._entityVisibleOnPlot(entity, bounds);
     });
 
     return nearest === undefined ? undefined : this._lightweightPlotEntityToPlotEntity(nearest);
   }
 
-  protected _entityVisibleOnPlot(entity: Plots.PlotEntity | Plots.LightweightPlotEntity, chartBounds: Bounds) {
+  protected _entityVisibleOnPlot(entity: Plots.IPlotEntity | Plots.ILightweightPlotEntity, chartBounds: Bounds) {
     return !(entity.position.x < chartBounds.topLeft.x || entity.position.y < chartBounds.topLeft.y ||
     entity.position.x > chartBounds.bottomRight.x || entity.position.y > chartBounds.bottomRight.y);
   }
@@ -780,7 +791,7 @@ export class Plot extends Component {
     return {};
   }
 
-  protected static _scaledAccessor<D, R>(binding: Plots.AccessorScaleBinding<D, R>) {
+  protected static _scaledAccessor<D, R>(binding: Plots.IAccessorScaleBinding<D, R>) {
     return binding.scale == null ?
       binding.accessor :
       (d: any, i: number, ds: Dataset) => binding.scale.scale(binding.accessor(d, i, ds));

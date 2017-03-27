@@ -214,12 +214,22 @@ var Plot = (function (_super) {
     };
     Plot.prototype._setup = function () {
         var _this = this;
+        if (this._isSetup) {
+            return;
+        }
         _super.prototype._setup.call(this);
         if (this._canvas != null) {
-            this.element().node().appendChild(this._canvas.node());
+            this._appendCanvasNode();
         }
         this._renderArea = this.content().append("g").classed("render-area", true);
         this.datasets().forEach(function (dataset) { return _this._createNodesForDataset(dataset); });
+    };
+    Plot.prototype._appendCanvasNode = function () {
+        var canvasContainer = this.element().select(".plot-canvas-container");
+        if (canvasContainer.empty()) {
+            canvasContainer = this.element().append("div").classed("plot-canvas-container", true);
+            canvasContainer.node().appendChild(this._canvas.node());
+        }
     };
     Plot.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
         _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
@@ -457,7 +467,7 @@ var Plot = (function (_super) {
                 // construct the canvas, remove drawer's renderAreas, set drawer's canvas
                 this._canvas = d3.select(document.createElement("canvas")).classed("plot-canvas", true);
                 if (this.element() != null) {
-                    this.element().node().appendChild(this._canvas.node());
+                    this._appendCanvasNode();
                 }
                 this._datasetToDrawer.forEach(function (drawer) {
                     drawer.useCanvas(_this._canvas);
@@ -2290,20 +2300,30 @@ var XYPlot = (function (_super) {
         _this.addClass("xy-plot");
         _this._adjustYDomainOnChangeFromXCallback = function (scale) { return _this._adjustYDomainOnChangeFromX(); };
         _this._adjustXDomainOnChangeFromYCallback = function (scale) { return _this._adjustXDomainOnChangeFromY(); };
+        // the pixel space X translate that has occurred since the last time we rendered
         var _deltaX = 0;
+        // the pixel space Y translate that has occurred since the last time we rendered
         var _deltaY = 0;
+        // the X scale that has occurred since the last time we rendered
         var _scalingX = 1;
+        // the Y scale that has occurred since the last time we rendered
         var _scalingY = 1;
+        // the X scale's domain the last time we rendered
         var _lastSeenDomainX = [null, null];
+        // the Y scale's domain the last time we rendered
         var _lastSeenDomainY = [null, null];
         var _timeoutReference = 0;
-        var _deferredRenderingTimeout = 500;
+        // call this every time the scales change (every pan/zoom event).
+        // this method will "render" now by applying a transform, and then
+        // debounce the true rendering
         var _registerDeferredRendering = function () {
             if (_this._renderArea == null) {
                 return;
             }
-            _this._renderArea.attr("transform", "translate(" + _deltaX + ", " + _deltaY + ")" +
-                "scale(" + _scalingX + ", " + _scalingY + ")");
+            _this._renderArea.attr("transform", "translate(" + _deltaX + ", " + _deltaY + ") scale(" + _scalingX + ", " + _scalingY + ")");
+            if (_this._canvas != null) {
+                _this._canvas.style("transform", "translate(" + _deltaX + "px, " + _deltaY + "px) scale(" + _scalingX + ", " + _scalingY + ")");
+            }
             clearTimeout(_timeoutReference);
             _timeoutReference = setTimeout(function () {
                 _this._cachedDomainX = _lastSeenDomainX;
@@ -2314,8 +2334,13 @@ var XYPlot = (function (_super) {
                 _scalingY = 1;
                 _this.render();
                 _this._renderArea.attr("transform", "translate(0, 0) scale(1, 1)");
-            }, _deferredRenderingTimeout);
+                if (_this._canvas != null) {
+                    _this._canvas.style("transform", "translate(0, 0) scale(1, 1)");
+                }
+            }, XYPlot._DEFERRED_RENDERING_DELAY);
         };
+        // calculate the translate and pan that has occurred on this scale since the last time we
+        // rendered with it
         var _lazyDomainChangeCallbackX = function (scale) {
             if (!_this._isAnchored) {
                 return;
@@ -2337,6 +2362,8 @@ var XYPlot = (function (_super) {
             _registerDeferredRendering();
         };
         _this._renderCallback = function (scale) {
+            // instead of rendering immediately when a scale has changed (aka in response to a pan/zoom),
+            // simply register the deferred rendering to take place
             if (_this.deferredRendering() && _this.x() && _this.x().scale === scale) {
                 _lazyDomainChangeCallbackX(scale);
             }
@@ -2565,6 +2592,7 @@ var XYPlot = (function (_super) {
 }(plot_1.Plot));
 XYPlot._X_KEY = "x";
 XYPlot._Y_KEY = "y";
+XYPlot._DEFERRED_RENDERING_DELAY = 200;
 exports.XYPlot = XYPlot;
 
 
@@ -2908,6 +2936,27 @@ var Axis = (function (_super) {
     Axis.prototype.destroy = function () {
         _super.prototype.destroy.call(this);
         this._scale.offUpdate(this._rescaleCallback);
+    };
+    /**
+     * Gets the tick label data on a element. Element in argument must be a descendent of a tick label element.
+     *
+     * @param {Element} element
+     */
+    Axis.prototype.tickLabelDataOnElement = function (element) {
+        if (element == null) {
+            return undefined;
+        }
+        var tickLabel;
+        // go up DOM tree to find tick label element in ancestor elements
+        while ((element != null) && (element.classList) && (tickLabel === undefined)) {
+            if (element.classList.contains(Axis.TICK_LABEL_CLASS)) {
+                tickLabel = element;
+            }
+            else {
+                element = element.parentNode;
+            }
+        }
+        return element === undefined ? undefined : d3.select(element).datum();
     };
     Axis.prototype._computeWidth = function () {
         // to be overridden by subclass logic
@@ -7197,12 +7246,11 @@ var Line = (function (_super) {
      * @private
      */
     Line.prototype._d3LineFactory = function (dataset, xProjector, yProjector) {
-        var _this = this;
         if (xProjector === void 0) { xProjector = plot_1.Plot._scaledAccessor(this.x()); }
         if (yProjector === void 0) { yProjector = plot_1.Plot._scaledAccessor(this.y()); }
         var definedProjector = function (d, i, dataset) {
-            var positionX = plot_1.Plot._scaledAccessor(_this.x())(d, i, dataset);
-            var positionY = plot_1.Plot._scaledAccessor(_this.y())(d, i, dataset);
+            var positionX = xProjector(d, i, dataset);
+            var positionY = yProjector(d, i, dataset);
             return positionX != null && !Utils.Math.isNaN(positionX) &&
                 positionY != null && !Utils.Math.isNaN(positionY);
         };

@@ -3,10 +3,10 @@ import * as sinon from "sinon";
 
 import { assert } from "chai";
 
-import * as TestMethods from "../testMethods";
-import { SVGDrawer } from "../../src/drawers/svgDrawer";
 import { CanvasDrawer } from "../../src/drawers/canvasDrawer";
 import { ProxyDrawer } from "../../src/drawers/drawer";
+import { SVGDrawer } from "../../src/drawers/svgDrawer";
+import * as TestMethods from "../testMethods";
 
 describe("ProxyDrawer", () => {
   let drawer: ProxyDrawer;

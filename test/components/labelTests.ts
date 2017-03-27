@@ -1,13 +1,12 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
 import * as Typesetter from "typesettable";
 
 import * as Plottable from "../../src";
+import { getTranslateValues } from "../../src/utils/domUtils";
 
 import * as TestMethods from "../testMethods";
-import { getTranslateValues } from "../../src/utils/domUtils";
 
 describe("Labels", () => {
   const LABEL_CLASS = "label";
@@ -152,7 +151,7 @@ describe("Labels", () => {
       });
 
       it("throws error on invalid angles", () => {
-        let badAngle = 10;
+        const badAngle = 10;
         (<any> assert).throws(() => new Plottable.Components.Label("foo").angle(badAngle), Error,
           `${badAngle} is not a valid angle for Label`, "only accept -90/0/90 for angle");
         (<any> assert).throws(() => new Plottable.Components.Label("foo", badAngle), Error,

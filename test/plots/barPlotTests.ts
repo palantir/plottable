@@ -1,12 +1,11 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
 
 import * as Plottable from "../../src";
+import { BarOrientation } from "../../src/plots/barPlot";
 
 import * as TestMethods from "../testMethods";
-import { BarOrientation } from "../../src/plots/barPlot";
 
 describe("Plots", () => {
   describe("Bar Plot", () => {
@@ -39,9 +38,6 @@ describe("Plots", () => {
       };
       const valuePositionAttr = isVertical ? "y" : "x";
       const valueSizeAttr = isVertical ? "height" : "width";
-      const getValueBaseSizeDimension = (div: d3.Selection<HTMLDivElement, any, any, any>) => {
-        return isVertical ? Plottable.Utils.DOM.elementHeight(div) : Plottable.Utils.DOM.elementWidth(div);
-      };
 
       describe(`rendering when ${orientation}`, () => {
         const data = [
@@ -419,7 +415,7 @@ describe("Plots", () => {
             x: (labelBoundingClientRect.left + labelBoundingClientRect.right) / 2 - plotBoundingClientRect.left,
             y: (labelBoundingClientRect.top + labelBoundingClientRect.bottom) / 2 - plotBoundingClientRect.top,
           };
-        };
+        }
 
         it("does not show labels by default", () => {
           const texts = barPlot.content().selectAll<Element, any>("text");

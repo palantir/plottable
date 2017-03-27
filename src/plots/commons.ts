@@ -4,7 +4,7 @@
  */
 
 import { Dataset } from "../core/dataset";
-import { Accessor, Entity, Point } from "../core/interfaces";
+import { IAccessor, IEntity, Point } from "../core/interfaces";
 import { IDrawer } from "../drawers/drawer";
 import { Plot } from "../plots/plot";
 import { Scale, TransformableScale } from "../scales/scale";
@@ -14,7 +14,7 @@ import { Scale, TransformableScale } from "../scales/scale";
  * reproduce the behavior of the Plots.PlotEntity, excluding the selection, but including
  * drawer and validDatumIndex, which can be used to compute the selection.
  */
-export interface LightweightPlotEntity {
+export interface ILightweightPlotEntity {
   datum: any;
   dataset: Dataset;
   datasetIndex: number;
@@ -25,20 +25,20 @@ export interface LightweightPlotEntity {
   validDatumIndex: number;
 }
 
-export interface PlotEntity extends Entity<Plot> {
+export interface IPlotEntity extends IEntity<Plot> {
   dataset: Dataset;
   datasetIndex: number;
   index: number;
   component: Plot;
 }
 
-export interface AccessorScaleBinding<D, R> {
+export interface IAccessorScaleBinding<D, R> {
   /**
    * The (possibly upcasted to a function) user defined accessor.
    *
    * The first argument in `plot.x((d) => d.x, scale)`.
    */
-  accessor: Accessor<any>;
+  accessor: IAccessor<any>;
   /**
    * The Scale that the accessor's result gets passed through.
    *
@@ -52,8 +52,8 @@ export interface AccessorScaleBinding<D, R> {
  * TransformableScale. It is distinct from a plain AccessorScaleBinding
  * in that the scale is guaranteed to be invertable.
  */
-export interface TransformableAccessorScaleBinding<D, R> {
-  accessor: Accessor<any>;
+export interface ITransformableAccessorScaleBinding<D, R> {
+  accessor: IAccessor<any>;
   scale?: TransformableScale<D, R>;
 }
 

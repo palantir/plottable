@@ -5,12 +5,12 @@
 
 import { AttributeToAppliedProjector, SimpleSelection } from "../core/interfaces";
 import { coerceExternalD3 } from "../utils/coerceD3";
-import { Animator } from "./animator";
+import { IAnimator } from "./animator";
 /**
  * An animator implementation with no animation. The attributes are
  * immediately set on the selection.
  */
-export class Null implements Animator {
+export class Null implements IAnimator {
   public totalTime(selection: any) {
     return 0;
   }

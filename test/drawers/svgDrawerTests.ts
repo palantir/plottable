@@ -1,8 +1,8 @@
 import { assert } from "chai";
 import * as d3 from "d3";
 
-import { SVGDrawer } from "../../src/drawers/svgDrawer";
 import * as Plottable from "../../src";
+import { SVGDrawer } from "../../src/drawers/svgDrawer";
 
 import * as TestMethods from "../testMethods";
 
@@ -86,7 +86,7 @@ describe("SVGDrawers", () => {
     });
 
     describe("animation timings", () => {
-      class MockAnimator implements Plottable.Animator {
+      class MockAnimator implements Plottable.IAnimator {
         private _time: number;
         private _callback: Function;
 

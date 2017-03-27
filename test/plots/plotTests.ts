@@ -4,9 +4,9 @@ import * as sinon from "sinon";
 
 import * as Plottable from "../../src";
 
-import * as TestMethods from "../testMethods";
-import { ProxyDrawer } from "../../src/drawers/drawer";
 import { CanvasDrawer } from "../../src/drawers/canvasDrawer";
+import { ProxyDrawer } from "../../src/drawers/drawer";
+import * as TestMethods from "../testMethods";
 
 describe("Plots", () => {
   describe("Plot", () => {
@@ -192,7 +192,7 @@ describe("Plots", () => {
         plot.addDataset(dataset);
         plot.attr("key", (d) => d, categoryScale);
 
-        let div = TestMethods.generateDiv();
+        const div = TestMethods.generateDiv();
         plot.anchor(div);
 
         assert.deepEqual(categoryScale.domain(), data2.concat(data), "extent in the right order");
@@ -218,7 +218,7 @@ describe("Plots", () => {
 
       it("correctly computes the total draw time", () => {
         function makeFixedTimeAnimator(totalTime: number) {
-          return <Plottable.Animator> {
+          return <Plottable.IAnimator> {
             animate: () => null,
             totalTime: () => totalTime,
           };
@@ -465,7 +465,7 @@ describe("Plots", () => {
         plot.renderer("canvas");
         const div = TestMethods.generateDiv();
         plot.renderTo(div);
-        
+
         assert.isTrue(plot.selections().empty(), "no selections on canvas");
         div.remove();
       });

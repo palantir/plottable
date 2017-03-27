@@ -5,7 +5,7 @@
 
 import { Point, SimpleSelection } from "../core/interfaces";
 import { QuantitativeScale } from "../scales/quantitativeScale";
-import { ScaleCallback } from "../scales/scale";
+import { IScaleCallback } from "../scales/scale";
 import * as Utils from "../utils";
 
 import { Component } from "./component";
@@ -20,7 +20,7 @@ export class GuideLineLayer<D> extends Component {
   private _value: D;
   private _scale: QuantitativeScale<D>;
   private _pixelPosition: number;
-  private _scaleUpdateCallback: ScaleCallback<QuantitativeScale<D>>;
+  private _scaleUpdateCallback: IScaleCallback<QuantitativeScale<D>>;
   private _guideLine: SimpleSelection<void>;
   private _mode = PropertyMode.VALUE;
 

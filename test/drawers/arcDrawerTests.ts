@@ -1,6 +1,5 @@
-import * as d3 from "d3";
-
 import { assert } from "chai";
+import * as d3 from "d3";
 
 import * as Plottable from "../../src";
 

@@ -8,16 +8,16 @@ import * as d3 from "d3";
 import * as Interactions from "../interactions";
 import * as Utils from "../utils";
 
-import { TransformableScale } from "./";
+import { ITransformableScale } from "./";
 import * as Scales from "./";
 import { Scale } from "./scale";
 import * as TickGenerators from "./tickGenerators";
 
-export class QuantitativeScale<D> extends Scale<D, number> implements TransformableScale {
+export class QuantitativeScale<D> extends Scale<D, number> implements ITransformableScale {
   protected static _DEFAULT_NUM_TICKS = 10;
-  private _tickGenerator: TickGenerators.TickGenerator<D> = (scale: QuantitativeScale<D>) => scale.defaultTicks();
+  private _tickGenerator: TickGenerators.ITickGenerator<D> = (scale: QuantitativeScale<D>) => scale.defaultTicks();
   private _padProportion = 0.05;
-  private _paddingExceptionsProviders: Utils.Set<Scales.PaddingExceptionsProvider<D>>;
+  private _paddingExceptionsProviders: Utils.Set<Scales.IPaddingExceptionsProvider<D>>;
   private _domainMin: D;
   private _domainMax: D;
   private _snappingDomainEnabled = true;
@@ -30,7 +30,7 @@ export class QuantitativeScale<D> extends Scale<D, number> implements Transforma
    */
   constructor() {
     super();
-    this._paddingExceptionsProviders = new Utils.Set<Scales.PaddingExceptionsProvider<D>>();
+    this._paddingExceptionsProviders = new Utils.Set<Scales.IPaddingExceptionsProvider<D>>();
   }
 
   public autoDomain() {
@@ -97,7 +97,7 @@ export class QuantitativeScale<D> extends Scale<D, number> implements Transforma
    * @param {Scales.PaddingExceptionProvider<D>} provider The provider function.
    * @returns {QuantitativeScale} The calling QuantitativeScale.
    */
-  public addPaddingExceptionsProvider(provider: Scales.PaddingExceptionsProvider<D>) {
+  public addPaddingExceptionsProvider(provider: Scales.IPaddingExceptionsProvider<D>) {
     this._paddingExceptionsProviders.add(provider);
     this._autoDomainIfAutomaticMode();
     return this;
@@ -109,7 +109,7 @@ export class QuantitativeScale<D> extends Scale<D, number> implements Transforma
    * @param {Scales.PaddingExceptionProvider<D>} provider The provider function.
    * @returns {QuantitativeScale} The calling QuantitativeScale.
    */
-  public removePaddingExceptionsProvider(provider: Scales.PaddingExceptionsProvider<D>) {
+  public removePaddingExceptionsProvider(provider: Scales.IPaddingExceptionsProvider<D>) {
     this._paddingExceptionsProviders.delete(provider);
     this._autoDomainIfAutomaticMode();
     return this;
@@ -332,15 +332,15 @@ export class QuantitativeScale<D> extends Scale<D, number> implements Transforma
   /**
    * Gets the TickGenerator.
    */
-  public tickGenerator(): Scales.TickGenerators.TickGenerator<D>;
+  public tickGenerator(): Scales.TickGenerators.ITickGenerator<D>;
   /**
    * Sets the TickGenerator
    *
    * @param {TickGenerator} generator
    * @return {QuantitativeScale} The calling QuantitativeScale.
    */
-  public tickGenerator(generator: Scales.TickGenerators.TickGenerator<D>): this;
-  public tickGenerator(generator?: Scales.TickGenerators.TickGenerator<D>): any {
+  public tickGenerator(generator: Scales.TickGenerators.ITickGenerator<D>): this;
+  public tickGenerator(generator?: Scales.TickGenerators.ITickGenerator<D>): any {
     if (generator == null) {
       return this._tickGenerator;
     } else {

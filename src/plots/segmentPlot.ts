@@ -4,14 +4,14 @@
  */
 
 import * as Animators from "../animators";
-import { Accessor, AttributeToProjector, Bounds, Point, Range } from "../core/interfaces";
+import { AttributeToProjector, Bounds, IAccessor, Point, Range } from "../core/interfaces";
 import * as Drawers from "../drawers";
 import { ProxyDrawer } from "../drawers/drawer";
 import { SegmentSVGDrawer } from "../drawers/segmentDrawer";
 import * as Scales from "../scales";
 import { Scale } from "../scales/scale";
 import { warn } from "../utils/windowUtils";
-import { AccessorScaleBinding, PlotEntity, TransformableAccessorScaleBinding } from "./";
+import { IAccessorScaleBinding, IPlotEntity, ITransformableAccessorScaleBinding } from "./";
 import { Plot } from "./plot";
 import { XYPlot } from "./xyPlot";
 
@@ -62,14 +62,14 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
   /**
    * Gets the AccessorScaleBinding for X
    */
-  public x(): TransformableAccessorScaleBinding<X, number>;
+  public x(): ITransformableAccessorScaleBinding<X, number>;
   /**
    * Sets X to a constant value or the result of an Accessor.
    *
    * @param {X|Accessor<X>} x
    * @returns {Plots.Segment} The calling Segment Plot.
    */
-  public x(x: number | Accessor<number>): this;
+  public x(x: number | IAccessor<number>): this;
   /**
    * Sets X to a scaled constant value or scaled result of an Accessor.
    * The provided Scale will account for the values when autoDomain()-ing.
@@ -78,15 +78,15 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
    * @param {Scale<X, number>} xScale
    * @returns {Plots.Segment} The calling Segment Plot.
    */
-  public x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
-  public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
+  public x(x: X | IAccessor<X>, xScale: Scale<X, number>): this;
+  public x(x?: number | IAccessor<number> | X | IAccessor<X>, xScale?: Scale<X, number>): any {
     if (x == null) {
       return super.x();
     }
     if (xScale == null) {
-      super.x(<number | Accessor<number>>x);
+      super.x(<number | IAccessor<number>>x);
     } else {
-      super.x(<X | Accessor<X>>x, xScale);
+      super.x(<X | IAccessor<X>>x, xScale);
       const x2Binding = this.x2();
       const x2 = x2Binding && x2Binding.accessor;
       if (x2 != null) {
@@ -99,7 +99,7 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
   /**
    * Gets the AccessorScaleBinding for X2
    */
-  public x2(): AccessorScaleBinding<X, number>;
+  public x2(): IAccessorScaleBinding<X, number>;
   /**
    * Sets X2 to a constant number or the result of an Accessor.
    * If a Scale has been set for X, it will also be used to scale X2.
@@ -107,8 +107,8 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
    * @param {number|Accessor<number>|Y|Accessor<Y>} y2
    * @returns {Plots.Segment} The calling Segment Plot
    */
-  public x2(x2: number | Accessor<number> | X | Accessor<X>): this;
-  public x2(x2?: number | Accessor<number> | X | Accessor<X>): any {
+  public x2(x2: number | IAccessor<number> | X | IAccessor<X>): this;
+  public x2(x2?: number | IAccessor<number> | X | IAccessor<X>): any {
     if (x2 == null) {
       return this._propertyBindings.get(Segment._X2_KEY);
     }
@@ -122,14 +122,14 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
   /**
    * Gets the AccessorScaleBinding for Y
    */
-  public y(): TransformableAccessorScaleBinding<Y, number>;
+  public y(): ITransformableAccessorScaleBinding<Y, number>;
   /**
    * Sets Y to a constant value or the result of an Accessor.
    *
    * @param {Y|Accessor<Y>} y
    * @returns {Plots.Segment} The calling Segment Plot.
    */
-  public y(y: number | Accessor<number>): this;
+  public y(y: number | IAccessor<number>): this;
   /**
    * Sets Y to a scaled constant value or scaled result of an Accessor.
    * The provided Scale will account for the values when autoDomain()-ing.
@@ -138,15 +138,15 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
    * @param {Scale<Y, number>} yScale
    * @returns {Plots.Segment} The calling Segment Plot.
    */
-  public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
-  public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
+  public y(y: Y | IAccessor<Y>, yScale: Scale<Y, number>): this;
+  public y(y?: number | IAccessor<number> | Y | IAccessor<Y>, yScale?: Scale<Y, number>): any {
     if (y == null) {
       return super.y();
     }
     if (yScale == null) {
-      super.y(<number | Accessor<number>>y);
+      super.y(<number | IAccessor<number>>y);
     } else {
-      super.y(<Y | Accessor<Y>>y, yScale);
+      super.y(<Y | IAccessor<Y>>y, yScale);
       const y2Binding = this.y2();
       const y2 = y2Binding && y2Binding.accessor;
       if (y2 != null) {
@@ -159,7 +159,7 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
   /**
    * Gets the AccessorScaleBinding for Y2.
    */
-  public y2(): AccessorScaleBinding<Y, number>;
+  public y2(): IAccessorScaleBinding<Y, number>;
   /**
    * Sets Y2 to a constant number or the result of an Accessor.
    * If a Scale has been set for Y, it will also be used to scale Y2.
@@ -167,8 +167,8 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
    * @param {number|Accessor<number>|Y|Accessor<Y>} y2
    * @returns {Plots.Segment} The calling Segment Plot.
    */
-  public y2(y2: number | Accessor<number> | Y | Accessor<Y>): this;
-  public y2(y2?: number | Accessor<number> | Y | Accessor<Y>): any {
+  public y2(y2: number | IAccessor<number> | Y | IAccessor<Y>): this;
+  public y2(y2?: number | IAccessor<number> | Y | IAccessor<Y>): any {
     if (y2 == null) {
       return this._propertyBindings.get(Segment._Y2_KEY);
     }
@@ -188,7 +188,7 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
     return attrToProjector;
   }
 
-  public entitiesAt(point: Point): PlotEntity[] {
+  public entitiesAt(point: Point): IPlotEntity[] {
     const entity = this.entityNearest(point);
     if (entity != null) {
       return [entity];
@@ -203,7 +203,7 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
    * @param {Bounds} bounds
    * @returns {PlotEntity[]}
    */
-  public entitiesIn(bounds: Bounds): PlotEntity[];
+  public entitiesIn(bounds: Bounds): IPlotEntity[];
   /**
    * Gets the Entities that intersect the area defined by the ranges.
    *
@@ -211,8 +211,8 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
    * @param {Range} yRange
    * @returns {PlotEntity[]}
    */
-  public entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
-  public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): PlotEntity[] {
+  public entitiesIn(xRange: Range, yRange: Range): IPlotEntity[];
+  public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): IPlotEntity[] {
     let dataXRange: Range;
     let dataYRange: Range;
     if (yRange == null) {
@@ -226,8 +226,8 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
     return this._entitiesIntersecting(dataXRange, dataYRange);
   }
 
-  private _entitiesIntersecting(xRange: Range, yRange: Range): PlotEntity[] {
-    const intersected: PlotEntity[] = [];
+  private _entitiesIntersecting(xRange: Range, yRange: Range): IPlotEntity[] {
+    const intersected: IPlotEntity[] = [];
     const attrToProjector = this._generateAttrToProjector();
     this.entities().forEach((entity) => {
       if (this._lineIntersectsBox(entity, xRange, yRange, attrToProjector)) {
@@ -237,7 +237,7 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
     return intersected;
   }
 
-  private _lineIntersectsBox(entity: PlotEntity, xRange: Range, yRange: Range, attrToProjector: AttributeToProjector) {
+  private _lineIntersectsBox(entity: IPlotEntity, xRange: Range, yRange: Range, attrToProjector: AttributeToProjector) {
     const x1 = attrToProjector["x1"](entity.datum, entity.index, entity.dataset);
     const x2 = attrToProjector["x2"](entity.datum, entity.index, entity.dataset);
     const y1 = attrToProjector["y1"](entity.datum, entity.index, entity.dataset);

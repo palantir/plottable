@@ -1,12 +1,10 @@
 import { assert } from "chai";
 import * as d3 from "d3";
-import * as sinon from "sinon";
 
 import * as Plottable from "../../src";
-import { SimpleSelection } from "../../src/core/interfaces";
 
-import * as TestMethods from "../testMethods";
 import { makeLineCanvasDrawStep } from "../../src/drawers/lineDrawer";
+import * as TestMethods from "../testMethods";
 
 describe("SVGDrawers", () => {
   describe("Line Drawer", () => {

@@ -1,5 +1,4 @@
 import { assert } from "chai";
-import * as sinon from "sinon";
 
 import * as Plottable from "../../src";
 

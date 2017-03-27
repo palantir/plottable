@@ -14,7 +14,7 @@ export type SimpleSelection<Datum> = d3.Selection<d3.BaseType, Datum | {}, any, 
  * Accesses a specific datum property. Users supply Accessors to their
  * plots' .x, .y, .attr, etc. functions.
  */
-export interface Accessor<T> {
+export interface IAccessor<T> {
   (datum: any, index: number, dataset: Dataset): T;
 }
 
@@ -79,7 +79,7 @@ export type Bounds = {
 /**
  * An object representing a data-backed visual entity inside a Component.
  */
-export interface Entity<C extends Component> {
+export interface IEntity<C extends Component> {
   datum: any;
   position: Point;
   selection: SimpleSelection<any>;

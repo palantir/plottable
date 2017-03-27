@@ -14,7 +14,7 @@ describe("Plots", () => {
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let linePlot: Plottable.Plots.Line<number>;
-      let data = [{x: 0, y: 0}, {x: 1, y: 1}];
+      const data = [{x: 0, y: 0}, {x: 1, y: 1}];
       let dataset: Plottable.Dataset;
 
       beforeEach(() => {
@@ -28,7 +28,7 @@ describe("Plots", () => {
       });
 
       it("does not throw error when given NaN values", () => {
-        let dataWithNaN = [
+        const dataWithNaN = [
           { x: 0.0, y: 0.0 },
           { x: 0.2, y: 0.2 },
           { x: 0.4, y: NaN },
@@ -39,8 +39,8 @@ describe("Plots", () => {
         linePlot.addDataset(new Plottable.Dataset(dataWithNaN));
         assert.doesNotThrow(() => linePlot.renderTo(div), Error, "does not throw error with NaN data");
 
-        let entities = linePlot.entities();
-        let expectedLength = dataWithNaN.length - 1;
+        const entities = linePlot.entities();
+        const expectedLength = dataWithNaN.length - 1;
         assert.lengthOf(entities, expectedLength, "NaN data was not returned");
 
         div.remove();
@@ -52,12 +52,12 @@ describe("Plots", () => {
       });
 
       it("retains original classes when setting class with attr", () => {
-        let cssClass = "pink";
+        const cssClass = "pink";
         linePlot.attr("class", cssClass);
         linePlot.renderTo(div);
         linePlot.addDataset(dataset);
 
-        let linePath = linePlot.content().select(".line");
+        const linePath = linePlot.content().select(".line");
         assert.isTrue(linePath.classed(cssClass), "custom class is applied");
         assert.isTrue(linePath.classed("line"), "default class is retained");
         div.remove();
@@ -68,7 +68,7 @@ describe("Plots", () => {
         linePlot.attr("stroke", (d, i, m) => d3.rgb(d.x, d.y, i).toString());
         linePlot.renderTo(div);
 
-        let linePath = linePlot.content().select(".line");
+        const linePath = linePlot.content().select(".line");
         TestMethods.assertPathEqualToDataPoints(linePath.attr("d"), data, xScale, yScale);
         assert.strictEqual(linePath.style("fill"), "none", "line fill renders as \"none\"");
         assert.strictEqual(linePath.attr("stroke"), "rgb(0, 0, 0)", "stroke set correctly");
@@ -79,10 +79,10 @@ describe("Plots", () => {
         linePlot.addDataset(dataset);
         linePlot.renderTo(div);
 
-        let newColor = "pink";
+        const newColor = "pink";
         linePlot.attr("stroke", newColor);
         linePlot.render();
-        let linePath = linePlot.content().select(".line");
+        const linePath = linePlot.content().select(".line");
         assert.strictEqual(linePath.attr("stroke"), newColor, "stroke changed correctly");
         div.remove();
       });
@@ -112,7 +112,7 @@ describe("Plots", () => {
         mutableDataset.data(dataWithNaN);
         TestMethods.assertPathEqualToDataPoints(linePath.attr("d"), validPoints, xScale, yScale);
 
-        let dataWithUndefined = lineData.slice();
+        const dataWithUndefined = lineData.slice();
         dataWithUndefined[2] = { x: 0.4, y: undefined };
         mutableDataset.data(dataWithUndefined);
         TestMethods.assertPathEqualToDataPoints(linePath.attr("d"), validPoints, xScale, yScale);
@@ -149,7 +149,7 @@ describe("Plots", () => {
       });
 
       it("draws step function when interpolator is set to step", () => {
-        let data = [
+        const data = [
           {x: 0.0, y: 0},
           {x: 0.8, y: 0.717},
           {x: 1.6, y: 0.999},
@@ -169,10 +169,10 @@ describe("Plots", () => {
         linePlot.curve("step");
 
         svgPath = linePlot.content().select("path").attr("d");
-        let stepPoints = [data[0]];
+        const stepPoints = [data[0]];
         for (let i = 1; i < data.length; i ++ ) {
-          let p1 = data[i - 1];
-          let p2 = data[i];
+          const p1 = data[i - 1];
+          const p2 = data[i];
           stepPoints.push({ x: (p1.x + p2.x) / 2, y: p1.y });
           stepPoints.push({ x: (p1.x + p2.x) / 2, y: p2.y });
         }
@@ -187,8 +187,8 @@ describe("Plots", () => {
       let div: d3.Selection<HTMLDivElement, any, any, any>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
-      let data = [{ x: 0, y: 0.75 }, { x: 1, y: 0.25 }];
-      let data2 = [{ x: 0, y: 1 }, { x: 1, y: 0.95 }];
+      const data = [{ x: 0, y: 0.75 }, { x: 1, y: 0.25 }];
+      const data2 = [{ x: 0, y: 1 }, { x: 1, y: 0.95 }];
       let dataset: Plottable.Dataset;
       let dataset2: Plottable.Dataset;
       let linePlot: Plottable.Plots.Line<number>;
@@ -262,7 +262,7 @@ describe("Plots", () => {
 
       it("retrieves all dataset selections with no args", () => {
         linePlot.addDataset(dataset2);
-        let allLines = linePlot.selections();
+        const allLines = linePlot.selections();
         assert.strictEqual(allLines.size(), 2, "all lines retrieved");
 
         div.remove();
@@ -270,18 +270,18 @@ describe("Plots", () => {
 
       it("retrieves selections for selected dataset", () => {
         linePlot.addDataset(dataset2);
-        let allLines = linePlot.selections([dataset]);
+        const allLines = linePlot.selections([dataset]);
         assert.strictEqual(allLines.size(), 1, "all lines retrieved");
-        let selectionData = allLines.data()[0];
+        const selectionData = allLines.data()[0];
         assert.deepEqual(selectionData, dataset.data(), "third dataset data in selection data");
       });
 
       it("skips invalid Dataset", () => {
-        let dummyDataset = new Plottable.Dataset([]);
+        const dummyDataset = new Plottable.Dataset([]);
 
-        let allLines = linePlot.selections([dataset, dummyDataset]);
+        const allLines = linePlot.selections([dataset, dummyDataset]);
         assert.strictEqual(allLines.size(), 1, "all lines retrieved");
-        let selectionData = allLines.data()[0];
+        const selectionData = allLines.data()[0];
         assert.deepEqual(selectionData, dataset.data(), "third dataset data in selection data");
       });
 
@@ -307,13 +307,13 @@ describe("Plots", () => {
       it("considers only in-view points for the nearest Entity", () => {
         xScale.domain([0.25, 1]);
 
-        let closest = linePlot.entityNearest({ x: xScale.scale(data[0].x), y: yScale.scale(data[0].y) });
+        const closest = linePlot.entityNearest({ x: xScale.scale(data[0].x), y: yScale.scale(data[0].y) });
         assert.strictEqual(closest.datum, data[1], "it retrieves the closest point in-view");
       });
 
       it("returns undefined if no Entities are visible", () => {
         dataset.data([]);
-        let closest = linePlot.entityNearest({ x: 0, y: 0 });
+        const closest = linePlot.entityNearest({ x: 0, y: 0 });
         assert.isUndefined(closest, "returns undefined if no Entity can be found");
       });
     });
@@ -323,7 +323,7 @@ describe("Plots", () => {
       let div: d3.Selection<HTMLDivElement, any, any, any>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
-      let data = [
+      const data = [
         {x: 0.0, y: -1},
         {x: 1.8, y: -2},
       ];
@@ -353,14 +353,14 @@ describe("Plots", () => {
 
         line.autorangeSmooth(true);
 
-        let base = data[0].y;
+        const base = data[0].y;
         let x1 = xScale.domain()[1] - data[0].x;
-        let x2 = data[1].x - data[0].x;
-        let y2 = data[1].y - data[0].y;
-        let expectedBottom = base + y2 * x1 / x2;
+        const x2 = data[1].x - data[0].x;
+        const y2 = data[1].y - data[0].y;
+        const expectedBottom = base + y2 * x1 / x2;
 
         x1 = xScale.domain()[0] - data[0].x;
-        let expectedTop = base + y2 * x1 / x2;
+        const expectedTop = base + y2 * x1 / x2;
 
         assert.closeTo(yScale.domain()[0], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (left)");
         assert.closeTo(yScale.domain()[1], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (right)");
@@ -386,14 +386,14 @@ describe("Plots", () => {
         line.autorangeMode("y");
         line.renderTo(div);
 
-        let base = data[0].y;
+        const base = data[0].y;
         let x1 = (xScale.domain()[1] - data[0].x) - (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
-        let x2 = data[1].x - data[0].x;
-        let y2 = data[1].y - data[0].y;
-        let expectedTop = base + y2 * x1 / x2;
+        const x2 = data[1].x - data[0].x;
+        const y2 = data[1].y - data[0].y;
+        const expectedTop = base + y2 * x1 / x2;
 
         x1 = (xScale.domain()[0] - data[0].x) + (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
-        let expectedBottom = base + y2 * x1 / x2;
+        const expectedBottom = base + y2 * x1 / x2;
 
         assert.closeTo(yScale.domain()[0], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (left)");
         assert.closeTo(yScale.domain()[1], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (right)");
@@ -407,14 +407,14 @@ describe("Plots", () => {
         line.autorangeMode("y");
         line.renderTo(div);
 
-        let base = data[0].y;
+        const base = data[0].y;
         let x1 = (xScale.domain()[1] - data[0].x) - (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
-        let x2 = data[1].x - data[0].x;
-        let y2 = data[1].y - data[0].y;
-        let expectedTop = base + y2 * x1 / x2;
+        const x2 = data[1].x - data[0].x;
+        const y2 = data[1].y - data[0].y;
+        const expectedTop = base + y2 * x1 / x2;
 
         x1 = (xScale.domain()[0] - data[0].x) + (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
-        let expectedBottom = base + y2 * x1 / x2;
+        const expectedBottom = base + y2 * x1 / x2;
 
         assert.closeTo(yScale.domain()[0], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (left)");
         assert.closeTo(yScale.domain()[1], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (right)");
@@ -428,14 +428,14 @@ describe("Plots", () => {
         line.autorangeSmooth(true);
         line.renderTo(div);
 
-        let base = data[0].y;
+        const base = data[0].y;
         let x1 = (xScale.domain()[1] - data[0].x) - (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
-        let x2 = data[1].x - data[0].x;
-        let y2 = data[1].y - data[0].y;
-        let expectedTop = base + y2 * x1 / x2;
+        const x2 = data[1].x - data[0].x;
+        const y2 = data[1].y - data[0].y;
+        const expectedTop = base + y2 * x1 / x2;
 
         x1 = (xScale.domain()[0] - data[0].x) + (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
-        let expectedBottom = base + y2 * x1 / x2;
+        const expectedBottom = base + y2 * x1 / x2;
 
         assert.closeTo(yScale.domain()[0], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (left)");
         assert.closeTo(yScale.domain()[1], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (right)");
@@ -449,14 +449,14 @@ describe("Plots", () => {
         line.renderTo(div);
         line.autorangeSmooth(true);
 
-        let base = data[0].y;
+        const base = data[0].y;
         let x1 = (xScale.domain()[1] - data[0].x) - (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
-        let x2 = data[1].x - data[0].x;
-        let y2 = data[1].y - data[0].y;
-        let expectedTop = base + y2 * x1 / x2;
+        const x2 = data[1].x - data[0].x;
+        const y2 = data[1].y - data[0].y;
+        const expectedTop = base + y2 * x1 / x2;
 
         x1 = (xScale.domain()[0] - data[0].x) + (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
-        let expectedBottom = base + y2 * x1 / x2;
+        const expectedBottom = base + y2 * x1 / x2;
 
         assert.closeTo(yScale.domain()[0], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (left)");
         assert.closeTo(yScale.domain()[1], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (right)");
@@ -471,14 +471,14 @@ describe("Plots", () => {
         line.autorangeSmooth(true);
         line.autorangeMode("y");
 
-        let base = data[0].y;
+        const base = data[0].y;
         let x1 = (xScale.domain()[1] - data[0].x) - (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
-        let x2 = data[1].x - data[0].x;
-        let y2 = data[1].y - data[0].y;
-        let expectedTop = base + y2 * x1 / x2;
+        const x2 = data[1].x - data[0].x;
+        const y2 = data[1].y - data[0].y;
+        const expectedTop = base + y2 * x1 / x2;
 
         x1 = (xScale.domain()[0] - data[0].x) + (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
-        let expectedBottom = base + y2 * x1 / x2;
+        const expectedBottom = base + y2 * x1 / x2;
 
         assert.closeTo(yScale.domain()[0], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (left)");
         assert.closeTo(yScale.domain()[1], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (right)");
@@ -487,7 +487,7 @@ describe("Plots", () => {
       });
 
       it("handles autoDomain correcly with and without autorangeSmooth", () => {
-        let expectedDomain = [-0.2, 2];
+        const expectedDomain = [-0.2, 2];
         xScale.domain([-0.2, 2]);
         line.addDataset(dataset);
         line.autorangeMode("y");
@@ -505,7 +505,7 @@ describe("Plots", () => {
       });
 
       it("handles autoDomain correcly with smooth autoranging set after rendering", () => {
-        let expectedDomain = [-0.2, 2];
+        const expectedDomain = [-0.2, 2];
         xScale.domain([-0.2, 2]);
         line.addDataset(dataset);
         line.renderTo(div);
@@ -523,7 +523,7 @@ describe("Plots", () => {
 
       it("handles autorange smoothly for vertical lines", () => {
         yScale.domain([0.1, 1.1]);
-        let verticalLinesData = [
+        const verticalLinesData = [
           {x: -2, y: 1.8},
           {x: -1, y: 0.0},
         ];
@@ -538,14 +538,14 @@ describe("Plots", () => {
 
         line.autorangeSmooth(true);
 
-        let base = verticalLinesData[0].x;
+        const base = verticalLinesData[0].x;
         let x1 = (yScale.domain()[1] - verticalLinesData[0].y);
-        let x2 = verticalLinesData[1].y - verticalLinesData[0].y;
-        let y2 = verticalLinesData[1].x - verticalLinesData[0].x;
-        let expectedTop = base + y2 * x1 / x2;
+        const x2 = verticalLinesData[1].y - verticalLinesData[0].y;
+        const y2 = verticalLinesData[1].x - verticalLinesData[0].x;
+        const expectedTop = base + y2 * x1 / x2;
 
         x1 = (yScale.domain()[0] - verticalLinesData[0].y);
-        let expectedBottom = base + y2 * x1 / x2;
+        const expectedBottom = base + y2 * x1 / x2;
 
         assert.closeTo(xScale.domain()[0], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (left)");
         assert.closeTo(xScale.domain()[1], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (right)");
@@ -593,7 +593,7 @@ describe("Plots", () => {
       });
 
       it("does not render lines that are outside the viewport", () => {
-        let data = [
+        const data = [
           {x: 1, y: 1},
           {x: 2, y: 2},
           {x: 3, y: 1},
@@ -608,15 +608,15 @@ describe("Plots", () => {
         plot.croppedRenderingEnabled(true);
         plot.renderTo(div);
 
-        let path = plot.content().select("path.line").attr("d");
-        let expectedRenderedData = [1, 2, 3].map((d) => data[d]);
+        const path = plot.content().select("path.line").attr("d");
+        const expectedRenderedData = [1, 2, 3].map((d) => data[d]);
         TestMethods.assertPathEqualToDataPoints(path, expectedRenderedData, xScale, yScale);
 
         div.remove();
       });
 
       it("works when the performance option is set after rendering to svg", () => {
-        let data = [
+        const data = [
           {x: 1, y: 1},
           {x: 2, y: 2},
           {x: 3, y: 1},
@@ -631,15 +631,15 @@ describe("Plots", () => {
         plot.renderTo(div);
         plot.croppedRenderingEnabled(true);
 
-        let path = plot.content().select("path.line").attr("d");
-        let expectedRenderedData = [1, 2, 3].map((d) => data[d]);
+        const path = plot.content().select("path.line").attr("d");
+        const expectedRenderedData = [1, 2, 3].map((d) => data[d]);
         TestMethods.assertPathEqualToDataPoints(path, expectedRenderedData, xScale, yScale);
 
         div.remove();
       });
 
       it("works for vertical line plots", () => {
-        let data = [
+        const data = [
           {x: 1, y: 1},
           {x: 2, y: 2},
           {x: 1, y: 3},
@@ -655,15 +655,15 @@ describe("Plots", () => {
         plot.croppedRenderingEnabled(true);
         plot.renderTo(div);
 
-        let path = plot.content().select("path.line").attr("d");
-        let expectedRenderedData = [1, 2, 3].map((d) => data[d]);
+        const path = plot.content().select("path.line").attr("d");
+        const expectedRenderedData = [1, 2, 3].map((d) => data[d]);
         TestMethods.assertPathEqualToDataPoints(path, expectedRenderedData, xScale, yScale);
 
         div.remove();
       });
 
       it("adapts to scale changes", () => {
-        let data = [
+        const data = [
           {x: 1, y: 1},
           {x: 2, y: 2},
           {x: 3, y: 1},
@@ -722,7 +722,7 @@ describe("Plots", () => {
       });
 
       it("does not render points that should be removed in downsampling in horizontal line plots" , () => {
-        let data = [
+        const data = [
           {x: -100, y: -1}, // last element in previous bucket
           {x: 0, y: 2}, // first element in current bucket
           {x: 0.5, y: 1.5}, // the point to be removed
@@ -737,7 +737,7 @@ describe("Plots", () => {
         plot.downsamplingEnabled(true);
         plot.renderTo(div);
 
-        let lineScaledXValue = Math.floor(xScale.scale(data[1].x));
+        const lineScaledXValue = Math.floor(xScale.scale(data[1].x));
         assert.notStrictEqual(Math.floor(xScale.scale(data[0].x)), lineScaledXValue,
           `point(${data[0].x},${data[0].y}) should not have the same scaled x value as the horizontal line`);
         data.slice(1, 6).forEach((d, i) => {
@@ -747,15 +747,15 @@ describe("Plots", () => {
         assert.notStrictEqual(Math.floor(xScale.scale(data[6].x)), lineScaledXValue,
           `point(${data[6].x},${data[6].y}) should not have the same scaled x value as the horizontal line`);
 
-        let path = plot.content().select("path.line").attr("d");
-        let expectedRenderedData = [0, 1, 4, 3, 5, 6].map((d) => data[d]);
+        const path = plot.content().select("path.line").attr("d");
+        const expectedRenderedData = [0, 1, 4, 3, 5, 6].map((d) => data[d]);
         TestMethods.assertPathEqualToDataPoints(path, expectedRenderedData, xScale, yScale);
 
         div.remove();
       });
 
       it("does not render points that should be removed in downsampling in vertical line plots", () => {
-        let data = [
+        const data = [
           {x: -1, y: -50}, // last element in previous bucket
           {x: 2, y: 1}, // first element in current bucket
           {x: 1.5, y: 1.5}, // the point to be removed
@@ -771,7 +771,7 @@ describe("Plots", () => {
         plot.downsamplingEnabled(true);
         plot.renderTo(div);
 
-        let lineScaledYValue = Math.floor(yScale.scale(data[1].y));
+        const lineScaledYValue = Math.floor(yScale.scale(data[1].y));
         assert.notStrictEqual(Math.floor(yScale.scale(data[0].y)), lineScaledYValue,
           `point(${data[0].x},${data[0].y}) should not have the same scaled y value as the vertical line`);
         data.slice(1, 6).forEach((d, i) => {
@@ -781,15 +781,15 @@ describe("Plots", () => {
         assert.notStrictEqual(Math.floor(yScale.scale(data[6].y)), lineScaledYValue,
           `point(${data[6].x},${data[6].y}) should not have the same scaled y value as the vertical line`);
 
-        let path = plot.content().select("path.line").attr("d");
-        let expectedRenderedData = [0, 1, 3, 4, 5, 6].map((d) => data[d]);
+        const path = plot.content().select("path.line").attr("d");
+        const expectedRenderedData = [0, 1, 3, 4, 5, 6].map((d) => data[d]);
         TestMethods.assertPathEqualToDataPoints(path, expectedRenderedData, xScale, yScale);
 
         div.remove();
       });
 
       it("does not render points that are on the same line except for the first, the last, the largest and the smallest points", () => {
-        let data = [
+        const data = [
           {x: 3, y: 1}, // last element in previous bucket
           {x: 2, y: 2}, // first element in the bucket
           {x: 1, y: 1}, // minimum element in the bucket
@@ -800,11 +800,11 @@ describe("Plots", () => {
         ];
         plot.addDataset(new Plottable.Dataset(data));
 
-        let expectedYValue = (p1: any, p2: any, slope: number) => {
+        const expectedYValue = (p1: any, p2: any, slope: number) => {
           return p1.y + (p2.x - p1.x) * slope;
         };
 
-        let lineCurrentSlope = (data[2].y - data[1].y) / (data[2].x - data[1].x);
+        const lineCurrentSlope = (data[2].y - data[1].y) / (data[2].x - data[1].x);
         assert.notStrictEqual(Math.floor(expectedYValue(data[1], data[0], lineCurrentSlope)), Math.floor(data[0].y),
           `point(${data[0].x},${data[0].y}) is not on the line with slope ${lineCurrentSlope}`);
         data.slice(1, 6).forEach((d, i) => {
@@ -817,8 +817,8 @@ describe("Plots", () => {
         plot.downsamplingEnabled(true);
         plot.renderTo(div);
 
-        let path = plot.content().select("path.line").attr("d");
-        let expectedRenderedData = [0, 1, 2, 3, 5, 6].map((d) => data[d]);
+        const path = plot.content().select("path.line").attr("d");
+        const expectedRenderedData = [0, 1, 2, 3, 5, 6].map((d) => data[d]);
         TestMethods.assertPathEqualToDataPoints(path, expectedRenderedData, xScale, yScale);
 
         div.remove();

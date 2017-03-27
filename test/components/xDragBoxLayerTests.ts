@@ -1,4 +1,3 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -124,7 +123,7 @@ describe("SelectionBoxLayer", () => {
         const dragDistance = 10;
         TestMethods.triggerFakeDragSequence(dbl.background(),
           { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 },
-          { x: DIV_WIDTH / 2 + dragDistance, y: DIV_HEIGHT / 2 + dragDistance }
+          { x: DIV_WIDTH / 2 + dragDistance, y: DIV_HEIGHT / 2 + dragDistance },
         );
 
         const boundsAfter = dbl.bounds();

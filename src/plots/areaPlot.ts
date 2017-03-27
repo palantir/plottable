@@ -6,7 +6,7 @@
 import * as d3 from "d3";
 
 import { Dataset } from "../core/dataset";
-import { Accessor, AttributeToProjector, Projector, SimpleSelection } from "../core/interfaces";
+import { AttributeToProjector, IAccessor, Projector, SimpleSelection } from "../core/interfaces";
 import * as Drawers from "../drawers";
 import * as Scales from "../scales";
 import { QuantitativeScale } from "../scales/quantitativeScale";
@@ -45,10 +45,10 @@ export class Area<X> extends Line<X> {
     this._lineDrawers.forEach((lineDrawer) => lineDrawer.attachTo(this._renderArea));
   }
 
-  public y(): Plots.TransformableAccessorScaleBinding<number, number>;
-  public y(y: number | Accessor<number>): this;
-  public y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): this;
-  public y(y?: number | Accessor<number>, yScale?: QuantitativeScale<number>): any {
+  public y(): Plots.ITransformableAccessorScaleBinding<number, number>;
+  public y(y: number | IAccessor<number>): this;
+  public y(y: number | IAccessor<number>, yScale: QuantitativeScale<number>): this;
+  public y(y?: number | IAccessor<number>, yScale?: QuantitativeScale<number>): any {
     if (y == null) {
       return super.y();
     }
@@ -72,7 +72,7 @@ export class Area<X> extends Line<X> {
   /**
    * Gets the AccessorScaleBinding for Y0.
    */
-  public y0(): Plots.AccessorScaleBinding<number, number>;
+  public y0(): Plots.IAccessorScaleBinding<number, number>;
   /**
    * Sets Y0 to a constant number or the result of an Accessor<number>.
    * If a Scale has been set for Y, it will also be used to scale Y0.
@@ -80,8 +80,8 @@ export class Area<X> extends Line<X> {
    * @param {number|Accessor<number>} y0
    * @returns {Area} The calling Area Plot.
    */
-  public y0(y0: number | Accessor<number>): this;
-  public y0(y0?: number | Accessor<number>): any {
+  public y0(y0: number | IAccessor<number>): this;
+  public y0(y0?: number | IAccessor<number>): any {
     if (y0 == null) {
       return this._propertyBindings.get(Area._Y0_KEY);
     }

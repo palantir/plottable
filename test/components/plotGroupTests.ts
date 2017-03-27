@@ -1,4 +1,3 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -44,7 +43,7 @@ describe("Components", () => {
     });
 
     it("throws error when appending not plot", () => {
-      let label = new Plottable.Components.Label();
+      const label = new Plottable.Components.Label();
       assert.throw(() => plotGroup.append((<any>label)), Error, "Plot Group only accepts plots");
       div.remove();
     });

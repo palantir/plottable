@@ -1,9 +1,9 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
 
 import * as Plottable from "../../src";
+import { SimpleSelection } from "../../src/core/interfaces";
 
 import * as TestMethods from "../testMethods";
 
@@ -256,9 +256,9 @@ describe("SelectionBoxLayer", () => {
         let callbackDragCalled = false;
         let callbackDragEndCalled = false;
 
-        let callbackDragStart = () => callbackDragStartCalled = true;
-        let callbackDrag = () => callbackDragCalled = true;
-        let callbackDragEnd = () => callbackDragEndCalled = true;
+        const callbackDragStart = () => callbackDragStartCalled = true;
+        const callbackDrag = () => callbackDragCalled = true;
+        const callbackDragEnd = () => callbackDragEndCalled = true;
 
         dbl.onDragStart(callbackDragStart);
         dbl.onDrag(callbackDrag);
@@ -347,10 +347,11 @@ describe("SelectionBoxLayer", () => {
           topLeft: { x: 0, y: 0 },
           bottomRight: { x: 0, y: 0 },
         });
-        TestMethods.triggerFakeDragSequence(target,
-                                { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4},
-                                { x: DIV_WIDTH * 3 / 4, y: DIV_HEIGHT * 3 / 4}
-                               );
+        TestMethods.triggerFakeDragSequence(
+          target,
+          { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4},
+          { x: DIV_WIDTH * 3 / 4, y: DIV_HEIGHT * 3 / 4},
+        );
         initialBounds = dbl.bounds();
       }
 
@@ -394,10 +395,11 @@ describe("SelectionBoxLayer", () => {
       it("can resize from top edge", () => {
         dbl.resizable(true);
         let newY = 0;
-        TestMethods.triggerFakeDragSequence(target,
-                                { x: midPoint.x, y: initialBounds.topLeft.y },
-                                { x: midPoint.x, y: newY }
-                               );
+        TestMethods.triggerFakeDragSequence(
+          target,
+          { x: midPoint.x, y: initialBounds.topLeft.y },
+          { x: midPoint.x, y: newY },
+        );
         let bounds = dbl.bounds();
         assert.strictEqual(bounds.topLeft.y, newY, "top edge was repositioned");
         assert.strictEqual(bounds.bottomRight.y, initialBounds.bottomRight.y, "bottom edge was not moved");
@@ -406,10 +408,11 @@ describe("SelectionBoxLayer", () => {
 
         resetBox();
         newY = DIV_HEIGHT;
-        TestMethods.triggerFakeDragSequence(target,
-                                { x: midPoint.x, y: initialBounds.topLeft.y },
-                                { x: midPoint.x, y: newY }
-                               );
+        TestMethods.triggerFakeDragSequence(
+          target,
+          { x: midPoint.x, y: initialBounds.topLeft.y },
+          { x: midPoint.x, y: newY },
+        );
         bounds = dbl.bounds();
         assert.strictEqual(bounds.bottomRight.y, newY, "can drag through to other side");
         div.remove();
@@ -418,10 +421,11 @@ describe("SelectionBoxLayer", () => {
       it("can resize from bottom edge", () => {
         dbl.resizable(true);
         let newY = DIV_HEIGHT;
-        TestMethods.triggerFakeDragSequence(target,
-                                { x: midPoint.x, y: initialBounds.bottomRight.y },
-                                { x: midPoint.x, y: newY }
-                               );
+        TestMethods.triggerFakeDragSequence(
+          target,
+          { x: midPoint.x, y: initialBounds.bottomRight.y },
+          { x: midPoint.x, y: newY },
+        );
         let bounds = dbl.bounds();
         assert.strictEqual(bounds.topLeft.y, initialBounds.topLeft.y, "top edge was not moved");
         assert.strictEqual(bounds.bottomRight.y, newY, "bottom edge was repositioned");
@@ -430,10 +434,11 @@ describe("SelectionBoxLayer", () => {
 
         resetBox();
         newY = 0;
-        TestMethods.triggerFakeDragSequence(target,
-                                { x: midPoint.x, y: initialBounds.bottomRight.y },
-                                { x: midPoint.x, y: newY }
-                               );
+        TestMethods.triggerFakeDragSequence(
+          target,
+          { x: midPoint.x, y: initialBounds.bottomRight.y },
+          { x: midPoint.x, y: newY },
+        );
         bounds = dbl.bounds();
         assert.strictEqual(bounds.topLeft.y, newY, "can drag through to other side");
         div.remove();
@@ -442,10 +447,11 @@ describe("SelectionBoxLayer", () => {
       it("can resize from left edge", () => {
         dbl.resizable(true);
         let newX = 0;
-        TestMethods.triggerFakeDragSequence(target,
-                                { x: initialBounds.topLeft.x, y: midPoint.y },
-                                { x: newX, y: midPoint.y }
-                               );
+        TestMethods.triggerFakeDragSequence(
+          target,
+          { x: initialBounds.topLeft.x, y: midPoint.y },
+          { x: newX, y: midPoint.y },
+        );
         let bounds = dbl.bounds();
         assert.strictEqual(bounds.topLeft.y, initialBounds.topLeft.y, "top edge was not moved");
         assert.strictEqual(bounds.bottomRight.y, initialBounds.bottomRight.y, "bottom edge was not moved");
@@ -454,10 +460,11 @@ describe("SelectionBoxLayer", () => {
 
         resetBox();
         newX = DIV_WIDTH;
-        TestMethods.triggerFakeDragSequence(target,
-                                { x: initialBounds.topLeft.x, y: midPoint.y },
-                                { x: newX, y: midPoint.y }
-                               );
+        TestMethods.triggerFakeDragSequence(
+          target,
+          { x: initialBounds.topLeft.x, y: midPoint.y },
+          { x: newX, y: midPoint.y },
+        );
         bounds = dbl.bounds();
         assert.strictEqual(bounds.bottomRight.x, newX, "can drag through to other side");
         div.remove();
@@ -466,10 +473,11 @@ describe("SelectionBoxLayer", () => {
       it("can resize from right edge", () => {
         dbl.resizable(true);
         let newX = DIV_WIDTH;
-        TestMethods.triggerFakeDragSequence(target,
-                                { x: initialBounds.bottomRight.x, y: midPoint.y },
-                                { x: newX, y: midPoint.y }
-                               );
+        TestMethods.triggerFakeDragSequence(
+          target,
+          { x: initialBounds.bottomRight.x, y: midPoint.y },
+          { x: newX, y: midPoint.y },
+        );
         let bounds = dbl.bounds();
         assert.strictEqual(bounds.topLeft.y, initialBounds.topLeft.y, "top edge was not moved");
         assert.strictEqual(bounds.bottomRight.y, initialBounds.bottomRight.y, "bottom edge was not moved");
@@ -478,10 +486,11 @@ describe("SelectionBoxLayer", () => {
 
         resetBox();
         newX = 0;
-        TestMethods.triggerFakeDragSequence(target,
-                                { x: initialBounds.bottomRight.x, y: midPoint.y },
-                                { x: newX, y: midPoint.y }
-                               );
+        TestMethods.triggerFakeDragSequence(
+          target,
+          { x: initialBounds.bottomRight.x, y: midPoint.y },
+          { x: newX, y: midPoint.y },
+        );
         bounds = dbl.bounds();
         assert.strictEqual(bounds.topLeft.x, newX, "can drag through to other side");
         div.remove();
@@ -490,10 +499,11 @@ describe("SelectionBoxLayer", () => {
       it("resizes if grabbed within detectionRadius", () => {
         dbl.resizable(true);
         const detectionRadius = dbl.detectionRadius();
-        TestMethods.triggerFakeDragSequence(target,
-                                { x: midPoint.x, y: initialBounds.bottomRight.y + detectionRadius - 1 },
-                                { x: midPoint.x, y: DIV_HEIGHT }
-                               );
+        TestMethods.triggerFakeDragSequence(
+          target,
+          { x: midPoint.x, y: initialBounds.bottomRight.y + detectionRadius - 1 },
+          { x: midPoint.x, y: DIV_HEIGHT },
+        );
         let bounds = dbl.bounds();
         assert.strictEqual(bounds.topLeft.y, initialBounds.topLeft.y, "top edge was not moved");
         assert.strictEqual(bounds.bottomRight.y, DIV_HEIGHT, "bottom edge was repositioned");
@@ -502,10 +512,11 @@ describe("SelectionBoxLayer", () => {
 
         resetBox();
         const startYOutside = initialBounds.bottomRight.y + detectionRadius + 1;
-        TestMethods.triggerFakeDragSequence(target,
-                                { x: midPoint.x, y: startYOutside },
-                                { x: midPoint.x, y: DIV_HEIGHT }
-                               );
+        TestMethods.triggerFakeDragSequence(
+          target,
+          { x: midPoint.x, y: startYOutside },
+          { x: midPoint.x, y: DIV_HEIGHT },
+        );
         bounds = dbl.bounds();
         assert.strictEqual(bounds.topLeft.x, midPoint.x, "new box was started at the drag start position");
         assert.strictEqual(bounds.topLeft.y, startYOutside, "new box was started at the drag start position");
@@ -516,10 +527,11 @@ describe("SelectionBoxLayer", () => {
 
       it("doesn't dismiss on no-op resize", () => {
         dbl.resizable(true);
-        TestMethods.triggerFakeDragSequence(target,
-                                { x: midPoint.x, y: initialBounds.topLeft.y },
-                                { x: midPoint.x, y: initialBounds.topLeft.y }
-                               );
+        TestMethods.triggerFakeDragSequence(
+          target,
+          { x: midPoint.x, y: initialBounds.topLeft.y },
+          { x: midPoint.x, y: initialBounds.topLeft.y },
+        );
         assert.isTrue(dbl.boxVisible(), "box was not dismissed");
         assert.deepEqual(dbl.bounds(), initialBounds, "bounds did not change");
         div.remove();
@@ -528,10 +540,11 @@ describe("SelectionBoxLayer", () => {
       it("can't resize if hidden", () => {
         dbl.resizable(true);
         dbl.boxVisible(false);
-        TestMethods.triggerFakeDragSequence(target,
-                                { x: midPoint.x, y: initialBounds.bottomRight.y },
-                                { x: midPoint.x, y: DIV_HEIGHT }
-                               );
+        TestMethods.triggerFakeDragSequence(
+          target,
+          { x: midPoint.x, y: initialBounds.bottomRight.y },
+          { x: midPoint.x, y: DIV_HEIGHT },
+        );
         const bounds = dbl.bounds();
         assert.strictEqual(bounds.topLeft.x, midPoint.x, "new box was started at the drag start position");
         assert.strictEqual(bounds.topLeft.y, initialBounds.bottomRight.y, "new box was started at the drag start position");
@@ -593,9 +606,10 @@ describe("SelectionBoxLayer", () => {
 
       it("can move left", () => {
         dbl.movable(true);
-        TestMethods.triggerFakeDragSequence(target,
+        TestMethods.triggerFakeDragSequence(
+          target,
           { x: midPoint.x, y: midPoint.y },
-          { x: midPoint.x - dragDistance, y: midPoint.y }
+          { x: midPoint.x - dragDistance, y: midPoint.y },
         );
         const bounds = dbl.bounds();
         assert.strictEqual(bounds.topLeft.x, initialBounds.topLeft.x - dragDistance, "left edge moved");
@@ -607,9 +621,10 @@ describe("SelectionBoxLayer", () => {
 
       it("can move right", () => {
         dbl.movable(true);
-        TestMethods.triggerFakeDragSequence(target,
+        TestMethods.triggerFakeDragSequence(
+          target,
           { x: midPoint.x, y: midPoint.y },
-          { x: midPoint.x + dragDistance, y: midPoint.y }
+          { x: midPoint.x + dragDistance, y: midPoint.y },
         );
         const bounds = dbl.bounds();
         assert.strictEqual(bounds.topLeft.x, initialBounds.topLeft.x + dragDistance, "left edge moved");
@@ -621,9 +636,10 @@ describe("SelectionBoxLayer", () => {
 
       it("can move up", () => {
         dbl.movable(true);
-        TestMethods.triggerFakeDragSequence(target,
+        TestMethods.triggerFakeDragSequence(
+          target,
           { x: midPoint.x, y: midPoint.y },
-          { x: midPoint.x, y: midPoint.y - dragDistance }
+          { x: midPoint.x, y: midPoint.y - dragDistance },
         );
         const bounds = dbl.bounds();
         assert.strictEqual(bounds.topLeft.x, initialBounds.topLeft.x, "left edge did not move");
@@ -635,9 +651,10 @@ describe("SelectionBoxLayer", () => {
 
       it("can move down", () => {
         dbl.movable(true);
-        TestMethods.triggerFakeDragSequence(target,
+        TestMethods.triggerFakeDragSequence(
+          target,
           { x: midPoint.x, y: midPoint.y },
-          { x: midPoint.x, y: midPoint.y + dragDistance }
+          { x: midPoint.x, y: midPoint.y + dragDistance },
         );
         const bounds = dbl.bounds();
         assert.strictEqual(bounds.topLeft.x, initialBounds.topLeft.x, "left edge did not move");
@@ -650,9 +667,10 @@ describe("SelectionBoxLayer", () => {
       it("does not move if grabbed within detectionRadius while resizable", () => {
         dbl.movable(true);
         dbl.resizable(true);
-        TestMethods.triggerFakeDragSequence(target,
+        TestMethods.triggerFakeDragSequence(
+          target,
           { x: initialBounds.bottomRight.x, y: midPoint.y },
-          { x: DIV_WIDTH, y: midPoint.y }
+          { x: DIV_WIDTH, y: midPoint.y },
         );
         const bounds = dbl.bounds();
         assert.strictEqual(bounds.topLeft.y, initialBounds.topLeft.y, "top edge was not moved");
@@ -664,9 +682,10 @@ describe("SelectionBoxLayer", () => {
 
       it("doesn't dismiss on no-op move", () => {
         dbl.movable(true);
-        TestMethods.triggerFakeDragSequence(target,
+        TestMethods.triggerFakeDragSequence(
+          target,
           { x: midPoint.x, y: midPoint.y },
-          { x: midPoint.x, y: midPoint.y }
+          { x: midPoint.x, y: midPoint.y },
         );
         assert.isTrue(dbl.boxVisible(), "box remains visible");
         assert.deepEqual(dbl.bounds(), initialBounds, "bounds did not change");
@@ -684,9 +703,10 @@ describe("SelectionBoxLayer", () => {
       it("starts new box if hidden instead of moving", () => {
         dbl.movable(true);
         dbl.boxVisible(false);
-        TestMethods.triggerFakeDragSequence(target,
+        TestMethods.triggerFakeDragSequence(
+          target,
           { x: midPoint.x, y: midPoint.y },
-          { x: midPoint.x, y: midPoint.y + dragDistance }
+          { x: midPoint.x, y: midPoint.y + dragDistance },
         );
         const bounds = dbl.bounds();
         assert.strictEqual(bounds.topLeft.x, midPoint.x, "new box was started at the drag start position (x)");
