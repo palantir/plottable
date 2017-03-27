@@ -14,9 +14,8 @@ export function warn(warning: string) {
   if (!Configs.SHOW_WARNINGS) {
     return;
   }
-  /* tslint:disable:no-console */
+  // tslint:disable-next-line:no-console
   console.warn(warning);
-  /* tslint:enable:no-console */
 }
 
 /**

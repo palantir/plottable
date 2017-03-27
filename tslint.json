@@ -6,6 +6,7 @@
     "ordered-imports": true,
     "no-boolean-literal-compare": true,
     "no-consecutive-blank-lines": true,
+    "no-console": true,
     "no-inferrable-types": [true, "ignore-params", "ignore-properties"],
     "no-string-throw": true,
     "no-trailing-whitespace": true,

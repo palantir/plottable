@@ -269,11 +269,10 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
   }
 
   private _lineIntersectsSegment(point1: Point, point2: Point, point3: Point, point4: Point) {
-    /* tslint:disable no-shadowed-variable */
+    // tslint:disable-next-line:no-shadowed-variable
     const calcOrientation = (point1: Point, point2: Point, point: Point) => {
       return (point2.x - point1.x) * (point.y - point2.y) - (point2.y - point1.y) * (point.x - point2.x);
     };
-    /* tslint:enable no-shadowed-variable */
 
     // point3 and point4 are on different sides of line formed by point1 and point2
     return calcOrientation(point1, point2, point3) * calcOrientation(point1, point2, point4) < 0;
