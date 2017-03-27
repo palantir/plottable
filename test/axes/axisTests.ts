@@ -657,56 +657,45 @@ describe("Axis", () => {
   });
 
   describe("tickLabelDataOnElement", () => {
+    const domain = ["label1", "label2", "long long long long long long long long long long long long title"];
+
     let div: d3.Selection<HTMLDivElement, void | {}, any, any>;
     let scale: Plottable.Scales.Category;
     let axis: Plottable.Axes.Category;
 
-    function setup(domain: string[]) {
+    beforeEach(() => {
       div = TestMethods.generateDiv();
       scale = new Plottable.Scales.Category().domain(domain);
       axis = new Plottable.Axes.Category(scale, "left");
       const TICK_LABEL_MAX_WIDTH = 60;
       axis.tickLabelMaxWidth(TICK_LABEL_MAX_WIDTH);
       axis.renderTo(div);
-    };
+    });
 
-    function cleanup() {
+    afterEach(() => {
       axis.destroy();
       div.remove();
-    };
+    });
 
     it("returns label datum when element has tick label class", () => {
-      const domain = ["label1", "label2"];
-      setup(domain);
       const tickLabelElement = div.select(`.${Plottable.Axis.TICK_LABEL_CLASS}`).node() as Element;
       assert.equal(axis.tickLabelDataOnElement(tickLabelElement), domain[0]);
-      cleanup();
     });
 
     it.skip("returns label datum when element in ancestor has tick label class", () => {
-      // force multiline
-      const domain = ["albatross long long long long long long long long long long long long title"];
-      setup(domain);
       const labelTextLineElement = div.select(".text-line").node() as Element;
       assert.equal(axis.tickLabelDataOnElement(labelTextLineElement), domain[0]);
-      cleanup();
     });
 
     it("returns undefined when no ancestor has tick label class", () => {
-      const domain = ["label1", "label2"];
-      setup(domain);
       const contentElement = div.select(".content").node() as Element;
       assert.isUndefined(axis.tickLabelDataOnElement(contentElement));
-      cleanup();
     });
 
     it("returns undefined when element is null / undefined", () => {
-      const domain = ["label1", "label2"];
-      setup(domain);
       axis = new Plottable.Axes.Category(scale, "left");
       assert.isUndefined(axis.tickLabelDataOnElement(undefined));
       assert.isUndefined(axis.tickLabelDataOnElement(null));
-      cleanup();
     });
   });
 });

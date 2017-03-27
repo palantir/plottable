@@ -106,12 +106,12 @@ export class Axis<D> extends Component {
   }
 
   /**
-   * Gets the tick label data on a element.
+   * Gets the tick label data on a element. Element in argument must be a descendent of a tick label element.
    *
    * @param {Element} element
    */
   public tickLabelDataOnElement(element: Element) {
-    if (element === null || element === undefined) { return undefined; }
+    if (element == null) { return undefined; }
 
     let tickLabel: Element;
     // go up DOM tree to find tick label element in ancestor elements
@@ -123,7 +123,7 @@ export class Axis<D> extends Component {
       }
     }
 
-    return element === undefined ? element : d3.select(element).datum();
+    return element === undefined ? undefined : d3.select(element).datum();
   }
 
   protected _computeWidth() {

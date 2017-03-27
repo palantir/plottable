@@ -2850,12 +2850,12 @@ var Axis = (function (_super) {
         this._scale.offUpdate(this._rescaleCallback);
     };
     /**
-     * Gets the tick label data on a element.
+     * Gets the tick label data on a element. Element in argument must be a descendent of a tick label element.
      *
      * @param {Element} element
      */
     Axis.prototype.tickLabelDataOnElement = function (element) {
-        if (element === null || element === undefined) {
+        if (element == null) {
             return undefined;
         }
         var tickLabel;
@@ -2868,7 +2868,7 @@ var Axis = (function (_super) {
                 element = element.parentNode;
             }
         }
-        return element === undefined ? element : d3.select(element).datum();
+        return element === undefined ? undefined : d3.select(element).datum();
     };
     Axis.prototype._computeWidth = function () {
         // to be overridden by subclass logic
