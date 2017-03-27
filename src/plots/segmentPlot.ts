@@ -4,11 +4,13 @@
  */
 
 import * as Animators from "../animators";
-import { Dataset } from "../core/dataset";
 import { AttributeToProjector, Bounds, IAccessor, Point, Range } from "../core/interfaces";
 import * as Drawers from "../drawers";
+import { ProxyDrawer } from "../drawers/drawer";
+import { SegmentSVGDrawer } from "../drawers/segmentDrawer";
 import * as Scales from "../scales";
 import { Scale } from "../scales/scale";
+import { warn } from "../utils/windowUtils";
 import { IAccessorScaleBinding, IPlotEntity, ITransformableAccessorScaleBinding } from "./";
 import { Plot } from "./plot";
 import { XYPlot } from "./xyPlot";
@@ -29,8 +31,10 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
     this.attr("stroke-width", "2px");
   }
 
-  protected _createDrawer(dataset: Dataset): Drawers.Segment {
-    return new Drawers.Segment(dataset);
+  protected _createDrawer() {
+    return new ProxyDrawer(() => new SegmentSVGDrawer(), () => {
+      warn("canvas renderer is not supported on Segment Plot!");
+    });
   }
 
   protected _generateDrawSteps(): Drawers.DrawStep[] {

@@ -1,25 +1,24 @@
-import { SimpleSelection } from "../../src/core/interfaces";
-
 import { assert } from "chai";
+import * as d3 from "d3";
 
 import * as Plottable from "../../src";
 
 import * as TestMethods from "../testMethods";
 
-describe("Drawers", () => {
+describe("SVGDrawers", () => {
   describe("Area Drawer", () => {
     const data = [["A", "B", "C"]]; // area normally takes single array of data
-    let svg: SimpleSelection<void>;
-    let drawer: Plottable.Drawers.Area;
+    let svg: d3.Selection<SVGElement, any, any, any>;
+    let drawer: Plottable.Drawers.AreaSVGDrawer;
 
     beforeEach(() => {
       svg = TestMethods.generateSVG();
-      drawer = new Plottable.Drawers.Area(null);
-      drawer.renderArea(svg);
+      drawer = new Plottable.Drawers.AreaSVGDrawer();
+      drawer.attachTo(svg);
 
-      const drawSteps: Plottable.Drawers.DrawStep[] = [
+      const drawSteps: Plottable.Drawers.AppliedDrawStep[] = [
         {
-          attrToProjector: {},
+          attrToAppliedProjector: {},
           animator: new Plottable.Animators.Null(),
         },
       ];
@@ -33,13 +32,13 @@ describe("Drawers", () => {
     });
 
     it("has a stroke of \"none\"", () => {
-      assert.strictEqual(drawer.selection().style("stroke"), "none");
+      assert.strictEqual(d3.selectAll(drawer.getVisualPrimitives()).style("stroke"), "none");
     });
 
     it("retrieves the same path regardless of requested selection index", () => {
       const expectedSelection = svg.selectAll<Element, any>("path");
       data[0].forEach((datum, index) => {
-        const selectionForIndex = drawer.selectionForIndex(index);
+        const selectionForIndex = d3.select(drawer.getVisualPrimitiveAtIndex(index));
         assert.strictEqual(selectionForIndex.size(), 1, `selection for index ${index} contains only one element`);
         assert.strictEqual(selectionForIndex.node(), expectedSelection.node(), `selection for index ${index} contains the correct element`);
       });

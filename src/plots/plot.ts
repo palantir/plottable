@@ -9,13 +9,21 @@ import * as Animators from "../animators";
 import { IAnimator } from "../animators/animator";
 import { Component } from "../components/component";
 import { Dataset, DatasetCallback } from "../core/dataset";
-import { AttributeToProjector, Bounds, IAccessor, Point, SimpleSelection } from "../core/interfaces";
+import {
+  AttributeToAppliedProjector,
+  AttributeToProjector,
+  Bounds,
+  IAccessor,
+  Point,
+  SimpleSelection,
+} from "../core/interfaces";
 import * as Drawers from "../drawers";
-import { Drawer } from "../drawers/drawer";
+import { ProxyDrawer } from "../drawers/drawer";
+import { AppliedDrawStep, DrawStep } from "../drawers/index";
+import { SVGDrawer } from "../drawers/svgDrawer";
 import * as Scales from "../scales";
 import { IScaleCallback, Scale } from "../scales/scale";
 import * as Utils from "../utils";
-
 import { coerceExternalD3 } from "../utils/coerceD3";
 import { makeEnum } from "../utils/makeEnum";
 import * as Plots from "./commons";
@@ -24,6 +32,27 @@ export const Renderer = makeEnum(["svg", "canvas"]);
 export type Renderer = keyof typeof Renderer;
 
 export class Plot extends Component {
+  public static getTotalDrawTime(data: any[], drawSteps: Drawers.DrawStep[]) {
+    return drawSteps.reduce((time, drawStep) => time + drawStep.animator.totalTime(data.length), 0);
+  }
+
+  public static applyDrawSteps(drawSteps: DrawStep[], dataset: Dataset): AppliedDrawStep[] {
+    const appliedDrawSteps: AppliedDrawStep[] = drawSteps.map((drawStep) => {
+      const attrToProjector = drawStep.attrToProjector;
+      const attrToAppliedProjector: AttributeToAppliedProjector = {};
+      Object.keys(attrToProjector).forEach((attr: string) => {
+        attrToAppliedProjector[attr] =
+          (datum: any, index: number) => attrToProjector[attr](datum, index, dataset);
+      });
+      return {
+        attrToAppliedProjector: attrToAppliedProjector,
+        animator: drawStep.animator,
+      };
+    });
+
+    return appliedDrawSteps;
+  }
+
   protected static _ANIMATION_MAX_DURATION = 600;
 
   /**
@@ -39,12 +68,12 @@ export class Plot extends Component {
   /**
    * Stores the Drawer for each dataset attached to this plot.
    */
-  private _datasetToDrawer: Utils.Map<Dataset, Drawer>;
+  private _datasetToDrawer: Utils.Map<Dataset, ProxyDrawer>;
 
   /**
    * The _renderArea is the main SVG drawing area upon which this plot should draw to.
    */
-  protected _renderArea: SimpleSelection<void>;
+  protected _renderArea: d3.Selection<SVGGElement, any, any, any>;
   /**
    * Mapping from attribute names to the AccessorScale that defines that attribute.
    */
@@ -118,7 +147,7 @@ export class Plot extends Component {
     super();
     this._overflowHidden = true;
     this.addClass("plot");
-    this._datasetToDrawer = new Utils.Map<Dataset, Drawer>();
+    this._datasetToDrawer = new Utils.Map<Dataset, ProxyDrawer>();
     this._attrBindings = d3.map<Plots.IAccessorScaleBinding<any, any>>();
     this._attrExtents = d3.map<any[]>();
     this._includedValuesProvider = (scale: Scale<any, any>) => this._includedValuesForScale(scale);
@@ -148,7 +177,7 @@ export class Plot extends Component {
     if (this._canvas != null) {
       this._appendCanvasNode();
     }
-    this._renderArea = this.content().append("g").classed("render-area", true);
+    this._renderArea = this.content().append<SVGGElement>("g").classed("render-area", true);
     this.datasets().forEach((dataset) => this._createNodesForDataset(dataset));
   }
 
@@ -179,18 +208,29 @@ export class Plot extends Component {
     this.datasets([]);
   }
 
+  /**
+   * Setup the DOM nodes for the given dataset. This is a separate
+   * step from "creating the Drawer" since the element may not be setup yet
+   * (in which case the _renderArea is null because the .element() and .content()
+   * are null). Also because subclasses may do more than just configure one
+   * single drawer (e.g. adding text drawing capabilities).
+   */
   protected _createNodesForDataset(dataset: Dataset) {
     const drawer = this._datasetToDrawer.get(dataset);
     if (this.renderer() === "svg") {
-      drawer.renderArea(this._renderArea.append("g"));
+      drawer.useSVG(this._renderArea);
     } else {
-      drawer.canvas(this._canvas);
+      drawer.useCanvas(this._canvas);
     }
     return drawer;
   }
 
-  protected _createDrawer(dataset: Dataset): Drawer {
-    return new Drawer(dataset);
+  /**
+   * Create a new Drawer. Subclasses should override this to return
+   * a Drawer that draws the correct shapes for this plot.
+   */
+  protected _createDrawer(dataset: Dataset): ProxyDrawer {
+    return new ProxyDrawer(() => new SVGDrawer("path", ""), () => {});
   }
 
   protected _getAnimator(key: string): IAnimator {
@@ -469,17 +509,14 @@ export class Plot extends Component {
           this._appendCanvasNode();
         }
         this._datasetToDrawer.forEach((drawer) => {
-          if (drawer.renderArea() != null) {
-            drawer.renderArea().remove();
-          }
-          drawer.canvas(this._canvas);
+          drawer.useCanvas(this._canvas);
         });
         this.render();
       } else if (this._canvas != null && renderer == "svg") {
         this._canvas.remove();
         this._canvas = null;
         this._datasetToDrawer.forEach((drawer) => {
-          drawer.renderArea(this._renderArea.append("g"));
+          drawer.useSVG(this._renderArea);
         });
         this.render();
       }
@@ -617,15 +654,20 @@ export class Plot extends Component {
       const context = canvas.getContext("2d");
       context.clearRect(0, 0, canvas.width, canvas.height);
     }
-    this.datasets().forEach((ds, i) => drawers[i].draw(dataToDraw.get(ds), drawSteps));
 
-    const times = this.datasets().map((ds, i) => drawers[i].totalDrawTime(dataToDraw.get(ds), drawSteps));
+    this.datasets().forEach((ds, i) => {
+      const appliedDrawSteps = Plot.applyDrawSteps(drawSteps, ds);
+      drawers[i].draw(dataToDraw.get(ds), appliedDrawSteps);
+    });
+
+    const times = this.datasets().map((ds, i) => Plot.getTotalDrawTime(dataToDraw.get(ds), drawSteps));
     const maxTime = Utils.Math.max(times, 0);
     this._additionalPaint(maxTime);
   }
 
   /**
    * Retrieves the drawn visual elements for the specified Datasets as a d3 Selection.
+   * Not supported on canvas renderer.
    *
    * @param {Dataset[]} [datasets] The Datasets to retrieve the Selections for.
    *   If not provided, Selections will be retrieved for all Datasets on the Plot.
@@ -633,7 +675,7 @@ export class Plot extends Component {
    */
   public selections(datasets = this.datasets()): SimpleSelection<any> {
     if (this.renderer() === "canvas") {
-      return null;
+      return d3.select(null);
     } else {
       const selections: d3.BaseType[] = [];
 
@@ -642,9 +684,8 @@ export class Plot extends Component {
         if (drawer == null) {
           return;
         }
-        drawer.renderArea().selectAll(drawer.selector()).each(function () {
-          selections.push(this);
-        });
+        const visualPrimitives = drawer.getVisualPrimitives();
+        selections.push(...visualPrimitives);
       });
 
       return d3.selectAll(selections);
@@ -694,7 +735,7 @@ export class Plot extends Component {
       datasetIndex: entity.datasetIndex,
       index: entity.index,
       component: entity.component,
-      selection: entity.drawer.selectionForIndex(entity.validDatumIndex),
+      selection: d3.select(entity.drawer.getVisualPrimitives()[entity.validDatumIndex]),
     };
     return plotEntity;
   }

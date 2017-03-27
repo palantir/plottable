@@ -8,14 +8,17 @@ import * as Typesetter from "typesettable";
 
 import * as Animators from "../animators";
 import { Dataset } from "../core/dataset";
-import { Formatter } from "../core/formatters";
 import * as Formatters from "../core/formatters";
+import { Formatter } from "../core/formatters";
 import { AttributeToProjector, IAccessor, Point, SimpleSelection } from "../core/interfaces";
-import * as Drawers from "../drawers";
 import * as Scales from "../scales";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
 
+import { ArcSVGDrawer } from "../drawers/arcDrawer";
+import { ArcOutlineSVGDrawer } from "../drawers/arcOutlineDrawer";
+import { ProxyDrawer } from "../drawers/drawer";
+import { warn } from "../utils/windowUtils";
 import { IAccessorScaleBinding, IPlotEntity } from "./";
 import { Plot } from "./plot";
 
@@ -34,7 +37,7 @@ export class Pie extends Plot {
   private _endAngles: number[];
   private _labelFormatter: Formatter = Formatters.identity();
   private _labelsEnabled = false;
-  private _strokeDrawers: Utils.Map<Dataset, Drawers.ArcOutline>;
+  private _strokeDrawers: Utils.Map<Dataset, ArcOutlineSVGDrawer>;
 
   /**
    * @constructor
@@ -49,12 +52,12 @@ export class Pie extends Plot {
     this.addClass("pie-plot");
     this.attr("fill", (d, i) => String(i), new Scales.Color());
 
-    this._strokeDrawers = new Utils.Map<Dataset, Drawers.ArcOutline>();
+    this._strokeDrawers = new Utils.Map<Dataset, ArcOutlineSVGDrawer>();
   }
 
   protected _setup() {
     super._setup();
-    this._strokeDrawers.forEach((d) => d.renderArea(this._renderArea.append("g")));
+    this._strokeDrawers.forEach((d) => d.attachTo(this._renderArea));
   }
 
   public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
@@ -85,9 +88,9 @@ export class Pie extends Plot {
       return this;
     }
     this._updatePieAngles();
-    const strokeDrawer = new Drawers.ArcOutline(dataset);
+    const strokeDrawer = new ArcOutlineSVGDrawer();
     if (this._isSetup) {
-      strokeDrawer.renderArea(this._renderArea.append("g"));
+      strokeDrawer.attachTo(this._renderArea);
     }
     this._strokeDrawers.set(dataset, strokeDrawer);
     super._addDataset(dataset);
@@ -118,9 +121,7 @@ export class Pie extends Plot {
       if (drawer == null) {
         return;
       }
-      drawer.renderArea().selectAll(drawer.selector()).each(function () {
-        allSelections.push(this);
-      });
+      allSelections.push(...drawer.getVisualPrimitives());
     });
     return d3.selectAll(allSelections);
   }
@@ -131,8 +132,10 @@ export class Pie extends Plot {
     this.render();
   }
 
-  protected _createDrawer(dataset: Dataset): Drawers.Arc {
-    return new Drawers.Arc(dataset);
+  protected _createDrawer() {
+    return new ProxyDrawer(() => new ArcSVGDrawer(), () => {
+      warn("canvas renderer is not supported on Pie Plot!");
+    });
   }
 
   public entities(datasets = this.datasets()): IPiePlotEntity[] {
@@ -140,7 +143,7 @@ export class Pie extends Plot {
     return entities.map((entity) => {
       entity.position.x += this.width() / 2;
       entity.position.y += this.height() / 2;
-      const stroke = this._strokeDrawers.get(entity.dataset).selectionForIndex(entity.index);
+      const stroke = d3.select(this._strokeDrawers.get(entity.dataset).getVisualPrimitiveAtIndex(entity.index));
       const piePlotEntity = entity as IPiePlotEntity;
       piePlotEntity.strokeSelection = stroke;
       return piePlotEntity;
@@ -545,7 +548,10 @@ export class Pie extends Plot {
 
     const drawSteps = this._generateStrokeDrawSteps();
     const dataToDraw = this._getDataToDraw();
-    this.datasets().forEach((dataset) => this._strokeDrawers.get(dataset).draw(dataToDraw.get(dataset), drawSteps));
+    this.datasets().forEach((dataset) => {
+      const appliedDrawSteps = Plot.applyDrawSteps(drawSteps, dataset);
+      this._strokeDrawers.get(dataset).draw(dataToDraw.get(dataset), appliedDrawSteps);
+    });
   }
 
   private _generateStrokeDrawSteps() {

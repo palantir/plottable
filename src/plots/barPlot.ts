@@ -8,16 +8,16 @@ import * as Typesetter from "typesettable";
 
 import * as Animators from "../animators";
 import { Dataset } from "../core/dataset";
-import { Formatter } from "../core/formatters";
 import * as Formatters from "../core/formatters";
+import { Formatter } from "../core/formatters";
 import { Bounds, IAccessor, Point, Range, SimpleSelection } from "../core/interfaces";
 import * as Drawers from "../drawers";
-import { Drawer } from "../drawers/drawer";
+import { ProxyDrawer } from "../drawers/drawer";
+import { RectangleCanvasDrawStep, RectangleSVGDrawer } from "../drawers/rectangleDrawer";
 import * as Scales from "../scales";
 import { QuantitativeScale } from "../scales/quantitativeScale";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
-
 import { makeEnum } from "../utils/makeEnum";
 import * as Plots from "./";
 import { IPlotEntity } from "./";
@@ -129,8 +129,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     return this;
   }
 
-  protected _createDrawer(dataset: Dataset): Drawers.Rectangle {
-    return new Drawers.Rectangle(dataset);
+  protected _createDrawer() {
+    return new ProxyDrawer(() => new RectangleSVGDrawer(Bar._BAR_AREA_CLASS), RectangleCanvasDrawStep);
   }
 
   protected _setup() {
@@ -259,11 +259,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     }
   }
 
-  protected _createNodesForDataset(dataset: Dataset): Drawer {
+  protected _createNodesForDataset(dataset: Dataset): ProxyDrawer {
     const drawer = super._createNodesForDataset(dataset);
-    if (drawer.renderArea() != null) {
-      drawer.renderArea().classed(Bar._BAR_AREA_CLASS, true);
-    }
     const labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
     const context = new Typesetter.SvgContext(labelArea.node() as SVGElement);
     const measurer = new Typesetter.CacheMeasurer(context);
@@ -313,7 +310,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       let secondaryDist = 0;
       const plotPt = this._pixelPoint(entity.datum, entity.index, entity.dataset);
       // if we're inside a bar, distance in both directions should stay 0
-      const barBBox = Utils.DOM.elementBBox(entity.drawer.selectionForIndex(entity.validDatumIndex));
+      const barBBox = Utils.DOM.elementBBox(d3.select(entity.drawer.getVisualPrimitiveAtIndex(entity.validDatumIndex)));
       if (!Utils.DOM.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
         const plotPtPrimary = this._isVertical ? plotPt.x : plotPt.y;
         primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
@@ -409,7 +406,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   private _entitiesIntersecting(xValOrRange: number | Range, yValOrRange: number | Range): IPlotEntity[] {
     const intersected: IPlotEntity[] = [];
     this._getEntityStore().forEach((entity) => {
-      const selection = entity.drawer.selectionForIndex(entity.validDatumIndex);
+      const selection = d3.select(entity.drawer.getVisualPrimitiveAtIndex(entity.validDatumIndex));
       if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, Utils.DOM.elementBBox(selection))) {
         intersected.push(this._lightweightPlotEntityToPlotEntity(entity));
       }
