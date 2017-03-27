@@ -7,8 +7,8 @@ import * as d3 from "d3";
 import * as Typesetter from "typesettable";
 
 import { Component } from "../components/component";
-import { Formatter } from "../core/formatters";
 import * as Formatters from "../core/formatters";
+import { Formatter } from "../core/formatters";
 import { Point, SimpleSelection, SpaceRequest } from "../core/interfaces";
 import { IScaleCallback, Scale } from "../scales/scale";
 import * as Utils from "../utils";
@@ -103,6 +103,27 @@ export class Axis<D> extends Component {
   public destroy() {
     super.destroy();
     this._scale.offUpdate(this._rescaleCallback);
+  }
+
+  /**
+   * Gets the tick label data on a element. Element in argument must be a descendent of a tick label element.
+   *
+   * @param {Element} element
+   */
+  public tickLabelDataOnElement(element: Element) {
+    if (element == null) { return undefined; }
+
+    let tickLabel: Element;
+    // go up DOM tree to find tick label element in ancestor elements
+    while ((element != null) && (element.classList) && (tickLabel === undefined)) {
+      if (element.classList.contains(Axis.TICK_LABEL_CLASS)) {
+        tickLabel = element;
+      } else {
+        element = element.parentNode as Element;
+      }
+    }
+
+    return element === undefined ? undefined : d3.select(element).datum();
   }
 
   protected _computeWidth() {

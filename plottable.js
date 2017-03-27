@@ -2877,6 +2877,27 @@ var Axis = (function (_super) {
         _super.prototype.destroy.call(this);
         this._scale.offUpdate(this._rescaleCallback);
     };
+    /**
+     * Gets the tick label data on a element. Element in argument must be a descendent of a tick label element.
+     *
+     * @param {Element} element
+     */
+    Axis.prototype.tickLabelDataOnElement = function (element) {
+        if (element == null) {
+            return undefined;
+        }
+        var tickLabel;
+        // go up DOM tree to find tick label element in ancestor elements
+        while ((element != null) && (element.classList) && (tickLabel === undefined)) {
+            if (element.classList.contains(Axis.TICK_LABEL_CLASS)) {
+                tickLabel = element;
+            }
+            else {
+                element = element.parentNode;
+            }
+        }
+        return element === undefined ? undefined : d3.select(element).datum();
+    };
     Axis.prototype._computeWidth = function () {
         // to be overridden by subclass logic
         return this._maxLabelTickLength();

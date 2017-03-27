@@ -655,4 +655,47 @@ describe("Axis", () => {
     axis.destroy();
     div.remove();
   });
+
+  describe("tickLabelDataOnElement", () => {
+    const domain = ["label1", "label2", "long long long long long long long long long long long long title"];
+
+    let div: d3.Selection<HTMLDivElement, void | {}, any, any>;
+    let scale: Plottable.Scales.Category;
+    let axis: Plottable.Axes.Category;
+
+    beforeEach(() => {
+      div = TestMethods.generateDiv();
+      scale = new Plottable.Scales.Category().domain(domain);
+      axis = new Plottable.Axes.Category(scale, "left");
+      const TICK_LABEL_MAX_WIDTH = 60;
+      axis.tickLabelMaxWidth(TICK_LABEL_MAX_WIDTH);
+      axis.renderTo(div);
+    });
+
+    afterEach(() => {
+      axis.destroy();
+      div.remove();
+    });
+
+    it("returns label datum when element has tick label class", () => {
+      const tickLabelElement = div.select(`.${Plottable.Axis.TICK_LABEL_CLASS}`).node() as Element;
+      assert.equal(axis.tickLabelDataOnElement(tickLabelElement), domain[0]);
+    });
+
+    it.skip("returns label datum when element in ancestor has tick label class", () => {
+      const labelTextLineElement = div.select(".text-line").node() as Element;
+      assert.equal(axis.tickLabelDataOnElement(labelTextLineElement), domain[0]);
+    });
+
+    it("returns undefined when no ancestor has tick label class", () => {
+      const contentElement = div.select(".content").node() as Element;
+      assert.isUndefined(axis.tickLabelDataOnElement(contentElement));
+    });
+
+    it("returns undefined when element is null / undefined", () => {
+      axis = new Plottable.Axes.Category(scale, "left");
+      assert.isUndefined(axis.tickLabelDataOnElement(undefined));
+      assert.isUndefined(axis.tickLabelDataOnElement(null));
+    });
+  });
 });
