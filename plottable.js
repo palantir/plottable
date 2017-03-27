@@ -2801,14 +2801,7 @@ function warn(warning) {
         return;
     }
     /* tslint:disable:no-console */
-    if (window.console != null) {
-        if (window.console.warn != null) {
-            console.warn(warning);
-        }
-        else if (window.console.log != null) {
-            console.log(warning);
-        }
-    }
+    console.warn(warning);
     /* tslint:enable:no-console */
 }
 exports.warn = warn;

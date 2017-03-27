@@ -342,9 +342,9 @@ describe("TimeAxis", () => {
           const tier = d3.select(this);
           let visibility = tier.style("visibility");
 
-          // HACKHACK window.getComputedStyle() is behaving weirdly in IE9. Further investigation required
+          // HACKHACK window.getComputedStyle().visibility returns "inherit" in IE instead of an actual value
           if (visibility === "inherit") {
-            visibility = getStyleInIE9(tier.node());
+            visibility = getInheritedVisibilityProperty(tier.node());
           }
           if (isInsideAxisBoundingRect(tier.node().getBoundingClientRect())) {
             assert.strictEqual(visibility, "visible", `tier ${i} inside axis should be visible`);
@@ -356,7 +356,7 @@ describe("TimeAxis", () => {
       div.remove();
       axis.destroy();
 
-      function getStyleInIE9(element: Element) {
+      function getInheritedVisibilityProperty(element: Element) {
         while (element) {
           const visibility = window.getComputedStyle(element).visibility;
           if (visibility !== "inherit") {
