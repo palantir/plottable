@@ -10,12 +10,12 @@ import * as Animators from "../animators";
 import { Dataset } from "../core/dataset";
 import { AttributeToProjector, Bounds, IAccessor, Point, Projector, Range } from "../core/interfaces";
 import * as Drawers from "../drawers";
-import { Drawer } from "../drawers/drawer";
+import { ProxyDrawer } from "../drawers/drawer";
+import { LineSVGDrawer, makeLineCanvasDrawStep } from "../drawers/lineDrawer";
 import * as Scales from "../scales";
 import { QuantitativeScale } from "../scales/quantitativeScale";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
-
 import { makeEnum } from "../utils/makeEnum";
 import * as Plots from "./";
 import { IPlotEntity } from "./";
@@ -226,8 +226,8 @@ export class Line<X> extends XYPlot<X, number> {
     return this;
   }
 
-  protected _createDrawer(dataset: Dataset): Drawer {
-    return new Drawers.Line(dataset, () => this._d3LineFactory(dataset));
+  protected _createDrawer(dataset: Dataset) {
+    return new ProxyDrawer(() => new LineSVGDrawer(), makeLineCanvasDrawStep(() => this._d3LineFactory(dataset)));
   }
 
   protected _extentsForProperty(property: string) {

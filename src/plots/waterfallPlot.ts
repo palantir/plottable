@@ -5,7 +5,7 @@
 
 import { Dataset } from "../core/dataset";
 import { IAccessor, SimpleSelection } from "../core/interfaces";
-import { Drawer } from "../drawers/drawer";
+import { ProxyDrawer } from "../drawers/drawer";
 import * as Utils from "../utils";
 
 import * as Plots from "./";
@@ -76,7 +76,7 @@ export class Waterfall<X, Y> extends Bar<X, number> {
     }
   }
 
-  protected _createNodesForDataset(dataset: Dataset): Drawer {
+  protected _createNodesForDataset(dataset: Dataset): ProxyDrawer {
     const drawer = super._createNodesForDataset(dataset);
     this._connectorArea = this._renderArea.append("g").classed(Waterfall._CONNECTOR_AREA_CLASS, true);
     return drawer;
