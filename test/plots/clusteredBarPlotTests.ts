@@ -1,12 +1,11 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
 
 import * as Plottable from "../../src";
+import { BarOrientation } from "../../src/plots/barPlot";
 
 import * as TestMethods from "../testMethods";
-import { BarOrientation } from "../../src/plots/barPlot";
 
 describe("Plots", () => {
   [BarOrientation.vertical, BarOrientation.horizontal].forEach((orientation: string) => {
@@ -97,7 +96,6 @@ describe("Plots", () => {
           {category: "B", num: 15},
           {category: "C", num: 15},
         ]));
-
 
         const barAreas = clusterBarPlot.content().selectAll<Element, any>(".bar-area");
         assert.strictEqual(barAreas.selectAll("rect").size(), 7, "Number of bars should be equivalent to number of datum");

@@ -1,4 +1,3 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -492,7 +491,7 @@ describe("InterpolatedColorLegend", () => {
     });
 
     it("does not create title elements if configuration is set to false", () => {
-      var originalSetting = Plottable.Configs.ADD_TITLE_ELEMENTS;
+      const originalSetting = Plottable.Configs.ADD_TITLE_ELEMENTS;
       Plottable.Configs.ADD_TITLE_ELEMENTS = false;
       legend.renderTo(div);
       Plottable.Configs.ADD_TITLE_ELEMENTS = originalSetting;

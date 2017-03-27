@@ -1,5 +1,3 @@
-import * as d3 from "d3";
-
 import { assert } from "chai";
 
 import * as Plottable from "../../src";
@@ -30,23 +28,23 @@ describe("Scales", () => {
         scale.range([0, 3000]);
 
         scale.domain(["1", "2", "3", "4"]);
-        let widthSum = scale.rangeBand() * (1 + scale.innerPadding());
+        const widthSum = scale.rangeBand() * (1 + scale.innerPadding());
         assert.closeTo(scale.stepWidth(), widthSum, 1e-5, "step width is the sum of innerPadding width and band width");
       });
 
       it("interacts well with BarPlot and data swapping", () => {
         // This unit test taken from SLATE, see SLATE-163 a fix for SLATE-102
-        let xScale = new Plottable.Scales.Category();
-        let yScale = new Plottable.Scales.Linear();
-        let dA = {x: "A", y: 2};
-        let dB = {x: "B", y: 2};
-        let dC = {x: "C", y: 2};
-        let dataset = new Plottable.Dataset([dA, dB]);
-        let barPlot = new Plottable.Plots.Bar();
+        const xScale = new Plottable.Scales.Category();
+        const yScale = new Plottable.Scales.Linear();
+        const dA = {x: "A", y: 2};
+        const dB = {x: "B", y: 2};
+        const dC = {x: "C", y: 2};
+        const dataset = new Plottable.Dataset([dA, dB]);
+        const barPlot = new Plottable.Plots.Bar();
         barPlot.addDataset(dataset);
         barPlot.x((d: any) => d.x, xScale);
         barPlot.y((d: any) => d.y, yScale);
-        let div = TestMethods.generateDiv();
+        const div = TestMethods.generateDiv();
         assert.deepEqual(xScale.domain(), [], "before anchoring, the bar plot doesn't proxy data to the scale");
         barPlot.renderTo(div);
         assert.deepEqual(xScale.domain(), ["A", "B"], "after anchoring, the bar plot's data is on the scale");
@@ -77,15 +75,15 @@ describe("Scales", () => {
       });
 
       it("gives the unique values when domain is stringy", () => {
-        let values = ["1", "3", "2", "1"];
-        let computedExtent = scale.extentOfValues(values);
+        const values = ["1", "3", "2", "1"];
+        const computedExtent = scale.extentOfValues(values);
 
         assert.deepEqual(computedExtent, ["1", "3", "2"], "the extent is made of all the unique values in the domain");
       });
 
       it("gives the unique values even when domain is numeric", () => {
-        let values = [1, 3, 2, 1];
-        let computedExtent = scale.extentOfValues(<any>values);
+        const values = [1, 3, 2, 1];
+        const computedExtent = scale.extentOfValues(<any>values);
 
         assert.deepEqual(computedExtent, [1, 3, 2], "the extent is made of all the unique values in the domain");
       });

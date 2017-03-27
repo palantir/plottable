@@ -34,7 +34,7 @@ describe("Dispatchers", () => {
       let callbackCalled = false;
       (<any> dispatcher)._eventToProcessingFunction[TEST_EVENT_NAME] = () => callbackCalled = true;
 
-      let d3document = d3.select(document);
+      const d3document = d3.select(document);
       (<any> dispatcher)._connect();
       TestMethods.triggerFakeUIEvent(TEST_EVENT_NAME, d3document);
       assert.isTrue(callbackCalled, "connected correctly (callback was called)");

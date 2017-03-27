@@ -1,4 +1,3 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -10,8 +9,8 @@ import * as Mocks from "../mocks";
 import * as TestMethods from "../testMethods";
 
 describe("Component", () => {
-  let DIV_WIDTH = 400;
-  let DIV_HEIGHT = 300;
+  const DIV_WIDTH = 400;
+  const DIV_HEIGHT = 300;
 
   describe("anchoring", () => {
 
@@ -37,8 +36,8 @@ describe("Component", () => {
       assert.isFalse(c.background().empty(), "background exists in the DOM");
       assert.isFalse(c.content().empty(), "content exists in the DOM");
 
-      let componentElement = div.select(".component");
-      let containerNodes = componentElement.selectAll<Element, any>("svg").nodes();
+      const componentElement = div.select(".component");
+      const containerNodes = componentElement.selectAll<Element, any>("svg").nodes();
       assert.strictEqual(containerNodes[0], c.background().node(), "background at the back");
       assert.strictEqual(containerNodes[1], c.content().node(), "content at the middle");
       assert.strictEqual(containerNodes[2], c.foreground().node(), "foreground at the front");
@@ -49,7 +48,7 @@ describe("Component", () => {
     it("sets the foreground-container pointer-events to none", () => {
       c.anchor(div);
       const foreground = c.foreground().node();
-      let pointerEventForeground = window.getComputedStyle(<Element>foreground).pointerEvents;
+      const pointerEventForeground = window.getComputedStyle(<Element>foreground).pointerEvents;
       assert.strictEqual(pointerEventForeground, "none", "foreground-container's pointer-event is set to none");
       c.destroy();
       div.remove();
@@ -64,7 +63,7 @@ describe("Component", () => {
 
     it("allows mouse events to operate if the component is visible", () => {
       c.anchor(div);
-      let computedStyle = window.getComputedStyle(<Element>div.node());
+      const computedStyle = window.getComputedStyle(<Element>div.node());
       assert.strictEqual(computedStyle.pointerEvents.toLowerCase(), "visiblefill",
         "\"pointer-events\" style set to \"visiblefill\"");
       c.destroy();
@@ -74,7 +73,7 @@ describe("Component", () => {
     it("can switch which element it is anchored to", () => {
       c.anchor(div);
 
-      let div2 = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
+      const div2 = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
       c.anchor(div2);
       assert.notStrictEqual(<SVGElement> c.rootElement().node(),
         div.node(), "component DOM elements are not children of div element");
@@ -87,7 +86,7 @@ describe("Component", () => {
 
     it("removes DOM elements in previous div when anchoring to a different div", () => {
       c.anchor(div);
-      let div2 = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
+      const div2 = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
       c.anchor(div2);
       assert.isTrue(div.select("svg").empty(), "previous div element should not have any group child nodes");
       assert.isFalse(div2.select("svg").empty(), "new div element should have group child nodes");
@@ -99,7 +98,7 @@ describe("Component", () => {
     it("can undergo set behavior upon anchoring", () => {
       let callbackCalled = false;
       let passedComponent: Plottable.Component;
-      let callback = (component: Plottable.Component) => {
+      const callback = (component: Plottable.Component) => {
         callbackCalled = true;
         passedComponent = component;
       };
@@ -115,7 +114,7 @@ describe("Component", () => {
     it("undergoes on-anchor behavior if already anchored", () => {
       let callbackCalled = false;
       let passedComponent: Plottable.Component;
-      let callback = (component: Plottable.Component) => {
+      const callback = (component: Plottable.Component) => {
         callbackCalled = true;
         passedComponent = component;
       };
@@ -130,14 +129,14 @@ describe("Component", () => {
     it("calls callbacks upon anchoring to different div", () => {
       let callbackCalled = false;
       let passedComponent: Plottable.Component;
-      let callback = (component: Plottable.Component) => {
+      const callback = (component: Plottable.Component) => {
         callbackCalled = true;
         passedComponent = component;
       };
       c.onAnchor(callback);
       c.anchor(div);
 
-      let div2 = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
+      const div2 = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
       callbackCalled = false;
       c.anchor(div2);
       assert.isTrue(callbackCalled, "callback was called on anchoring to a new <div>");
@@ -150,7 +149,7 @@ describe("Component", () => {
 
     it("can remove set behavior the component would have underwent upon anchoring", () => {
       let callbackCalled = false;
-      let callback = (component: Plottable.Component) => {
+      const callback = (component: Plottable.Component) => {
         callbackCalled = true;
       };
       c.onAnchor(callback);
@@ -165,7 +164,7 @@ describe("Component", () => {
     it("overflow: visible by default", () => {
       c.anchor(div);
       const styles = window.getComputedStyle(<Element> c.content().node());
-      assert.strictEqual(styles.getPropertyValue("overflow"), "visible", "content has overflow: visible")
+      assert.strictEqual(styles.getPropertyValue("overflow"), "visible", "content has overflow: visible");
 
       c.destroy();
       div.remove();
@@ -209,7 +208,7 @@ describe("Component", () => {
     });
 
     it("sets its parent to null when detaching", () => {
-      let parent = new Plottable.Components.Group([c]);
+      const parent = new Plottable.Components.Group([c]);
       c.detach();
       assert.isNull(c.parent(), "parent removed upon detaching");
       parent.destroy();
@@ -222,7 +221,7 @@ describe("Component", () => {
 
       let callbackCalled = false;
       let passedComponent: Plottable.Component;
-      let callback = (component: Plottable.Component) => {
+      const callback = (component: Plottable.Component) => {
         callbackCalled = true;
         passedComponent = component;
       };
@@ -237,7 +236,7 @@ describe("Component", () => {
     it("calls callbacks upon detaching even if not anchored", () => {
       let callbackCalled = false;
       let passedComponent: Plottable.Component;
-      let callback = (component: Plottable.Component) => {
+      const callback = (component: Plottable.Component) => {
         callbackCalled = true;
         passedComponent = component;
       };
@@ -252,7 +251,7 @@ describe("Component", () => {
 
     it("can remove callbacks that would have been called upon detaching", () => {
       let callbackCalled = false;
-      let callback = (component: Plottable.Component) => {
+      const callback = (component: Plottable.Component) => {
         callbackCalled = true;
       };
       c.onDetach(callback);
@@ -276,7 +275,7 @@ describe("Component", () => {
     });
 
     it("can set its parent to a container that contains this component", () => {
-      let acceptingContainer: any = {
+      const acceptingContainer: any = {
         has: () => true,
       };
       assert.strictEqual(c.parent(acceptingContainer), c, "setter returns calling object");
@@ -286,7 +285,7 @@ describe("Component", () => {
     });
 
     it("throws an error when the input parent does not contain this component", () => {
-      let rejectingContainer: any = {
+      const rejectingContainer: any = {
         has: (component: Plottable.Component) => false,
       };
       // HACKHACK: https://github.com/palantir/plottable/issues/2661 Cannot assert errors being thrown with description
@@ -308,7 +307,7 @@ describe("Component", () => {
     });
 
     it("can add css classes", () => {
-      let className = "foo";
+      const className = "foo";
       assert.strictEqual(c.addClass(className), c, "setter returns calling object");
       assert.isTrue(c.hasClass(className), "component has added css class");
 
@@ -321,7 +320,7 @@ describe("Component", () => {
     });
 
     it("can remove css classes", () => {
-      let className = "foo";
+      const className = "foo";
       c.addClass(className);
       assert.isTrue(c.hasClass(className), "component has added css class");
       c.renderTo(div);
@@ -354,7 +353,7 @@ describe("Component", () => {
       c.computeLayout();
       assert.strictEqual(c.width() , DIV_WIDTH, "takes all available width");
       assert.strictEqual(c.height(), DIV_HEIGHT, "takes all available height");
-      let origin = c.origin();
+      const origin = c.origin();
       assert.strictEqual(origin.x, 0 , "x origin defaults to leftmost");
       assert.strictEqual(origin.y, 0 , "y origin defaults to topmost");
 
@@ -364,8 +363,8 @@ describe("Component", () => {
 
     it("does not allow the origin object to be modified", () => {
       c.renderTo(div);
-      let receivedOrigin = c.origin();
-      let delta = 10;
+      const receivedOrigin = c.origin();
+      const delta = 10;
       receivedOrigin.x += delta;
       receivedOrigin.y += delta;
       assert.notDeepEqual(c.origin(), receivedOrigin, "underlying origin object cannot be modified");
@@ -389,10 +388,10 @@ describe("Component", () => {
     });
 
     it("can compute the layout based on CSS", () => {
-      let parentWidth = 400;
-      let parentHeight = 200;
+      const parentWidth = 400;
+      const parentHeight = 200;
       // Manually size parent
-      let parent = d3.select(<Element> div.node().parentNode);
+      const parent = d3.select(<Element> div.node().parentNode);
       parent.style("width", `${parentWidth}px`);
       parent.style("height", `${parentHeight}px`);
 
@@ -406,8 +405,8 @@ describe("Component", () => {
       assert.strictEqual(origin.x, 0, "xOrigin defaulted to 0");
       assert.strictEqual(origin.y, 0, "yOrigin defaulted to 0");
 
-      let divWidthPercentage = 50;
-      let divHeightPercentage = 50;
+      const divWidthPercentage = 50;
+      const divHeightPercentage = 50;
       div.style("width", `${divWidthPercentage}%`).style("height", `${divHeightPercentage}%`);
       c.computeLayout();
 
@@ -431,12 +430,12 @@ describe("Component", () => {
     });
 
     it("computes the layout of the component based on input", () => {
-      let origin = {
+      const origin = {
         x: 10,
         y: 20,
       };
-      let width = 100;
-      let height = 200;
+      const width = 100;
+      const height = 200;
       c.anchor(div);
       c.computeLayout(origin, width, height);
 
@@ -445,8 +444,8 @@ describe("Component", () => {
       assert.strictEqual(c.width() , width, "width set");
       assert.strictEqual(c.height(), height, "height set");
 
-      let componentElement = c.element();
-      let translate = [parseFloat(componentElement.style("left")), parseFloat(componentElement.style("top"))];
+      const componentElement = c.element();
+      const translate = [parseFloat(componentElement.style("left")), parseFloat(componentElement.style("top"))];
       assert.deepEqual(translate, [origin.x, origin.y], "the element translated appropriately");
       c.destroy();
       div.remove();
@@ -456,22 +455,22 @@ describe("Component", () => {
       c.renderTo(div);
       c.computeLayout({x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4}, DIV_WIDTH / 4, DIV_HEIGHT / 4);
       c.redraw();
-      let origin = c.origin();
+      const origin = c.origin();
       assert.deepEqual(origin, {x: 0, y: 0}, "origin reset");
-      let componentElement = div.select(".component");
-      let translate = [parseFloat(componentElement.style("left")), parseFloat(componentElement.style("top"))];
+      const componentElement = div.select(".component");
+      const translate = [parseFloat(componentElement.style("left")), parseFloat(componentElement.style("top"))];
       assert.deepEqual(translate, [origin.x, origin.y], "DOM element rendered at new origin");
       c.destroy();
       div.remove();
     });
 
     it("calls onResize callback if callback is registered", (done) => {
-      let origin = {
+      const origin = {
         x: 10,
         y: 20,
       };
-      let width = 100;
-      let height = 200;
+      const width = 100;
+      const height = 200;
       c.anchor(div);
 
       c.onResize((size: { height: number, width: number }) => {
@@ -489,8 +488,8 @@ describe("Component", () => {
 
     let c: Plottable.Component;
     let div: d3.Selection<HTMLDivElement, any, any, any>;
-    let fixedWidth = 100;
-    let fixedHeight = 100;
+    const fixedWidth = 100;
+    const fixedHeight = 100;
 
     beforeEach(() => {
       c = new Mocks.FixedSizeComponent(fixedWidth, fixedHeight);
@@ -507,8 +506,8 @@ describe("Component", () => {
     });
 
     it("gives the component the offered space if it is less than the fixed space", () => {
-      let restrictedWidth = fixedWidth / 2;
-      let restrictedHeight = fixedHeight / 2;
+      const restrictedWidth = fixedWidth / 2;
+      const restrictedHeight = fixedHeight / 2;
       c.computeLayout({x: 0, y: 0}, restrictedWidth, restrictedHeight);
       assert.strictEqual(c.width(), restrictedWidth, "width bounded to restricted width");
       assert.strictEqual(c.height(), restrictedHeight, "height bounded to restricted height");
@@ -517,15 +516,15 @@ describe("Component", () => {
     });
 
     it("does not translate if more space was requested than offered", () => {
-      let requestedWidth = DIV_WIDTH * 2;
-      let requestedHeight = DIV_HEIGHT * 2;
+      const requestedWidth = DIV_WIDTH * 2;
+      const requestedHeight = DIV_HEIGHT * 2;
       c.destroy();
       c = new Mocks.FixedSizeComponent(requestedWidth, requestedHeight);
-      let t = new Plottable.Components.Table([[c]]);
+      const t = new Plottable.Components.Table([[c]]);
       t.renderTo(div);
 
-      let componentElement = div.select(".component");
-      let translate = [parseFloat(componentElement.style("left")), parseFloat(componentElement.style("top"))];
+      const componentElement = div.select(".component");
+      const translate = [parseFloat(componentElement.style("left")), parseFloat(componentElement.style("top"))];
       assert.deepEqual(translate, [0, 0], "the element was not translated");
       div.remove();
     });
@@ -561,7 +560,7 @@ describe("Component", () => {
     });
 
     it("throws errors on bad alignments", () => {
-      let invalidAlignment = "foo" as any;
+      const invalidAlignment = "foo" as any;
       // HACKHACK: https://github.com/palantir/plottable/issues/2661 Cannot assert errors being thrown with description
       (<any> assert).throws(() => c.xAlignment(invalidAlignment), Error,
         "Unsupported alignment", "cannot set an invalid x alignment");
@@ -576,8 +575,8 @@ describe("Component", () => {
 
     let c: Plottable.Component;
     let div: d3.Selection<HTMLDivElement, any, any, any>;
-    let fixedWidth = 100;
-    let fixedHeight = 100;
+    const fixedWidth = 100;
+    const fixedHeight = 100;
 
     beforeEach(() => {
       c = new Mocks.FixedSizeComponent(fixedWidth, fixedHeight);
@@ -619,9 +618,9 @@ describe("Component", () => {
     });
 
     it("does not request any space when offered a width and a height", () => {
-      let offeredWidth = 1;
-      let offeredHeight = 1;
-      let layout = c.requestedSpace(offeredWidth, offeredHeight);
+      const offeredWidth = 1;
+      const offeredHeight = 1;
+      const layout = c.requestedSpace(offeredWidth, offeredHeight);
       assert.strictEqual(layout.minWidth, 0, "requested minWidth defaults to 0");
       assert.strictEqual(layout.minHeight, 0, "requested minHeight defaults to 0");
       div.remove();
@@ -694,7 +693,7 @@ describe("Component", () => {
       c.render();
       assert.isFalse(renderFlag, "no render until width/height set to nonzero");
 
-      let offeredWidth = 10;
+      const offeredWidth = 10;
       let offeredHeight = 0;
       c.computeLayout({x: 0, y: 0}, offeredWidth, offeredHeight);
       c.render();
@@ -778,7 +777,7 @@ describe("Component", () => {
     });
 
     it("renders to a node chosen through a selector string", () => {
-      let divId = "foo";
+      const divId = "foo";
       div.attr("id", divId);
       c.renderTo(`#${divId}`);
       assert.isTrue(div.classed("plottable"), "correct div chosen");
@@ -805,8 +804,8 @@ describe("Component", () => {
     });
 
     it("detaches the component if rendering to a new div", () => {
-      let divHeight2 = 50;
-      let div2 = TestMethods.generateDiv(DIV_WIDTH, divHeight2);
+      const divHeight2 = 50;
+      const div2 = TestMethods.generateDiv(DIV_WIDTH, divHeight2);
 
       c.renderTo(div);
       assert.isTrue((<Node> div.node()).hasChildNodes(), "anchored onto div");
@@ -841,12 +840,12 @@ describe("Component", () => {
     });
 
     it("is offset by the parent's origin", () => {
-      let parent = new Plottable.Components.Group([c]);
+      const parent = new Plottable.Components.Group([c]);
       parent.anchor(div);
       c.anchor(div);
       parent.computeLayout({x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4}, DIV_WIDTH / 2, DIV_HEIGHT / 2);
       c.computeLayout({x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4}, DIV_WIDTH / 4, DIV_HEIGHT / 4);
-      let originToRoot = {
+      const originToRoot = {
         x: parent.origin().x + c.origin().x,
         y: parent.origin().y + c.origin().y,
       };
@@ -871,7 +870,7 @@ describe("Component", () => {
     it("calculates the bounds relative to the origin", () => {
       assert.deepEqual(c.bounds(), {
         topLeft: c.origin(),
-        bottomRight: { x: DIV_WIDTH, y: DIV_HEIGHT }
+        bottomRight: { x: DIV_WIDTH, y: DIV_HEIGHT },
       });
       c.destroy();
       div.remove();

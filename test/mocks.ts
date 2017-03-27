@@ -1,5 +1,5 @@
+
 import { SimpleSelection } from "../src/core/interfaces";
-import * as d3 from "d3";
 
 import * as Plottable from "../src";
 
@@ -29,7 +29,7 @@ export class FixedSizeComponent extends Plottable.Component {
   }
 }
 
-export class NoOpAnimator implements Plottable.Animator {
+export class NoOpAnimator implements Plottable.IAnimator {
   /*
    * A do-nothing Animator.
    * Useful for testing the reset states of Plots by blanking the MAIN Animator.
