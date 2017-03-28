@@ -5,26 +5,29 @@ import * as Plottable from "../../src";
 import { makeSymbolCanvasDrawStep } from "../../src/drawers/symbolDrawer";
 
 describe("SymbolCanvasDrawStep", () => {
-  const data = [{ x: 0, y: 0 }, { x: 2, y: 1 }, { x: 3, y: 2 }];
+  const data = [{ x: -20, y: 0 }, { x: 2, y: -30 }, { x: -50, y: 2 }];
   const dataset = new Plottable.Dataset(data);
 
-  const symbolProjectorSpy: sinon.SinonSpy = sinon.spy();
-  const sizeProjectorSpy: sinon.SinonSpy = sinon.spy();
+  const symbolProjector = () => () => Plottable.SymbolFactories.circle();
+  const sizeProjector = () => () => 10;
 
-  const symbolCanvasDrawStep = makeSymbolCanvasDrawStep(
-    dataset,
-    symbolProjectorSpy,
-    sizeProjectorSpy,
-  );
+  const symbolProjectorSpy = sinon.spy(symbolProjector);
+  const sizeProjectorSpy = sinon.spy(sizeProjector);
+  const symbolCanvasDrawStep = makeSymbolCanvasDrawStep(dataset, symbolProjectorSpy, sizeProjectorSpy);
 
-  it("uses the line factory during canvas drawing", () => {
+  it("checks whether each symbol is in view before drawing", () => {
     const canvas = document.createElement("canvas");
+    canvas.width = 10;
+    canvas.height = 10;
     const context = canvas.getContext("2d");
-    symbolCanvasDrawStep(context, data, {});
+    symbolCanvasDrawStep(context, data, {
+      x: (data) => data.x,
+      y: (data) => data.y,
+    });
 
     // we check the size of each symbol
     assert.isTrue(sizeProjectorSpy.called, "called size projector");
-    assert.equal(sizeProjectorSpy.callCount, 3, "called size projector 3 times");
+    assert.equal(sizeProjectorSpy.callCount, data.length, "called size projector n times");
     // all the symbols are culled because they are not within the canvas
     // bounds, so symbolProjector should never get called
     assert.isFalse(symbolProjectorSpy.called, "called symbol projector");
