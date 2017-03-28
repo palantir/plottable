@@ -3,6 +3,7 @@ build/
 test/tests.js
 test/tests.js.map
 plottable.js
+plottable.min.js
 
 # Typescript
 .baseDir.ts
