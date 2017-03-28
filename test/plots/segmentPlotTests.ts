@@ -1,4 +1,3 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -178,7 +177,7 @@ describe("Plots", () => {
       it("retrieves the entities that intersect with given ranges", () => {
         const entities = plot.entitiesIn(
           { min: xScale.scale(2.5), max: xScale.scale(4.5) },
-          { min: yScale.scale(4.5), max: yScale.scale(2.5) }
+          { min: yScale.scale(4.5), max: yScale.scale(2.5) },
         );
         assert.lengthOf(entities, 2, "retrieved 2 entities intersect with the ranges");
         assert.strictEqual(entities[0].index, 1, "the entity of index 1 is retrieved");
@@ -238,7 +237,7 @@ describe("Plots", () => {
       it("returns empty array when no entities intersect with the ranges", () => {
         const entities = plot.entitiesIn(
           { min: xScale.scale(1.5), max: xScale.scale(2.5) },
-          { min: yScale.scale(2.5), max: yScale.scale(1.5) }
+          { min: yScale.scale(2.5), max: yScale.scale(1.5) },
         );
         assert.lengthOf(entities, 0, "no entities intersects with the ranges");
         div.remove();
@@ -247,7 +246,7 @@ describe("Plots", () => {
       it("retrieves undefined from entityNearest when no entities are rendered", () => {
         plot.datasets([new Plottable.Dataset([])]);
         plot.renderTo(div);
-        let closest = plot.entityNearest({
+        const closest = plot.entityNearest({
           x: plot.width() / 2,
           y: plot.height() / 2,
         });
@@ -258,7 +257,7 @@ describe("Plots", () => {
       function checkEntitiesInRange(index: number, x1: number, x2: number, y1: number, y2: number) {
         const entities = plot.entitiesIn(
           { min: xScale.scale(x1), max: xScale.scale(x2) },
-          { min: yScale.scale(y1), max: yScale.scale(y2) }
+          { min: yScale.scale(y1), max: yScale.scale(y2) },
         );
         assert.lengthOf(entities, 1, "retrieved 1 entity that intersects with the box");
         assert.strictEqual(entities[0].index, index, `the entity of index ${index} is retrieved`);

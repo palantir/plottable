@@ -9,7 +9,7 @@ import * as d3Ease from "d3-ease";
 import { AttributeToAppliedProjector, SimpleSelection } from "../core/interfaces";
 import { coerceExternalD3 } from "../utils/coerceD3";
 import { makeEnum } from "../utils/makeEnum";
-import { Animator } from "./animator";
+import { IAnimator } from "./animator";
 
 export type EaseFn = (normalizedTime: number) => number;
 
@@ -101,7 +101,7 @@ export type EaseName = keyof typeof EaseName;
 /**
  * An Animator with easing and configurable durations and delays.
  */
-export class Easing implements Animator {
+export class Easing implements IAnimator {
   /**
    * The default starting delay of the animation in milliseconds
    */

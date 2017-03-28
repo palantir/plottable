@@ -10,7 +10,7 @@ import { Formatter } from "../core/formatters";
 import * as Formatters from "../core/formatters";
 import { Point, SimpleSelection, SpaceRequest } from "../core/interfaces";
 import * as Scales from "../scales";
-import { ScaleCallback } from "../scales/scale";
+import { IScaleCallback } from "../scales/scale";
 import * as Utils from "../utils";
 
 import { Component } from "./component";
@@ -31,7 +31,7 @@ export class InterpolatedColorLegend extends Component {
   private _swatchBoundingBox: SimpleSelection<void>;
   private _lowerLabel: SimpleSelection<void>;
   private _upperLabel: SimpleSelection<void>;
-  private _redrawCallback: ScaleCallback<Scales.InterpolatedColor>;
+  private _redrawCallback: IScaleCallback<Scales.InterpolatedColor>;
 
   /**
    * The css class applied to the legend labels.

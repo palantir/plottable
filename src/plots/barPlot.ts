@@ -8,20 +8,20 @@ import * as Typesetter from "typesettable";
 
 import * as Animators from "../animators";
 import { Dataset } from "../core/dataset";
-import { Formatter } from "../core/formatters";
 import * as Formatters from "../core/formatters";
-import { Accessor, Bounds, Point, Range, SimpleSelection } from "../core/interfaces";
+import { Formatter } from "../core/formatters";
+import { Bounds, IAccessor, Point, Range, SimpleSelection } from "../core/interfaces";
 import * as Drawers from "../drawers";
-import { Drawer } from "../drawers/drawer";
+import { ProxyDrawer } from "../drawers/drawer";
+import { RectangleCanvasDrawStep, RectangleSVGDrawer } from "../drawers/rectangleDrawer";
 import * as Scales from "../scales";
 import { QuantitativeScale } from "../scales/quantitativeScale";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
-
 import { makeEnum } from "../utils/makeEnum";
 import * as Plots from "./";
-import { PlotEntity } from "./";
-import { LightweightPlotEntity } from "./commons";
+import { IPlotEntity } from "./";
+import { ILightweightPlotEntity } from "./commons";
 import { Plot } from "./plot";
 import { XYPlot } from "./xyPlot";
 
@@ -75,18 +75,18 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     this._updateBarPixelWidthCallback = () => this._updateBarPixelWidth();
   }
 
-  public x(): Plots.TransformableAccessorScaleBinding<X, number>;
-  public x(x: number | Accessor<number>): this;
-  public x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
-  public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
+  public x(): Plots.ITransformableAccessorScaleBinding<X, number>;
+  public x(x: number | IAccessor<number>): this;
+  public x(x: X | IAccessor<X>, xScale: Scale<X, number>): this;
+  public x(x?: number | IAccessor<number> | X | IAccessor<X>, xScale?: Scale<X, number>): any {
     if (x == null) {
       return super.x();
     }
 
     if (xScale == null) {
-      super.x(<number | Accessor<number>>x);
+      super.x(<number | IAccessor<number>>x);
     } else {
-      super.x(< X | Accessor<X>>x, xScale);
+      super.x(< X | IAccessor<X>>x, xScale);
       xScale.onUpdate(this._updateBarPixelWidthCallback);
     }
 
@@ -94,18 +94,18 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     return this;
   }
 
-  public y(): Plots.TransformableAccessorScaleBinding<Y, number>;
-  public y(y: number | Accessor<number>): this;
-  public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
-  public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
+  public y(): Plots.ITransformableAccessorScaleBinding<Y, number>;
+  public y(y: number | IAccessor<number>): this;
+  public y(y: Y | IAccessor<Y>, yScale: Scale<Y, number>): this;
+  public y(y?: number | IAccessor<number> | Y | IAccessor<Y>, yScale?: Scale<Y, number>): any {
     if (y == null) {
       return super.y();
     }
 
     if (yScale == null) {
-      super.y(<number | Accessor<number>>y);
+      super.y(<number | IAccessor<number>>y);
     } else {
-      super.y(<Y | Accessor<Y>>y, yScale);
+      super.y(<Y | IAccessor<Y>>y, yScale);
       yScale.onUpdate(this._updateBarPixelWidthCallback);
     }
 
@@ -129,8 +129,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     return this;
   }
 
-  protected _createDrawer(dataset: Dataset): Drawers.Rectangle {
-    return new Drawers.Rectangle(dataset);
+  protected _createDrawer() {
+    return new ProxyDrawer(() => new RectangleSVGDrawer(Bar._BAR_AREA_CLASS), RectangleCanvasDrawStep);
   }
 
   protected _setup() {
@@ -259,11 +259,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     }
   }
 
-  protected _createNodesForDataset(dataset: Dataset): Drawer {
+  protected _createNodesForDataset(dataset: Dataset): ProxyDrawer {
     const drawer = super._createNodesForDataset(dataset);
-    if (drawer.renderArea() != null) {
-      drawer.renderArea().classed(Bar._BAR_AREA_CLASS, true);
-    }
     const labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
     const context = new Typesetter.SvgContext(labelArea.node() as SVGElement);
     const measurer = new Typesetter.CacheMeasurer(context);
@@ -291,7 +288,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
    * @param {Point} queryPoint
    * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
    */
-  public entityNearest(queryPoint: Point): PlotEntity {
+  public entityNearest(queryPoint: Point): IPlotEntity {
     let minPrimaryDist = Infinity;
     let minSecondaryDist = Infinity;
 
@@ -304,8 +301,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     const tolerance = 0.5;
 
     const chartBounds = this.bounds();
-    let closest: LightweightPlotEntity;
-    this._getEntityStore().forEach((entity: LightweightPlotEntity) => {
+    let closest: ILightweightPlotEntity;
+    this._getEntityStore().forEach((entity: ILightweightPlotEntity) => {
       if (!this._entityVisibleOnPlot(entity, chartBounds)) {
         return;
       }
@@ -313,7 +310,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       let secondaryDist = 0;
       const plotPt = this._pixelPoint(entity.datum, entity.index, entity.dataset);
       // if we're inside a bar, distance in both directions should stay 0
-      const barBBox = Utils.DOM.elementBBox(entity.drawer.selectionForIndex(entity.validDatumIndex));
+      const barBBox = Utils.DOM.elementBBox(d3.select(entity.drawer.getVisualPrimitiveAtIndex(entity.validDatumIndex)));
       if (!Utils.DOM.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
         const plotPtPrimary = this._isVertical ? plotPt.x : plotPt.y;
         primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
@@ -346,7 +343,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     }
   }
 
-  protected _entityVisibleOnPlot(entity: Plots.PlotEntity | Plots.LightweightPlotEntity, bounds: Bounds) {
+  protected _entityVisibleOnPlot(entity: Plots.IPlotEntity | Plots.ILightweightPlotEntity, bounds: Bounds) {
     const chartWidth = bounds.bottomRight.x - bounds.topLeft.x;
     const chartHeight = bounds.bottomRight.y - bounds.topLeft.y;
 
@@ -383,7 +380,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
    * @param {Bounds} bounds
    * @returns {PlotEntity[]}
    */
-  public entitiesIn(bounds: Bounds): PlotEntity[];
+  public entitiesIn(bounds: Bounds): IPlotEntity[];
   /**
    * Gets the Entities that intersect the area defined by the ranges.
    *
@@ -391,8 +388,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
    * @param {Range} yRange
    * @returns {PlotEntity[]}
    */
-  public entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
-  public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): PlotEntity[] {
+  public entitiesIn(xRange: Range, yRange: Range): IPlotEntity[];
+  public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): IPlotEntity[] {
     let dataXRange: Range;
     let dataYRange: Range;
     if (yRange == null) {
@@ -406,10 +403,10 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     return this._entitiesIntersecting(dataXRange, dataYRange);
   }
 
-  private _entitiesIntersecting(xValOrRange: number | Range, yValOrRange: number | Range): PlotEntity[] {
-    const intersected: PlotEntity[] = [];
+  private _entitiesIntersecting(xValOrRange: number | Range, yValOrRange: number | Range): IPlotEntity[] {
+    const intersected: IPlotEntity[] = [];
     this._getEntityStore().forEach((entity) => {
-      const selection = entity.drawer.selectionForIndex(entity.validDatumIndex);
+      const selection = d3.select(entity.drawer.getVisualPrimitiveAtIndex(entity.validDatumIndex));
       if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, Utils.DOM.elementBBox(selection))) {
         intersected.push(this._lightweightPlotEntityToPlotEntity(entity));
       }
@@ -454,7 +451,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   protected _extentsForProperty(property: string) {
     let extents = super._extentsForProperty(property);
 
-    let accScaleBinding: Plots.AccessorScaleBinding<any, any>;
+    let accScaleBinding: Plots.IAccessorScaleBinding<any, any>;
     if (property === "x" && this._isVertical) {
       accScaleBinding = this.x();
     } else if (property === "y" && !this._isVertical) {
@@ -722,7 +719,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     this._barPixelWidth = this._getBarPixelWidth();
   }
 
-  public entities(datasets = this.datasets()): PlotEntity[] {
+  public entities(datasets = this.datasets()): IPlotEntity[] {
     if (!this._projectorsReady()) {
       return [];
     }

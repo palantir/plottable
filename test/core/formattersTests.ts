@@ -1,15 +1,11 @@
-import * as d3 from "d3";
-
 import { assert } from "chai";
 
 import * as Plottable from "../../src";
 
-import * as TestMethods from "../testMethods";
-
 describe("Formatters", () => {
   describe("fixed()", () => {
     it("shows correct amount of digits according to precision", () => {
-      let fixed3 = Plottable.Formatters.fixed();
+      const fixed3 = Plottable.Formatters.fixed();
       assert.strictEqual(fixed3(1), "1.000", "shows three decimal places by defalut");
       assert.strictEqual(fixed3(-1), "-1.000", "shows three decimal places for negative integer");
       assert.strictEqual(fixed3(1.234), "1.234", "shows three decimal places for float");
@@ -22,7 +18,7 @@ describe("Formatters", () => {
       assert.strictEqual(fixed3(-Infinity), "-Infinity", "formats non-numeric number correctly");
       assert.strictEqual(fixed3(NaN), "NaN", "formats non-numeric number correctly");
 
-      let fixed0 = Plottable.Formatters.fixed(0);
+      const fixed0 = Plottable.Formatters.fixed(0);
       assert.strictEqual(fixed0(1), "1", "shows no decimal places for integer");
       assert.strictEqual(fixed0(-1), "-1", "shows no decimal places for negative integer");
       assert.strictEqual(fixed0(1.23), "1", "shows no decimal places for float");
@@ -31,32 +27,32 @@ describe("Formatters", () => {
     });
 
     it.skip("throws exception for non-numeric values", () => {
-      let nonNumericValues = [null, undefined, "123", "abc", ""];
-      let fixed = Plottable.Formatters.fixed();
+      const nonNumericValues = [null, undefined, "123", "abc", ""];
+      const fixed = Plottable.Formatters.fixed();
       nonNumericValues.forEach((value) =>
         (<any> assert).throws(() => fixed(<any> value), Error,
-          "error message TBD", `${value} is not a valid value for Formatter.fixed`)
+          "error message TBD", `${value} is not a valid value for Formatter.fixed`),
       );
     });
 
     it("throws exception for invalid precision", () => {
-      let nonIntegerValues = [null, 2.1, NaN, "5", "abc"];
+      const nonIntegerValues = [null, 2.1, NaN, "5", "abc"];
       nonIntegerValues.forEach((value) =>
         (<any> assert).throws(() => Plottable.Formatters.fixed(<any> value), Error,
-          "Formatter precision must be an integer", `${value} is not a valid precision value`)
+          "Formatter precision must be an integer", `${value} is not a valid precision value`),
       );
 
-      let outOfBoundValues = [-1, 21, -Infinity, Infinity];
+      const outOfBoundValues = [-1, 21, -Infinity, Infinity];
       outOfBoundValues.forEach((value) =>
         (<any> assert).throws(() => Plottable.Formatters.fixed(<any> value), Error,
-          "Formatter precision must be between 0 and 20", `${value} is not a valid precision value`)
+          "Formatter precision must be between 0 and 20", `${value} is not a valid precision value`),
       );
     });
   });
 
   describe("general()", () => {
     it("shows correct amount of digits according to precision", () => {
-      let general3 = Plottable.Formatters.general();
+      const general3 = Plottable.Formatters.general();
       assert.strictEqual(general3(1), "1", "does not pad 0 to three decimal places");
       assert.strictEqual(general3(-1), "-1", "does not pad 0 to three decimal places");
       assert.strictEqual(general3(1.234), "1.234", "shows up to three decimal places");
@@ -64,7 +60,7 @@ describe("Formatters", () => {
       assert.strictEqual(general3(1.2346), "1.235", "shows up to three decimal places");
       assert.strictEqual(general3(-1.2346), "-1.235", "shows up to three decimal places");
 
-      let general2 = Plottable.Formatters.general(2);
+      const general2 = Plottable.Formatters.general(2);
       assert.strictEqual(general2(1), "1", "does not pad 0 to two decimal places");
       assert.strictEqual(general2(-1), "-1", "does not pad 0 to two decimal places");
       assert.strictEqual(general2(1.2), "1.2", "does not pad 0 to two decimal places");
@@ -74,88 +70,88 @@ describe("Formatters", () => {
       assert.strictEqual(general2(1.235), "1.24", "shows up to two decimal places");
       assert.strictEqual(general2(-1.235), "-1.24", "shows up to two decimal places");
 
-      let general0 = Plottable.Formatters.general(0);
+      const general0 = Plottable.Formatters.general(0);
       assert.strictEqual(general0(1), "1", "shows no decimals");
       assert.strictEqual(general0(1.535), "2", "shows no decimals");
     });
 
     it("stringifies non-numeric values", () => {
-      let general = Plottable.Formatters.general();
-      let nonNumericValues = [null, undefined, Infinity, -Infinity, NaN, "123", "abc"];
-      let stringifiedValues = ["null", "undefined", "Infinity", "-Infinity", "NaN", "123", "abc"];
+      const general = Plottable.Formatters.general();
+      const nonNumericValues = [null, undefined, Infinity, -Infinity, NaN, "123", "abc"];
+      const stringifiedValues = ["null", "undefined", "Infinity", "-Infinity", "NaN", "123", "abc"];
       nonNumericValues.forEach((value, i) =>
-        assert.strictEqual(general(value), stringifiedValues[i], `non-numeric input ${value} is stringified`)
+        assert.strictEqual(general(value), stringifiedValues[i], `non-numeric input ${value} is stringified`),
       );
     });
 
     it("throws an error on invalid precision", () => {
-      let nonIntegerValues = [null, 2.1, NaN, "5", "abc"];
+      const nonIntegerValues = [null, 2.1, NaN, "5", "abc"];
       nonIntegerValues.forEach((value) =>
         (<any> assert).throws(() => Plottable.Formatters.general(<any> value), Error,
-          "Formatter precision must be an integer", `${value} is not a valid precision value`)
+          "Formatter precision must be an integer", `${value} is not a valid precision value`),
       );
 
-      let outOfBoundValues = [-1, 21, -Infinity, Infinity];
+      const outOfBoundValues = [-1, 21, -Infinity, Infinity];
       outOfBoundValues.forEach((value) =>
         (<any> assert).throws(() => Plottable.Formatters.general(<any> value), Error,
-          "Formatter precision must be between 0 and 20", `${value} is not a valid precision value`)
+          "Formatter precision must be between 0 and 20", `${value} is not a valid precision value`),
       );
     });
   });
 
   describe("identity()", () => {
     it("stringifies inputs", () => {
-      let identity = Plottable.Formatters.identity();
-      let values = [1, 0.999999, null, undefined, Infinity, -Infinity, NaN, "123", "abc", ""];
-      let stringifiedValues = ["1", "0.999999", "null", "undefined", "Infinity", "-Infinity", "NaN", "123", "abc", ""];
+      const identity = Plottable.Formatters.identity();
+      const values = [1, 0.999999, null, undefined, Infinity, -Infinity, NaN, "123", "abc", ""];
+      const stringifiedValues = ["1", "0.999999", "null", "undefined", "Infinity", "-Infinity", "NaN", "123", "abc", ""];
       values.forEach((value, i) =>
-        assert.strictEqual(identity(value), stringifiedValues[i], `${value} is stringified`)
+        assert.strictEqual(identity(value), stringifiedValues[i], `${value} is stringified`),
       );
     });
   });
 
   describe("currency()", () => {
     it("formats values based on precision, symobl, and prefix correctly", () => {
-      let defaultFormatter = Plottable.Formatters.currency();
+      const defaultFormatter = Plottable.Formatters.currency();
       assert.strictEqual(defaultFormatter(1), "$1.00", "formatted correctly with default \"$\" prefix");
       assert.strictEqual(defaultFormatter(-1), "-$1.00", "formatted negative integer correctly with default \"$\" prefix");
       assert.strictEqual(defaultFormatter(1.999), "$2.00", "formatted correctly with default \"$\" prefix");
       assert.strictEqual(defaultFormatter(-1.234), "-$1.23", "formatted negative float correctly with default \"$\" prefix");
 
-      let currencyFormatter0 = Plottable.Formatters.currency(0);
+      const currencyFormatter0 = Plottable.Formatters.currency(0);
       assert.strictEqual(currencyFormatter0(1.1234), "$1", "formatted with correct precision");
       assert.strictEqual(currencyFormatter0(123), "$123", "formatted with correct precision");
 
-      let poundFormatter = Plottable.Formatters.currency(2, "£");
+      const poundFormatter = Plottable.Formatters.currency(2, "£");
       assert.strictEqual(poundFormatter(1.1234), "£1.12", "formatted with correct precision and \"£\" as prefix");
       assert.strictEqual(poundFormatter(-100.987), "-£100.99", "formatted with correct precision and \"£\" as prefix");
 
-      let centsFormatter = Plottable.Formatters.currency(0, "c", false);
+      const centsFormatter = Plottable.Formatters.currency(0, "c", false);
       assert.strictEqual(centsFormatter(1), "1c", "formatted correctly with \"c\" as suffix");
       assert.strictEqual(centsFormatter(-1), "-1c", "formatted correctly with \"c\" as suffix");
     });
 
     it("throws an error on invalid precision", () => {
-      let nonIntegerValues = [null, 2.1, NaN, "5", "abc"];
+      const nonIntegerValues = [null, 2.1, NaN, "5", "abc"];
       nonIntegerValues.forEach((value) =>
         (<any> assert).throws(() => Plottable.Formatters.currency(<any> value), Error,
-          "Formatter precision must be an integer", `${value} is not a valid precision value`)
+          "Formatter precision must be an integer", `${value} is not a valid precision value`),
       );
 
-      let outOfBoundValues = [-1, 21, -Infinity, Infinity];
+      const outOfBoundValues = [-1, 21, -Infinity, Infinity];
       outOfBoundValues.forEach((value) =>
         (<any> assert).throws(() => Plottable.Formatters.currency(<any> value), Error,
-          "Formatter precision must be between 0 and 20", `${value} is not a valid precision value`)
+          "Formatter precision must be between 0 and 20", `${value} is not a valid precision value`),
       );
     });
 
     it.skip("throws exception for non-numeric values", () => {
-      let nonNumericValues: any[] = [null, undefined, "123", "abc", ""];
+      const nonNumericValues: any[] = [null, undefined, "123", "abc", ""];
       // "$0.00", "$NaN", "$123.00", "$NaN", "$0.00"
-      let defaultFormatter = Plottable.Formatters.currency();
+      const defaultFormatter = Plottable.Formatters.currency();
       nonNumericValues.forEach((value) =>
         (<any> assert).throws(() => defaultFormatter(<any> value), Error,
-          "error message TBD", `${value} is not a valid value for Formatter.currency`)
+          "error message TBD", `${value} is not a valid value for Formatter.currency`),
       );
     });
 
@@ -163,7 +159,7 @@ describe("Formatters", () => {
 
   describe("multiTime()", () => {
     it("uses reasonable defaults", () => {
-      let timeFormatter = Plottable.Formatters.multiTime();
+      const timeFormatter = Plottable.Formatters.multiTime();
       // year, month, day, hours, minutes, seconds, milliseconds
       assert.strictEqual(timeFormatter(new Date(2000, 0, 1, 0, 0, 0, 0)), "2000", "only the year was displayed");
       assert.strictEqual(timeFormatter(new Date(2000, 2, 1, 0, 0, 0, 0)), "Mar", "only the month was displayed");
@@ -176,109 +172,109 @@ describe("Formatters", () => {
     });
 
     it.skip("throws exception for non-Date values", () => {
-      let nonNumericValues = [null, undefined, NaN, "123", "abc", "", 0];
-      let timeFormatter = Plottable.Formatters.multiTime();
+      const nonNumericValues = [null, undefined, NaN, "123", "abc", "", 0];
+      const timeFormatter = Plottable.Formatters.multiTime();
       nonNumericValues.forEach((value) =>
         (<any> assert).throws(() => timeFormatter(<any> value), Error,
-          "error message TBD", `${value} is not a valid value for Formatter.multiTime`)
+          "error message TBD", `${value} is not a valid value for Formatter.multiTime`),
       );
     });
   });
 
   describe("percentage()", () => {
     it("formats number to percetage with correct precision", () => {
-      let percentFormatter = Plottable.Formatters.percentage();
+      const percentFormatter = Plottable.Formatters.percentage();
       assert.strictEqual(percentFormatter(1), "100%",
         "the value was multiplied by 100, a percent sign was appended, and no decimal places are shown by default");
       assert.strictEqual(percentFormatter(0.07), "7%", "does not have trailing zeros and is not empty string");
       assert.strictEqual(percentFormatter(-0.355), "-36%", "negative values are formatted correctly");
       assert.strictEqual(percentFormatter(50), "5000%", "formats 2 digit integer correctly");
 
-      let twoPercentFormatter = Plottable.Formatters.percentage(2);
+      const twoPercentFormatter = Plottable.Formatters.percentage(2);
       assert.strictEqual(twoPercentFormatter(0.0035), "0.35%", "works even if multiplying by 100 does not make it an integer");
       assert.strictEqual(twoPercentFormatter(-0.123), "-12.30%", "add 0 padding to make precision");
     });
 
     it.skip("formats non-numeric number correctly", () => {
-      let percentFormatter = Plottable.Formatters.percentage();
+      const percentFormatter = Plottable.Formatters.percentage();
       assert.strictEqual(percentFormatter(NaN), "NaN", "stringifies non-numeric number");
       assert.strictEqual(percentFormatter(Infinity), "Infinity", "stringifies non-numeric number");
       assert.strictEqual(percentFormatter(-Infinity), "-Infinity", "stringifies non-numeric number");
     });
 
     it("throws an error on invalid precision", () => {
-      let nonIntegerValues = [null, 2.1, NaN, "5", "abc"];
+      const nonIntegerValues = [null, 2.1, NaN, "5", "abc"];
       nonIntegerValues.forEach((value) =>
         (<any> assert).throws(() => Plottable.Formatters.percentage(<any> value), Error,
-          "Formatter precision must be an integer", `${value} is not a valid precision value`)
+          "Formatter precision must be an integer", `${value} is not a valid precision value`),
       );
 
-      let outOfBoundValues = [-1, 21, -Infinity, Infinity];
+      const outOfBoundValues = [-1, 21, -Infinity, Infinity];
       outOfBoundValues.forEach((value) =>
         (<any> assert).throws(() => Plottable.Formatters.percentage(<any> value), Error,
-          "Formatter precision must be between 0 and 20", `${value} is not a valid precision value`)
+          "Formatter precision must be between 0 and 20", `${value} is not a valid precision value`),
       );
     });
 
     it.skip("throws exception for non-numeric values", () => {
-      let nonNumericValues = [null, undefined, "123", "abc", ""];
-      let percentFormatter = Plottable.Formatters.percentage();
+      const nonNumericValues = [null, undefined, "123", "abc", ""];
+      const percentFormatter = Plottable.Formatters.percentage();
       nonNumericValues.forEach((value) =>
         (<any> assert).throws(() => percentFormatter(<any> value), Error,
-          "error message TBD", `${value} is not a valid value for Formatter.percentage`)
+          "error message TBD", `${value} is not a valid value for Formatter.percentage`),
       );
     });
   });
 
   describe("siSuffix()", () => {
     it("shortens long numbers", () => {
-      let lnFormatter = Plottable.Formatters.siSuffix();
+      const lnFormatter = Plottable.Formatters.siSuffix();
       assert.strictEqual(lnFormatter(1), "1.00", "shows 3 signifigicant figures by default");
       assert.operator(lnFormatter(Math.pow(10, 12)).length, "<=", 5, "large number was formatted to a short string");
       assert.operator(lnFormatter(Math.pow(10, -12)).length, "<=", 5, "small number was formatted to a short string");
       assert.strictEqual(lnFormatter(Math.pow(10, 5) * 1.55555), "156k", "formatting respects precision");
       assert.strictEqual(lnFormatter(-Math.pow(10, 6) * 23.456), "-23.5M", "formatting respects precision");
 
-      let lnFormatter2 = Plottable.Formatters.siSuffix(2);
+      const lnFormatter2 = Plottable.Formatters.siSuffix(2);
       assert.strictEqual(lnFormatter2(1), "1.0", "shows 2 signifigicant figures by default");
       assert.strictEqual(lnFormatter2(Math.pow(10, 5) * 1.55555), "160k", "formatting respects precision");
       assert.strictEqual(lnFormatter2(-Math.pow(10, 6) * 23.456), "-23M", "formatting respects precision");
     });
 
     it.skip("formats non-numeric number correctly", () => {
-      let lnFormatter = Plottable.Formatters.siSuffix();
+      const lnFormatter = Plottable.Formatters.siSuffix();
       assert.strictEqual(lnFormatter(NaN), "NaN", "stringifies non-numeric number");
       assert.strictEqual(lnFormatter(Infinity), "Infinity", "stringifies non-numeric number");
       assert.strictEqual(lnFormatter(-Infinity), "-Infinity", "stringifies non-numeric number");
     });
 
     it("throws an error on invalid precision", () => {
-      let nonIntegerValues = [null, 2.1, NaN, "5", "abc"];
+      const nonIntegerValues = [null, 2.1, NaN, "5", "abc"];
       nonIntegerValues.forEach((value) =>
         (<any> assert).throws(() => Plottable.Formatters.siSuffix(<any> value), Error,
-          "Formatter precision must be an integer", `${value} is not a valid precision value`)
+          "Formatter precision must be an integer", `${value} is not a valid precision value`),
       );
 
-      let outOfBoundValues = [-1, 21, -Infinity, Infinity];
+      const outOfBoundValues = [-1, 21, -Infinity, Infinity];
       outOfBoundValues.forEach((value) =>
         (<any> assert).throws(() => Plottable.Formatters.siSuffix(<any> value), Error,
-          "Formatter precision must be between 0 and 20", `${value} is not a valid precision value`)
+          "Formatter precision must be between 0 and 20", `${value} is not a valid precision value`),
       );
     });
 
     it.skip("throws exception for non-numeric values", () => {
-      let nonNumericValues = [null, undefined, "123", "abc", ""];
-      let lnFormatter = Plottable.Formatters.siSuffix();
+      const nonNumericValues = [null, undefined, "123", "abc", ""];
+      const lnFormatter = Plottable.Formatters.siSuffix();
       nonNumericValues.forEach((value) =>
         (<any> assert).throws(() => lnFormatter(<any> value), Error,
-          "error message TBD", `${value} is not a valid value for Formatter.siSuffix`)
+          "error message TBD", `${value} is not a valid value for Formatter.siSuffix`),
       );
     });
   });
 
   describe("shortScale()", () => {
     it("shortens long numbers", () => {
-      let formatter = Plottable.Formatters.shortScale();
+      const formatter = Plottable.Formatters.shortScale();
       assert.strictEqual(formatter(1), "1.000", "small numbers format simply");
       assert.strictEqual(formatter(-1), "-1.000", "negative small numbers format simply");
 
@@ -324,7 +320,7 @@ describe("Formatters", () => {
     });
 
     it("respects the precision provided", () => {
-      let formatter = Plottable.Formatters.shortScale(1);
+      const formatter = Plottable.Formatters.shortScale(1);
       assert.strictEqual(formatter(1), "1.0", "Just one decimal digit is added");
       assert.strictEqual(formatter(999), "999.0", "Conversion to K happens in the same place (lower)");
       assert.strictEqual(formatter(1000), "1.0K", "Conversion to K happens in the same place (upper)");
@@ -345,7 +341,7 @@ describe("Formatters", () => {
 
       assert.strictEqual(formatter(0), "0.0", "0 gets formatted well");
 
-      let formatter0 = Plottable.Formatters.shortScale(0);
+      const formatter0 = Plottable.Formatters.shortScale(0);
       assert.strictEqual(formatter0(1), "1", "Just one decimal digit is added");
       assert.strictEqual(formatter0(999), "999", "Conversion to K happens in the same place (lower)");
       assert.strictEqual(formatter0(1000), "1K", "Conversion to K happens in the same place (upper)");
@@ -363,16 +359,16 @@ describe("Formatters", () => {
     });
 
     it("throws an error on invalid precision", () => {
-      let nonIntegerValues = [null, 2.1, NaN, "5", "abc"];
+      const nonIntegerValues = [null, 2.1, NaN, "5", "abc"];
       nonIntegerValues.forEach((value) =>
         (<any> assert).throws(() => Plottable.Formatters.shortScale(<any> value), Error,
-          "Formatter precision must be an integer", `${value} is not a valid precision value`)
+          "Formatter precision must be an integer", `${value} is not a valid precision value`),
       );
 
-      let outOfBoundValues = [-1, 21, -Infinity, Infinity];
+      const outOfBoundValues = [-1, 21, -Infinity, Infinity];
       outOfBoundValues.forEach((value) =>
         (<any> assert).throws(() => Plottable.Formatters.shortScale(<any> value), Error,
-          "Formatter precision must be between 0 and 20", `${value} is not a valid precision value`)
+          "Formatter precision must be between 0 and 20", `${value} is not a valid precision value`),
       );
     });
   });

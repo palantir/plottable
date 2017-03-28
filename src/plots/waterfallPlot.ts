@@ -4,8 +4,8 @@
  */
 
 import { Dataset } from "../core/dataset";
-import { Accessor, SimpleSelection } from "../core/interfaces";
-import { Drawer } from "../drawers/drawer";
+import { IAccessor, SimpleSelection } from "../core/interfaces";
+import { ProxyDrawer } from "../drawers/drawer";
 import * as Utils from "../utils";
 
 import * as Plots from "./";
@@ -53,15 +53,15 @@ export class Waterfall<X, Y> extends Bar<X, number> {
   /**
    * Gets the AccessorScaleBinding for whether a bar represents a total or a delta.
    */
-  public total<T>(): Plots.AccessorScaleBinding<T, boolean>;
+  public total<T>(): Plots.IAccessorScaleBinding<T, boolean>;
   /**
    * Sets total to a constant number or the result of an Accessor
    *
    * @param {Accessor<boolean>}
    * @returns {Plots.Waterfall} The calling Waterfall Plot.
    */
-  public total(total: Accessor<boolean>): this;
-  public total(total?: Accessor<boolean>): any {
+  public total(total: IAccessor<boolean>): this;
+  public total(total?: IAccessor<boolean>): any {
     if (total == null) {
       return this._propertyBindings.get(Waterfall._TOTAL_KEY);
     }
@@ -76,7 +76,7 @@ export class Waterfall<X, Y> extends Bar<X, number> {
     }
   }
 
-  protected _createNodesForDataset(dataset: Dataset): Drawer {
+  protected _createNodesForDataset(dataset: Dataset): ProxyDrawer {
     const drawer = super._createNodesForDataset(dataset);
     this._connectorArea = this._renderArea.append("g").classed(Waterfall._CONNECTOR_AREA_CLASS, true);
     return drawer;

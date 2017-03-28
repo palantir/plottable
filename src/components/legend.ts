@@ -9,11 +9,11 @@ import * as Typesetter from "typesettable";
 import * as Configs from "../core/config";
 import * as Formatters from "../core/formatters";
 import { Formatter } from "../core/formatters";
-import { Entity, Point, SpaceRequest } from "../core/interfaces";
+import { IEntity, Point, SpaceRequest } from "../core/interfaces";
 import * as SymbolFactories from "../core/symbolFactories";
 import { SymbolFactory } from "../core/symbolFactories";
 import * as Scales from "../scales";
-import { ScaleCallback } from "../scales/scale";
+import { IScaleCallback } from "../scales/scale";
 import * as Utils from "../utils";
 
 import { Component } from "./component";
@@ -22,7 +22,7 @@ import { Component } from "./component";
  * The Legend's column representation. Stores position information
  * as well as data
  */
-interface LegendColumn<T> {
+interface ILegendColumn<T> {
   /**
    * Data stored in the column
    */
@@ -47,7 +47,7 @@ class LegendRow {
      * Columns within the row
      * @param {LegendColumn<any>[]} columns
      */
-    public columns: LegendColumn<any>[] = [],
+    public columns: ILegendColumn<any>[] = [],
     /**
      * Padding applied below the row. Affects the spacing between rows. Defaults to 0.
      * @param {bottomPadding} number
@@ -65,7 +65,7 @@ class LegendRow {
    *
    * @param {LegendColumn<any>} column
    */
-  public addColumn(column: LegendColumn<any>) {
+  public addColumn(column: ILegendColumn<any>) {
     const desiredColumnWidth = column.width;
 
     // choose the smaller of 1) remaining space, 2) desired width
@@ -239,7 +239,7 @@ export class Legend extends Component {
   private _writer: Typesetter.Writer;
   private _symbolFactoryAccessor: (datum: any, index: number) => SymbolFactory;
   private _symbolOpacityAccessor: (datum: any, index: number) => number;
-  private _redrawCallback: ScaleCallback<Scales.Color>;
+  private _redrawCallback: IScaleCallback<Scales.Color>;
 
   /**
    * The Legend consists of a series of entries, each with a color and label taken from the Color Scale.
@@ -501,13 +501,13 @@ export class Legend extends Component {
    * @param {Point} p
    * @returns {Entity<Legend>[]}
    */
-  public entitiesAt(p: Point): Entity<Legend>[] {
+  public entitiesAt(p: Point): IEntity<Legend>[] {
     if (!this._isSetup) {
       return [];
     }
 
     const table = this._buildLegendTable(this.width(), this.height());
-    return table.rows.reduce((entity: Entity<Legend>[], row: LegendRow, rowIndex: number) => {
+    return table.rows.reduce((entity: IEntity<Legend>[], row: LegendRow, rowIndex: number) => {
       if (entity.length !== 0) {
         // we've already found the nearest entity; just return it.
         return entity;
@@ -521,7 +521,7 @@ export class Legend extends Component {
         return entity;
       }
 
-      return row.columns.reduce((entity: Entity<Legend>[], column: LegendColumn<{ name: string, type: string }>, columnIndex: number) => {
+      return row.columns.reduce((entity: IEntity<Legend>[], column: ILegendColumn<{ name: string, type: string }>, columnIndex: number) => {
         const columnBounds = table.getColumnBounds(rowIndex, columnIndex);
         const withinColumn = Utils.Math.within(p, columnBounds);
 
@@ -551,7 +551,7 @@ export class Legend extends Component {
         return entity;
       }, entity);
 
-    }, [] as Entity<Legend>[]);
+    }, [] as IEntity<Legend>[]);
   }
 
   public renderImmediately() {
@@ -574,7 +574,7 @@ export class Legend extends Component {
       return `translate(${rowBounds.topLeft.x}, ${rowBounds.topLeft.y})`;
     });
 
-    type SymbolEntryPair = [ LegendColumn<{name: string, type: string }>, LegendColumn<{ name: string, type: string}> ];
+    type SymbolEntryPair = [ ILegendColumn<{name: string, type: string }>, ILegendColumn<{ name: string, type: string}> ];
 
     const self = this;
     rows.each(function (row, rowIndex) {

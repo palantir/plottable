@@ -30,7 +30,6 @@ module.exports = [
     },
     externals: {
       "d3": "d3",
-      "sinon": "sinon",
       "mocha": "mocha",
       "chai": "chai"
     },

@@ -1,5 +1,5 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
+import { SimpleSelection } from "../../src/core/interfaces";
 
 import { assert } from "chai";
 
@@ -14,7 +14,7 @@ describe("Interactions", () => {
     const INSIDE_POINT = { x: 100, y: 100 };
     const OUTSIDE_POINT = { x: -100, y: -100 };
 
-    interface KeyTestCallback {
+    interface IKeyTestCallback {
       called: boolean;
       keycode: number;
       reset: () => void;
@@ -22,7 +22,7 @@ describe("Interactions", () => {
     }
 
     function makeKeyCallback() {
-      const callback = <KeyTestCallback> function(keycode?: number) {
+      const callback = <IKeyTestCallback> function(keycode?: number) {
         callback.called = true;
         callback.keycode = keycode;
       };
@@ -41,11 +41,11 @@ describe("Interactions", () => {
         let div: d3.Selection<HTMLDivElement, any, any, any>;
         let eventTarget: SimpleSelection<void>;
         let keyInteraction: Plottable.Interactions.Key;
-        let callback: KeyTestCallback;
+        let callback: IKeyTestCallback;
 
         beforeEach(() => {
           div = TestMethods.generateDiv();
-          let component = new Plottable.Component().renderTo(div);
+          const component = new Plottable.Component().renderTo(div);
           eventTarget = component.background();
           keyInteraction = new Plottable.Interactions.Key();
           keyInteraction.attachTo(component);
@@ -66,7 +66,7 @@ describe("Interactions", () => {
           }
         }
 
-        function registerEvent(keycode: number, handler: KeyTestCallback) {
+        function registerEvent(keycode: number, handler: IKeyTestCallback) {
           if (event === "KeyPress") {
             return keyInteraction.onKeyPress(keycode, handler);
           } else {
@@ -74,7 +74,7 @@ describe("Interactions", () => {
           }
         }
 
-        function unregisterEvent(keycode: number, handler: KeyTestCallback) {
+        function unregisterEvent(keycode: number, handler: IKeyTestCallback) {
           if (event === "KeyPress") {
             return keyInteraction.offKeyPress(keycode, handler);
           } else {
@@ -157,11 +157,11 @@ describe("Interactions", () => {
       let div: d3.Selection<HTMLDivElement, any, any, any>;
       let eventTarget: SimpleSelection<void>;
       let keyInteraction: Plottable.Interactions.Key;
-      let callback: KeyTestCallback;
+      let callback: IKeyTestCallback;
 
       beforeEach(() => {
         div = TestMethods.generateDiv();
-        let component = new Plottable.Component().renderTo(div);
+        const component = new Plottable.Component().renderTo(div);
         eventTarget = component.background();
         keyInteraction = new Plottable.Interactions.Key();
         keyInteraction.attachTo(component);
@@ -202,11 +202,11 @@ describe("Interactions", () => {
       let div: d3.Selection<HTMLDivElement, any, any, any>;
       let eventTarget: SimpleSelection<void>;
       let keyInteraction: Plottable.Interactions.Key;
-      let callback: KeyTestCallback;
+      let callback: IKeyTestCallback;
 
       beforeEach(() => {
         div = TestMethods.generateDiv();
-        let component = new Plottable.Component().renderTo(div);
+        const component = new Plottable.Component().renderTo(div);
         eventTarget = component.background();
         keyInteraction = new Plottable.Interactions.Key();
         keyInteraction.attachTo(component);

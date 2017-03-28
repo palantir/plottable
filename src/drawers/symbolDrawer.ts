@@ -3,124 +3,129 @@
  * @license MIT
  */
 
+import * as d3 from "d3";
+
 import { Dataset } from "../core/dataset";
-import { Accessor, AttributeToAppliedProjector } from "../core/interfaces";
+import { AttributeToAppliedProjector, IAccessor } from "../core/interfaces";
 import { SymbolFactory } from "../core/symbolFactories";
 import { CanvasBuffer } from "./canvasBuffer";
-import { Drawer } from "./drawer";
-import { AppliedDrawStep } from "./index";
+import { CanvasDrawStep } from "./canvasDrawer";
+import { SVGDrawer } from "./svgDrawer";
 
-export class Symbol extends Drawer {
-  private buffer: CanvasBuffer;
-
-  constructor(
-      dataset: Dataset,
-      private symbolProjector: () => Accessor<SymbolFactory>,
-      private sizeProjector: () => Accessor<number>,
-  ) {
-    super(dataset);
-    this._svgElementName = "path";
-    this._className = "symbol";
-  }
-
-  protected _drawStepCanvas(data: any[], step: AppliedDrawStep) {
-    this._drawSymbolsRubberStamp(data, step);
-  }
-
-  /**
-   * Uses an internal canvas buffer to blit the symbols into the canvas.
-   *
-   * For each symbol, we first detect if it's even in to the canvas bounds, if
-   * not we continue. Then we check it's other style attributes and symbol type.
-   * If those don't match what are in the buffer, we redraw the buffer. Finally,
-   * we blit the buffer to the canvas at the symbol coordinates.
-   */
-  private _drawSymbolsRubberStamp(data: any[], step: AppliedDrawStep) {
-    const ctx = this.canvas().node().getContext("2d");
-    const projector = step.attrToAppliedProjector;
-    const styleKeys = Object.keys(Drawer._CANVAS_CONTEXT_ATTRIBUTES);
-    const attrKeys = styleKeys.concat(["x", "y"]);
-
-    // create canvas intersection tester
-    const { width, height } = ctx.canvas; // TODO devicePixelRatio?
-    const intersectsCanvasBounds = (x: number, y: number, size: number) => {
-      return (
-        x + size >= 0 && x - size <= width &&
-        y + size >= 0 && y - size <= height
-      );
-    };
-
-    // lazilly create offscreen buffer of modest size
-    if (this.buffer == null) {
-      this.buffer = new CanvasBuffer(0, 0, 1);
+export class SymbolSVGDrawer extends SVGDrawer {
+    constructor() {
+        super("path", "symbol");
     }
+}
 
-    let prevAttrs: any = null;
-    let prevSymbolGenerator: any = null;
-    let prevSymbolSize: number = null;
-    let skipped = 0;
-    for(let index = 0; index < data.length; index++) {
-      const datum = data[index];
+let buffer: CanvasBuffer;
+export function makeSymbolCanvasDrawStep(
+        dataset: Dataset,
+        symbolProjector: () => IAccessor<SymbolFactory>,
+        sizeProjector: () => IAccessor<number>): CanvasDrawStep {
+    return (context: CanvasRenderingContext2D, data: any[][], attrToAppliedProjector: AttributeToAppliedProjector) => {
+        const styleKeys = ["stroke-width", "stroke", "opacity", "fill"];
+        const attrKeys = styleKeys.concat(["x", "y"]);
 
-      // check symbol is in viewport
-      const attrs = this._resolveAttributesSubset(projector, attrKeys, datum, index);
-      const symbolSize = this.sizeProjector()(datum, index, this._dataset);
-      if (!intersectsCanvasBounds(attrs["x"], attrs["y"], symbolSize)) {
-        skipped++;
-        continue;
-      }
+        // create canvas intersection tester
+        const { width, height } = context.canvas; // TODO devicePixelRatio?
+        const intersectsCanvasBounds = (x: number, y: number, size: number) => {
+          return (
+            x + size >= 0 && x - size <= width &&
+            y + size >= 0 && y - size <= height
+          );
+        };
 
-      // check attributes and symbol type
-      const attrsSame = this._attributesSame(prevAttrs, attrs, styleKeys);
-      const symbolGenerator = this.symbolProjector()(datum, index, this._dataset);
-      if (attrsSame && prevSymbolSize == symbolSize && prevSymbolGenerator == symbolGenerator) {
-        skipped++;
-      } else {
-        // make room for bigger symbol if needed
-        if (symbolSize > this.buffer.pixelWidth || symbolSize > this.buffer.pixelHeight) {
-          this.buffer.resize(symbolSize, symbolSize, true);
+        // lazily create offscreen buffer of modest size
+        if (buffer == null) {
+            buffer = new CanvasBuffer(0, 0, 1);
         }
 
-        // draw actual symbol into buffer
-        this.buffer.clear();
-        const bufferCtx = this.buffer.ctx;
-        bufferCtx.beginPath();
-        symbolGenerator(symbolSize).context(bufferCtx)(null);
-        bufferCtx.closePath();
-        this._setCanvasContextStyles(attrs, bufferCtx);
+        let prevAttrs: any = null;
+        let prevSymbolGenerator: any = null;
+        let prevSymbolSize: number = null;
+        let skipped = 0;
+        for (let index = 0; index < data.length; index++) {
+            const datum = data[index];
 
-        // save the values that are in the buffer
-        prevSymbolGenerator = symbolGenerator;
-        prevSymbolSize = symbolSize;
-        prevAttrs = attrs;
-      }
+            // check symbol is in viewport
+            const attrs = resolveAttributesSubset(attrToAppliedProjector, attrKeys, datum, index);
+            const symbolSize = sizeProjector()(datum, index, dataset);
+            if (!intersectsCanvasBounds(attrs["x"], attrs["y"], symbolSize)) {
+                skipped++;
+                continue;
+            }
 
-      // blit the buffer to the canvas
-      this.buffer.blitCenter(ctx, attrs["x"], attrs["y"]);
-    }
-  }
+            // check attributes and symbol type
+            const attrsSame = attributesSame(prevAttrs, attrs, styleKeys);
+            const symbolGenerator = symbolProjector()(datum, index, this._dataset);
+            if (attrsSame && prevSymbolSize == symbolSize && prevSymbolGenerator == symbolGenerator) {
+                skipped++;
+            } else {
+                // make room for bigger symbol if needed
+                if (symbolSize > buffer.pixelWidth || symbolSize > buffer.pixelHeight) {
+                    buffer.resize(symbolSize, symbolSize, true);
+                }
 
-  private _attributesSame(prevAttrs: any, attrs: any, attrKeys: string[]) {
+                // draw actual symbol into buffer
+                buffer.clear();
+                const bufferCtx = buffer.ctx;
+                bufferCtx.beginPath();
+                symbolGenerator(symbolSize).context(bufferCtx)(null);
+                bufferCtx.closePath();
+
+                if (attrs["stroke-width"]) {
+                  bufferCtx.lineWidth = parseFloat(attrs["stroke-width"]);
+                }
+                if (attrs["stroke"]) {
+                  const strokeColor = d3.color("stroke");
+                  if (attrs["opacity"]) {
+                    strokeColor.opacity = attrs["opacity"];
+                  }
+                  bufferCtx.strokeStyle = strokeColor.rgb().toString();
+                  bufferCtx.stroke();
+                }
+                if (attrs["fill"]) {
+                  const fillColor = d3.color(attrs["fill"]);
+                  if (attrs["opacity"]) {
+                    fillColor.opacity = attrs["opacity"];
+                  }
+                  bufferCtx.fillStyle = fillColor.rgb().toString();
+                  bufferCtx.fill();
+                }
+
+                // save the values that are in the buffer
+                prevSymbolGenerator = symbolGenerator;
+                prevSymbolSize = symbolSize;
+                prevAttrs = attrs;
+            }
+
+            // blit the buffer to the canvas
+            buffer.blitCenter(context, attrs["x"], attrs["y"]);
+        }
+    };
+}
+
+function attributesSame(prevAttrs: any, attrs: any, attrKeys: string[]) {
     if (prevAttrs == null) {
-      return false;
+        return false;
     }
     for (let i = 0; i < attrKeys.length; i++) {
-      const attrKey = attrKeys[i];
-      if (prevAttrs[attrKey] != attrs[attrKey]) {
-        return false;
-      }
+        const attrKey = attrKeys[i];
+        if (prevAttrs[attrKey] != attrs[attrKey]) {
+            return false;
+        }
     }
     return true;
-  }
+}
 
-  private _resolveAttributesSubset(projector: AttributeToAppliedProjector, attrKeys: string[], datum: any, index: number){
+function resolveAttributesSubset(projector: AttributeToAppliedProjector, attrKeys: string[], datum: any, index: number) {
     const attrs: {[key: string]: any} = {};
     for (let i = 0; i < attrKeys.length; i++) {
-      const attrKey = attrKeys[i];
-      if (projector.hasOwnProperty(attrKey)) {
-        attrs[attrKey] = projector[attrKey](datum, index);
-      }
+        const attrKey = attrKeys[i];
+        if (projector.hasOwnProperty(attrKey)) {
+            attrs[attrKey] = projector[attrKey](datum, index);
+        }
     }
     return attrs;
-  }
 }

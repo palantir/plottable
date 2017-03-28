@@ -10,7 +10,7 @@ import * as RenderController from "./renderController";
 /**
  * A policy for rendering Components.
  */
-export interface RenderPolicy {
+export interface IRenderPolicy {
   render(): any;
 }
 
@@ -18,7 +18,7 @@ export interface RenderPolicy {
  * Renders Components immediately after they are enqueued.
  * Useful for debugging, horrible for performance.
  */
-export class Immediate implements RenderPolicy {
+export class Immediate implements IRenderPolicy {
   public render() {
     RenderController.flush();
   }
@@ -28,7 +28,7 @@ export class Immediate implements RenderPolicy {
  * The default way to render, which only tries to render every frame
  * (usually, 1/60th of a second).
  */
-export class AnimationFrame implements RenderPolicy {
+export class AnimationFrame implements IRenderPolicy {
   public render() {
     Utils.DOM.requestAnimationFramePolyfill(RenderController.flush);
   }
@@ -39,7 +39,7 @@ export class AnimationFrame implements RenderPolicy {
  * Generally an inferior way to render compared to `requestAnimationFrame`,
  * but useful for browsers that don't suppoort `requestAnimationFrame`.
  */
-export class Timeout implements RenderPolicy {
+export class Timeout implements IRenderPolicy {
   private _timeoutMsec: number = Utils.DOM.SCREEN_REFRESH_RATE_MILLISECONDS;
 
   public render() {

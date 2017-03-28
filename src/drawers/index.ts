@@ -3,15 +3,18 @@
  * @license MIT
  */
 
-import { Animator } from "../animators/animator";
+import { IAnimator } from "../animators/animator";
 import { AttributeToAppliedProjector, AttributeToProjector } from "../core/interfaces";
 
 export * from "./arcDrawer";
 export * from "./arcOutlineDrawer";
 export * from "./areaDrawer";
+export * from "./canvasDrawer";
+export * from "./drawer";
 export * from "./lineDrawer";
 export * from "./rectangleDrawer";
 export * from "./segmentDrawer";
+export * from "./svgDrawer";
 export * from "./symbolDrawer";
 
 /**
@@ -21,7 +24,7 @@ export * from "./symbolDrawer";
  */
 export type DrawStep = {
   attrToProjector: AttributeToProjector;
-  animator: Animator;
+  animator: IAnimator;
 };
 
 /**
@@ -29,5 +32,5 @@ export type DrawStep = {
  */
 export type AppliedDrawStep = {
   attrToAppliedProjector: AttributeToAppliedProjector;
-  animator: Animator;
+  animator: IAnimator;
 };

@@ -3,27 +3,21 @@
  * @license MIT
  */
 
-import * as d3 from "d3";
-
-import { Dataset } from "../core/dataset";
-
 import { SimpleSelection } from "../core/interfaces";
-import { Drawer } from "./drawer";
+import { SVGDrawer } from "./svgDrawer";
 
-export class Area extends Drawer {
-
-  constructor(dataset: Dataset) {
-    super(dataset);
-    this._className = "area";
-    this._svgElementName = "path";
+export class AreaSVGDrawer extends SVGDrawer {
+  constructor() {
+    super("path", "area");
   }
 
   protected _applyDefaultAttributes(selection: SimpleSelection<any>) {
-    super._applyDefaultAttributes(selection);
     selection.style("stroke", "none");
   }
 
-  public selectionForIndex(index: number): SimpleSelection<any> {
-    return d3.select(this.selection().node());
+  public getVisualPrimitiveAtIndex(index: number) {
+    // areas are represented by one single element; always get that element
+    // regardless of the data index.
+    return super.getVisualPrimitiveAtIndex(0);
   }
 }

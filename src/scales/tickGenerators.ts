@@ -14,7 +14,7 @@ import * as Utils from "../utils";
  * @param {QuantitativeScale} scale
  * @returns {D[]}
  */
-export interface TickGenerator<D> {
+export interface ITickGenerator<D> {
   (scale: QuantitativeScale<D>): D[];
 }
 /**
@@ -25,7 +25,7 @@ export interface TickGenerator<D> {
  * @param {number} interval
  * @returns {TickGenerator}
  */
-export function intervalTickGenerator(interval: number): TickGenerator<number> {
+export function intervalTickGenerator(interval: number): ITickGenerator<number> {
   if (interval <= 0) {
     throw new Error("interval must be positive number");
   }
@@ -50,7 +50,7 @@ export function intervalTickGenerator(interval: number): TickGenerator<number> {
  *
  * @returns {TickGenerator}
  */
-export function integerTickGenerator(): TickGenerator<number> {
+export function integerTickGenerator(): ITickGenerator<number> {
   return function (s: QuantitativeScale<number>) {
     const defaultTicks = s.defaultTicks();
     return defaultTicks.filter((tick, i) => (tick % 1 === 0) || (i === 0) || (i === defaultTicks.length - 1));

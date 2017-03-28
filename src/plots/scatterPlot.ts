@@ -4,9 +4,11 @@
  */
 
 import { Dataset } from "../core/dataset";
-import { Accessor, AttributeToProjector, Bounds, Point, Range } from "../core/interfaces";
+import { AttributeToProjector, Bounds, IAccessor, Point, Range } from "../core/interfaces";
 import * as SymbolFactories from "../core/symbolFactories";
 import { SymbolFactory } from "../core/symbolFactories";
+import { ProxyDrawer } from "../drawers/drawer";
+import { makeSymbolCanvasDrawStep, SymbolSVGDrawer } from "../drawers/symbolDrawer";
 import { Scale } from "../scales/scale";
 
 import * as Animators from "../animators";
@@ -14,11 +16,11 @@ import * as Drawers from "../drawers";
 import * as Scales from "../scales";
 import * as Utils from "../utils";
 import * as Plots from "./";
-import { AccessorScaleBinding, LightweightPlotEntity, PlotEntity, TransformableAccessorScaleBinding } from "./";
+import { IAccessorScaleBinding, ILightweightPlotEntity, IPlotEntity, ITransformableAccessorScaleBinding } from "./";
 import { Plot } from "./plot";
 import { XYPlot } from "./xyPlot";
 
-export interface LightweightScatterPlotEntity extends LightweightPlotEntity {
+export interface ILightweightScatterPlotEntity extends ILightweightPlotEntity {
   // size of the entity in pixel space
   diameter: number;
 }
@@ -50,7 +52,7 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
   protected _buildLightweightPlotEntities(datasets: Dataset[]) {
     const lightweightPlotEntities = super._buildLightweightPlotEntities(datasets);
 
-    return lightweightPlotEntities.map((lightweightPlotEntity: LightweightScatterPlotEntity) => {
+    return lightweightPlotEntities.map((lightweightPlotEntity: ILightweightScatterPlotEntity) => {
       const diameter = Plot._scaledAccessor(this.size())(
         lightweightPlotEntity.datum,
         lightweightPlotEntity.index,
@@ -61,11 +63,14 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
     });
   }
 
-  protected _createDrawer(dataset: Dataset): Drawers.Symbol {
-    return new Drawers.Symbol(
-      dataset,
-      () => Plot._scaledAccessor(this.symbol()),
-      () => Plot._scaledAccessor(this.size()),
+  protected _createDrawer(dataset: Dataset) {
+    return new ProxyDrawer(
+      () => new SymbolSVGDrawer(),
+      makeSymbolCanvasDrawStep(
+        dataset,
+        () => Plot._scaledAccessor(this.symbol()),
+        () => Plot._scaledAccessor(this.size()),
+      ),
     );
   }
 
@@ -73,14 +78,14 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
    * Gets the AccessorScaleBinding for the size property of the plot.
    * The size property corresponds to the area of the symbol.
    */
-  public size<S>(): TransformableAccessorScaleBinding<S, number>;
+  public size<S>(): ITransformableAccessorScaleBinding<S, number>;
   /**
    * Sets the size property to a constant number or the result of an Accessor<number>.
    *
    * @param {number|Accessor<number>} size
    * @returns {Plots.Scatter} The calling Scatter Plot.
    */
-  public size(size: number | Accessor<number>): this;
+  public size(size: number | IAccessor<number>): this;
   /**
    * Sets the size property to a scaled constant value or scaled result of an Accessor.
    * The provided Scale will account for the values when autoDomain()-ing.
@@ -89,8 +94,8 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
    * @param {Scale<S, number>} scale
    * @returns {Plots.Scatter} The calling Scatter Plot.
    */
-  public size<S>(size: S | Accessor<S>, scale: Scale<S, number>): this;
-  public size<S>(size?: number | Accessor<number> | S | Accessor<S>, scale?: Scale<S, number>): any {
+  public size<S>(size: S | IAccessor<S>, scale: Scale<S, number>): this;
+  public size<S>(size?: number | IAccessor<number> | S | IAccessor<S>, scale?: Scale<S, number>): any {
     if (size == null) {
       return this._propertyBindings.get(Scatter._SIZE_KEY);
     }
@@ -103,15 +108,15 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
    * Gets the AccessorScaleBinding for the symbol property of the plot.
    * The symbol property corresponds to how the symbol will be drawn.
    */
-  public symbol(): AccessorScaleBinding<any, any>;
+  public symbol(): IAccessorScaleBinding<any, any>;
   /**
    * Sets the symbol property to an Accessor<SymbolFactory>.
    *
    * @param {Accessor<SymbolFactory>} symbol
    * @returns {Plots.Scatter} The calling Scatter Plot.
    */
-  public symbol(symbol: Accessor<SymbolFactory>): this;
-  public symbol(symbol?: Accessor<SymbolFactory>): any {
+  public symbol(symbol: IAccessor<SymbolFactory>): this;
+  public symbol(symbol?: IAccessor<SymbolFactory>): any {
     if (symbol == null) {
       return this._propertyBindings.get(Scatter._SYMBOL_KEY);
     }
@@ -161,7 +166,7 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
     };
   }
 
-  protected _entityVisibleOnPlot(entity: LightweightScatterPlotEntity, bounds: Bounds) {
+  protected _entityVisibleOnPlot(entity: ILightweightScatterPlotEntity, bounds: Bounds) {
     const xRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
     const yRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
 
@@ -181,7 +186,7 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
    * @param {Bounds} bounds
    * @returns {PlotEntity[]}
    */
-  public entitiesIn(bounds: Bounds): PlotEntity[];
+  public entitiesIn(bounds: Bounds): IPlotEntity[];
   /**
    * Gets the Entities that intersect the area defined by the ranges.
    *
@@ -189,8 +194,8 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
    * @param {Range} yRange
    * @returns {PlotEntity[]}
    */
-  public entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
-  public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): PlotEntity[] {
+  public entitiesIn(xRange: Range, yRange: Range): IPlotEntity[];
+  public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): IPlotEntity[] {
     let dataXRange: Range;
     let dataYRange: Range;
     if (yRange == null) {

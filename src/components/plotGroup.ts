@@ -12,8 +12,8 @@ import { Component } from "./component";
 import { Group } from "./group";
 
 export class PlotGroup extends Group {
-  public entityNearest(point: Point): Plots.PlotEntity {
-    let closestPlotEntity: Plots.PlotEntity;
+  public entityNearest(point: Point): Plots.IPlotEntity {
+    let closestPlotEntity: Plots.IPlotEntity;
     let minDistSquared = Infinity;
     this.components().forEach((plotComponent: Component) => {
       // we know it's a Plot since .append() throws a runtime error otherwise

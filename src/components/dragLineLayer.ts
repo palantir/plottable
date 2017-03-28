@@ -8,7 +8,7 @@ import { Point, SimpleSelection } from "../core/interfaces";
 import * as Interactions from "../interactions";
 import * as Utils from "../utils";
 
-export interface DragLineCallback<D> {
+export interface IDragLineCallback<D> {
   (dragLineLayer: DragLineLayer<D>): void;
 }
 
@@ -18,9 +18,9 @@ export class DragLineLayer<D> extends GuideLineLayer<D> {
   private _detectionEdge: SimpleSelection<void>;
   private _enabled = true;
 
-  private _dragStartCallbacks: Utils.CallbackSet<DragLineCallback<D>>;
-  private _dragCallbacks: Utils.CallbackSet<DragLineCallback<D>>;
-  private _dragEndCallbacks: Utils.CallbackSet<DragLineCallback<D>>;
+  private _dragStartCallbacks: Utils.CallbackSet<IDragLineCallback<D>>;
+  private _dragCallbacks: Utils.CallbackSet<IDragLineCallback<D>>;
+  private _dragEndCallbacks: Utils.CallbackSet<IDragLineCallback<D>>;
   private _disconnectInteraction: () => void;
 
   constructor(orientation: string) {
@@ -75,9 +75,9 @@ export class DragLineLayer<D> extends GuideLineLayer<D> {
       this._dragInteraction.detachFrom(this);
     };
 
-    this._dragStartCallbacks = new Utils.CallbackSet<DragLineCallback<D>>();
-    this._dragCallbacks = new Utils.CallbackSet<DragLineCallback<D>>();
-    this._dragEndCallbacks = new Utils.CallbackSet<DragLineCallback<D>>();
+    this._dragStartCallbacks = new Utils.CallbackSet<IDragLineCallback<D>>();
+    this._dragCallbacks = new Utils.CallbackSet<IDragLineCallback<D>>();
+    this._dragEndCallbacks = new Utils.CallbackSet<IDragLineCallback<D>>();
   }
 
   protected _setup() {
@@ -157,7 +157,7 @@ export class DragLineLayer<D> extends GuideLineLayer<D> {
    * @param {DragLineCallback<D>} callback
    * @returns {DragLineLayer<D>} The calling DragLineLayer.
    */
-  public onDragStart(callback: DragLineCallback<D>) {
+  public onDragStart(callback: IDragLineCallback<D>) {
     this._dragStartCallbacks.add(callback);
     return this;
   }
@@ -168,7 +168,7 @@ export class DragLineLayer<D> extends GuideLineLayer<D> {
    * @param {DragLineCallback<D>} callback
    * @returns {DragLineLayer<D>} The calling DragLineLayer.
    */
-  public offDragStart(callback: DragLineCallback<D>) {
+  public offDragStart(callback: IDragLineCallback<D>) {
     this._dragStartCallbacks.delete(callback);
     return this;
   }
@@ -180,7 +180,7 @@ export class DragLineLayer<D> extends GuideLineLayer<D> {
    * @param {DragLineCallback<D>} callback
    * @returns {DragLineLayer<D>} The calling DragLineLayer.
    */
-  public onDrag(callback: DragLineCallback<D>) {
+  public onDrag(callback: IDragLineCallback<D>) {
     this._dragCallbacks.add(callback);
     return this;
   }
@@ -191,7 +191,7 @@ export class DragLineLayer<D> extends GuideLineLayer<D> {
    * @param {DragLineCallback<D>} callback
    * @returns {DragLineLayer<D>} The calling DragLineLayer.
    */
-  public offDrag(callback: DragLineCallback<D>) {
+  public offDrag(callback: IDragLineCallback<D>) {
     this._dragCallbacks.delete(callback);
     return this;
   }
@@ -203,7 +203,7 @@ export class DragLineLayer<D> extends GuideLineLayer<D> {
    * @param {DragLineCallback<D>} callback
    * @returns {DragLineLayer<D>} The calling DragLineLayer.
    */
-  public onDragEnd(callback: DragLineCallback<D>) {
+  public onDragEnd(callback: IDragLineCallback<D>) {
     this._dragEndCallbacks.add(callback);
     return this;
   }
@@ -214,7 +214,7 @@ export class DragLineLayer<D> extends GuideLineLayer<D> {
    * @param {DragLineCallback<D>} callback
    * @returns {DragLineLayer<D>} The calling DragLineLayer.
    */
-  public offDragEnd(callback: DragLineCallback<D>) {
+  public offDragEnd(callback: IDragLineCallback<D>) {
     this._dragEndCallbacks.delete(callback);
     return this;
   }
