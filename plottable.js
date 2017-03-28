@@ -5505,7 +5505,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var d3 = __webpack_require__(1);
+var canvasDrawer_1 = __webpack_require__(43);
 var svgDrawer_1 = __webpack_require__(8);
 var LineSVGDrawer = (function (_super) {
     __extends(LineSVGDrawer, _super);
@@ -5530,26 +5530,11 @@ exports.LineSVGDrawer = LineSVGDrawer;
 function makeLineCanvasDrawStep(d3LineFactory) {
     return function (context, data, attrToAppliedProjector) {
         var d3Line = d3LineFactory();
-        var resolvedAttrs = Object.keys(attrToAppliedProjector).reduce(function (obj, attrName) {
-            if (attrName !== "d") {
-                obj[attrName] = attrToAppliedProjector[attrName](data[0], 0);
-            }
-            return obj;
-        }, {});
+        var attrs = canvasDrawer_1.resolveAttributesSubsetWithStyles(attrToAppliedProjector, [], data[0], 0);
         context.beginPath();
         d3Line.context(context);
         d3Line(data[0]);
-        if (resolvedAttrs["stroke-width"]) {
-            context.lineWidth = parseFloat(resolvedAttrs["stroke-width"]);
-        }
-        if (resolvedAttrs["stroke"]) {
-            var strokeColor = d3.color(resolvedAttrs["stroke"]);
-            if (resolvedAttrs["opacity"]) {
-                strokeColor.opacity = resolvedAttrs["opacity"];
-            }
-            context.strokeStyle = strokeColor.rgb().toString();
-            context.stroke();
-        }
+        canvasDrawer_1.styleContext(context, attrs);
     };
 }
 exports.makeLineCanvasDrawStep = makeLineCanvasDrawStep;
@@ -5570,7 +5555,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var d3 = __webpack_require__(1);
+var canvasDrawer_1 = __webpack_require__(43);
 var svgDrawer_1 = __webpack_require__(8);
 var RectangleSVGDrawer = (function (_super) {
     __extends(RectangleSVGDrawer, _super);
@@ -5585,33 +5570,14 @@ var RectangleSVGDrawer = (function (_super) {
 }(svgDrawer_1.SVGDrawer));
 exports.RectangleSVGDrawer = RectangleSVGDrawer;
 exports.RectangleCanvasDrawStep = function (context, data, attrToAppliedProjector) {
-    data.forEach(function (point, index) {
-        var resolvedAttrs = Object.keys(attrToAppliedProjector).reduce(function (obj, attrName) {
-            obj[attrName] = attrToAppliedProjector[attrName](point, index);
-            return obj;
-        }, {});
+    context.save();
+    data.forEach(function (datum, index) {
+        var attrs = canvasDrawer_1.resolveAttributesSubsetWithStyles(attrToAppliedProjector, ["x", "y", "width", "height"], datum, index);
         context.beginPath();
-        context.rect(resolvedAttrs["x"], resolvedAttrs["y"], resolvedAttrs["width"], resolvedAttrs["height"]);
-        if (resolvedAttrs["stroke-width"]) {
-            context.lineWidth = resolvedAttrs["stroke-width"];
-        }
-        if (resolvedAttrs["stroke"]) {
-            var strokeColor = d3.color(resolvedAttrs["stroke"]);
-            if (resolvedAttrs["opacity"]) {
-                strokeColor.opacity = resolvedAttrs["opacity"];
-            }
-            context.strokeStyle = strokeColor.rgb().toString();
-            context.stroke();
-        }
-        if (resolvedAttrs["fill"]) {
-            var fillColor = d3.color(resolvedAttrs["fill"]);
-            if (resolvedAttrs["opacity"]) {
-                fillColor.opacity = resolvedAttrs["opacity"];
-            }
-            context.fillStyle = fillColor.rgb().toString();
-            context.fill();
-        }
+        context.rect(attrs["x"], attrs["y"], attrs["width"], attrs["height"]);
+        canvasDrawer_1.styleContext(context, attrs);
     });
+    context.restore();
 };
 
 
@@ -6565,6 +6531,7 @@ exports.AreaSVGDrawer = AreaSVGDrawer;
  * @license MIT
  */
 
+var d3 = __webpack_require__(1);
 /**
  * A CanvasDrawer draws data onto a supplied Canvas Context.
  *
@@ -6602,6 +6569,43 @@ var CanvasDrawer = (function () {
     return CanvasDrawer;
 }());
 exports.CanvasDrawer = CanvasDrawer;
+exports.ContextStyleAttrs = {
+    strokeWidth: "stroke-width", stroke: "stroke", opacity: "opacity", fill: "fill",
+};
+function resolveAttributesSubsetWithStyles(projector, extraKeys, datum, index) {
+    var attrKeys = Object.keys(exports.ContextStyleAttrs).concat(extraKeys);
+    var attrs = {};
+    for (var i = 0; i < attrKeys.length; i++) {
+        var attrKey = attrKeys[i];
+        if (projector.hasOwnProperty(attrKey)) {
+            attrs[attrKey] = projector[attrKey](datum, index);
+        }
+    }
+    return attrs;
+}
+exports.resolveAttributesSubsetWithStyles = resolveAttributesSubsetWithStyles;
+function styleContext(context, attrs) {
+    if (attrs[exports.ContextStyleAttrs.strokeWidth]) {
+        context.lineWidth = parseFloat(attrs[exports.ContextStyleAttrs.strokeWidth]);
+    }
+    if (attrs[exports.ContextStyleAttrs.stroke]) {
+        var strokeColor = d3.color(attrs[exports.ContextStyleAttrs.stroke]);
+        if (attrs[exports.ContextStyleAttrs.opacity]) {
+            strokeColor.opacity = attrs[exports.ContextStyleAttrs.opacity];
+        }
+        context.strokeStyle = strokeColor.rgb().toString();
+        context.stroke();
+    }
+    if (attrs[exports.ContextStyleAttrs.fill]) {
+        var fillColor = d3.color(attrs[exports.ContextStyleAttrs.fill]);
+        if (attrs[exports.ContextStyleAttrs.opacity]) {
+            fillColor.opacity = attrs[exports.ContextStyleAttrs.opacity];
+        }
+        context.fillStyle = fillColor.rgb().toString();
+        context.fill();
+    }
+}
+exports.styleContext = styleContext;
 
 
 /***/ }),
@@ -6645,8 +6649,8 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var d3 = __webpack_require__(1);
 var canvasBuffer_1 = __webpack_require__(80);
+var canvasDrawer_1 = __webpack_require__(43);
 var svgDrawer_1 = __webpack_require__(8);
 var SymbolSVGDrawer = (function (_super) {
     __extends(SymbolSVGDrawer, _super);
@@ -6660,8 +6664,6 @@ var buffer;
 function makeSymbolCanvasDrawStep(dataset, symbolProjector, sizeProjector) {
     var _this = this;
     return function (context, data, attrToAppliedProjector) {
-        var styleKeys = ["stroke-width", "stroke", "opacity", "fill"];
-        var attrKeys = styleKeys.concat(["x", "y"]);
         // create canvas intersection tester
         var _a = context.canvas, width = _a.width, height = _a.height; // TODO devicePixelRatio?
         var intersectsCanvasBounds = function (x, y, size) {
@@ -6679,14 +6681,14 @@ function makeSymbolCanvasDrawStep(dataset, symbolProjector, sizeProjector) {
         for (var index = 0; index < data.length; index++) {
             var datum = data[index];
             // check symbol is in viewport
-            var attrs = resolveAttributesSubset(attrToAppliedProjector, attrKeys, datum, index);
+            var attrs = canvasDrawer_1.resolveAttributesSubsetWithStyles(attrToAppliedProjector, ["x", "y"], datum, index);
             var symbolSize = sizeProjector()(datum, index, dataset);
             if (!intersectsCanvasBounds(attrs["x"], attrs["y"], symbolSize)) {
                 skipped++;
                 continue;
             }
             // check attributes and symbol type
-            var attrsSame = attributesSame(prevAttrs, attrs, styleKeys);
+            var attrsSame = attributesSame(prevAttrs, attrs, Object.keys(canvasDrawer_1.ContextStyleAttrs));
             var symbolGenerator = symbolProjector()(datum, index, _this._dataset);
             if (attrsSame && prevSymbolSize == symbolSize && prevSymbolGenerator == symbolGenerator) {
                 skipped++;
@@ -6702,25 +6704,7 @@ function makeSymbolCanvasDrawStep(dataset, symbolProjector, sizeProjector) {
                 bufferCtx.beginPath();
                 symbolGenerator(symbolSize).context(bufferCtx)(null);
                 bufferCtx.closePath();
-                if (attrs["stroke-width"]) {
-                    bufferCtx.lineWidth = parseFloat(attrs["stroke-width"]);
-                }
-                if (attrs["stroke"]) {
-                    var strokeColor = d3.color("stroke");
-                    if (attrs["opacity"]) {
-                        strokeColor.opacity = attrs["opacity"];
-                    }
-                    bufferCtx.strokeStyle = strokeColor.rgb().toString();
-                    bufferCtx.stroke();
-                }
-                if (attrs["fill"]) {
-                    var fillColor = d3.color(attrs["fill"]);
-                    if (attrs["opacity"]) {
-                        fillColor.opacity = attrs["opacity"];
-                    }
-                    bufferCtx.fillStyle = fillColor.rgb().toString();
-                    bufferCtx.fill();
-                }
+                canvasDrawer_1.styleContext(bufferCtx, attrs);
                 // save the values that are in the buffer
                 prevSymbolGenerator = symbolGenerator;
                 prevSymbolSize = symbolSize;
@@ -6743,16 +6727,6 @@ function attributesSame(prevAttrs, attrs, attrKeys) {
         }
     }
     return true;
-}
-function resolveAttributesSubset(projector, attrKeys, datum, index) {
-    var attrs = {};
-    for (var i = 0; i < attrKeys.length; i++) {
-        var attrKey = attrKeys[i];
-        if (projector.hasOwnProperty(attrKey)) {
-            attrs[attrKey] = projector[attrKey](datum, index);
-        }
-    }
-    return attrs;
 }
 
 
