@@ -63,7 +63,7 @@ module.exports = [
    * User adds two script tags to their html page:
    *
    *   <script src="//cdnjs.cloudflare.com/ajax/libs/d3/4.5.0/d3.js"></script>
-   *   <script src="//rawgithub.com/palantir/plottable/develop/plottable.js"></script>
+   *   <script src="//unpkg.com/plottable/plottable.js"></script>
    *
    * And then references Plottable globally.
    *
@@ -74,7 +74,7 @@ module.exports = [
    * require.config( {
    *   paths: {
    *     d3: "https://cdnjs.cloudflare.com/ajax/libs/d3/4.5.0/d3.min",
-   *     plottable: "https://cdnjs.cloudflare.com/ajax/libs/plottable.js/2.8.0/plottable"
+   *     plottable: "//unpkg.com/plottable/plottable.js"
    *   },
    *   shim: {
    *     "plottable": {
