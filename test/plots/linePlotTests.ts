@@ -851,7 +851,7 @@ describe("Plots", () => {
         const attrSpy = sinon.spy();
 
         plot.datasets([dataset]);
-        plot.attr("foo", attrSpy);
+        plot.attr("stroke", attrSpy);
         plot.renderTo(div);
         assert.isTrue(attrSpy.calledWith(datum, 0, dataset), "attr is passed individual datum");
       });

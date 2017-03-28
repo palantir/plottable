@@ -3,7 +3,6 @@
  * @license MIT
  */
 
-import * as d3 from "d3";
 import { AttributeToAppliedProjector } from "../core/interfaces";
 import { CanvasDrawStep, resolveAttributesSubsetWithStyles, styleContext } from "./canvasDrawer";
 import { SVGDrawer } from "./svgDrawer";

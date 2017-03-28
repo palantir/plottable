@@ -3,8 +3,6 @@
  * @license MIT
  */
 
-import * as d3 from "d3";
-
 import { Dataset } from "../core/dataset";
 import { AttributeToAppliedProjector, IAccessor } from "../core/interfaces";
 import { SymbolFactory } from "../core/symbolFactories";
@@ -18,7 +16,9 @@ export class SymbolSVGDrawer extends SVGDrawer {
     }
 }
 
-let buffer: CanvasBuffer;
+// for testing use of buffer
+export let buffer: CanvasBuffer;
+
 export function makeSymbolCanvasDrawStep(
         dataset: Dataset,
         symbolProjector: () => IAccessor<SymbolFactory>,
@@ -41,7 +41,6 @@ export function makeSymbolCanvasDrawStep(
         let prevAttrs: any = null;
         let prevSymbolGenerator: any = null;
         let prevSymbolSize: number = null;
-        let skipped = 0;
         for (let index = 0; index < data.length; index++) {
             const datum = data[index];
 
@@ -49,7 +48,6 @@ export function makeSymbolCanvasDrawStep(
             const attrs = resolveAttributesSubsetWithStyles(attrToAppliedProjector, ["x", "y"], datum, index);
             const symbolSize = sizeProjector()(datum, index, dataset);
             if (!intersectsCanvasBounds(attrs["x"], attrs["y"], symbolSize)) {
-                skipped++;
                 continue;
             }
 
@@ -57,7 +55,7 @@ export function makeSymbolCanvasDrawStep(
             const attrsSame = attributesSame(prevAttrs, attrs, Object.keys(ContextStyleAttrs));
             const symbolGenerator = symbolProjector()(datum, index, this._dataset);
             if (attrsSame && prevSymbolSize == symbolSize && prevSymbolGenerator == symbolGenerator) {
-                skipped++;
+                // no-op;
             } else {
                 // make room for bigger symbol if needed
                 if (symbolSize > buffer.pixelWidth || symbolSize > buffer.pixelHeight) {

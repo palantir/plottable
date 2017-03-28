@@ -6660,7 +6660,6 @@ var SymbolSVGDrawer = (function (_super) {
     return SymbolSVGDrawer;
 }(svgDrawer_1.SVGDrawer));
 exports.SymbolSVGDrawer = SymbolSVGDrawer;
-var buffer;
 function makeSymbolCanvasDrawStep(dataset, symbolProjector, sizeProjector) {
     var _this = this;
     return function (context, data, attrToAppliedProjector) {
@@ -6671,36 +6670,33 @@ function makeSymbolCanvasDrawStep(dataset, symbolProjector, sizeProjector) {
                 y + size >= 0 && y - size <= height);
         };
         // lazily create offscreen buffer of modest size
-        if (buffer == null) {
-            buffer = new canvasBuffer_1.CanvasBuffer(0, 0, 1);
+        if (exports.buffer == null) {
+            exports.buffer = new canvasBuffer_1.CanvasBuffer(0, 0, 1);
         }
         var prevAttrs = null;
         var prevSymbolGenerator = null;
         var prevSymbolSize = null;
-        var skipped = 0;
         for (var index = 0; index < data.length; index++) {
             var datum = data[index];
             // check symbol is in viewport
             var attrs = canvasDrawer_1.resolveAttributesSubsetWithStyles(attrToAppliedProjector, ["x", "y"], datum, index);
             var symbolSize = sizeProjector()(datum, index, dataset);
             if (!intersectsCanvasBounds(attrs["x"], attrs["y"], symbolSize)) {
-                skipped++;
                 continue;
             }
             // check attributes and symbol type
             var attrsSame = attributesSame(prevAttrs, attrs, Object.keys(canvasDrawer_1.ContextStyleAttrs));
             var symbolGenerator = symbolProjector()(datum, index, _this._dataset);
             if (attrsSame && prevSymbolSize == symbolSize && prevSymbolGenerator == symbolGenerator) {
-                skipped++;
             }
             else {
                 // make room for bigger symbol if needed
-                if (symbolSize > buffer.pixelWidth || symbolSize > buffer.pixelHeight) {
-                    buffer.resize(symbolSize, symbolSize, true);
+                if (symbolSize > exports.buffer.pixelWidth || symbolSize > exports.buffer.pixelHeight) {
+                    exports.buffer.resize(symbolSize, symbolSize, true);
                 }
                 // draw actual symbol into buffer
-                buffer.clear();
-                var bufferCtx = buffer.ctx;
+                exports.buffer.clear();
+                var bufferCtx = exports.buffer.ctx;
                 bufferCtx.beginPath();
                 symbolGenerator(symbolSize).context(bufferCtx)(null);
                 bufferCtx.closePath();
@@ -6711,7 +6707,7 @@ function makeSymbolCanvasDrawStep(dataset, symbolProjector, sizeProjector) {
                 prevAttrs = attrs;
             }
             // blit the buffer to the canvas
-            buffer.blitCenter(context, attrs["x"], attrs["y"]);
+            exports.buffer.blitCenter(context, attrs["x"], attrs["y"]);
         }
     };
 }
