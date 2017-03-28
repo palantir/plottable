@@ -157,7 +157,6 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
     return propertyToProjectors;
   }
 
-  // When generate is true, callback returns generated symbol, otherwise returns symbol generator
   protected _constructSymbolGenerator() {
     const symbolProjector = Plot._scaledAccessor(this.symbol());
     const sizeProjector = Plot._scaledAccessor(this.size());

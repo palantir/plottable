@@ -1,3 +1,7 @@
+/**
+ * Copyright 2017-present Palantir Technologies
+ * @license MIT
+ */
 
 export class CanvasBuffer {
     /**

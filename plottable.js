@@ -11631,6 +11631,10 @@ exports.Touch = Touch;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/**
+ * Copyright 2017-present Palantir Technologies
+ * @license MIT
+ */
 
 var CanvasBuffer = (function () {
     function CanvasBuffer(screenWidth, screenHeight, devicePixelRatio) {
@@ -13746,7 +13750,6 @@ var Scatter = (function (_super) {
         propertyToProjectors["d"] = this._constructSymbolGenerator();
         return propertyToProjectors;
     };
-    // When generate is true, callback returns generated symbol, otherwise returns symbol generator
     Scatter.prototype._constructSymbolGenerator = function () {
         var symbolProjector = plot_1.Plot._scaledAccessor(this.symbol());
         var sizeProjector = plot_1.Plot._scaledAccessor(this.size());

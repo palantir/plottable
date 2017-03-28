@@ -8,7 +8,7 @@ import * as d3Shape from "d3-shape";
 
 /**
  * A SymbolFactory is a function that takes in a symbolSize which is the edge length of the render area
- * and returns the Symbol to continue chaining the context onto before generating.
+ * and returns a d3 symbol generator.
  */
 export type SymbolFactory = (symbolSize: number) => d3Shape.Symbol<any, any>;
 
