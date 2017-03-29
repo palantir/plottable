@@ -69,8 +69,6 @@ module.exports = function(grunt) {
   };
 
   var FILES_TO_COMMIT = [
-    "plottable.js",
-    "plottable.min.js",
     "plottable.d.ts",
     "plottable.css",
     "plottable.zip",
@@ -103,8 +101,6 @@ module.exports = function(grunt) {
         archive: "plottable.zip"
       },
       files: [
-        {src: "plottable.js",       dest: "."},
-        {src: "plottable.min.js",   dest: "."},
         {src: "plottable.d.ts",     dest: "."},
         {src: "plottable.css",      dest: "."},
         {src: "README.md",          dest: "."},
