@@ -13,17 +13,6 @@ module.exports = function(grunt) {
     }
   };
 
-  var bumpConfig = {
-    options: {
-      files: ["package.json", "bower.json"],
-      updateConfigs: ["pkg"],
-      commit: false,
-      createTag: false,
-      push: false,
-      prereleaseName: "rc"
-    }
-  };
-
   var jscsConfig = {
     files: ["Gruntfile.js", "quicktests/**/*.js"],
     options: {
@@ -68,58 +57,6 @@ module.exports = function(grunt) {
     }
   };
 
-  var FILES_TO_COMMIT = [
-    "plottable.js",
-    "plottable.min.js",
-    "plottable.d.ts",
-    "plottable.css",
-    "plottable.zip",
-    "bower.json",
-    "package.json"
-  ];
-
-  var gitcommitConfig = {
-    version: {
-      options: {
-        message: "Release version <%= pkg.version %>"
-      },
-      files: {
-        src: FILES_TO_COMMIT
-      }
-    },
-    built: {
-      options: {
-        message: "Update built files"
-      },
-      files: {
-        src: FILES_TO_COMMIT
-      }
-    }
-  };
-
-  var compressConfig = {
-    main: {
-      options: {
-        archive: "plottable.zip"
-      },
-      files: [
-        {src: "plottable.js",       dest: "."},
-        {src: "plottable.min.js",   dest: "."},
-        {src: "plottable.d.ts",     dest: "."},
-        {src: "plottable.css",      dest: "."},
-        {src: "README.md",          dest: "."},
-        {src: "LICENSE",            dest: "."},
-        {src: ["build/**"],         dest: "."}
-      ]
-    }
-  };
-
-  var uglifyConfig = {
-    main: {
-      files: {"plottable.min.js": ["plottable.js"]}
-    }
-  };
-
   var saucelabsMochaConfig = {
     all: {
       options: {
@@ -149,16 +86,12 @@ module.exports = function(grunt) {
 
   grunt.initConfig({
     pkg: grunt.file.readJSON("package.json"),
-    bump: bumpConfig,
     jscs: jscsConfig,
     eslint: eslintConfig,
     exec: execConfig,
     watch: watchConfig,
     "blanket_mocha": blanketMochaConfig,
     connect: connectConfig,
-    gitcommit: gitcommitConfig,
-    compress: compressConfig,
-    uglify: uglifyConfig,
     "saucelabs-mocha": saucelabsMochaConfig
   });
 
@@ -170,13 +103,6 @@ module.exports = function(grunt) {
     "update-quicktests"
   ]);
 
-  grunt.registerTask("release:patch", ["bump:patch", "dist-compile", "gitcommit:version"]);
-  grunt.registerTask("release:minor", ["bump:minor", "dist-compile", "gitcommit:version"]);
-  grunt.registerTask("release:major", ["bump:major", "dist-compile", "gitcommit:version"]);
-
-  grunt.registerTask("dist-compile", ["exec:yarn:build", "exec:yarn:sed-version", "uglify", "compress"]);
-
-  grunt.registerTask("commitjs", ["dist-compile", "gitcommit:built"]);
   grunt.registerTask("default", ["exec:yarn:start"]);
 
   grunt.registerTask("test", ["dev-compile", "test-local"]);
