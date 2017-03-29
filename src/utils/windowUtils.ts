@@ -14,15 +14,8 @@ export function warn(warning: string) {
   if (!Configs.SHOW_WARNINGS) {
     return;
   }
-  /* tslint:disable:no-console */
-  if ((<any> window).console != null) {
-    if ((<any> window).console.warn != null) {
-      console.warn(warning);
-    } else if ((<any> window).console.log != null) {
-      console.log(warning);
-    }
-  }
-  /* tslint:enable:no-console */
+  // tslint:disable-next-line:no-console
+  console.warn(warning);
 }
 
 /**

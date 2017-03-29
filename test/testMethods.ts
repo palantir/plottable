@@ -88,8 +88,7 @@ export function assertBBoxNonIntersection(firstEl: SimpleSelection<void>, second
     top: Math.max(firstBox.top, secondBox.top),
   };
 
-  // +1 for inaccuracy in IE
-  assert.isTrue(intersectionBox.left + 1 >= intersectionBox.right || intersectionBox.bottom + 1 >= intersectionBox.top,
+  assert.isTrue(intersectionBox.left >= intersectionBox.right || intersectionBox.bottom >= intersectionBox.top,
     "bounding rects are not intersecting");
 }
 
