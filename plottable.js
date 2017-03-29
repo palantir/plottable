@@ -3656,7 +3656,7 @@ var Plots = __webpack_require__(17);
 var plot_1 = __webpack_require__(2);
 var xyPlot_1 = __webpack_require__(16);
 exports.BarOrientation = makeEnum_1.makeEnum(["vertical", "horizontal"]);
-exports.LabelsPosition = makeEnum_1.makeEnum(["start", "middle", "end"]);
+exports.LabelsPosition = makeEnum_1.makeEnum(["start", "middle", "end", "outside"]);
 var Bar = (function (_super) {
     __extends(Bar, _super);
     /**
@@ -4043,7 +4043,8 @@ var Bar = (function (_super) {
                     effectiveBarHeight = barY + barHeight;
                 }
                 var offset_1 = Bar._LABEL_PADDING;
-                showLabelOnBar = measurement.height + 2 * offset_1 <= effectiveBarHeight;
+                showLabelOnBar = (measurement.height + 2 * offset_1 <= effectiveBarHeight)
+                    && (_this._labelsPosition !== exports.LabelsPosition.outside);
                 var placeLabel = function (position) {
                     switch (position) {
                         case "top":

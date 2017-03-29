@@ -34,7 +34,7 @@ type LabelConfig = {
 export const BarOrientation = makeEnum(["vertical", "horizontal"]);
 export type BarOrientation = keyof typeof BarOrientation;
 
-export const LabelsPosition = makeEnum(["start", "middle", "end"]);
+export const LabelsPosition = makeEnum(["start", "middle", "end", "outside"]);
 export type LabelsPosition = keyof typeof LabelsPosition;
 
 export class Bar<X, Y> extends XYPlot<X, Y> {
@@ -543,7 +543,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
           effectiveBarHeight = barY + barHeight;
         }
         const offset = Bar._LABEL_PADDING;
-        showLabelOnBar = measurement.height + 2 * offset <= effectiveBarHeight;
+        showLabelOnBar = (measurement.height + 2 * offset <= effectiveBarHeight)
+          && (this._labelsPosition !== LabelsPosition.outside);
 
         const placeLabel = (position: "top" | "middle" | "bottom") => {
           switch (position) {
