@@ -4134,7 +4134,7 @@ var Bar = (function (_super) {
                             return;
                     }
                 };
-                var barIsLeftOfBaseline = scaledValue <= scaledBaseline;
+                var barIsLeftOfBaseline = scaledValue < scaledBaseline;
                 if (showLabelOnBar) {
                     switch (_this._labelsPosition) {
                         case exports.LabelsPosition.start:

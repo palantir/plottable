@@ -637,7 +637,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
           }
         };
 
-        const barIsLeftOfBaseline = scaledValue <= scaledBaseline;
+        const barIsLeftOfBaseline = scaledValue < scaledBaseline;
         if (showLabelOnBar) {
           switch (this._labelsPosition) {
             case LabelsPosition.start:
