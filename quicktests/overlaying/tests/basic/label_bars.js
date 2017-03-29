@@ -17,10 +17,7 @@ function run(svg, data, Plottable) {
   "use strict";
 
   var xScale = new Plottable.Scales.Linear();
-  var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
-
   var yScale = new Plottable.Scales.Linear();
-  var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
   var dataset = new Plottable.Dataset(data);
   var dataset1 = new Plottable.Dataset(data);
@@ -28,7 +25,7 @@ function run(svg, data, Plottable) {
                               .addDataset(dataset)
                               .x(function(d) { return d.x; }, xScale)
                               .y(function(d) { return d.y; }, yScale)
-                              .labelsEnabled(true)
+                              .labelsEnabled(true, "start")
                               .attr("opacity", 0.75)
 
   var verticalStackedBarPlot = new Plottable.Plots.StackedBar("vertical")
@@ -36,21 +33,33 @@ function run(svg, data, Plottable) {
                               .addDataset(dataset1)
                               .x(function(d) { return d.x; }, xScale)
                               .y(function(d) { return d.y; }, yScale)
-                              .labelsEnabled(true)
+                              .labelsEnabled(true, "middle")
+                              .attr("opacity", 0.75)
+
+  var horizontalBarPlot = new Plottable.Plots.Bar("horizontal")
+                              .addDataset(dataset)
+                              .x(function(d) { return d.x; }, xScale)
+                              .y(function(d) { return d.y; }, yScale)
+                              .labelsEnabled(true, "end")
+                              .attr("opacity", 0.75)
+
+  var horizontalStackedBarPlot = new Plottable.Plots.StackedBar("horizontal")
+                              .addDataset(dataset)
+                              .addDataset(dataset1)
+                              .x(function(d) { return d.x; }, xScale)
+                              .y(function(d) { return d.y; }, yScale)
+                              .labelsEnabled(true, "middle")
                               .attr("opacity", 0.75)
 
   var chart = new Plottable.Components.Table([
-    [yAxis, verticalBarPlot, verticalStackedBarPlot],
-    [null,  xAxis]]);
+    [verticalBarPlot, verticalStackedBarPlot],
+    [horizontalBarPlot, horizontalStackedBarPlot]
+  ]);
 
   chart.renderTo(svg);
 
-  var cb = function(){
-    var d = dataset.data();
-    dataset.data(d);
-  };
-
-  new Plottable.Interactions.Click().onClick(cb).attachTo(verticalBarPlot);
   new Plottable.Interactions.PanZoom(xScale, yScale).attachTo(verticalBarPlot);
   new Plottable.Interactions.PanZoom(xScale, yScale).attachTo(verticalStackedBarPlot);
+  new Plottable.Interactions.PanZoom(xScale, yScale).attachTo(horizontalBarPlot);
+  new Plottable.Interactions.PanZoom(xScale, yScale).attachTo(horizontalStackedBarPlot);
 }

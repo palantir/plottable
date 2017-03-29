@@ -16,41 +16,41 @@
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
-/******/
+
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
-/******/
+
 /******/ 		// Check if module is in cache
 /******/ 		if(installedModules[moduleId])
 /******/ 			return installedModules[moduleId].exports;
-/******/
+
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
 /******/ 			l: false,
 /******/ 			exports: {}
 /******/ 		};
-/******/
+
 /******/ 		// Execute the module function
 /******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/
+
 /******/ 		// Flag the module as loaded
 /******/ 		module.l = true;
-/******/
+
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-/******/
-/******/
+
+
 /******/ 	// expose the modules object (__webpack_modules__)
 /******/ 	__webpack_require__.m = modules;
-/******/
+
 /******/ 	// expose the module cache
 /******/ 	__webpack_require__.c = installedModules;
-/******/
+
 /******/ 	// identity function for calling harmony imports with the correct context
 /******/ 	__webpack_require__.i = function(value) { return value; };
-/******/
+
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
 /******/ 		if(!__webpack_require__.o(exports, name)) {
@@ -61,7 +61,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 			});
 /******/ 		}
 /******/ 	};
-/******/
+
 /******/ 	// getDefaultExport function for compatibility with non-harmony modules
 /******/ 	__webpack_require__.n = function(module) {
 /******/ 		var getter = module && module.__esModule ?
@@ -70,13 +70,13 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 		__webpack_require__.d(getter, 'a', getter);
 /******/ 		return getter;
 /******/ 	};
-/******/
+
 /******/ 	// Object.prototype.hasOwnProperty.call
 /******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-/******/
+
 /******/ 	// __webpack_public_path__
 /******/ 	__webpack_require__.p = "";
-/******/
+
 /******/ 	// Load entry module and return exports
 /******/ 	return __webpack_require__(__webpack_require__.s = 127);
 /******/ })
@@ -2800,9 +2800,8 @@ function warn(warning) {
     if (!Configs.SHOW_WARNINGS) {
         return;
     }
-    /* tslint:disable:no-console */
+    // tslint:disable-next-line:no-console
     console.warn(warning);
-    /* tslint:enable:no-console */
 }
 exports.warn = warn;
 /**
@@ -3657,6 +3656,7 @@ var Plots = __webpack_require__(17);
 var plot_1 = __webpack_require__(2);
 var xyPlot_1 = __webpack_require__(16);
 exports.BarOrientation = makeEnum_1.makeEnum(["vertical", "horizontal"]);
+exports.LabelsPosition = makeEnum_1.makeEnum(["start", "middle", "end"]);
 var Bar = (function (_super) {
     __extends(Bar, _super);
     /**
@@ -3670,6 +3670,7 @@ var Bar = (function (_super) {
         var _this = _super.call(this) || this;
         _this._labelFormatter = Formatters.identity();
         _this._labelsEnabled = false;
+        _this._labelsPosition = exports.LabelsPosition.end;
         _this._hideBarsIfAnyAreTooWide = true;
         _this._barPixelWidth = 0;
         _this.addClass("bar-plot");
@@ -3785,12 +3786,15 @@ var Bar = (function (_super) {
         this._updateBarPixelWidth();
         return this;
     };
-    Bar.prototype.labelsEnabled = function (enabled) {
+    Bar.prototype.labelsEnabled = function (enabled, labelsPosition) {
         if (enabled == null) {
             return this._labelsEnabled;
         }
         else {
             this._labelsEnabled = enabled;
+            if (labelsPosition != null) {
+                this._labelsPosition = labelsPosition;
+            }
             this.render();
             return this;
         }
@@ -4030,6 +4034,7 @@ var Bar = (function (_super) {
             if (_this._isVertical) {
                 labelOrigin.x += containerWidth / 2 - measurement.width / 2;
                 var barY = attrToProjector["y"](d, i, dataset);
+                // height of the bar in the viewport
                 var effectiveBarHeight = barHeight;
                 if (barY + barHeight > _this.height()) {
                     effectiveBarHeight = _this.height() - barY;
@@ -4037,36 +4042,59 @@ var Bar = (function (_super) {
                 else if (barY < 0) {
                     effectiveBarHeight = barY + barHeight;
                 }
-                var offset = Bar._LABEL_PADDING;
-                showLabelOnBar = measurement.height + 2 * offset <= effectiveBarHeight;
-                if (showLabelOnBar) {
-                    if (scaledValue < scaledBaseline) {
-                        labelContainerOrigin.y += offset;
-                        yAlignment = "top";
-                        labelOrigin.y += offset;
+                var offset_1 = Bar._LABEL_PADDING;
+                showLabelOnBar = measurement.height + 2 * offset_1 <= effectiveBarHeight;
+                var placeLabel = function (position) {
+                    switch (position) {
+                        case "top":
+                            labelContainerOrigin.y += offset_1;
+                            yAlignment = "top";
+                            labelOrigin.y += offset_1;
+                            return;
+                        case "bottom":
+                            labelContainerOrigin.y -= offset_1;
+                            yAlignment = "bottom";
+                            labelOrigin.y += containerHeight - offset_1 - measurement.height;
+                            return;
+                        case "middle":
+                            yAlignment = "center";
+                            labelOrigin.y += ((containerHeight + measurement.height) / 2);
+                            return;
                     }
-                    else {
-                        labelContainerOrigin.y -= offset;
-                        yAlignment = "bottom";
-                        labelOrigin.y += containerHeight - offset - measurement.height;
+                };
+                if (showLabelOnBar) {
+                    var barIsAboveBaseline = scaledValue < scaledBaseline;
+                    switch (_this._labelsPosition) {
+                        case exports.LabelsPosition.start:
+                            barIsAboveBaseline ? placeLabel("bottom") : placeLabel("top");
+                            break;
+                        case exports.LabelsPosition.middle:
+                            placeLabel("middle");
+                            break;
+                        case exports.LabelsPosition.end:
+                            barIsAboveBaseline ? placeLabel("top") : placeLabel("bottom");
+                            break;
                     }
                 }
                 else {
-                    containerHeight = barHeight + offset + measurement.height;
+                    // show label off bar
+                    containerHeight = barHeight + offset_1 + measurement.height;
                     if (scaledValue <= scaledBaseline) {
-                        labelContainerOrigin.y -= offset + measurement.height;
+                        labelContainerOrigin.y -= offset_1 + measurement.height;
                         yAlignment = "top";
-                        labelOrigin.y -= offset + measurement.height;
+                        labelOrigin.y -= offset_1 + measurement.height;
                     }
                     else {
                         yAlignment = "bottom";
-                        labelOrigin.y += barHeight + offset;
+                        labelOrigin.y += barHeight + offset_1;
                     }
                 }
             }
             else {
+                // horizontal
                 labelOrigin.y += containerHeight / 2 - measurement.height / 2;
                 var barX = attrToProjector["x"](d, i, dataset);
+                // width of bar in viewport
                 var effectiveBarWidth = barWidth;
                 if (barX + barWidth > _this.width()) {
                     effectiveBarWidth = _this.width() - barX;
@@ -4074,30 +4102,51 @@ var Bar = (function (_super) {
                 else if (barX < 0) {
                     effectiveBarWidth = barX + barWidth;
                 }
-                var offset = Bar._LABEL_PADDING;
-                showLabelOnBar = measurement.width + 2 * offset <= effectiveBarWidth;
-                if (showLabelOnBar) {
-                    if (scaledValue < scaledBaseline) {
-                        labelContainerOrigin.x += offset;
-                        xAlignment = "left";
-                        labelOrigin.x += offset;
+                var offset_2 = Bar._LABEL_PADDING;
+                showLabelOnBar = measurement.width + 2 * offset_2 <= effectiveBarWidth;
+                var placeLabel = function (position) {
+                    switch (position) {
+                        case "left":
+                            labelContainerOrigin.x += offset_2;
+                            xAlignment = "left";
+                            labelOrigin.x += offset_2;
+                            return;
+                        case "right":
+                            labelContainerOrigin.x -= offset_2;
+                            xAlignment = "right";
+                            labelOrigin.x += containerWidth - offset_2 - measurement.width;
+                            return;
+                        case "middle":
+                            yAlignment = "center";
+                            labelOrigin.x += ((containerHeight + measurement.width) / 2);
+                            return;
                     }
-                    else {
-                        labelContainerOrigin.x -= offset;
-                        xAlignment = "right";
-                        labelOrigin.x += containerWidth - offset - measurement.width;
+                };
+                if (showLabelOnBar) {
+                    var barIsLeftOfBaseline = scaledValue < scaledBaseline;
+                    switch (_this._labelsPosition) {
+                        case exports.LabelsPosition.start:
+                            barIsLeftOfBaseline ? placeLabel("right") : placeLabel("left");
+                            break;
+                        case exports.LabelsPosition.middle:
+                            placeLabel("middle");
+                            break;
+                        case exports.LabelsPosition.end:
+                            barIsLeftOfBaseline ? placeLabel("left") : placeLabel("right");
+                            break;
                     }
                 }
                 else {
-                    containerWidth = barWidth + offset + measurement.width;
+                    // show label off bar
+                    containerWidth = barWidth + offset_2 + measurement.width;
                     if (scaledValue < scaledBaseline) {
-                        labelContainerOrigin.x -= offset + measurement.width;
+                        labelContainerOrigin.x -= offset_2 + measurement.width;
                         xAlignment = "left";
-                        labelOrigin.x -= offset + measurement.width;
+                        labelOrigin.x -= offset_2 + measurement.width;
                     }
                     else {
                         xAlignment = "right";
-                        labelOrigin.x += barWidth + offset;
+                        labelOrigin.x += barWidth + offset_2;
                     }
                 }
             }
@@ -5641,18 +5690,14 @@ exports.clamp = clamp;
 function max(array, firstArg, secondArg) {
     var accessor = typeof (firstArg) === "function" ? firstArg : null;
     var defaultValue = accessor == null ? firstArg : secondArg;
-    /* tslint:disable:ban */
     var maxValue = accessor == null ? d3.max(array) : d3.max(array, accessor);
-    /* tslint:enable:ban */
     return maxValue !== undefined ? maxValue : defaultValue;
 }
 exports.max = max;
 function min(array, firstArg, secondArg) {
     var accessor = typeof (firstArg) === "function" ? firstArg : null;
     var defaultValue = accessor == null ? firstArg : secondArg;
-    /* tslint:disable:ban */
     var minValue = accessor == null ? d3.min(array) : d3.min(array, accessor);
-    /* tslint:enable:ban */
     return minValue !== undefined ? minValue : defaultValue;
 }
 exports.min = min;
@@ -13828,11 +13873,10 @@ var Segment = (function (_super) {
         return intersections.length > 0;
     };
     Segment.prototype._lineIntersectsSegment = function (point1, point2, point3, point4) {
-        /* tslint:disable no-shadowed-variable */
+        // tslint:disable-next-line:no-shadowed-variable
         var calcOrientation = function (point1, point2, point) {
             return (point2.x - point1.x) * (point.y - point2.y) - (point2.y - point1.y) * (point.x - point2.x);
         };
-        /* tslint:enable no-shadowed-variable */
         // point3 and point4 are on different sides of line formed by point1 and point2
         return calcOrientation(point1, point2, point3) * calcOrientation(point1, point2, point4) < 0;
     };
