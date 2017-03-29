@@ -13,11 +13,12 @@
   "scripts": {
     "build": "npm-run-all -p lint:tslint build:tsc -s build:webpack",
     "build:tsc": "tsc -p test/",
-    "build:webpack": "webpack --config webpack.config.js",
+    "build:webpack": "webpack",
     "check_version": "echo ${npm_package_version} $(npm view ${npm_package_name} version) | awk '{ if ($1 == $2) { exit 1 }}'",
-    "dist-compile": "grunt dist-compile",
+    "dist": "npm-run-all build dist:sed-version dist:build-min",
+    "dist:build-min": "webpack --config webpackConfig/build-min.js",
+    "dist:sed-version": "sed -i.bak -e \"s/exports.version = __VERSION__/exports.version = \\\"${npm_package_version}\\\"/\" build/src/core/version.js",
     "lint:tslint": "tslint --project tsconfig.json --type-check",
-    "sed-version": "sed -i.bak -e \"s/exports.version = __VERSION__/exports.version = \\\"${npm_package_version}\\\"/\" build/src/core/version.js",
     "start": "npm-run-all -p start:update-quicktests start:watch-tsc start:watch-quicktests start:webpack-dev-server",
     "start:update-quicktests": "grunt update-quicktests",
     "start:watch-quicktests": "grunt watch-quicktests",
@@ -53,8 +54,11 @@
     "sinon": "^2.1.0",
     "tslint": "4.5.1",
     "typescript": "2.1.5",
+    "uglify-js": "^2.8.18",
+    "uglifyjs-webpack-plugin": "^0.3.1",
     "webpack": "2.2.1",
     "webpack-dev-server": "2.3.0",
+    "webpack-merge": "^4.1.0",
     "write-file-webpack-plugin": "3.4.2"
   },
   "dependencies": {
