@@ -1,5 +1,4 @@
 const webpack = require("webpack");
-const WriteFilePlugin = require("write-file-webpack-plugin");
 
 const packageJson = require("../package.json");
 
@@ -73,7 +72,6 @@ module.exports = {
     }),
     new webpack.DefinePlugin({
       "__VERSION__": JSON.stringify(packageJson.version)
-    }),
-    new WriteFilePlugin()
+    })
   ]
 };
