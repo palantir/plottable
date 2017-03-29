@@ -546,7 +546,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
         showLabelOnBar = (measurement.height + 2 * offset <= effectiveBarHeight)
           && (this._labelsPosition !== LabelsPosition.outside);
 
-        const placeLabel = (position: "top" | "middle" | "bottom") => {
+        const placeLabel = (position: "top" | "middle" | "bottom" | "outside-top" | "outside-bottom") => {
           switch (position) {
             case "top":
               labelContainerOrigin.y += offset;
@@ -562,11 +562,20 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
               yAlignment = "center";
               labelOrigin.y += ((containerHeight + measurement.height) / 2);
               return;
+            case "outside-top":
+              labelContainerOrigin.y -= offset + measurement.height;
+              yAlignment = "top";
+              labelOrigin.y -= offset + measurement.height;
+              return;
+            case "outside-bottom":
+              yAlignment = "bottom";
+              labelOrigin.y += barHeight + offset;
+              return;
           }
         };
 
+        const barIsAboveBaseline = scaledValue <= scaledBaseline;
         if (showLabelOnBar) {
-          const barIsAboveBaseline = scaledValue < scaledBaseline;
           switch (this._labelsPosition) {
             case LabelsPosition.start:
               barIsAboveBaseline ? placeLabel("bottom") : placeLabel("top");
@@ -581,14 +590,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
         } else {
           // show label off bar
           containerHeight = barHeight + offset + measurement.height;
-          if (scaledValue <= scaledBaseline) {
-            labelContainerOrigin.y -= offset + measurement.height;
-            yAlignment = "top";
-            labelOrigin.y -= offset + measurement.height;
-          } else {
-            yAlignment = "bottom";
-            labelOrigin.y += barHeight + offset;
-          }
+          barIsAboveBaseline ? placeLabel("outside-top") : placeLabel("outside-bottom");
         }
       } else {
         // horizontal
@@ -604,9 +606,10 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
           effectiveBarWidth = barX + barWidth;
         }
         const offset = Bar._LABEL_PADDING;
-        showLabelOnBar = measurement.width + 2 * offset <= effectiveBarWidth;
+        showLabelOnBar = (measurement.width + 2 * offset <= effectiveBarWidth)
+          && (this._labelsPosition !== LabelsPosition.outside);
 
-        const placeLabel = (position: "left" | "middle" | "right") => {
+        const placeLabel = (position: "left" | "middle" | "right" | "outside-left" | "outside-right") => {
           switch (position) {
             case "left":
               labelContainerOrigin.x += offset;
@@ -620,13 +623,22 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
               return;
             case "middle":
               yAlignment = "center";
-              labelOrigin.x += ((containerHeight + measurement.width) / 2);
+              labelOrigin.x += ((containerWidth + measurement.width) / 2);
+              return;
+            case "outside-left":
+              labelContainerOrigin.x -= offset + measurement.width;
+              xAlignment = "left";
+              labelOrigin.x -= offset + measurement.width;
+              return;
+            case "outside-right":
+              xAlignment = "right";
+              labelOrigin.x += barWidth + offset;
               return;
           }
         };
 
+        const barIsLeftOfBaseline = scaledValue <= scaledBaseline;
         if (showLabelOnBar) {
-          const barIsLeftOfBaseline = scaledValue < scaledBaseline;
           switch (this._labelsPosition) {
             case LabelsPosition.start:
               barIsLeftOfBaseline ? placeLabel("right") : placeLabel("left");
@@ -641,14 +653,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
         } else {
           // show label off bar
           containerWidth = barWidth + offset + measurement.width;
-          if (scaledValue < scaledBaseline) {
-            labelContainerOrigin.x -= offset + measurement.width;
-            xAlignment = "left";
-            labelOrigin.x -= offset + measurement.width;
-          } else {
-            xAlignment = "right";
-            labelOrigin.x += barWidth + offset;
-          }
+          barIsLeftOfBaseline ? placeLabel("outside-left") : placeLabel("outside-right");
         }
       }
 

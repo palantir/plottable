@@ -4061,10 +4061,19 @@ var Bar = (function (_super) {
                             yAlignment = "center";
                             labelOrigin.y += ((containerHeight + measurement.height) / 2);
                             return;
+                        case "outside-top":
+                            labelContainerOrigin.y -= offset_1 + measurement.height;
+                            yAlignment = "top";
+                            labelOrigin.y -= offset_1 + measurement.height;
+                            return;
+                        case "outside-bottom":
+                            yAlignment = "bottom";
+                            labelOrigin.y += barHeight + offset_1;
+                            return;
                     }
                 };
+                var barIsAboveBaseline = scaledValue <= scaledBaseline;
                 if (showLabelOnBar) {
-                    var barIsAboveBaseline = scaledValue < scaledBaseline;
                     switch (_this._labelsPosition) {
                         case exports.LabelsPosition.start:
                             barIsAboveBaseline ? placeLabel("bottom") : placeLabel("top");
@@ -4080,15 +4089,7 @@ var Bar = (function (_super) {
                 else {
                     // show label off bar
                     containerHeight = barHeight + offset_1 + measurement.height;
-                    if (scaledValue <= scaledBaseline) {
-                        labelContainerOrigin.y -= offset_1 + measurement.height;
-                        yAlignment = "top";
-                        labelOrigin.y -= offset_1 + measurement.height;
-                    }
-                    else {
-                        yAlignment = "bottom";
-                        labelOrigin.y += barHeight + offset_1;
-                    }
+                    barIsAboveBaseline ? placeLabel("outside-top") : placeLabel("outside-bottom");
                 }
             }
             else {
@@ -4104,7 +4105,8 @@ var Bar = (function (_super) {
                     effectiveBarWidth = barX + barWidth;
                 }
                 var offset_2 = Bar._LABEL_PADDING;
-                showLabelOnBar = measurement.width + 2 * offset_2 <= effectiveBarWidth;
+                showLabelOnBar = (measurement.width + 2 * offset_2 <= effectiveBarWidth)
+                    && (_this._labelsPosition !== exports.LabelsPosition.outside);
                 var placeLabel = function (position) {
                     switch (position) {
                         case "left":
@@ -4119,12 +4121,21 @@ var Bar = (function (_super) {
                             return;
                         case "middle":
                             yAlignment = "center";
-                            labelOrigin.x += ((containerHeight + measurement.width) / 2);
+                            labelOrigin.x += ((containerWidth + measurement.width) / 2);
+                            return;
+                        case "outside-left":
+                            labelContainerOrigin.x -= offset_2 + measurement.width;
+                            xAlignment = "left";
+                            labelOrigin.x -= offset_2 + measurement.width;
+                            return;
+                        case "outside-right":
+                            xAlignment = "right";
+                            labelOrigin.x += barWidth + offset_2;
                             return;
                     }
                 };
+                var barIsLeftOfBaseline = scaledValue <= scaledBaseline;
                 if (showLabelOnBar) {
-                    var barIsLeftOfBaseline = scaledValue < scaledBaseline;
                     switch (_this._labelsPosition) {
                         case exports.LabelsPosition.start:
                             barIsLeftOfBaseline ? placeLabel("right") : placeLabel("left");
@@ -4140,15 +4151,7 @@ var Bar = (function (_super) {
                 else {
                     // show label off bar
                     containerWidth = barWidth + offset_2 + measurement.width;
-                    if (scaledValue < scaledBaseline) {
-                        labelContainerOrigin.x -= offset_2 + measurement.width;
-                        xAlignment = "left";
-                        labelOrigin.x -= offset_2 + measurement.width;
-                    }
-                    else {
-                        xAlignment = "right";
-                        labelOrigin.x += barWidth + offset_2;
-                    }
+                    barIsLeftOfBaseline ? placeLabel("outside-left") : placeLabel("outside-right");
                 }
             }
             var labelContainer = labelArea.append("g").attr("transform", "translate(" + labelContainerOrigin.x + ", " + labelContainerOrigin.y + ")");
