@@ -35,7 +35,7 @@ deployment:
     commands:
       - ./demo.js
   publish-npm-latest:
-    tag: /v[0-9.]+(-beta[0-9.]*)?/
+    tag: /v[0-9.]+(-(beta|rc)[0-9.]*)?/
     commands:
       # Confirm we are ready to publish
       - yarn dist
