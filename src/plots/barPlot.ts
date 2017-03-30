@@ -10,7 +10,7 @@ import * as Animators from "../animators";
 import { Dataset } from "../core/dataset";
 import * as Formatters from "../core/formatters";
 import { Formatter } from "../core/formatters";
-import { Bounds, IAccessor, Point, Range, SimpleSelection } from "../core/interfaces";
+import { AttributeToProjector, Bounds, IAccessor, Point, Range, SimpleSelection } from "../core/interfaces";
 import * as Drawers from "../drawers";
 import { ProxyDrawer } from "../drawers/drawer";
 import { RectangleCanvasDrawStep, RectangleSVGDrawer } from "../drawers/rectangleDrawer";
@@ -36,6 +36,8 @@ export type BarOrientation = keyof typeof BarOrientation;
 
 export const LabelsPosition = makeEnum(["start", "middle", "end", "outside"]);
 export type LabelsPosition = keyof typeof LabelsPosition;
+
+interface IDimensions { width: number; height: number; }
 
 export class Bar<X, Y> extends XYPlot<X, Y> {
   private static _BAR_WIDTH_RATIO = 0.95;
@@ -229,7 +231,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
    * Sets whether labels are enabled. If enabled, also sets their position relative to the baseline.
    *
    * @param {boolean} labelsEnabled
-   * * @param {LabelsPosition} labelsPosition
+   * @param {LabelsPosition} labelsPosition
    * @returns {Bar} The calling Bar Plot.
    */
   public labelsEnabled(enabled: boolean): this;
@@ -488,206 +490,166 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
 
   protected _drawLabels() {
     const dataToDraw = this._getDataToDraw();
-    let labelsTooWide = false;
-    this.datasets().forEach((dataset) => labelsTooWide = labelsTooWide || this._drawLabel(dataToDraw.get(dataset), dataset));
-    if (this._hideBarsIfAnyAreTooWide && labelsTooWide) {
+    const attrToProjector = this._generateAttrToProjector();
+    const anyLabelTooWide = this.datasets().some((dataset) => {
+      return dataToDraw.get(dataset).some((datum, index) => {
+        return this._drawLabel(datum, index, dataset, attrToProjector);
+      });
+    });
+
+    if (this._hideBarsIfAnyAreTooWide && anyLabelTooWide) {
       this.datasets().forEach((dataset) => this._labelConfig.get(dataset).labelArea.selectAll("g").remove());
     }
   }
 
-  private _drawLabel(data: any[], dataset: Dataset) {
-    const attrToProjector = this._generateAttrToProjector();
-    const labelConfig = this._labelConfig.get(dataset);
-    const labelArea = labelConfig.labelArea;
-    const measurer = labelConfig.measurer;
-    const writer = labelConfig.writer;
+  private _drawLabel(datum: any, index: number, dataset: Dataset, attrToProjector: AttributeToProjector) {
+    const { labelArea, measurer, writer } = this._labelConfig.get(dataset);
 
-    const drawLabel = (d: any, i: number) => {
-      const valueAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
-      const value = valueAccessor(d, i, dataset);
-      const valueScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
-      const scaledValue = valueScale != null ? valueScale.scale(value) : value;
-      const scaledBaseline = valueScale != null ? valueScale.scale(this.baselineValue()) : this.baselineValue();
+    const valueAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
+    const value = valueAccessor(datum, index, dataset);
+    const valueScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
+    const scaledValue = valueScale != null ? valueScale.scale(value) : value;
+    const scaledBaseline = valueScale != null ? valueScale.scale(this.baselineValue()) : this.baselineValue();
 
-      const barWidth = attrToProjector["width"](d, i, dataset);
-      const barHeight = attrToProjector["height"](d, i, dataset);
-      const text = this._labelFormatter(valueAccessor(d, i, dataset));
-      const measurement = measurer.measure(text);
+    const barCoordinates = { x: attrToProjector["x"](datum, index, dataset), y: attrToProjector["y"](datum, index, dataset) };
+    const barDimensions = { width: attrToProjector["width"](datum, index, dataset), height: attrToProjector["height"](datum, index, dataset) };
+    const text = this._labelFormatter(valueAccessor(datum, index, dataset));
+    const measurement = measurer.measure(text);
 
-      let xAlignment: Typesetter.IXAlign = "center";
-      let yAlignment: Typesetter.IYAlign = "center";
-      const labelContainerOrigin = {
-        x: attrToProjector["x"](d, i, dataset),
-        y: attrToProjector["y"](d, i, dataset),
-      };
-      let containerWidth = barWidth;
-      let containerHeight = barHeight;
+    const showLabelOnBar = this._getShowLabelOnBar(barCoordinates, barDimensions, measurement);
 
-      const labelOrigin = {
-        x: labelContainerOrigin.x,
-        y: labelContainerOrigin.y,
-      };
+    // show label on right when value === baseline for horizontal plots
+    const aboveOrLeftOfBaseline = this._isVertical ? scaledValue <= scaledBaseline : scaledValue < scaledBaseline;
+    const { containerDimensions, labelContainerOrigin, labelOrigin, alignment } = this._calculateLabelProperties(
+      barCoordinates, barDimensions, measurement, showLabelOnBar, aboveOrLeftOfBaseline,
+    );
 
-      let showLabelOnBar: boolean;
+    const color = attrToProjector["fill"](datum, index, dataset);
+    const labelContainer = this._createLabelContainer(labelArea, labelContainerOrigin, labelOrigin, measurement, showLabelOnBar, color);
 
-      if (this._isVertical) {
-        labelOrigin.x += containerWidth / 2 - measurement.width / 2;
+    const writeOptions = { xAlign: alignment.x as Typesetter.IXAlign, yAlign: alignment.y as Typesetter.IYAlign };
+    writer.write(text, containerDimensions.width, containerDimensions.height, writeOptions, labelContainer.node());
 
-        const barY = attrToProjector["y"](d, i, dataset);
+    const tooWide = this._isVertical
+      ? barDimensions.width < (measurement.width + Bar._LABEL_PADDING * 2)
+      : barDimensions.height < (measurement.height + Bar._LABEL_PADDING * 2);
+    return tooWide;
+  }
 
-        // height of the bar in the viewport
-        let effectiveBarHeight = barHeight;
-        if (barY + barHeight > this.height()) {
-          effectiveBarHeight = this.height() - barY;
-        } else if (barY < 0) {
-          effectiveBarHeight = barY + barHeight;
-        }
-        const offset = Bar._LABEL_PADDING;
-        showLabelOnBar = (measurement.height + 2 * offset <= effectiveBarHeight)
-          && (this._labelsPosition !== LabelsPosition.outside);
+  private _getShowLabelOnBar(barCoordinates: Point, barDimensions: IDimensions, measurement: Typesetter.IDimensions) {
+    if (this._labelsPosition === LabelsPosition.outside) { return false; }
 
-        const placeLabel = (position: "top" | "middle" | "bottom" | "outside-top" | "outside-bottom") => {
-          switch (position) {
-            case "top":
-              labelContainerOrigin.y += offset;
-              yAlignment = "top";
-              labelOrigin.y += offset;
-              return;
-            case "bottom":
-              labelContainerOrigin.y -= offset;
-              yAlignment = "bottom";
-              labelOrigin.y += containerHeight - offset - measurement.height;
-              return;
-            case "middle":
-              yAlignment = "center";
-              labelOrigin.y += ((containerHeight + measurement.height) / 2);
-              return;
-            case "outside-top":
-              labelContainerOrigin.y -= offset + measurement.height;
-              yAlignment = "top";
-              labelOrigin.y -= offset + measurement.height;
-              return;
-            case "outside-bottom":
-              yAlignment = "bottom";
-              labelOrigin.y += barHeight + offset;
-              return;
-          }
-        };
+    const barCoordinate = this._isVertical ? barCoordinates.y : barCoordinates.x;
+    const barDimension = this._isVertical ? barDimensions.height : barDimensions.width;
+    const plotDimension = this._isVertical ? this.height() : this.width();
+    const measurementDimension = this._isVertical ? measurement.height : measurement.width;
 
-        const barIsAboveBaseline = scaledValue <= scaledBaseline;
-        if (showLabelOnBar) {
-          switch (this._labelsPosition) {
-            case LabelsPosition.start:
-              barIsAboveBaseline ? placeLabel("bottom") : placeLabel("top");
-              break;
-            case LabelsPosition.middle:
-              placeLabel("middle");
-              break;
-            case LabelsPosition.end:
-              barIsAboveBaseline ? placeLabel("top") : placeLabel("bottom");
-              break;
-          }
-        } else {
-          // show label off bar
-          containerHeight = barHeight + offset + measurement.height;
-          barIsAboveBaseline ? placeLabel("outside-top") : placeLabel("outside-bottom");
-        }
-      } else {
-        // horizontal
-        labelOrigin.y += containerHeight / 2 - measurement.height / 2;
+    let effectiveBarDimension = barDimension;
+    if (barCoordinate + barDimension > plotDimension) {
+      effectiveBarDimension = plotDimension - barCoordinate;
+    } else if (barCoordinate < 0) {
+      effectiveBarDimension = barCoordinate + barDimension;
+    }
 
-        const barX = attrToProjector["x"](d, i, dataset);
+    return (measurementDimension + 2 * Bar._LABEL_PADDING <= effectiveBarDimension);
+  }
 
-        // width of bar in viewport
-        let effectiveBarWidth = barWidth;
-        if (barX + barWidth > this.width()) {
-          effectiveBarWidth = this.width() - barX;
-        } else if (barX < 0) {
-          effectiveBarWidth = barX + barWidth;
-        }
-        const offset = Bar._LABEL_PADDING;
-        showLabelOnBar = (measurement.width + 2 * offset <= effectiveBarWidth)
-          && (this._labelsPosition !== LabelsPosition.outside);
+  private _calculateLabelProperties(
+      barCoordinates: Point, barDimensions: IDimensions, measurement: Typesetter.IDimensions,
+      showLabelOnBar: boolean, aboveOrLeftOfBaseline: boolean) {
+    const barCoordinate = this._isVertical ? barCoordinates.y : barCoordinates.x;
+    const barDimension = this._isVertical ? barDimensions.height : barDimensions.width;
+    const measurementDimension = this._isVertical ? measurement.height : measurement.width;
 
-        const placeLabel = (position: "left" | "middle" | "right" | "outside-left" | "outside-right") => {
-          switch (position) {
-            case "left":
-              labelContainerOrigin.x += offset;
-              xAlignment = "left";
-              labelOrigin.x += offset;
-              return;
-            case "right":
-              labelContainerOrigin.x -= offset;
-              xAlignment = "right";
-              labelOrigin.x += containerWidth - offset - measurement.width;
-              return;
-            case "middle":
-              yAlignment = "center";
-              labelOrigin.x += ((containerWidth + measurement.width) / 2);
-              return;
-            case "outside-left":
-              labelContainerOrigin.x -= offset + measurement.width;
-              xAlignment = "left";
-              labelOrigin.x -= offset + measurement.width;
-              return;
-            case "outside-right":
-              xAlignment = "right";
-              labelOrigin.x += barWidth + offset;
-              return;
-          }
-        };
+    let alignmentDimension = "center";
+    let containerDimension = barDimension;
+    let labelContainerOriginCoordinate = barCoordinate;
+    let labelOriginCoordinate = barCoordinate;
 
-        const barIsLeftOfBaseline = scaledValue < scaledBaseline;
-        if (showLabelOnBar) {
-          switch (this._labelsPosition) {
-            case LabelsPosition.start:
-              barIsLeftOfBaseline ? placeLabel("right") : placeLabel("left");
-              break;
-            case LabelsPosition.middle:
-              placeLabel("middle");
-              break;
-            case LabelsPosition.end:
-              barIsLeftOfBaseline ? placeLabel("left"): placeLabel("right");
-              break;
-          }
-        } else {
-          // show label off bar
-          containerWidth = barWidth + offset + measurement.width;
-          barIsLeftOfBaseline ? placeLabel("outside-left") : placeLabel("outside-right");
-        }
+    const updateCoordinates = (position: "topLeft" | "center" | "bottomRight") => {
+      switch (position) {
+        case "topLeft":
+          alignmentDimension = this._isVertical ? "top" : "left";
+          labelContainerOriginCoordinate += Bar._LABEL_PADDING;
+          labelOriginCoordinate += Bar._LABEL_PADDING;
+          return;
+        case "center":
+          labelOriginCoordinate += (barDimension + measurementDimension) / 2;
+          return;
+        case "bottomRight":
+          alignmentDimension = this._isVertical ? "bottom" : "right";
+          labelContainerOriginCoordinate -= Bar._LABEL_PADDING;
+          labelOriginCoordinate += containerDimension - Bar._LABEL_PADDING - measurementDimension;
+          return;
       }
-
-      const labelContainer = labelArea.append("g").attr("transform", `translate(${labelContainerOrigin.x}, ${labelContainerOrigin.y})`);
-
-      if (showLabelOnBar) {
-        labelContainer.classed("on-bar-label", true);
-        const color = attrToProjector["fill"](d, i, dataset);
-        const dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
-        labelContainer.classed(dark ? "dark-label" : "light-label", true);
-      } else {
-        labelContainer.classed("off-bar-label", true);
-      }
-
-      const hideLabel = labelOrigin.x < 0 ||
-        labelOrigin.y < 0 ||
-        labelOrigin.x + measurement.width > this.width() ||
-        labelOrigin.y + measurement.height > this.height();
-      labelContainer.style("visibility", hideLabel ? "hidden" : "inherit");
-
-      const writeOptions = {
-        xAlign: xAlignment,
-        yAlign: yAlignment,
-      };
-      writer.write(text, containerWidth, containerHeight, writeOptions, labelContainer.node());
-
-      const tooWide = this._isVertical
-        ? barWidth < (measurement.width + Bar._LABEL_PADDING * 2)
-        : barHeight < (measurement.height + Bar._LABEL_PADDING * 2);
-      return tooWide;
     };
 
-    const labelTooWide = data.map(drawLabel);
-    return labelTooWide.some((d: boolean) => d);
+    if (showLabelOnBar) {
+      switch (this._labelsPosition) {
+        case LabelsPosition.start:
+          aboveOrLeftOfBaseline ? updateCoordinates("bottomRight") : updateCoordinates("topLeft");
+          break;
+        case LabelsPosition.middle:
+          updateCoordinates("center");
+          break;
+        case LabelsPosition.end:
+          aboveOrLeftOfBaseline ? updateCoordinates("topLeft") : updateCoordinates("bottomRight");
+          break;
+      }
+    } else {
+      if (aboveOrLeftOfBaseline) {
+        alignmentDimension = this._isVertical ? "top" : "left";
+        containerDimension = barDimension + Bar._LABEL_PADDING + measurementDimension;
+        labelContainerOriginCoordinate -= Bar._LABEL_PADDING + measurementDimension;
+        labelOriginCoordinate -= Bar._LABEL_PADDING + measurementDimension;
+      } else {
+        alignmentDimension = this._isVertical ? "bottom" : "right";
+        containerDimension = barDimension + Bar._LABEL_PADDING + measurementDimension;
+        labelOriginCoordinate += barDimension + Bar._LABEL_PADDING;
+      }
+    }
+
+    return {
+      containerDimensions: {
+        width: this._isVertical ? barDimensions.width : containerDimension,
+        height: this._isVertical ? containerDimension : barDimensions.height,
+      },
+      labelContainerOrigin: {
+        x: this._isVertical ? barCoordinates.x : labelContainerOriginCoordinate,
+        y: this._isVertical ? labelContainerOriginCoordinate : barCoordinates.y,
+      },
+      labelOrigin: {
+        x: this._isVertical ? (barCoordinates.x + barDimensions.width / 2 - measurement.width / 2) : labelOriginCoordinate,
+        y: this._isVertical ? labelOriginCoordinate : (barCoordinates.y + barDimensions.height / 2 - measurement.height / 2),
+      },
+      alignment: {
+        x: this._isVertical ? "center" : alignmentDimension,
+        y: this._isVertical ? alignmentDimension : "center",
+      },
+    };
+  }
+
+  private _createLabelContainer(
+      labelArea: SimpleSelection<void>, labelContainerOrigin: Point, labelOrigin: Point, measurement: Typesetter.IDimensions,
+      showLabelOnBar: boolean, color: string) {
+    const labelContainer = labelArea.append("g").attr("transform", `translate(${labelContainerOrigin.x}, ${labelContainerOrigin.y})`);
+
+    if (showLabelOnBar) {
+      labelContainer.classed("on-bar-label", true);
+      const dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
+      labelContainer.classed(dark ? "dark-label" : "light-label", true);
+    } else {
+      labelContainer.classed("off-bar-label", true);
+    }
+
+    const hideLabel =
+      labelOrigin.x < 0 ||
+      labelOrigin.y < 0 ||
+      labelOrigin.x + measurement.width > this.width() ||
+      labelOrigin.y + measurement.height > this.height();
+    labelContainer.style("visibility", hideLabel ? "hidden" : "inherit");
+
+    return labelContainer;
   }
 
   protected _generateDrawSteps(): Drawers.DrawStep[] {

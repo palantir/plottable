@@ -40,7 +40,7 @@ function run(svg, data, Plottable) {
                               .addDataset(dataset)
                               .x(function(d) { return d.x; }, xScale)
                               .y(function(d) { return d.y; }, yScale)
-                              .labelsEnabled(true, "middle")
+                              .labelsEnabled(true, "outside")
                               .attr("opacity", 0.75)
 
   var horizontalStackedBarPlot = new Plottable.Plots.StackedBar("horizontal")
@@ -48,7 +48,7 @@ function run(svg, data, Plottable) {
                               .addDataset(dataset1)
                               .x(function(d) { return d.x; }, xScale)
                               .y(function(d) { return d.y; }, yScale)
-                              .labelsEnabled(true, "end")
+                              .labelsEnabled(true, "start")
                               .attr("opacity", 0.75)
 
   var chart = new Plottable.Components.Table([
