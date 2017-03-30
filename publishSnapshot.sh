@@ -9,6 +9,6 @@ then
 else
   # set package.json version
   npm --no-git-tag-version version $GIT_DESCRIBE
-  yarn dist-compile
+  yarn dist
   npm publish --tag next
 fi
