@@ -35,10 +35,10 @@ deployment:
     commands:
       - ./demo.js
   publish-npm-latest:
-    tag: /v[0-9.]+(-beta[0-9.]*)?/
+    tag: /v[0-9.]+(-(beta|rc)[0-9.]*)?/
     commands:
       # Confirm we are ready to publish
-      - yarn dist-compile
+      - yarn dist
       - git diff HEAD..origin/develop --quiet || (echo "dist not built"; exit 1)
       - npm run -s check_version || (echo "package.json version not updated"; exit 1)
       # Publish

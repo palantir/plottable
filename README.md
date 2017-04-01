@@ -15,11 +15,14 @@ Plottable is used and developed at [Palantir Technologies](http://palantir.com/)
   - npm: `npm install --save plottable`
   - yarn: `yarn add plottable`
   - Bower (**deprecated**): `bower install --save plottable`
+  - [unpkg](https://unpkg.com/plottable/plottable.min.js)
   - [cdnjs URL](https://cdnjs.com/libraries/plottable.js)
   - [Direct download: plottable.zip](plottable.zip)
 - [Check out examples](http://plottablejs.org/examples/)
 - [Read the tutorials](http://plottablejs.org/tutorials/)
 - [Visit the website, plottablejs.org](http://plottablejs.org/)
+
+**As of 3.0, the plottable.js file is no longer accessible through rawgithub. Use npm or unpkg.**
 
 ## Upgrading to v1.0.0
 
@@ -44,5 +47,4 @@ If you run into any problems using Plottable, please let us know. We want Plotta
 - Write your code
 - Add tests for new functionality, and please add some quicktests too
 - Run `yarn test` and verify it completes with no warnings or failures
-- Commit new files, including the updated built files like `plottable.js` and `plottable.d.ts`
 - Submit a pull request and sign the CLA when prompted by our bot
