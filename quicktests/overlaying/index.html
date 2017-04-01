@@ -31,8 +31,8 @@
         <option value="realistic">Realistic</option>
       </select>
 
-      <input type="text" id="branch1" name="branch1" value="develop" placeholder="1st branch (default develop)">
-      <input type="text" id="branch2" name="branch2" value="#local" placeholder="2nd branch (default #local)">
+      <input type="text" id="branch1" name="branch1" value="//unpkg.com/plottable@next/plottable.js" placeholder="1st url (default plottable@next)">
+      <input type="text" id="branch2" name="branch2" value="../../plottable.js" placeholder="2nd branch (default local)">
       <input id="render" type="submit" class="button" value="Compare!">
       <input id="expand" type="button" class="button" value="+" onclick="showSizeControls()">
       <input id="help" type="button" class="button" value="?">
@@ -42,9 +42,9 @@
 
   <div class="size-controls">
     <div class="control-knobs">
-      <input type="text" id="width" name="width" value="500" placeholder="svg width">
+      <input type="text" id="width" name="width" value="500" placeholder="chart width">
 
-      <input type="text" id="height" name="height" value="400" placeholder="svg height">
+      <input type="text" id="height" name="height" value="400" placeholder="chart height">
     </div>
   </div>
 
