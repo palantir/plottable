@@ -1,9 +1,4 @@
-# Plottable [![Builds](https://api.travis-ci.org/repositories/palantir/plottable.svg?branch=master)](https://travis-ci.org/palantir/plottable)
-============
-
-[![Join the chat at https://gitter.im/palantir/plottable](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/palantir/plottable?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-## Overview
+# Plottable [![Builds](https://api.travis-ci.org/repositories/palantir/plottable.svg?branch=master)](https://travis-ci.org/palantir/plottable) [![Join the chat at https://gitter.im/palantir/plottable](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/palantir/plottable?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Plottable is a library of chart components for creating flexible, custom charts for websites. It is built on top of [D3.js](http://d3js.org/) and provides higher-level pieces, like plots, gridlines, and axes. As such, it's easier to quickly build charts than with D3, and the charts are much
 more flexible than standard-template charts provided by charting libraries. You can think of Plottable as a "D3 for Charts" &mdash; it is not a charting library but rather a library of chart components. Check out examples of Plottable on our website's [examples page](http://plottablejs.org/examples/).
@@ -20,11 +15,14 @@ Plottable is used and developed at [Palantir Technologies](http://palantir.com/)
   - npm: `npm install --save plottable`
   - yarn: `yarn add plottable`
   - Bower (**deprecated**): `bower install --save plottable`
+  - [unpkg](https://unpkg.com/plottable/plottable.min.js)
   - [cdnjs URL](https://cdnjs.com/libraries/plottable.js)
   - [Direct download: plottable.zip](plottable.zip)
 - [Check out examples](http://plottablejs.org/examples/)
 - [Read the tutorials](http://plottablejs.org/tutorials/)
 - [Visit the website, plottablejs.org](http://plottablejs.org/)
+
+**As of 3.0, the plottable.js file is no longer accessible through rawgithub. Use npm or unpkg.**
 
 ## Upgrading to v1.0.0
 
@@ -49,5 +47,4 @@ If you run into any problems using Plottable, please let us know. We want Plotta
 - Write your code
 - Add tests for new functionality, and please add some quicktests too
 - Run `yarn test` and verify it completes with no warnings or failures
-- Commit new files, including the updated built files like `plottable.js` and `plottable.d.ts`
 - Submit a pull request and sign the CLA when prompted by our bot

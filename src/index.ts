@@ -43,7 +43,7 @@ export { TimeInterval } from "./axes/timeAxis";
 export * from "./components/component";
 export * from "./components/componentContainer";
 export { DragBoxCallback } from "./components/dragBoxLayer";
-export { DragLineCallback } from "./components/dragLineLayer";
+export { IDragLineCallback } from "./components/dragLineLayer";
 
 export * from "./core/dataset";
 export { Formatter } from "./core/formatters";

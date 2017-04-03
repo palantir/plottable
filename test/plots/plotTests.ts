@@ -1,10 +1,11 @@
-import * as d3 from "d3";
-
 import { assert } from "chai";
+import * as d3 from "d3";
 import * as sinon from "sinon";
 
 import * as Plottable from "../../src";
 
+import { CanvasDrawer } from "../../src/drawers/canvasDrawer";
+import { ProxyDrawer } from "../../src/drawers/drawer";
 import * as TestMethods from "../testMethods";
 
 describe("Plots", () => {
@@ -191,7 +192,7 @@ describe("Plots", () => {
         plot.addDataset(dataset);
         plot.attr("key", (d) => d, categoryScale);
 
-        let div = TestMethods.generateDiv();
+        const div = TestMethods.generateDiv();
         plot.anchor(div);
 
         assert.deepEqual(categoryScale.domain(), data2.concat(data), "extent in the right order");
@@ -213,6 +214,26 @@ describe("Plots", () => {
 
       beforeEach(() => {
         plot = new Plottable.Plot();
+      });
+
+      it("correctly computes the total draw time", () => {
+        function makeFixedTimeAnimator(totalTime: number) {
+          return <Plottable.IAnimator> {
+            animate: () => null,
+            totalTime: () => totalTime,
+          };
+        }
+
+        const animationTimes = [10, 20];
+        const drawSteps = animationTimes.map((time) => {
+          return {
+            attrToProjector: <Plottable.AttributeToProjector> {},
+            animator: makeFixedTimeAnimator(time),
+          };
+        });
+        const totalTime = Plottable.Plot.getTotalDrawTime([], drawSteps);
+        const expectedTotalTime = d3.sum(animationTimes);
+        assert.strictEqual(totalTime, expectedTotalTime, "returned the total time taken by all Animators");
       });
 
       it("uses a null animator for the reset animator by default", () => {
@@ -432,8 +453,8 @@ describe("Plots", () => {
         plot.anchor(div);
 
         plot.renderer("canvas");
-        (<any> plot)._datasetToDrawer.forEach((drawer: Plottable.Drawer) => {
-          assert.strictEqual(drawer.canvas().node(), div.select("canvas").node(), "drawer's canvas is set");
+        (<any> plot)._datasetToDrawer.forEach((drawer: ProxyDrawer) => {
+          assert.isTrue(drawer.getDrawer() instanceof CanvasDrawer, "ProxyDrawer is using a CanvasDrawer");
         });
 
         div.remove();
@@ -444,8 +465,8 @@ describe("Plots", () => {
         plot.renderer("canvas");
         const div = TestMethods.generateDiv();
         plot.renderTo(div);
-        
-        assert.isNull(plot.selections(), "no selections on canvas");
+
+        assert.isTrue(plot.selections().empty(), "no selections on canvas");
         div.remove();
       });
     });

@@ -1,13 +1,12 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
 
 import * as Plottable from "../../src";
+import { getTranslateValues } from "../../src/utils/domUtils";
 
 import * as Mocks from "../mocks";
 import * as TestMethods from "../testMethods";
-import { getTranslateValues } from "../../src/utils/domUtils";
 
 describe("Plots", () => {
   describe("ScatterPlot", () => {
@@ -42,7 +41,7 @@ describe("Plots", () => {
       });
 
       it("is initialized correctly", () => {
-        let dataset = new Plottable.Dataset([{ x: 0, y: 0 }]);
+        const dataset = new Plottable.Dataset([{ x: 0, y: 0 }]);
         plot.addDataset(dataset);
 
         assert.isDefined(plot.attr("fill"), "default color is defined");
@@ -74,14 +73,14 @@ describe("Plots", () => {
       });
 
       it.skip("correctly handles NaN, undefined, Infinity, and non-number x and y values", () => {
-        let data = [
+        const data = [
           { x: 0.0, y: 0.0 },
           { x: 0.2, y: 0.2 },
           { x: 0.4, y: 0.4 },
           { x: 0.6, y: 0.6 },
           { x: 0.8, y: 0.8 },
         ];
-        let dataset = new Plottable.Dataset(data);
+        const dataset = new Plottable.Dataset(data);
         plot.addDataset(dataset);
         plot.renderTo(div);
 
@@ -147,9 +146,9 @@ describe("Plots", () => {
         const DIV_WIDTH = 400;
         const DIV_HEIGHT = 400;
         div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
-        let xScale = new Plottable.Scales.Linear().domain([0, DIV_WIDTH]);
-        let yScale = new Plottable.Scales.Linear().domain([0, DIV_HEIGHT]);
-        let metadata = { foo: 10, bar: 20 };
+        const xScale = new Plottable.Scales.Linear().domain([0, DIV_WIDTH]);
+        const yScale = new Plottable.Scales.Linear().domain([0, DIV_HEIGHT]);
+        const metadata = { foo: 10, bar: 20 };
         data = [{ x: 0, y: 0 }, { x: 1, y: 1 }];
         dataset = new Plottable.Dataset(data, metadata);
         plot = new Plottable.Plots.Scatter<number, number>();
@@ -160,13 +159,13 @@ describe("Plots", () => {
 
       it("renders symbols correctly", () => {
         plot.renderTo(div);
-        let symbols = plot.selections();
+        const symbols = plot.selections();
         assert.strictEqual(symbols.size(), data.length, "exactly 2 symbols are rendered");
 
-        let c1 = d3.select(symbols.node());
-        let c2 = d3.select(symbols.nodes()[1]);
-        let c1Position = getTranslateValues(c1);
-        let c2Position = getTranslateValues(c2);
+        const c1 = d3.select(symbols.node());
+        const c2 = d3.select(symbols.nodes()[1]);
+        const c1Position = getTranslateValues(c1);
+        const c2Position = getTranslateValues(c2);
         assert.closeTo(c1Position[0], 0, 0.01, "first symbol cx is correct");
         assert.closeTo(c1Position[1], 380, 0.01, "first symbol cy is correct");
         assert.closeTo(c2Position[0], 11, 0.01, "second symbol cx is correct");
@@ -177,16 +176,16 @@ describe("Plots", () => {
 
       it("renders symbols correctly after data change", () => {
         plot.renderTo(div);
-        let changedData = [{ x: 2, y: 2 }, { x: 4, y: 4 }];
+        const changedData = [{ x: 2, y: 2 }, { x: 4, y: 4 }];
         dataset.data(changedData);
 
-        let symbols = plot.selections();
+        const symbols = plot.selections();
         assert.strictEqual(symbols.size(), data.length, "exactly 2 symbols are rendered");
 
-        let c1 = d3.select(symbols.node());
-        let c2 = d3.select(symbols.nodes()[1]);
-        let c1Position = getTranslateValues(c1);
-        let c2Position = getTranslateValues(c2);
+        const c1 = d3.select(symbols.node());
+        const c2 = d3.select(symbols.nodes()[1]);
+        const c1Position = getTranslateValues(c1);
+        const c2Position = getTranslateValues(c2);
         assert.closeTo(c1Position[0], 2, 0.01, "first symbol cx is correct after data change");
         assert.closeTo(c1Position[1], 380, 0.01, "first symbol cy is correct after data change");
         assert.closeTo(c2Position[0], 14, 0.01, "second symbol cx is correct after data change");
@@ -197,16 +196,16 @@ describe("Plots", () => {
 
       it("renders symbols correctly after metadata change", () => {
         plot.renderTo(div);
-        let changedMetadata = { foo: 0, bar: 0 };
+        const changedMetadata = { foo: 0, bar: 0 };
         dataset.metadata(changedMetadata);
 
-        let symbols = plot.selections();
+        const symbols = plot.selections();
         assert.strictEqual(symbols.size(), 2, "exactly 2 symbols are rendered");
 
-        let c1 = d3.select(symbols.node());
-        let c2 = d3.select(symbols.nodes()[1]);
-        let c1Position = getTranslateValues(c1);
-        let c2Position = getTranslateValues(c2);
+        const c1 = d3.select(symbols.node());
+        const c2 = d3.select(symbols.nodes()[1]);
+        const c1Position = getTranslateValues(c1);
+        const c2Position = getTranslateValues(c2);
         assert.closeTo(c1Position[0], 0, 0.01, "first symbol cx is correct after metadata change");
         assert.closeTo(c1Position[1], 400, 0.01, "first symbol cy is correct after metadata change");
         assert.closeTo(c2Position[0], 1, 0.01, "second symbol cx is correct after metadata change");
@@ -231,8 +230,8 @@ describe("Plots", () => {
       });
 
       it("sets symbol() correctly", () => {
-        let circleSymbolFactory = Plottable.SymbolFactories.circle();
-        let squareSymbolFactory = Plottable.SymbolFactories.square();
+        const circleSymbolFactory = Plottable.SymbolFactories.circle();
+        const squareSymbolFactory = Plottable.SymbolFactories.square();
 
         assert.strictEqual(plot.symbol(() => circleSymbolFactory), plot, "setting symbol() returns calling Plot.Scatter");
         assert.deepEqual(plot.symbol().accessor(data[0], 0, dataset), circleSymbolFactory, "first symbol SymbolFactory is set correctly");
@@ -274,9 +273,9 @@ describe("Plots", () => {
 
       it("selects all points in all datasets", () => {
         plot.renderTo(div);
-        let allCircles = plot.selections();
+        const allCircles = plot.selections();
         assert.strictEqual(allCircles.size(), 4, "all circles retrieved");
-        let selectionData = allCircles.data();
+        const selectionData = allCircles.data();
         assert.includeMembers(selectionData, data, "first dataset data in selection data");
         assert.includeMembers(selectionData, data2, "second dataset data in selection data");
 
@@ -285,8 +284,8 @@ describe("Plots", () => {
 
       it("selects the closest data point", () => {
         plot.renderTo(div);
-        let diff = 10;
-        let closest = plot.entityNearest({
+        const diff = 10;
+        const closest = plot.entityNearest({
           x: xScale.scale(0) + diff,
           y: yScale.scale(0) + diff,
         });
@@ -300,7 +299,7 @@ describe("Plots", () => {
         plot.renderTo(div);
         yScale.domain([0, 1.9]);
 
-        let closest = plot.entityNearest({
+        const closest = plot.entityNearest({
           x: xScale.scale(1),
           y: xScale.scale(2),
         });
@@ -314,7 +313,7 @@ describe("Plots", () => {
         xScale.domain([-2, -1]);
         plot.renderTo(div);
 
-        let closest = plot.entityNearest({
+        const closest = plot.entityNearest({
           x: plot.width() / 2,
           y: plot.height() / 2,
         });
@@ -325,7 +324,7 @@ describe("Plots", () => {
       it("can retrieve Entities in a certain range", () => {
         plot.renderTo(div);
 
-        let entities = plot.entitiesIn({
+        const entities = plot.entitiesIn({
           min: xScale.scale(1),
           max: xScale.scale(1),
         }, {
@@ -342,7 +341,7 @@ describe("Plots", () => {
       it("does not return Entities whose center lies outside the range", () => {
         plot.renderTo(div);
 
-        let entities = plot.entitiesIn({
+        const entities = plot.entitiesIn({
           min: xScale.scale(1.001),
           max: xScale.scale(1.001),
         }, {
@@ -357,7 +356,7 @@ describe("Plots", () => {
 
       it("can retrieve Entities in a certain bounds", () => {
         plot.renderTo(div);
-        let entities = plot.entitiesIn({
+        const entities = plot.entitiesIn({
           topLeft: {
             x: xScale.scale(1),
             y: yScale.scale(1),
@@ -377,7 +376,7 @@ describe("Plots", () => {
       it("can retrieve Entities centered at a given Point", () => {
         plot.renderTo(div);
 
-        let entities = plot.entitiesAt({
+        const entities = plot.entitiesAt({
           x: xScale.scale(1),
           y: yScale.scale(1),
         });
@@ -388,8 +387,8 @@ describe("Plots", () => {
       });
 
       it("determines whether an Entity contains a given Point by its position and size", () => {
-        let initialSize = 10;
-        let initialRadius = initialSize / 2;
+        const initialSize = 10;
+        const initialRadius = initialSize / 2;
         plot.size(initialSize);
         plot.renderTo(div);
 
@@ -413,7 +412,7 @@ describe("Plots", () => {
         dataset2.data([{ x: 0, y: 1 }, { x: 200, y: 200 }]);
         plot.renderTo(div);
 
-        let entities = plot.entitiesAt({
+        const entities = plot.entitiesAt({
           x: xScale.scale(0.5),
           y: yScale.scale(0.5),
         });

@@ -1,5 +1,3 @@
-import * as d3 from "d3";
-
 import { assert } from "chai";
 
 import * as Plottable from "../../src";
@@ -8,8 +6,8 @@ import * as TestMethods from "../testMethods";
 
 describe("Interactions", () => {
   describe("Interaction", () => {
-    let DIV_WIDTH = 400;
-    let DIV_HEIGHT = 400;
+    const DIV_WIDTH = 400;
+    const DIV_HEIGHT = 400;
 
     function triggerMoveEvent(component: Plottable.Component) {
       TestMethods.triggerFakeInteractionEvent(
@@ -17,14 +15,14 @@ describe("Interactions", () => {
         TestMethods.InteractionType.Move,
         component.content(),
         DIV_WIDTH / 2,
-        DIV_HEIGHT / 2
+        DIV_HEIGHT / 2,
       );
     }
 
     it("attaching/detaching a component modifies the state of the interaction", () => {
-      let div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
-      let component = new Plottable.Component();
-      let interaction = new Plottable.Interaction();
+      const div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
+      const component = new Plottable.Component();
+      const interaction = new Plottable.Interaction();
       component.renderTo(div);
 
       interaction.attachTo(component);
@@ -39,14 +37,14 @@ describe("Interactions", () => {
     });
 
     it("can attach interaction to component", () => {
-      let div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
-      let component = new Plottable.Component();
+      const div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
+      const component = new Plottable.Component();
       component.renderTo(div);
 
-      let pointerInteraction= new Plottable.Interactions.Pointer();
+      const pointerInteraction= new Plottable.Interactions.Pointer();
 
       let callbackCalled = false;
-      let callback = () => callbackCalled = true;
+      const callback = () => callbackCalled = true;
       pointerInteraction.onPointerMove(callback);
 
       pointerInteraction.attachTo(component);
@@ -58,14 +56,14 @@ describe("Interactions", () => {
     });
 
     it("can detach interaction from component", () => {
-      let div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
-      let component = new Plottable.Component();
+      const div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
+      const component = new Plottable.Component();
       component.renderTo(div);
 
-      let pointerInteraction = new Plottable.Interactions.Pointer();
+      const pointerInteraction = new Plottable.Interactions.Pointer();
 
       let callbackCalled = false;
-      let callback = () => callbackCalled = true;
+      const callback = () => callbackCalled = true;
       pointerInteraction.onPointerMove(callback);
 
       pointerInteraction.attachTo(component);
@@ -83,10 +81,10 @@ describe("Interactions", () => {
     });
 
     it("calling detachFrom() on a detached Interaction has no effect", () => {
-      let div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
-      let component = new Plottable.Component();
+      const div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
+      const component = new Plottable.Component();
 
-      let clickInteraction = new Plottable.Interactions.Click();
+      const clickInteraction = new Plottable.Interactions.Click();
 
       assert.doesNotThrow(() => {
         clickInteraction.detachFrom(component);
@@ -111,18 +109,18 @@ describe("Interactions", () => {
     });
 
     it("can move interaction from one component to another", () => {
-      let div1 = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
-      let div2 = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
-      let component1 = new Plottable.Component();
-      let component2 = new Plottable.Component();
+      const div1 = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
+      const div2 = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
+      const component1 = new Plottable.Component();
+      const component2 = new Plottable.Component();
 
       component1.renderTo(div1);
       component2.renderTo(div2);
 
-      let pointerInteraction = new Plottable.Interactions.Pointer();
+      const pointerInteraction = new Plottable.Interactions.Pointer();
 
       let callbackCalled = false;
-      let callback = () => callbackCalled = true;
+      const callback = () => callbackCalled = true;
       pointerInteraction.onPointerMove(callback);
 
       pointerInteraction.attachTo(component1);
@@ -162,7 +160,7 @@ describe("Interactions", () => {
 
     describe("enabled()", () => {
       it("setting and querying status", () => {
-        let interaction = new Plottable.Interaction();
+        const interaction = new Plottable.Interaction();
         assert.isTrue(interaction.enabled(), "defaults to enabled");
         interaction.enabled(false);
         assert.isFalse(interaction.enabled(), "enabled status set to false");
@@ -171,13 +169,13 @@ describe("Interactions", () => {
       });
 
       it("no longer responds when disabled", () => {
-        let div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
-        let component = new Plottable.Component();
+        const div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
+        const component = new Plottable.Component();
         component.renderTo(div);
 
-        let pointerInteraction = new Plottable.Interactions.Pointer();
+        const pointerInteraction = new Plottable.Interactions.Pointer();
         let callbackCalled = false;
-        let callback = () => callbackCalled = true;
+        const callback = () => callbackCalled = true;
         pointerInteraction.onPointerMove(callback);
         pointerInteraction.attachTo(component);
 
@@ -193,16 +191,16 @@ describe("Interactions", () => {
       });
 
       it("can be attached to new Component while disabled", () => {
-        let div1 = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
-        let div2 = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
-        let component1 = new Plottable.Component();
-        let component2 = new Plottable.Component();
+        const div1 = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
+        const div2 = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
+        const component1 = new Plottable.Component();
+        const component2 = new Plottable.Component();
         component1.renderTo(div1);
         component2.renderTo(div2);
 
-        let pointerInteraction = new Plottable.Interactions.Pointer();
+        const pointerInteraction = new Plottable.Interactions.Pointer();
         let callbackCalled = false;
-        let callback = () => callbackCalled = true;
+        const callback = () => callbackCalled = true;
         pointerInteraction.onPointerMove(callback);
         pointerInteraction.attachTo(component1);
 

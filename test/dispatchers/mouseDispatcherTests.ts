@@ -1,6 +1,4 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
-import * as sinon from "sinon";
 
 import { assert } from "chai";
 
@@ -22,17 +20,17 @@ describe("Dispatchers", () => {
       });
 
       it("creates only one Dispatcher.Mouse per <div> using getDispatcher() ", () => {
-        let dispatcher1 = Plottable.Dispatchers.Mouse.getDispatcher(component);
+        const dispatcher1 = Plottable.Dispatchers.Mouse.getDispatcher(component);
         assert.isNotNull(dispatcher1, "created a new Dispatcher on an SVG");
-        let dispatcher2 = Plottable.Dispatchers.Mouse.getDispatcher(component);
+        const dispatcher2 = Plottable.Dispatchers.Mouse.getDispatcher(component);
         assert.strictEqual(dispatcher1, dispatcher2, "returned the existing Dispatcher if called again with same <div>");
 
         div.remove();
       });
 
       it("returns non-null value for default lastMousePosition()", () => {
-        let mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(component);
-        let point = mouseDispatcher.lastMousePosition();
+        const mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(component);
+        const point = mouseDispatcher.lastMousePosition();
         assert.isNotNull(point, "returns a value after initialization");
         assert.isNotNull(point.x, "x value is set");
         assert.isNotNull(point.y, "y value is set");
@@ -42,9 +40,9 @@ describe("Dispatchers", () => {
     });
 
     describe("Callbacks", () => {
-      let targetX = 17;
-      let targetY = 76;
-      let expectedPoint = {
+      const targetX = 17;
+      const targetY = 76;
+      const expectedPoint = {
         x: targetX,
         y: targetY,
       };
@@ -54,8 +52,8 @@ describe("Dispatchers", () => {
       let mouseDispatcher: Plottable.Dispatchers.Mouse;
 
       beforeEach(() => {
-        let DIV_WIDTH = 400;
-        let DIV_HEIGHT = 400;
+        const DIV_WIDTH = 400;
+        const DIV_HEIGHT = 400;
 
         component = new Plottable.Component();
         div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
@@ -66,7 +64,7 @@ describe("Dispatchers", () => {
 
       it("calls the mouseDown callback", () => {
         let callbackWasCalled = false;
-        let callback = (point: Plottable.Point, event: MouseEvent) => {
+        const callback = (point: Plottable.Point, event: MouseEvent) => {
           callbackWasCalled = true;
           TestMethods.assertPointsClose(point, expectedPoint, 0.5, "mouse position is correct");
           assert.isNotNull(event, "mouse event was passed to the callback");
@@ -91,7 +89,7 @@ describe("Dispatchers", () => {
 
       it("calls the mouseUp callback", () => {
         let callbackWasCalled = false;
-        let callback = (point: Plottable.Point, event: MouseEvent) => {
+        const callback = (point: Plottable.Point, event: MouseEvent) => {
           callbackWasCalled = true;
           TestMethods.assertPointsClose(point, expectedPoint, 0.5, "mouse position is correct");
           assert.isNotNull(event, "mouse event was passed to the callback");
@@ -122,10 +120,10 @@ describe("Dispatchers", () => {
           return;
         }
 
-        let targetDeltaY = 10;
+        const targetDeltaY = 10;
 
         let callbackWasCalled = false;
-        let callback = (point: Plottable.Point, event: WheelEvent) => {
+        const callback = (point: Plottable.Point, event: WheelEvent) => {
           callbackWasCalled = true;
           assert.strictEqual(event.deltaY, targetDeltaY, "deltaY value was passed to callback");
           TestMethods.assertPointsClose(point, expectedPoint, 0.5, "mouse position is correct");
@@ -151,7 +149,7 @@ describe("Dispatchers", () => {
 
       it("calls the dblClick callback", () => {
         let callbackWasCalled = false;
-        let callback = (point: Plottable.Point, event: MouseEvent) => {
+        const callback = (point: Plottable.Point, event: MouseEvent) => {
           callbackWasCalled = true;
           TestMethods.assertPointsClose(point, expectedPoint, 0.5, "mouse position is correct");
           assert.isNotNull(event, "mouse event was passed to the callback");
@@ -176,7 +174,7 @@ describe("Dispatchers", () => {
 
       it("calls mouseMove callback on mouseover, mousemove, and mouseout", () => {
         let callbackWasCalled = false;
-        let callback = (point: Plottable.Point, event: MouseEvent) => {
+        const callback = (point: Plottable.Point, event: MouseEvent) => {
           callbackWasCalled = true;
           TestMethods.assertPointsClose(point, expectedPoint, 0.5, "mouse position is correct");
           assert.isNotNull(event, "mouse event was passed to the callback");
@@ -209,9 +207,9 @@ describe("Dispatchers", () => {
 
       it("can register two callbacks for the same mouse dispatcher", () => {
         let cb1Called = false;
-        let cb1 = () => cb1Called = true;
+        const cb1 = () => cb1Called = true;
         let cb2Called = false;
-        let cb2 = () => cb2Called = true;
+        const cb2 = () => cb2Called = true;
 
         mouseDispatcher.onMouseMove(cb1);
         mouseDispatcher.onMouseMove(cb2);
@@ -232,7 +230,7 @@ describe("Dispatchers", () => {
 
       it("doesn't call callbacks if not in the DOM", () => {
         let callbackWasCalled = false;
-        let callback = () => callbackWasCalled = true;
+        const callback = () => callbackWasCalled = true;
 
         mouseDispatcher.onMouseMove(callback);
         TestMethods.triggerFakeMouseEvent("mousemove", div, targetX, targetY);
@@ -248,7 +246,7 @@ describe("Dispatchers", () => {
 
       it("doesn't call callbacks for clicks if obscured by overlay", () => {
         let callbackWasCalled = false;
-        let callback = () => callbackWasCalled = true;
+        const callback = () => callbackWasCalled = true;
 
         mouseDispatcher.onMouseDown(callback);
         TestMethods.triggerFakeMouseEvent("mousedown", div, targetX, targetY);
@@ -256,14 +254,14 @@ describe("Dispatchers", () => {
 
         let element = <HTMLElement> <any> div.node();
         // Getting the absolute coordinates of the SVG in order to place the overlay at the right location
-        let topLeftCorner = { x: 0, y: 0 };
+        const topLeftCorner = { x: 0, y: 0 };
         while (element != null) {
           topLeftCorner.x += (element.offsetLeft || element.clientLeft || 0);
           topLeftCorner.y += (element.offsetTop || element.clientTop || 0);
           element = <HTMLElement> (element.offsetParent || element.parentNode);
         }
 
-        let overlay = TestMethods.getElementParent().append("div").styles({
+        const overlay = TestMethods.getElementParent().append("div").styles({
           height: "400px",
           width: "400px",
           topLeftCorner: "absolute",

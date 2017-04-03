@@ -1,4 +1,3 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -352,8 +351,7 @@ describe("InterpolatedColorLegend", () => {
       let swatchEdge = swatchBoundingRect.left;
       let legendEdge = legendBoundingRect.left;
       let padding = swatchEdge - legendEdge;
-      // HACKHACK #2122: two measurement errors in IE combine, and total error = 2
-      assert.closeTo(swatchWidth, padding, 2,
+      assert.closeTo(swatchWidth, padding, window.Pixel_CloseTo_Requirement,
         "padding is approximately equal to swatch width");
       legend.expands(true);
       swatchBoundingRect = (<Element> legend.content().select(SWATCH_CONTAINER_SELECTOR).node()).getBoundingClientRect();
@@ -362,8 +360,7 @@ describe("InterpolatedColorLegend", () => {
       swatchEdge = swatchBoundingRect.left;
       legendEdge = legendBoundingRect.left;
       padding = swatchEdge - legendEdge;
-      // HACKHACK #2122: two measurement errors in IE combine, and total error = 2
-      assert.closeTo(swatchWidth, padding, 2,
+      assert.closeTo(swatchWidth, padding, window.Pixel_CloseTo_Requirement,
         "padding is approximately equal to swatch width when expanded");
       div.remove();
     });
@@ -492,7 +489,7 @@ describe("InterpolatedColorLegend", () => {
     });
 
     it("does not create title elements if configuration is set to false", () => {
-      var originalSetting = Plottable.Configs.ADD_TITLE_ELEMENTS;
+      const originalSetting = Plottable.Configs.ADD_TITLE_ELEMENTS;
       Plottable.Configs.ADD_TITLE_ELEMENTS = false;
       legend.renderTo(div);
       Plottable.Configs.ADD_TITLE_ELEMENTS = originalSetting;

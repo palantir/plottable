@@ -26,6 +26,7 @@ function run(div, data, Plottable) {
   });
   var plot = new Plottable.Plots.Line().datasets(datasets)
     .renderer("canvas")
+    .deferredRendering(true)
     .x((d) => d.x, xScale)
     .y((d) => d.y, yScale)
     .attr("stroke", (d,i,ds) => ds.metadata(), colorScale);

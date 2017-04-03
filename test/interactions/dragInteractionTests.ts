@@ -1,4 +1,3 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -33,7 +32,7 @@ describe("Interactions", () => {
     let component: Plottable.Component;
     let dragInteraction: Plottable.Interactions.Drag;
 
-    interface DragTestCallback {
+    interface IDragTestCallback {
       lastStartPoint: Plottable.Point;
       lastEndPoint: Plottable.Point;
       called: boolean;
@@ -42,7 +41,7 @@ describe("Interactions", () => {
     }
 
     function makeDragCallback() {
-      let callback = <DragTestCallback> function(start: Plottable.Point, end: Plottable.Point) {
+      const callback = <IDragTestCallback> function(start: Plottable.Point, end: Plottable.Point) {
         callback.lastStartPoint = start;
         callback.lastEndPoint = end;
         callback.called = true;
@@ -177,7 +176,7 @@ describe("Interactions", () => {
       describe("for DragStart", () => {
         [TestMethods.InteractionMode.Mouse, TestMethods.InteractionMode.Touch].forEach((mode) => {
           describe(`with ${TestMethods.InteractionMode[mode]} events`, () => {
-            let callback: DragTestCallback;
+            let callback: IDragTestCallback;
 
             beforeEach(() => {
               callback = makeDragCallback();
@@ -208,7 +207,7 @@ describe("Interactions", () => {
       });
 
       describe("for Drag", () => {
-        let callback: DragTestCallback;
+        let callback: IDragTestCallback;
 
         beforeEach(() => {
           callback = makeDragCallback();
@@ -225,7 +224,7 @@ describe("Interactions", () => {
         });
 
         it("does not continue dragging once the touch is cancelled", () => {
-          let target = component.background();
+          const target = component.background();
           const tenFromEndPoint = {
             x: endPoint.x - 10,
             y: endPoint.y - 10,
@@ -241,7 +240,7 @@ describe("Interactions", () => {
       });
 
       describe("for DragEnd", () => {
-        let callback: DragTestCallback;
+        let callback: IDragTestCallback;
 
         beforeEach(() => {
           callback = makeDragCallback();
@@ -311,7 +310,7 @@ describe("Interactions", () => {
 
       [TestMethods.InteractionMode.Mouse, TestMethods.InteractionMode.Touch].forEach((mode) => {
         describe(`invoking callbacks with ${TestMethods.InteractionMode[mode]} events when not constrained`, () => {
-          let callback: DragTestCallback;
+          let callback: IDragTestCallback;
 
           beforeEach(() => {
             callback = makeDragCallback();
@@ -345,7 +344,7 @@ describe("Interactions", () => {
           const constrainedPos = { x: DIV_WIDTH, y: DIV_HEIGHT };
           const constrainedNeg = { x: 0, y: 0 };
 
-          let callback: DragTestCallback;
+          let callback: IDragTestCallback;
 
           beforeEach(() => {
             callback = makeDragCallback();

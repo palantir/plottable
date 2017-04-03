@@ -1,5 +1,5 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
+import { SimpleSelection } from "../../src/core/interfaces";
 
 import { assert } from "chai";
 
@@ -21,7 +21,7 @@ describe("Interactions", () => {
       called: boolean;
       reset: () => void;
       (p: Plottable.Point): void;
-    }
+    };
 
     function makePointerCallback() {
       const callback = <PointerTestCallback> function(p?: Plottable.Point) {

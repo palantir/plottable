@@ -5,10 +5,9 @@
 
 import * as d3 from "d3";
 
-import { Dataset } from "../core/dataset";
-
-import { SimpleSelection } from "../core/interfaces";
-import { Drawer } from "./drawer";
+import { AttributeToAppliedProjector, SimpleSelection } from "../core/interfaces";
+import { CanvasDrawStep } from "./canvasDrawer";
+import { SVGDrawer } from "./svgDrawer";
 import { AppliedDrawStep } from "./index";
 
 interface ILineBucket {
@@ -20,56 +19,40 @@ interface ILineBucket {
 
 type d3Projector = (d: any, index: number, data: any[]) => number;
 
-export class Line extends Drawer {
-  public static COLLAPSE_LINES = true;
-
-  private _d3LineFactory: () => d3.Line<any>;
-
-  /**
-   * @param dataset
-   * @param _d3LineFactory A callback that gives this Line Drawer a d3.Line object which will be
-   * used to draw with.
-   */
-  constructor(dataset: Dataset, d3LineFactory: () => d3.Line<any>) {
-    super(dataset);
-    this._d3LineFactory = d3LineFactory;
-    this._className = "line";
-    this._svgElementName = "path";
+export class LineSVGDrawer extends SVGDrawer {
+  constructor() {
+    super("path", "line");
   }
 
   protected _applyDefaultAttributes(selection: SimpleSelection<any>) {
-    super._applyDefaultAttributes(selection);
     selection.style("fill", "none");
   }
 
-  public selectionForIndex(index: number): SimpleSelection<any> {
-    return d3.select(this.selection().node());
+  public getVisualPrimitiveAtIndex(index: number) {
+    return super.getVisualPrimitiveAtIndex(0);
   }
+}
 
-  /**
-   *
-   * @param data Data to draw. The data will be passed through the line factory in order to get applied
-   * onto the canvas.
-   * @param step
-   * @private
-   */
-  protected _drawStepCanvas(data: any[][], step: AppliedDrawStep) {
-    const context = this.canvas().node().getContext("2d");
-
-    const d3Line = this._d3LineFactory();
-
-    const attrToAppliedProjector = step.attrToAppliedProjector;
+/**
+ * @param d3LineFactory A callback that gives this Line Drawer a d3.Line object which will be
+ * used to draw with.
+ *
+ * TODO put the d3.Line into the attrToAppliedProjector directly
+ */
+export function makeLineCanvasDrawStep(d3LineFactory: () => d3.Line<any>, collapseProximateX = true): CanvasDrawStep {
+  return (context: CanvasRenderingContext2D, data: any[][], attrToAppliedProjector: AttributeToAppliedProjector) => {
+    const d3Line = d3LineFactory();
     const resolvedAttrs = Object.keys(attrToAppliedProjector).reduce((obj, attrName) => {
-      obj[attrName] = attrToAppliedProjector[attrName](data, 0);
+      if (attrName !== "d") {
+        obj[attrName] = attrToAppliedProjector[attrName](data[0], 0);
+      }
       return obj;
     }, {} as { [key: string]: any | number | string });
 
-    context.save();
-
     context.beginPath();
 
-    if (Line.COLLAPSE_LINES) {
-      this._collapseLineGeometry(context, data[0]);
+    if (collapseProximateX) {
+      _collapseLineGeometry(context, data[0]);
     } else {
       d3Line.context(context);
       d3Line(data[0]);
@@ -98,7 +81,7 @@ export class Line extends Drawer {
    * we can save a lot of render time by just drawing one line from the min to
    * max y-coordinate of all those points.
    */
-  private _collapseLineGeometry(ctx: CanvasRenderingContext2D, data: any[]) {
+  function _collapseLineGeometry(ctx: CanvasRenderingContext2D, data: any[]) {
     const d3Line = this._d3LineFactory();
     const xFn = d3Line.x();
     const yFn = d3Line.y();
@@ -125,7 +108,7 @@ export class Line extends Drawer {
     // iterate over subsequent points
     // TODO determine if we should collapse x or y or not collapse at all.
     // For now, we assume line charts are always a function of x
-    this._bucketByX(ctx, data, i, xFn, yFn, bucket);
+    _bucketByX(ctx, data, i, xFn, yFn, bucket);
 
     // finally, draw last line segment
     if (bucket.prevX != null) {
@@ -144,7 +127,7 @@ export class Line extends Drawer {
    * also drawn. This allows lines with no collapsed segments to render
    * correctly.
    */
-  private _bucketByX(
+  function _bucketByX(
       ctx: CanvasRenderingContext2D,
       data: any[],
       iStart: number,

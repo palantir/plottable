@@ -1,28 +1,27 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
 
 import * as Plottable from "../../src";
+import { TierLabelPosition } from "../../src/axes/timeAxis";
 
 import * as TestMethods from "../testMethods";
-import { TierLabelPosition } from "../../src/axes/timeAxis";
 
 describe("TimeAxis", () => {
 
-  let orientations: ["top", "bottom"] = ["top", "bottom"];
+  const orientations: ["top", "bottom"] = ["top", "bottom"];
 
   describe("setting the orientation", () => {
     it("throws an error when setting a vertical orientation", () => {
-      let scale = new Plottable.Scales.Time();
+      const scale = new Plottable.Scales.Time();
       assert.throws(() => new Plottable.Axes.Time(scale, "left" as any), "horizontal");
       assert.throws(() => new Plottable.Axes.Time(scale, "right" as any), "horizontal");
     });
 
     it("cannot change to a vertical orientation", () => {
-      let scale = new Plottable.Scales.Time();
-      let originalOrientation: "bottom" = "bottom";
-      let axis = new Plottable.Axes.Time(scale, originalOrientation);
+      const scale = new Plottable.Scales.Time();
+      const originalOrientation: "bottom" = "bottom";
+      const axis = new Plottable.Axes.Time(scale, originalOrientation);
       assert.throws(() => axis.orientation("left" as any), "horizontal");
       assert.throws(() => axis.orientation("right" as any), "horizontal");
       assert.strictEqual(axis.orientation(), originalOrientation, "orientation unchanged");
@@ -32,9 +31,9 @@ describe("TimeAxis", () => {
 
   describe("rendering in edge case scenarios", () => {
     it("does not error when setting the domain to a large span", () => {
-      let scale = new Plottable.Scales.Time();
-      let axis = new Plottable.Axes.Time(scale, "bottom");
-      let div = TestMethods.generateDiv();
+      const scale = new Plottable.Scales.Time();
+      const axis = new Plottable.Axes.Time(scale, "bottom");
+      const div = TestMethods.generateDiv();
       axis.renderTo(div);
 
       // very large time span
@@ -44,9 +43,9 @@ describe("TimeAxis", () => {
     });
 
     it("does not error when setting the domain to a small span", () => {
-      let scale = new Plottable.Scales.Time();
-      let axis = new Plottable.Axes.Time(scale, "bottom");
-      let div = TestMethods.generateDiv();
+      const scale = new Plottable.Scales.Time();
+      const axis = new Plottable.Axes.Time(scale, "bottom");
+      const div = TestMethods.generateDiv();
       axis.renderTo(div);
 
       // very small time span
@@ -58,16 +57,16 @@ describe("TimeAxis", () => {
 
   function assertVisibleLabelsDoNotOverlap(axis: Plottable.Axes.Time) {
     axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}-container`).each(function(d, i) {
-      let container = d3.select(this);
-      let visibleTickLabels = container
+      const container = d3.select(this);
+      const visibleTickLabels = container
         .selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}`)
         .filter(function() {
           return d3.select(this).style("visibility") === "visible";
         });
       visibleTickLabels.each(function(d2, j) {
-        let clientRect1 = this.getBoundingClientRect();
+        const clientRect1 = this.getBoundingClientRect();
         visibleTickLabels.filter((d3, k) => k > j).each(function(d3, k) {
-          let clientRect2 = this.getBoundingClientRect();
+          const clientRect2 = this.getBoundingClientRect();
           assert.isFalse(Plottable.Utils.DOM.clientRectsOverlap(clientRect1, clientRect2), "tick labels don't overlap");
         });
       });
@@ -75,7 +74,7 @@ describe("TimeAxis", () => {
   }
 
   orientations.forEach((orientation) => {
-    let domains = [
+    const domains = [
       // 100 year span
       [new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2100, 0, 1, 0, 0, 0, 0)],
       // 1 year span
@@ -93,9 +92,9 @@ describe("TimeAxis", () => {
     ];
 
     it(`does not overlap visible tick labels with orientation ${orientation}`, () => {
-      let div = TestMethods.generateDiv();
-      let scale = new Plottable.Scales.Time();
-      let axis = new Plottable.Axes.Time(scale, orientation);
+      const div = TestMethods.generateDiv();
+      const scale = new Plottable.Scales.Time();
+      const axis = new Plottable.Axes.Time(scale, orientation);
       axis.renderTo(div);
 
       domains.forEach((domain) => {
@@ -109,29 +108,29 @@ describe("TimeAxis", () => {
   });
 
   function assertTickMarksAndLabelsDoNotOverlap(axis: Plottable.Axes.Time) {
-    let tickMarks = axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_MARK_CLASS}:not(.${Plottable.Axis.END_TICK_MARK_CLASS})`);
+    const tickMarks = axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_MARK_CLASS}:not(.${Plottable.Axis.END_TICK_MARK_CLASS})`);
     assert.operator(tickMarks.size(), ">=", 1, "There is at least one tick mark in the test");
-    let tickLabels = axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}`).filter(function(d, i) {
+    const tickLabels = axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}`).filter(function(d, i) {
         return d3.select(this).style("visibility") !== "hidden";
     });
     assert.operator(tickLabels.size(), ">=", 1, "There is at least one tick label in the test");
     tickMarks.each(function(tickMark, i) {
-      let tickMarkRect = this.getBoundingClientRect();
+      const tickMarkRect = this.getBoundingClientRect();
       tickLabels.each(function(tickLabel, j) {
-        let tickLabelRect = this.getBoundingClientRect();
-        let isOverlap = Plottable.Utils.DOM.clientRectsOverlap(tickMarkRect, tickLabelRect);
+        const tickLabelRect = this.getBoundingClientRect();
+        const isOverlap = Plottable.Utils.DOM.clientRectsOverlap(tickMarkRect, tickLabelRect);
         assert.isFalse(isOverlap, `Tick mark ${i} should not overlap with tick label ${j}`);
       });
     });
   }
 
-  let tierLabelPositions: TierLabelPosition[] = ["center", "between"];
+  const tierLabelPositions: TierLabelPosition[] = ["center", "between"];
   orientations.forEach((orientation) => {
     tierLabelPositions.forEach((tierLabelPosition) => {
       it(`does not overlap labels with tick marks when label position is ${tierLabelPosition} and orientation ${orientation}`, () => {
-        let scale = new Plottable.Scales.Time();
-        let axis = new Plottable.Axes.Time(scale, orientation);
-        let div = TestMethods.generateDiv();
+        const scale = new Plottable.Scales.Time();
+        const axis = new Plottable.Axes.Time(scale, orientation);
+        const div = TestMethods.generateDiv();
         axis.tierLabelPositions([tierLabelPosition, tierLabelPosition]);
         axis.renderTo(div);
         assertTickMarksAndLabelsDoNotOverlap(axis);
@@ -145,7 +144,7 @@ describe("TimeAxis", () => {
     let div: d3.Selection<HTMLDivElement, any, any, any>;
 
     beforeEach(() => {
-      let scale = new Plottable.Scales.Time();
+      const scale = new Plottable.Scales.Time();
       axis = new Plottable.Axes.Time(scale, "bottom");
       div = TestMethods.generateDiv();
     });
@@ -156,10 +155,10 @@ describe("TimeAxis", () => {
 
     it("renders end ticks at the two edges", () => {
       axis.renderTo(div);
-      let firstTick = axis.content().select(`.${Plottable.Axis.TICK_MARK_CLASS}`);
+      const firstTick = axis.content().select(`.${Plottable.Axis.TICK_MARK_CLASS}`);
       assert.strictEqual(firstTick.attr("x1"), "0", "first tick mark at beginning of axis");
       assert.strictEqual(firstTick.attr("x2"), "0", "first tick mark at beginning of axis");
-      let lastTick = axis.content().select(`.${Plottable.Axis.TICK_MARK_CLASS}:last-child`);
+      const lastTick = axis.content().select(`.${Plottable.Axis.TICK_MARK_CLASS}:last-child`);
       assert.strictEqual(lastTick.attr("x1")+"px", div.style("width"), "last end tick mark at end of axis");
       assert.strictEqual(lastTick.attr("x2")+"px", div.style("width"), "last end tick mark at end of axis");
       div.remove();
@@ -167,9 +166,9 @@ describe("TimeAxis", () => {
 
     it("adds the end-tick class to the first and last ticks", () => {
       axis.renderTo(div);
-      let firstTick = axis.content().select(`.${Plottable.Axis.TICK_MARK_CLASS}`);
+      const firstTick = axis.content().select(`.${Plottable.Axis.TICK_MARK_CLASS}`);
       assert.isTrue(firstTick.classed(Plottable.Axis.END_TICK_MARK_CLASS), "first end tick has end-tick-mark class");
-      let lastTick = axis.content().select(`.${Plottable.Axis.TICK_MARK_CLASS}:last-child`);
+      const lastTick = axis.content().select(`.${Plottable.Axis.TICK_MARK_CLASS}:last-child`);
       assert.isTrue(lastTick.classed(Plottable.Axis.END_TICK_MARK_CLASS), "last end tick has end-tick-mark class");
       div.remove();
     });
@@ -177,11 +176,11 @@ describe("TimeAxis", () => {
     it("sets the length of the end ticks to the specified value when tierLabelPosition is set to center", () => {
       axis.tierLabelPositions(["center", "center"]);
       axis.renderTo(div);
-      let endTicks = axis.content().selectAll<Element, any>(`.${Plottable.Axis.END_TICK_MARK_CLASS}`);
+      const endTicks = axis.content().selectAll<Element, any>(`.${Plottable.Axis.END_TICK_MARK_CLASS}`);
       assert.operator(endTicks.size(), ">=", 1, "At least one end tick mark is selected in the test");
       endTicks.each(function(d, i){
-        let endTick = d3.select(this);
-        let tickLength = Math.abs(TestMethods.numAttr(endTick, "y1") - TestMethods.numAttr(endTick, "y2"));
+        const endTick = d3.select(this);
+        const tickLength = Math.abs(TestMethods.numAttr(endTick, "y1") - TestMethods.numAttr(endTick, "y2"));
         assert.closeTo(tickLength, axis.endTickLength(), window.Pixel_CloseTo_Requirement,
           `end tick mark ${i} length should equal the specified amount`);
       });
@@ -191,23 +190,23 @@ describe("TimeAxis", () => {
 
   describe("formatting annotation ticks", () => {
     it("formats the dates to '{{abbreviated weekday}} {{abbreviated month}} {{day of month}}, {{year}}' by default", () => {
-      let div = TestMethods.generateDiv();
-      let scale = new Plottable.Scales.Time();
-      let axis = new Plottable.Axes.Time(scale, "bottom");
+      const div = TestMethods.generateDiv();
+      const scale = new Plottable.Scales.Time();
+      const axis = new Plottable.Axes.Time(scale, "bottom");
       axis.annotationsEnabled(true);
 
-      let testDate = new Date((scale.domain()[0].valueOf() + scale.domain()[1].valueOf()) / 2);
+      const testDate = new Date((scale.domain()[0].valueOf() + scale.domain()[1].valueOf()) / 2);
       axis.annotatedTicks([testDate]);
-      let defaultFormatter = Plottable.Formatters.time("%a %b %d, %Y");
+      const defaultFormatter = Plottable.Formatters.time("%a %b %d, %Y");
 
-      let annotationFormatter = axis.annotationFormatter();
+      const annotationFormatter = axis.annotationFormatter();
       assert.strictEqual(annotationFormatter(testDate), defaultFormatter(testDate), "formats to a default customized time formatter");
 
       axis.renderTo(div);
 
-      let annotationLabels = axis.content().selectAll<Element, any>(".annotation-label");
+      const annotationLabels = axis.content().selectAll<Element, any>(".annotation-label");
       annotationLabels.each(function(d, i) {
-        let annotationLabel = d3.select(this);
+        const annotationLabel = d3.select(this);
         assert.strictEqual(annotationLabel.text(), defaultFormatter(d), "formats to a default customized time formatter");
       });
       div.remove();
@@ -219,7 +218,7 @@ describe("TimeAxis", () => {
     let div: d3.Selection<HTMLDivElement, any, any, any>;
 
     beforeEach(() => {
-      let scale = new Plottable.Scales.Time();
+      const scale = new Plottable.Scales.Time();
       axis = new Plottable.Axes.Time(scale, "bottom");
       div = TestMethods.generateDiv();
     });
@@ -236,7 +235,7 @@ describe("TimeAxis", () => {
       ]);
       axis.renderTo(div);
 
-      let oneTierHeight = axis.height();
+      const oneTierHeight = axis.height();
 
       axis.axisConfigurations([
         [
@@ -245,7 +244,7 @@ describe("TimeAxis", () => {
         ],
       ]);
 
-      let twoTierHeight = axis.height();
+      const twoTierHeight = axis.height();
 
       assert.operator(twoTierHeight, ">", oneTierHeight, "two-tiered a taller than one-tiered");
 
@@ -257,7 +256,7 @@ describe("TimeAxis", () => {
         ],
       ]);
 
-      let threeTierHeight = axis.height();
+      const threeTierHeight = axis.height();
 
       assert.operator(threeTierHeight, ">", twoTierHeight, "three-tiered is taller than the two-tiered");
 
@@ -273,7 +272,7 @@ describe("TimeAxis", () => {
       ]);
       axis.renderTo(div);
 
-      let twoTierHeight = axis.height();
+      const twoTierHeight = axis.height();
 
       axis.axisConfigurations([
         [
@@ -281,7 +280,7 @@ describe("TimeAxis", () => {
         ],
       ]);
 
-      let newHeight = axis.height();
+      const newHeight = axis.height();
 
       assert.operator(newHeight, "<", twoTierHeight, "two-tier time axis shrinks when changed to 1 tier");
 
@@ -292,7 +291,7 @@ describe("TimeAxis", () => {
       axis.margin(100);
       axis.anchor(div);
       axis.computeLayout({ x: 0, y: 0 }, 400, 400);
-      let minimumHeight = axis.tickLabelPadding() + axis.margin() + axis.innerTickLength();
+      const minimumHeight = axis.tickLabelPadding() + axis.margin() + axis.innerTickLength();
       assert.operator(axis.height(), ">=", minimumHeight, "height includes all relevant pieces");
       div.remove();
     });
@@ -303,7 +302,7 @@ describe("TimeAxis", () => {
 
       axis.anchor(div);
       axis.computeLayout({ x: 0, y: 0}, Plottable.Utils.DOM.elementWidth(div), Plottable.Utils.DOM.elementHeight(div));
-      let twoAnnotationTierHeight = axis.height();
+      const twoAnnotationTierHeight = axis.height();
 
       axis.annotationTierCount(3);
       axis.computeLayout({ x: 0, y: 0}, Plottable.Utils.DOM.elementWidth(div), Plottable.Utils.DOM.elementHeight(div));
@@ -316,23 +315,23 @@ describe("TimeAxis", () => {
 
   describe("drawing tiers", () => {
     it("draws all of tiers within the component space", () => {
-      let div = TestMethods.generateDiv();
-      let constrainedHeight = 50;
+      const div = TestMethods.generateDiv();
+      const constrainedHeight = 50;
       div.style("height", constrainedHeight+"px");
-      let scale = new Plottable.Scales.Time();
-      let axis = new Plottable.Axes.Time(scale, "bottom");
+      const scale = new Plottable.Scales.Time();
+      const axis = new Plottable.Axes.Time(scale, "bottom");
 
-      let tiersToCreate = 15;
-      let configuration = Array.apply(null, Array(tiersToCreate)).map(() => {
+      const tiersToCreate = 15;
+      const configuration = Array.apply(null, Array(tiersToCreate)).map(() => {
         return {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e") };
       });
       axis.axisConfigurations([configuration]);
 
       axis.renderTo(div);
 
-      let axisBoundingRect = axis.element().node().getBoundingClientRect();
+      const axisBoundingRect = axis.element().node().getBoundingClientRect();
 
-      let isInsideAxisBoundingRect = function(innerRect: ClientRect) {
+      const isInsideAxisBoundingRect = function(innerRect: ClientRect) {
         return Math.floor(innerRect.bottom) <= Math.ceil(axisBoundingRect.bottom) + window.Pixel_CloseTo_Requirement &&
               Math.floor(axisBoundingRect.top) <= Math.ceil(innerRect.top) + window.Pixel_CloseTo_Requirement;
       };
@@ -340,12 +339,12 @@ describe("TimeAxis", () => {
       axis.content()
         .selectAll<Element, any>(`.${Plottable.Axes.Time.TIME_AXIS_TIER_CLASS}`)
         .each(function(d, i) {
-          let tier = d3.select(this);
+          const tier = d3.select(this);
           let visibility = tier.style("visibility");
 
-          // HACKHACK window.getComputedStyle() is behaving weirdly in IE9. Further investigation required
+          // HACKHACK window.getComputedStyle().visibility returns "inherit" in IE instead of an actual value
           if (visibility === "inherit") {
-            visibility = getStyleInIE9(tier.node());
+            visibility = getInheritedVisibilityProperty(tier.node());
           }
           if (isInsideAxisBoundingRect(tier.node().getBoundingClientRect())) {
             assert.strictEqual(visibility, "visible", `tier ${i} inside axis should be visible`);
@@ -357,9 +356,9 @@ describe("TimeAxis", () => {
       div.remove();
       axis.destroy();
 
-      function getStyleInIE9(element: Element) {
+      function getInheritedVisibilityProperty(element: Element) {
         while (element) {
-          let visibility = window.getComputedStyle(element).visibility;
+          const visibility = window.getComputedStyle(element).visibility;
           if (visibility !== "inherit") {
             return visibility;
           }
@@ -372,19 +371,19 @@ describe("TimeAxis", () => {
 
   describe("configuring the label presentation", () => {
     it("allows usage of a custom configuration list", () => {
-      let div = TestMethods.generateDiv();
-      let scale = new Plottable.Scales.Time();
-      let axis = new Plottable.Axes.Time(scale, "bottom");
-      let formatter = Plottable.Formatters.time("%a %e");
+      const div = TestMethods.generateDiv();
+      const scale = new Plottable.Scales.Time();
+      const axis = new Plottable.Axes.Time(scale, "bottom");
+      const formatter = Plottable.Formatters.time("%a %e");
       axis.axisConfigurations([
         [
           {interval: Plottable.TimeInterval.day, step: 2, formatter: formatter},
         ],
       ]);
       axis.renderTo(div);
-      let tickLabels = axis.content().selectAll<Element, any>(".tick-label");
+      const tickLabels = axis.content().selectAll<Element, any>(".tick-label");
       tickLabels.each(function(d, i) {
-        let tickLabel = d3.select(this);
+        const tickLabel = d3.select(this);
         assert.strictEqual(tickLabel.text(), formatter(d), "formats to a customized time formatter");
       });
       axis.destroy();
@@ -394,11 +393,11 @@ describe("TimeAxis", () => {
 
   describe("limiting timeinterval precision", () => {
     it("uses default axis config when maxTimeIntervalPrecision not set", () => {
-      let div = TestMethods.generateDiv();
-      let axis = new Plottable.Axes.Time(new Plottable.Scales.Time(), "bottom");
+      const div = TestMethods.generateDiv();
+      const axis = new Plottable.Axes.Time(new Plottable.Scales.Time(), "bottom");
 
       axis.renderTo(div);
-      let config = axis.currentAxisConfiguration();
+      const config = axis.currentAxisConfiguration();
       assert.strictEqual(config.length, 2, "2 tiers");
       assert.strictEqual(config[0].interval, "hour");
       assert.strictEqual(config[1].interval, "day");
@@ -408,12 +407,12 @@ describe("TimeAxis", () => {
     });
 
     it("still works when maxTimeIntervalPrecision is set high", () => {
-      let div = TestMethods.generateDiv();
-      let axis = new Plottable.Axes.Time(new Plottable.Scales.Time(), "bottom");
+      const div = TestMethods.generateDiv();
+      const axis = new Plottable.Axes.Time(new Plottable.Scales.Time(), "bottom");
 
-      axis.maxTimeIntervalPrecision("minute")
+      axis.maxTimeIntervalPrecision("minute");
       axis.renderTo(div);
-      let config = axis.currentAxisConfiguration();
+      const config = axis.currentAxisConfiguration();
       assert.strictEqual(config.length, 2, "2 tiers");
       assert.strictEqual(config[0].interval, "hour");
       assert.strictEqual(config[1].interval, "day");
@@ -423,12 +422,12 @@ describe("TimeAxis", () => {
     });
 
     it("limits axis config when maxTimeIntervalPrecision is set", () => {
-      let div = TestMethods.generateDiv();
-      let axis = new Plottable.Axes.Time(new Plottable.Scales.Time(), "bottom");
+      const div = TestMethods.generateDiv();
+      const axis = new Plottable.Axes.Time(new Plottable.Scales.Time(), "bottom");
 
-      axis.maxTimeIntervalPrecision("day")
+      axis.maxTimeIntervalPrecision("day");
       axis.renderTo(div);
-      let config = axis.currentAxisConfiguration();
+      const config = axis.currentAxisConfiguration();
       // day/month is most precise valid config after hour/day
       assert.strictEqual(config.length, 2, "2 tiers");
       assert.strictEqual(config[0].interval, "day");

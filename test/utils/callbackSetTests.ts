@@ -1,31 +1,27 @@
-import * as d3 from "d3";
-
 import { assert } from "chai";
 
 import * as Plottable from "../../src";
 
-import * as TestMethods from "../testMethods";
-
 describe("Utils", () => {
   describe("CallbackSet", () => {
     it("callCallbacks()", () => {
-      let expectedString = "Plottable";
-      let expectedIndex = 1;
+      const expectedString = "Plottable";
+      const expectedIndex = 1;
 
       let cb1called = false;
-      let cb1 = (s: string, i: number) => {
+      const cb1 = (s: string, i: number) => {
         assert.strictEqual(s, expectedString, "was passed the correct first argument");
         assert.strictEqual(i, expectedIndex, "was passed the correct second argument");
         cb1called = true;
       };
       let cb2called = false;
-      let cb2 = (s: string, i: number) => {
+      const cb2 = (s: string, i: number) => {
         assert.strictEqual(s, expectedString, "was passed the correct first argument");
         assert.strictEqual(i, expectedIndex, "was passed the correct second argument");
         cb2called = true;
       };
 
-      let callbackSet = new Plottable.Utils.CallbackSet<(s: string, i: number) => any>();
+      const callbackSet = new Plottable.Utils.CallbackSet<(s: string, i: number) => any>();
       callbackSet.add(cb1);
       callbackSet.add(cb2);
 

@@ -8,17 +8,17 @@ import * as d3Shape from "d3-shape";
 
 import * as Animators from "../animators";
 import { Dataset } from "../core/dataset";
-import { Accessor, AttributeToProjector, Bounds, Point, Projector, Range } from "../core/interfaces";
+import { AttributeToProjector, Bounds, IAccessor, Point, Projector, Range } from "../core/interfaces";
 import * as Drawers from "../drawers";
-import { Drawer } from "../drawers/drawer";
+import { ProxyDrawer } from "../drawers/drawer";
+import { LineSVGDrawer, makeLineCanvasDrawStep } from "../drawers/lineDrawer";
 import * as Scales from "../scales";
 import { QuantitativeScale } from "../scales/quantitativeScale";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
-
 import { makeEnum } from "../utils/makeEnum";
 import * as Plots from "./";
-import { PlotEntity } from "./";
+import { IPlotEntity } from "./";
 import { Plot } from "./plot";
 import { XYPlot } from "./xyPlot";
 
@@ -90,27 +90,27 @@ export class Line<X> extends XYPlot<X, number> {
     this.attr("stroke-width", "2px");
   }
 
-  public x(): Plots.TransformableAccessorScaleBinding<X, number>;
-  public x(x: number | Accessor<number>): this;
-  public x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
-  public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
+  public x(): Plots.ITransformableAccessorScaleBinding<X, number>;
+  public x(x: number | IAccessor<number>): this;
+  public x(x: X | IAccessor<X>, xScale: Scale<X, number>): this;
+  public x(x?: number | IAccessor<number> | X | IAccessor<X>, xScale?: Scale<X, number>): any {
     if (x == null) {
       return super.x();
     } else {
       if (xScale == null) {
-        super.x(<number | Accessor<number>>x);
+        super.x(<number | IAccessor<number>>x);
       } else {
-        super.x(<X | Accessor<X>>x, xScale);
+        super.x(<X | IAccessor<X>>x, xScale);
       }
       this._setScaleSnapping();
       return this;
     }
   }
 
-  public y(): Plots.TransformableAccessorScaleBinding<number, number>;
-  public y(y: number | Accessor<number>): this;
-  public y(y: number | Accessor<number>, yScale: Scale<number, number>): this;
-  public y(y?: number | Accessor<number>, yScale?: Scale<number, number>): any {
+  public y(): Plots.ITransformableAccessorScaleBinding<number, number>;
+  public y(y: number | IAccessor<number>): this;
+  public y(y: number | IAccessor<number>, yScale: Scale<number, number>): this;
+  public y(y?: number | IAccessor<number>, yScale?: Scale<number, number>): any {
     if (y == null) {
       return super.y();
     } else {
@@ -226,8 +226,8 @@ export class Line<X> extends XYPlot<X, number> {
     return this;
   }
 
-  protected _createDrawer(dataset: Dataset): Drawer {
-    return new Drawers.Line(dataset, () => this._d3LineFactory(dataset));
+  protected _createDrawer(dataset: Dataset) {
+    return new ProxyDrawer(() => new LineSVGDrawer(), makeLineCanvasDrawStep(() => this._d3LineFactory(dataset)));
   }
 
   protected _extentsForProperty(property: string) {
@@ -391,7 +391,7 @@ export class Line<X> extends XYPlot<X, number> {
     return attrToProjector;
   }
 
-  public entitiesAt(point: Point): PlotEntity[] {
+  public entitiesAt(point: Point): IPlotEntity[] {
     const entity = this.entityNearestByXThenY(point);
     if (entity != null) {
       return [entity];
@@ -406,7 +406,7 @@ export class Line<X> extends XYPlot<X, number> {
    * @param {Bounds} bounds
    * @returns {PlotEntity[]}
    */
-  public entitiesIn(bounds: Bounds): PlotEntity[];
+  public entitiesIn(bounds: Bounds): IPlotEntity[];
   /**
    * Gets the Entities that intersect the area defined by the ranges.
    *
@@ -414,8 +414,8 @@ export class Line<X> extends XYPlot<X, number> {
    * @param {Range} yRange
    * @returns {PlotEntity[]}
    */
-  public entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
-  public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): PlotEntity[] {
+  public entitiesIn(xRange: Range, yRange: Range): IPlotEntity[];
+  public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): IPlotEntity[] {
     let dataXRange: Range;
     let dataYRange: Range;
     if (yRange == null) {
@@ -444,10 +444,10 @@ export class Line<X> extends XYPlot<X, number> {
    * @param {Point} queryPoint
    * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
    */
-  public entityNearestByXThenY(queryPoint: Point): PlotEntity {
+  public entityNearestByXThenY(queryPoint: Point): IPlotEntity {
     let minXDist = Infinity;
     let minYDist = Infinity;
-    let closest: PlotEntity;
+    let closest: IPlotEntity;
 
     const chartBounds = this.bounds();
     this.entities().forEach((entity) => {
@@ -493,8 +493,8 @@ export class Line<X> extends XYPlot<X, number> {
     xProjector = Plot._scaledAccessor(this.x()),
     yProjector = Plot._scaledAccessor(this.y())): d3Shape.Line<any> {
     const definedProjector = (d: any, i: number, dataset: Dataset) => {
-      const positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
-      const positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
+      const positionX = xProjector(d, i, dataset);
+      const positionY = yProjector(d, i, dataset);
       return positionX != null && !Utils.Math.isNaN(positionX) &&
         positionY != null && !Utils.Math.isNaN(positionY);
     };

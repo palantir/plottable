@@ -1,5 +1,5 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
+import { SimpleSelection } from "../../src/core/interfaces";
 
 import { assert } from "chai";
 
@@ -24,7 +24,7 @@ describe("Dispatchers", () => {
 
       it("can set a callback to be called when a key is pressed down", () => {
         let keyDowned = false;
-        let callback = (code: number, event: KeyboardEvent) => {
+        const callback = (code: number, event: KeyboardEvent) => {
           keyDowned = true;
           assert.strictEqual(code, keyCodeToSend, "correct keycode was passed");
           assert.isNotNull(event, "key event was passed to the callback");
@@ -40,7 +40,7 @@ describe("Dispatchers", () => {
 
       it("can remove the keydown listener", () => {
         let keyDowned = false;
-        let callback = () => keyDowned = true;
+        const callback = () => keyDowned = true;
 
         keyDispatcher.onKeyDown(callback);
 
@@ -56,7 +56,7 @@ describe("Dispatchers", () => {
 
       it("can set a callback to be called when the key is released", () => {
         let keyUped = false;
-        let callback = (code: number, event: KeyboardEvent) => {
+        const callback = (code: number, event: KeyboardEvent) => {
           keyUped = true;
           assert.strictEqual(code, keyCodeToSend, "correct keycode was passed");
           assert.isNotNull(event, "key event was passed to the callback");
@@ -72,7 +72,7 @@ describe("Dispatchers", () => {
 
       it("can remove the keyup listener", () => {
         let keyUped = false;
-        let callback = () => keyUped = true;
+        const callback = () => keyUped = true;
 
         keyDispatcher.onKeyUp(callback);
 

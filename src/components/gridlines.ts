@@ -5,7 +5,7 @@
 
 import { Point, SimpleSelection } from "../core/interfaces";
 import { QuantitativeScale } from "../scales/quantitativeScale";
-import { ScaleCallback } from "../scales/scale";
+import { IScaleCallback } from "../scales/scale";
 
 import { Component } from "./component";
 
@@ -15,7 +15,7 @@ export class Gridlines extends Component {
   private _xLinesContainer: SimpleSelection<void>;
   private _yLinesContainer: SimpleSelection<void>;
 
-  private _renderCallback: ScaleCallback<QuantitativeScale<any>>;
+  private _renderCallback: IScaleCallback<QuantitativeScale<any>>;
 
   /**
    * @constructor

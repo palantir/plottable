@@ -1,4 +1,3 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -84,6 +83,6 @@ describe("Gridlines", () => {
     (<any> assert).throw(() => new Plottable.Components.Gridlines(null, <any> colorScale), Error,
       "yScale needs to inherit from Scale.QuantitativeScale", "can't set yScale to color scale");
 
-     div.remove();
+    div.remove();
   });
 });
