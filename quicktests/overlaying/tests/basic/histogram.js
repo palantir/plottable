@@ -33,7 +33,7 @@ function run(svg, data, Plottable) {
     const vert = table();
     const vbarPlot = new Plottable.Plots.Bar("vertical")
         .addDataset(dataset)
-        .barAlignment("start")
+        .barAlignment(align)
         .attr("gap", 1)
         .x((d) => d.start, vert.x)
         .y((d) => d.val, vert.y)
@@ -66,25 +66,10 @@ function run(svg, data, Plottable) {
         .barEnd((d) => d.end, stack.x);
     stack.table.add(stackPlot, 0, 1);
 
-    // bar plot w category axis
-    const xCatScale = new Plottable.Scales.Linear();
-    const yCatScale = new Plottable.Scales.Category();
-    const hcatbarPlot = new Plottable.Plots.Bar("horizontal")
-        .addDataset(dataset)
-        .barAlignment("middle")
-        .x((d) => d.val, xCatScale)
-        .y((d) => d.category, yCatScale)
-        .barEnd((d) => yCatScale.scale(d.category) + 10);
-    const catTable = new Plottable.Components.Table([
-        [new Plottable.Axes.Category(yCatScale, "left"), hcatbarPlot],
-        [null, new Plottable.Axes.Numeric(xCatScale, "bottom")],
-    ]);
-
     const layout = new Plottable.Components.Table([
         [vert.table],
         [horiz.table],
         [stack.table],
-        [catTable],
     ]);
     layout.renderTo(svg);
 }

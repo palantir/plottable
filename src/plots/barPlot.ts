@@ -120,27 +120,38 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     return this;
   }
 
-  public barEnd(): Plots.TransformableAccessorScaleBinding<X, number>;
-  public barEnd(end: number | Accessor<number>): this;
-  public barEnd(end: X | Accessor<X>, scale: Scale<X, number>): this;
   /**
-   * Gets/sets the accessor for the bar "end", which is used to compute the
-   * width of vertical bars or the height of horizontal bars.
-   *
-   * Normally, bar width is determined by how many bars can fit in the given
-   * space (minus some padding).
-   *
-   * You can override this behavior and manually set the start and end
-   * coordinates for each bar.
-   *
-   * For example, if the bar chart is "vertical" and this accessor is defined,
-   * then the width of a bar is calculated as `abs(barEnd() - x())`.
+   * Gets the accessor for the bar "end", which is used to compute the width of
+   * each bar on the independent axis.
    */
-  public barEnd(end?: number | Accessor<number> | X | Accessor<X>, scale?: Scale<X, number>): any {
+  public barEnd(): Plots.ITransformableAccessorScaleBinding<X, number>;
+  public barEnd(end: number | IAccessor<number> | X | IAccessor<X>): this;
+  /**
+   * Sets the accessor for the bar "end", which is used to compute the width of
+   * each bar on the x axis (y axis if horizontal).
+   *
+   * If a `Scale` has been set for the independent axis via the `x` method (`y`
+   * if horizontal), it will also be used to scale `barEnd`.
+   *
+   * Additionally, calling this setter will set `barAlignment` to `"start"`,
+   * indicating that `x` and `barEnd` now define the left and right x
+   * coordinates of a bar (bottom/top if horizontal).
+   *
+   * Normally, a single bar width for all bars is determined by how many bars
+   * can fit in the given space (minus some padding). Settings this accessor
+   * will override this behavior and manually set the start and end coordinates
+   * for each bar.
+   *
+   * This means it will totally ignore the range band width of category scales,
+   * so this probably doesn't make sense to use with category axes.
+   */
+  public barEnd(end?: number | IAccessor<number> | X | IAccessor<X>): any {
     if (end == null) {
       return this._propertyBindings.get(Bar._BAR_END_KEY);
     }
 
+    const binding = (this._isVertical) ? this.x() : this.y();
+    const scale = binding && binding.scale;
     this._bindProperty(Bar._BAR_END_KEY, end, scale);
     this._updateWidthAccesor();
     this._updateValueScale();
@@ -148,10 +159,13 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     return this;
   }
 
+  /**
+   * Gets the current bar alignment
+   */
   public barAlignment(): BarAlignment;
   public barAlignment(align: BarAlignment): this;
   /**
-   * Gets/Sets the bar alignment. Valid values are `"start"`, `"middle"`, and
+   * Sets the bar alignment. Valid values are `"start"`, `"middle"`, and
    * `"end"`, which determines the meaning of the accessor of the bar's scale
    * coordinate (e.g. "x" for vertical bars).
    *
@@ -760,7 +774,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   }
 
   protected _updateWidthAccesor() {
-    const startProj: Plots.TransformableAccessorScaleBinding<any, number> = this._isVertical ? this.x() : this.y();
+    const startProj: Plots.ITransformableAccessorScaleBinding<any, number> = this._isVertical ? this.x() : this.y();
     const endProj = this.barEnd();
     if (startProj != null && endProj != null) {
       this._fixedWidth = false;

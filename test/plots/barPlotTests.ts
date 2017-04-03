@@ -873,7 +873,7 @@ describe("Plots", () => {
           .addDataset(new Plottable.Dataset(data))
           .x((d) => d.x0, xScale)
           .y((d) => d.y, yScale)
-          .barEnd((d) => d.x1, xScale)
+          .barEnd((d) => d.x1)
           .renderTo(div);
       });
 
