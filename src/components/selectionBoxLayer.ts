@@ -5,7 +5,7 @@
 
 import { Bounds, Point, SimpleSelection } from "../core/interfaces";
 import { QuantitativeScale } from "../scales/quantitativeScale";
-import { ScaleCallback } from "../scales/scale";
+import { IScaleCallback } from "../scales/scale";
 import * as Utils from "../utils";
 
 import { Component } from "./component";
@@ -24,7 +24,7 @@ export class SelectionBoxLayer extends Component {
   private _yExtent: (number | { valueOf(): number })[];
   private _xScale: QuantitativeScale<number | { valueOf(): number }>;
   private _yScale: QuantitativeScale<number | { valueOf(): number }>;
-  private _adjustBoundsCallback: ScaleCallback<QuantitativeScale<number | { valueOf(): number }>>;
+  private _adjustBoundsCallback: IScaleCallback<QuantitativeScale<number | { valueOf(): number }>>;
   protected _xBoundsMode = PropertyMode.PIXEL;
   protected _yBoundsMode = PropertyMode.PIXEL;
 

@@ -16,43 +16,43 @@ describe("Axis", () => {
   const numAttr = TestMethods.numAttr;
 
   horizontalOrientations.forEach((horizontalOrientation) => {
-    let alignment = horizontalOrientation === "top" ? "bottom" : "top";
+    const alignment = horizontalOrientation === "top" ? "bottom" : "top";
 
     it(`defaults to a ${alignment} y alignment with orientation ${horizontalOrientation}`, () => {
-      let scale = new Plottable.Scales.Linear();
-      let axis = new Plottable.Axis(scale, horizontalOrientation);
+      const scale = new Plottable.Scales.Linear();
+      const axis = new Plottable.Axis(scale, horizontalOrientation);
       assert.strictEqual(axis.yAlignment(), alignment, `y alignment for ${horizontalOrientation} is default ${alignment}`);
       axis.destroy();
     });
   });
 
   verticalOrientations.forEach((verticalOrientation) => {
-    let alignment = verticalOrientation === "left" ? "right" : "left";
+    const alignment = verticalOrientation === "left" ? "right" : "left";
 
     it(`defaults to a ${alignment} x alignment with orientation ${verticalOrientation}`, () => {
-      let scale = new Plottable.Scales.Linear();
-      let axis = new Plottable.Axis(scale, verticalOrientation);
+      const scale = new Plottable.Scales.Linear();
+      const axis = new Plottable.Axis(scale, verticalOrientation);
       assert.strictEqual(axis.xAlignment(), alignment, `x alignment for ${verticalOrientation} is default ${alignment}`);
       axis.destroy();
     });
   });
 
   it("throws an error when setting an invalid orientation", () => {
-    let scale = new Plottable.Scales.Linear();
+    const scale = new Plottable.Scales.Linear();
     assert.throws(() => new Plottable.Axis(scale, "blargh" as any), "unsupported");
   });
 
   it("throws an error when setting a negative tickLabelPadding", () => {
-    let scale = new Plottable.Scales.Linear();
-    let axis = new Plottable.Axis(scale, "bottom");
+    const scale = new Plottable.Scales.Linear();
+    const axis = new Plottable.Axis(scale, "bottom");
 
     assert.throws(() => axis.tickLabelPadding(-1), "must be positive");
     axis.destroy();
   });
 
   it("throws an error when setting a negative margin", () => {
-    let scale = new Plottable.Scales.Linear();
-    let axis = new Plottable.Axis(scale, "right");
+    const scale = new Plottable.Scales.Linear();
+    const axis = new Plottable.Axis(scale, "right");
 
     assert.throws(() => axis.margin(-1), "must be positive");
     axis.destroy();
@@ -60,17 +60,17 @@ describe("Axis", () => {
 
   orientations.forEach((orientation) => {
     it(`updates the layout when updating the margin after rendering for orientation ${orientation}`, () => {
-      let div = TestMethods.generateDiv();
-      let scale = new Plottable.Scales.Linear();
-      let axis = new Plottable.Axis(scale, orientation);
+      const div = TestMethods.generateDiv();
+      const scale = new Plottable.Scales.Linear();
+      const axis = new Plottable.Axis(scale, orientation);
       axis.renderTo(div);
 
-      let relevantDimensionF = () => isHorizOrient(orientation) ? axis.height() : axis.width();
+      const relevantDimensionF = () => isHorizOrient(orientation) ? axis.height() : axis.width();
 
       let axisSize = axis.innerTickLength() + axis.margin();
       assert.strictEqual(relevantDimensionF(), axisSize, "axis size is the tick length and the margin");
 
-      let newMargin = 20;
+      const newMargin = 20;
       axis.margin(newMargin);
       axisSize = axis.innerTickLength() + axis.margin();
       assert.strictEqual(relevantDimensionF(), axisSize, "changing the margin size updates the size");
@@ -82,12 +82,12 @@ describe("Axis", () => {
 
   orientations.forEach((orientation) => {
     it(`draws the baseline at the correct edge for ${orientation} orientation`, () => {
-      let div = TestMethods.generateDiv();
-      let scale = new Plottable.Scales.Linear();
-      let axis = new Plottable.Axis(scale, orientation);
+      const div = TestMethods.generateDiv();
+      const scale = new Plottable.Scales.Linear();
+      const axis = new Plottable.Axis(scale, orientation);
       axis.renderTo(div);
 
-      let baseline = axis.content().select(".baseline");
+      const baseline = axis.content().select(".baseline");
       assert.isFalse(baseline.empty(), "baseline exists");
       assert.strictEqual(baseline.attr("x1"), orientation !== "left" ? "0" : String(axis.width()), "x1");
       assert.strictEqual(baseline.attr("x2"), orientation !== "right" ? String(axis.width()) : "0", "x2");
@@ -101,9 +101,9 @@ describe("Axis", () => {
 
   describe("setting the length of the tick marks", () => {
     it("can set for inner", () => {
-      let scale = new Plottable.Scales.Linear();
-      let axis = new Plottable.Axis(scale, "bottom");
-      let tickLength = 10;
+      const scale = new Plottable.Scales.Linear();
+      const axis = new Plottable.Axis(scale, "bottom");
+      const tickLength = 10;
       assert.strictEqual(axis.innerTickLength(tickLength), axis, "setting returns calling object");
       assert.strictEqual(axis.innerTickLength(), tickLength, "retrieves set tick length");
       assert.throws(() => axis.innerTickLength(-1), "must be positive");
@@ -111,9 +111,9 @@ describe("Axis", () => {
     });
 
     it("can set for ends", () => {
-      let scale = new Plottable.Scales.Linear();
-      let axis = new Plottable.Axis(scale, "bottom");
-      let tickLength = 10;
+      const scale = new Plottable.Scales.Linear();
+      const axis = new Plottable.Axis(scale, "bottom");
+      const tickLength = 10;
       assert.strictEqual(axis.endTickLength(tickLength), axis, "setting returns calling object");
       assert.strictEqual(axis.endTickLength(), tickLength, "retrieves set tick length");
       assert.throws(() => axis.endTickLength(-1), "must be positive");
@@ -121,24 +121,24 @@ describe("Axis", () => {
     });
 
     it("adjusts the height to the greater of innerTickLength and endTickLength", () => {
-      let div = TestMethods.generateDiv();
-      let scale = new Plottable.Scales.Linear();
-      let axis = new Plottable.Axis(scale, "bottom");
+      const div = TestMethods.generateDiv();
+      const scale = new Plottable.Scales.Linear();
+      const axis = new Plottable.Axis(scale, "bottom");
       axis.showEndTickLabels(true);
       axis.renderTo(div);
 
-      let expectedHeight = Math.max(axis.innerTickLength(), axis.endTickLength()) + axis.margin();
+      const expectedHeight = Math.max(axis.innerTickLength(), axis.endTickLength()) + axis.margin();
       assert.strictEqual(axis.height(), expectedHeight, "height should be equal to the maximum of the two");
 
-      let increasingInnerTickLength = axis.endTickLength() + 10;
+      const increasingInnerTickLength = axis.endTickLength() + 10;
       axis.innerTickLength(increasingInnerTickLength);
       assert.strictEqual(axis.height(), increasingInnerTickLength + axis.margin(), "height should increase to inner tick length");
 
-      let increasingEndTickLength = axis.innerTickLength() + 10;
+      const increasingEndTickLength = axis.innerTickLength() + 10;
       axis.endTickLength(increasingEndTickLength);
       assert.strictEqual(axis.height(), increasingEndTickLength + axis.margin(), "height should increase to end tick length");
 
-      let decreasingInnerTickLength = axis.endTickLength() - 10;
+      const decreasingInnerTickLength = axis.endTickLength() - 10;
       axis.innerTickLength(decreasingInnerTickLength);
       assert.strictEqual(axis.height(), increasingEndTickLength + axis.margin(), "height should not decrease");
 
@@ -161,14 +161,14 @@ describe("Axis", () => {
     });
 
     it("can set if annotations are enabled", () => {
-      let annotationsEnabled = true;
+      const annotationsEnabled = true;
       assert.strictEqual(axis.annotationsEnabled(annotationsEnabled), axis, "enabling/disabling annotations returns calling axis");
       assert.strictEqual(axis.annotationsEnabled(), annotationsEnabled, "can set if annotations are enabled");
 
-      let annotatedTicks = [new Date((scale.domain()[0].valueOf() + scale.domain()[1].valueOf()) / 2)];
+      const annotatedTicks = [new Date((scale.domain()[0].valueOf() + scale.domain()[1].valueOf()) / 2)];
       axis.annotatedTicks(annotatedTicks);
 
-      let div = TestMethods.generateDiv();
+      const div = TestMethods.generateDiv();
       axis.renderTo(div);
 
       assert.isFalse(axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_CIRCLE_CLASS}`).empty(), "annotations render");
@@ -178,9 +178,9 @@ describe("Axis", () => {
     });
 
     it("can enable annotations after render", () => {
-      let div = TestMethods.generateDiv();
-      let domainValues = [scale.domain()[0].valueOf(), scale.domain()[1].valueOf()];
-      let annotatedTicks = Plottable.Utils.Math.range(domainValues[0], domainValues[1], (domainValues[1] - domainValues[0]) / 10)
+      const div = TestMethods.generateDiv();
+      const domainValues = [scale.domain()[0].valueOf(), scale.domain()[1].valueOf()];
+      const annotatedTicks = Plottable.Utils.Math.range(domainValues[0], domainValues[1], (domainValues[1] - domainValues[0]) / 10)
         .map((d) => new Date(d));
       axis.annotatedTicks(annotatedTicks);
       axis.renderTo(div);
@@ -197,9 +197,9 @@ describe("Axis", () => {
     });
 
     it("can disable annotations after render", () => {
-      let div = TestMethods.generateDiv();
-      let domainValues = [scale.domain()[0].valueOf(), scale.domain()[1].valueOf()];
-      let annotatedTicks = Plottable.Utils.Math.range(domainValues[0], domainValues[1], (domainValues[1] - domainValues[0]) / 10)
+      const div = TestMethods.generateDiv();
+      const domainValues = [scale.domain()[0].valueOf(), scale.domain()[1].valueOf()];
+      const annotatedTicks = Plottable.Utils.Math.range(domainValues[0], domainValues[1], (domainValues[1] - domainValues[0]) / 10)
         .map((d) => new Date(d));
       axis.annotationsEnabled(true);
       axis.annotatedTicks(annotatedTicks);
@@ -232,14 +232,14 @@ describe("Axis", () => {
     });
 
     it("can set the annotated ticks", () => {
-      let domainValues = [scale.domain()[0].valueOf(), scale.domain()[1].valueOf()];
-      let annotatedTicks = Plottable.Utils.Math.range(domainValues[0], domainValues[1], 10);
+      const domainValues = [scale.domain()[0].valueOf(), scale.domain()[1].valueOf()];
+      const annotatedTicks = Plottable.Utils.Math.range(domainValues[0], domainValues[1], 10);
       assert.strictEqual(axis.annotatedTicks(annotatedTicks), axis, "setting annotated ticks returns calling axis");
       assert.deepEqual(axis.annotatedTicks(), annotatedTicks, "can set the annotated ticks");
 
       axis.annotationsEnabled(true);
 
-      let div = TestMethods.generateDiv();
+      const div = TestMethods.generateDiv();
       axis.renderTo(div);
 
       assert.deepEqual(axis.content().selectAll<Element, any>(".annotation-label").data(), annotatedTicks, "annotated ticks set");
@@ -249,9 +249,9 @@ describe("Axis", () => {
     });
 
     it("re-renders when annotated ticks are set after render", () => {
-      let domainValues = [scale.domain()[0].valueOf(), scale.domain()[1].valueOf()];
-      let annotatedTicks = Plottable.Utils.Math.range(domainValues[0], domainValues[1], 10);
-      let div = TestMethods.generateDiv();
+      const domainValues = [scale.domain()[0].valueOf(), scale.domain()[1].valueOf()];
+      const annotatedTicks = Plottable.Utils.Math.range(domainValues[0], domainValues[1], 10);
+      const div = TestMethods.generateDiv();
       axis.annotationsEnabled(true);
       axis.renderTo(div);
 
@@ -263,8 +263,8 @@ describe("Axis", () => {
       assert.strictEqual(axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS}`).size(),
         annotatedTicks.length, "annotated ticks annotated");
 
-      let annotationFormatter = axis.annotationFormatter();
-      let annotationLabels = axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS}`);
+      const annotationFormatter = axis.annotationFormatter();
+      const annotationLabels = axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS}`);
       annotationLabels.each(function(d, i) {
         assert.strictEqual(d3.select(this).text(), annotationFormatter(annotatedTicks[i]), `annotated tick ${i} has been formatted`);
       });
@@ -282,27 +282,27 @@ describe("Axis", () => {
     });
 
     it("uses the identity formatter by default", () => {
-      let annotationFormatter = axis.annotationFormatter();
-      let identityFormatter = Plottable.Formatters.identity();
-      let testString = "testString";
+      const annotationFormatter = axis.annotationFormatter();
+      const identityFormatter = Plottable.Formatters.identity();
+      const testString = "testString";
       assert.strictEqual(annotationFormatter(testString), identityFormatter(testString), "uses the identity formatter by default");
       axis.destroy();
     });
 
     it("can set the annotation formatter", () => {
-      let annotationFormatter = (d: any) => `${d}foo`;
+      const annotationFormatter = (d: any) => `${d}foo`;
       assert.strictEqual(axis.annotationFormatter(annotationFormatter), axis, "setting annotation formatter returns calling axis");
-      let testString = "testString";
+      const testString = "testString";
       assert.strictEqual(annotationFormatter(testString), axis.annotationFormatter()(testString), "can set the annotated ticks");
 
-      let annotatedTicks = Plottable.Utils.Math.range(scale.domain()[0], scale.domain()[1], 10);
+      const annotatedTicks = Plottable.Utils.Math.range(scale.domain()[0], scale.domain()[1], 10);
       axis.annotatedTicks(annotatedTicks);
       axis.annotationsEnabled(true);
 
-      let div = TestMethods.generateDiv();
+      const div = TestMethods.generateDiv();
       axis.renderTo(div);
 
-      let annotationLabels = axis.content().selectAll<Element, any>(".annotation-label");
+      const annotationLabels = axis.content().selectAll<Element, any>(".annotation-label");
       assert.strictEqual(annotationLabels.size(), annotatedTicks.length, "same number of annotation labels as annotated ticks");
       annotationLabels.each(function(d, i) {
         assert.strictEqual(d3.select(this).text(), annotationFormatter(d), `formats tick ${i}`);
@@ -313,8 +313,8 @@ describe("Axis", () => {
     });
 
     it("re-renders when the annotation formatter is changed", () => {
-      let div = TestMethods.generateDiv();
-      let annotatedTicks = Plottable.Utils.Math.range(scale.domain()[0], scale.domain()[1], 10);
+      const div = TestMethods.generateDiv();
+      const annotatedTicks = Plottable.Utils.Math.range(scale.domain()[0], scale.domain()[1], 10);
       axis.annotationsEnabled(true);
       axis.annotatedTicks(annotatedTicks);
       axis.renderTo(div);
@@ -322,10 +322,10 @@ describe("Axis", () => {
       assert.strictEqual(axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS}`).size(),
         annotatedTicks.length, "annotations have rendered");
 
-      let bazFormatter = (d: any) => `${d}baz`;
+      const bazFormatter = (d: any) => `${d}baz`;
       axis.annotationFormatter(bazFormatter);
 
-      let annotationLabels = axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS}`);
+      const annotationLabels = axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS}`);
       assert.strictEqual(annotationLabels.size(), annotatedTicks.length, "annotations have rendered");
 
       annotationLabels.each(function(d, i) {
@@ -349,17 +349,17 @@ describe("Axis", () => {
     });
 
     it("can set the annotation tier count", () => {
-      let annotationTierCount = 5;
+      const annotationTierCount = 5;
       assert.strictEqual(axis.annotationTierCount(annotationTierCount), axis, "setting annotation tier count returns calling axis");
       assert.deepEqual(axis.annotationTierCount(), annotationTierCount, "can set the annotation tier count");
 
       axis.annotationsEnabled(true);
 
-      let div = TestMethods.generateDiv();
+      const div = TestMethods.generateDiv();
       axis.renderTo(div);
 
-      let oldAxisHeight = axis.height();
-      let increaseAmount = 2;
+      const oldAxisHeight = axis.height();
+      const increaseAmount = 2;
       axis.annotationTierCount(axis.annotationTierCount() + increaseAmount);
       assert.operator(axis.height(), ">", oldAxisHeight, "axis takes number of tiers into account");
 
@@ -368,9 +368,9 @@ describe("Axis", () => {
     });
 
     it("throws an error when annotation tier count is not valid", () => {
-      let invalidAnnotationTierCounts = [-1, -100];
+      const invalidAnnotationTierCounts = [-1, -100];
       invalidAnnotationTierCounts.forEach(function(annotationTierCount) {
-        let currentAnnotationTierCount = axis.annotationTierCount();
+        const currentAnnotationTierCount = axis.annotationTierCount();
         assert.throws(() => axis.annotationTierCount(annotationTierCount),
         `annotationTierCount cannot be negative`);
         assert.strictEqual(axis.annotationTierCount(), currentAnnotationTierCount,
@@ -382,61 +382,61 @@ describe("Axis", () => {
 
   describe("drawing annotation elements", () => {
     orientations.forEach((orientation) => {
-      let scale = new Plottable.Scales.ModifiedLog();
+      const scale = new Plottable.Scales.ModifiedLog();
       scale.domain([0, 300]);
-      let annotatedTicks = [3, 100, 250];
+      const annotatedTicks = [3, 100, 250];
 
       it(`renders annotation lines, circles, and text extending out from baseline to rect with orientation ${orientation}`, () => {
-        let div = TestMethods.generateDiv();
-        let axis = new Plottable.Axis(scale, orientation);
+        const div = TestMethods.generateDiv();
+        const axis = new Plottable.Axis(scale, orientation);
         axis.annotatedTicks(annotatedTicks);
         axis.annotationsEnabled(true);
         axis.renderTo(div);
 
-        let annotationRects = axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
+        const annotationRects = axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
 
-        let annotationCircles = axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_CIRCLE_CLASS}`);
+        const annotationCircles = axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_CIRCLE_CLASS}`);
 
         assert.strictEqual(annotationCircles.size(), annotatedTicks.length, "circle for each annotated tick");
 
-        let axisPointX = (index: number) => {
-          let correspRect = d3.select(annotationRects.nodes()[index]);
+        const axisPointX = (index: number) => {
+          const correspRect = d3.select(annotationRects.nodes()[index]);
           return isHorizOrient(orientation) ? numAttr(correspRect, "x") : (orientation === "left" ? axis.width() : 0);
         };
 
-        let axisPointY = (index: number) => {
-          let correspRect = d3.select(annotationRects.nodes()[index]);
+        const axisPointY = (index: number) => {
+          const correspRect = d3.select(annotationRects.nodes()[index]);
           return isHorizOrient(orientation) ? (orientation === "top" ? axis.height() : 0) : numAttr(correspRect, "y");
         };
 
         annotationCircles.each(function (d, i) {
-          let annotationCircle = d3.select(this);
+          const annotationCircle = d3.select(this);
           assert.closeTo(numAttr(annotationCircle, "cx"), axisPointX(i), window.Pixel_CloseTo_Requirement, `circle ${i} at start`);
           assert.closeTo(numAttr(annotationCircle, "cy"), axisPointY(i), window.Pixel_CloseTo_Requirement, `circle ${i} at the top`);
         });
 
-        let annotationLines = axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_LINE_CLASS}`);
+        const annotationLines = axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_LINE_CLASS}`);
 
         assert.strictEqual(annotationLines.size(), annotatedTicks.length, "line for each annotated tick");
 
         annotationLines.each(function (d, i) {
-          let annotationLine = d3.select(this);
-          let correspondingRect = d3.select(annotationRects.nodes()[i]);
-          let x2 = numAttr(correspondingRect, "x") + (orientation === "left" ? numAttr(correspondingRect, "width") : 0);
-          let y2 = numAttr(correspondingRect, "y") + (orientation === "top" ? numAttr(correspondingRect, "height") : 0);
+          const annotationLine = d3.select(this);
+          const correspondingRect = d3.select(annotationRects.nodes()[i]);
+          const x2 = numAttr(correspondingRect, "x") + (orientation === "left" ? numAttr(correspondingRect, "width") : 0);
+          const y2 = numAttr(correspondingRect, "y") + (orientation === "top" ? numAttr(correspondingRect, "height") : 0);
           assert.closeTo(numAttr(annotationLine, "x1"), axisPointX(i), window.Pixel_CloseTo_Requirement, `line ${i} x1`);
           assert.closeTo(numAttr(annotationLine, "x2"), x2, window.Pixel_CloseTo_Requirement, `line ${i} x2`);
           assert.closeTo(numAttr(annotationLine, "y1"), axisPointY(i), window.Pixel_CloseTo_Requirement, `line ${i} y1`);
           assert.closeTo(numAttr(annotationLine, "y2"), y2, window.Pixel_CloseTo_Requirement, `line ${i} y2`);
         });
 
-        let annotationLabelTexts = axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS} text`);
+        const annotationLabelTexts = axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS} text`);
 
         assert.strictEqual(annotationLabelTexts.size(), annotatedTicks.length, "label text for each annotated tick");
 
         annotationLabelTexts.each(function (d, i) {
-          let annotationLabel = d3.select(this);
-          let surroundingRect = d3.select(annotationRects.nodes()[i]);
+          const annotationLabel = d3.select(this);
+          const surroundingRect = d3.select(annotationRects.nodes()[i]);
           TestMethods.assertBBoxInclusion(surroundingRect, annotationLabel);
         });
         axis.destroy();
@@ -445,25 +445,25 @@ describe("Axis", () => {
     });
 
     orientations.forEach((orientation) => {
-      let scale = new Plottable.Scales.ModifiedLog();
+      const scale = new Plottable.Scales.ModifiedLog();
       scale.domain([0, 300]);
-      let annotatedTicks = [3, 100, 250];
+      const annotatedTicks = [3, 100, 250];
 
       it(`places the rectangle at the scaled x position for ${orientation} orientation`, () => {
-        let div = TestMethods.generateDiv();
-        let axis = new Plottable.Axis(scale, orientation);
+        const div = TestMethods.generateDiv();
+        const axis = new Plottable.Axis(scale, orientation);
         axis.annotatedTicks(annotatedTicks);
         axis.annotationsEnabled(true);
         axis.renderTo(div);
 
-        let annotationRects = axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
+        const annotationRects = axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
 
         assert.strictEqual(annotationRects.size(), annotatedTicks.length, "same number of annotation rects as ticks");
 
-        let scaleAttribute = isHorizOrient(orientation) ? "x" : "y";
+        const scaleAttribute = isHorizOrient(orientation) ? "x" : "y";
 
         annotationRects.each(function (d, i) {
-          let annotationRect = d3.select(this);
+          const annotationRect = d3.select(this);
           assert.closeTo(numAttr(annotationRect, scaleAttribute), scale.scale(d),
             window.Pixel_CloseTo_Requirement, `rectangle ${i} positioned at scaled position`);
         });
@@ -473,18 +473,18 @@ describe("Axis", () => {
     });
 
     orientations.forEach((orientation) => {
-      let scale = new Plottable.Scales.ModifiedLog();
+      const scale = new Plottable.Scales.ModifiedLog();
       scale.domain([0, 300]);
-      let annotatedTicks = [3, 100, 250];
+      const annotatedTicks = [3, 100, 250];
 
       it(`places the first row right at the beginning of the annotation area for ${orientation} orientation`, () => {
-        let div = TestMethods.generateDiv();
-        let axis = new Plottable.Axis(scale, orientation);
+        const div = TestMethods.generateDiv();
+        const axis = new Plottable.Axis(scale, orientation);
         axis.annotatedTicks(annotatedTicks);
         axis.annotationsEnabled(true);
         axis.renderTo(div);
 
-        let firstAnnotationRect = axis.content().select(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
+        const firstAnnotationRect = axis.content().select(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
 
         let rectangleRowPos: number;
         let expectedRowPos: number;
@@ -514,23 +514,23 @@ describe("Axis", () => {
     });
 
     orientations.forEach((orientation) => {
-      let scale = new Plottable.Scales.ModifiedLog();
+      const scale = new Plottable.Scales.ModifiedLog();
       scale.domain([0, 300]);
-      let annotatedTicks = [50, 51];
+      const annotatedTicks = [50, 51];
 
       it(`moves rectangles that would overlap to different rows for ${orientation} orientation`, () => {
-        let div = TestMethods.generateDiv();
-        let axis = new Plottable.Axis(scale, orientation);
+        const div = TestMethods.generateDiv();
+        const axis = new Plottable.Axis(scale, orientation);
         axis.annotatedTicks(annotatedTicks);
         axis.annotationsEnabled(true);
         axis.renderTo(div);
 
-        let annotationRects = axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
-        let firstAnnotationRect = d3.select(annotationRects.nodes()[0]);
-        let secondAnnotationRect = d3.select(annotationRects.nodes()[1]);
+        const annotationRects = axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
+        const firstAnnotationRect = d3.select(annotationRects.nodes()[0]);
+        const secondAnnotationRect = d3.select(annotationRects.nodes()[1]);
 
-        let positionAttr = isHorizOrient(orientation) ? "y" : "x";
-        let offsetAttr = isHorizOrient(orientation) ? "height" : "width";
+        const positionAttr = isHorizOrient(orientation) ? "y" : "x";
+        const offsetAttr = isHorizOrient(orientation) ? "height" : "width";
 
         assert.strictEqual(Math.abs(numAttr(secondAnnotationRect, positionAttr) - numAttr(firstAnnotationRect, positionAttr)),
           numAttr(firstAnnotationRect, offsetAttr), "rectangle offset by previous rectangle");
@@ -541,25 +541,25 @@ describe("Axis", () => {
   });
 
   it("hides annotations if rectangles are outside the annotation area", () => {
-    let scale = new Plottable.Scales.Linear();
-    let annotatedTicks = [50, 51, 150];
+    const scale = new Plottable.Scales.Linear();
+    const annotatedTicks = [50, 51, 150];
     scale.domain([0, 300]);
 
-    let axis = new Plottable.Axis(scale, "bottom");
+    const axis = new Plottable.Axis(scale, "bottom");
     axis.annotatedTicks(annotatedTicks);
     axis.annotationsEnabled(true);
 
-    let div = TestMethods.generateDiv(300, 300);
+    const div = TestMethods.generateDiv(300, 300);
     axis.renderTo(div);
 
-    let annotationRects = axis.content().selectAll<SVGRectElement, any>(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
+    const annotationRects = axis.content().selectAll<SVGRectElement, any>(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
 
     assert.strictEqual(annotationRects.size(), annotatedTicks.length, "same number of annotation rects as ticks");
 
     annotationRects.each(function(d, i) {
-      let annotationRect = d3.select(this);
-      let bbox = this.getBBox();
-      let insideAnnotationArea = bbox.x >= 0 && bbox.x + bbox.width <= axis.width() &&
+      const annotationRect = d3.select(this);
+      const bbox = this.getBBox();
+      const insideAnnotationArea = bbox.x >= 0 && bbox.x + bbox.width <= axis.width() &&
         bbox.y >= 0 && bbox.y + bbox.height <= axis.height() - axis.margin();
       if (insideAnnotationArea) {
         assert.strictEqual(annotationRect.attr("visibility"), "visible", `rect ${i} inside margin area should be visible`);
@@ -572,23 +572,23 @@ describe("Axis", () => {
   });
 
   it("shows annotation circles regardless if rectangles are hidden", () => {
-    let scale = new Plottable.Scales.Linear();
-    let annotatedTicks = [50, 51, 150];
+    const scale = new Plottable.Scales.Linear();
+    const annotatedTicks = [50, 51, 150];
     scale.domain([0, 300]);
 
-    let axis = new Plottable.Axis(scale, "bottom");
+    const axis = new Plottable.Axis(scale, "bottom");
     axis.annotatedTicks(annotatedTicks);
     axis.annotationsEnabled(true);
 
-    let div = TestMethods.generateDiv(300, 300);
+    const div = TestMethods.generateDiv(300, 300);
     axis.renderTo(div);
 
-    let annotationCircles = axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_CIRCLE_CLASS}`);
+    const annotationCircles = axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_CIRCLE_CLASS}`);
 
     assert.strictEqual(annotationCircles.size(), annotatedTicks.length, "same number of annotation circles as ticks");
 
     annotationCircles.each(function(d, i) {
-      let annotationCircle = d3.select(this);
+      const annotationCircle = d3.select(this);
       assert.notStrictEqual(annotationCircle.attr("visibility"), "hidden", `circle ${i} inside margin area should be visible`);
     });
     axis.destroy();
@@ -596,12 +596,12 @@ describe("Axis", () => {
   });
 
   it("does not render the null as an annotation", () => {
-    let annotatedTicks: Date[] = [null];
-    let scale = new Plottable.Scales.Time();
+    const annotatedTicks: Date[] = [null];
+    const scale = new Plottable.Scales.Time();
     scale.domain([new Date(1994, 11, 17), new Date(1995, 11, 17)]);
-    let axis = new Plottable.Axis(scale, "bottom");
+    const axis = new Plottable.Axis(scale, "bottom");
     axis.annotationsEnabled(true);
-    let div = TestMethods.generateDiv(300, 300);
+    const div = TestMethods.generateDiv(300, 300);
     axis.renderTo(div);
 
     axis.annotatedTicks(annotatedTicks);
@@ -613,17 +613,17 @@ describe("Axis", () => {
   });
 
   it("only renders unique annotated ticks", () => {
-    let annotatedTicks = [150, 150, 200];
-    let scale = new Plottable.Scales.Linear();
+    const annotatedTicks = [150, 150, 200];
+    const scale = new Plottable.Scales.Linear();
     scale.domain([100, 200]);
-    let axis = new Plottable.Axis(scale, "bottom");
+    const axis = new Plottable.Axis(scale, "bottom");
     axis.annotationsEnabled(true);
-    let div = TestMethods.generateDiv(300, 300);
+    const div = TestMethods.generateDiv(300, 300);
     axis.renderTo(div);
 
     axis.annotatedTicks(annotatedTicks);
 
-    let annotatedTickSet = new Plottable.Utils.Set();
+    const annotatedTickSet = new Plottable.Utils.Set();
     annotatedTicks.forEach((annotatedTick) => {
       annotatedTickSet.add(annotatedTick);
     });
@@ -635,24 +635,67 @@ describe("Axis", () => {
   });
 
   it("places the tick at the top most row even if it is a duplicated tick", () => {
-    let annotatedTicks = [150, 150];
-    let scale = new Plottable.Scales.Linear();
+    const annotatedTicks = [150, 150];
+    const scale = new Plottable.Scales.Linear();
     scale.domain([100, 200]);
-    let axis = new Plottable.Axis(scale, "bottom");
+    const axis = new Plottable.Axis(scale, "bottom");
     axis.annotationsEnabled(true);
-    let div = TestMethods.generateDiv(300, 300);
+    const div = TestMethods.generateDiv(300, 300);
     axis.renderTo(div);
 
     axis.annotatedTicks(annotatedTicks);
 
-    let annotationRects = axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
+    const annotationRects = axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
     assert.strictEqual(annotationRects.size(), 1, "only one annotation rendered");
 
-    let annotationRect = d3.select(annotationRects.nodes()[0]);
+    const annotationRect = d3.select(annotationRects.nodes()[0]);
     assert.closeTo(numAttr(annotationRect, "y") + numAttr(annotationRect, "height"),
       axis.height() - axis.margin(), window.Pixel_CloseTo_Requirement, "rectangle positioned correctly");
 
     axis.destroy();
     div.remove();
+  });
+
+  describe("tickLabelDataOnElement", () => {
+    const domain = ["label1", "label2", "long long long long long long long long long long long long title"];
+
+    let div: d3.Selection<HTMLDivElement, void | {}, any, any>;
+    let scale: Plottable.Scales.Category;
+    let axis: Plottable.Axes.Category;
+
+    beforeEach(() => {
+      div = TestMethods.generateDiv();
+      scale = new Plottable.Scales.Category().domain(domain);
+      axis = new Plottable.Axes.Category(scale, "left");
+      const TICK_LABEL_MAX_WIDTH = 60;
+      axis.tickLabelMaxWidth(TICK_LABEL_MAX_WIDTH);
+      axis.renderTo(div);
+    });
+
+    afterEach(() => {
+      axis.destroy();
+      div.remove();
+    });
+
+    it("returns label datum when element has tick label class", () => {
+      const tickLabelElement = div.select(`.${Plottable.Axis.TICK_LABEL_CLASS}`).node() as Element;
+      assert.equal(axis.tickLabelDataOnElement(tickLabelElement), domain[0]);
+    });
+
+    it.skip("returns label datum when element in ancestor has tick label class", () => {
+      const labelTextLineElement = div.select(".text-line").node() as Element;
+      assert.equal(axis.tickLabelDataOnElement(labelTextLineElement), domain[0]);
+    });
+
+    it("returns undefined when no ancestor has tick label class", () => {
+      const contentElement = div.select(".content").node() as Element;
+      assert.isUndefined(axis.tickLabelDataOnElement(contentElement));
+    });
+
+    it("returns undefined when element is null / undefined", () => {
+      axis = new Plottable.Axes.Category(scale, "left");
+      assert.isUndefined(axis.tickLabelDataOnElement(undefined));
+      assert.isUndefined(axis.tickLabelDataOnElement(null));
+    });
   });
 });

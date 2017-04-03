@@ -6,7 +6,7 @@
 import * as Typesetter from "typesettable";
 
 import { Dataset } from "../core/dataset";
-import { Accessor, Point, SimpleSelection } from "../core/interfaces";
+import { IAccessor, Point, SimpleSelection } from "../core/interfaces";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
 
@@ -41,34 +41,34 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
     this._stackedExtent = [];
   }
 
-  public x(): Plots.TransformableAccessorScaleBinding<X, number>;
-  public x(x: number | Accessor<number>): this;
-  public x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
-  public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
+  public x(): Plots.ITransformableAccessorScaleBinding<X, number>;
+  public x(x: number | IAccessor<number>): this;
+  public x(x: X | IAccessor<X>, xScale: Scale<X, number>): this;
+  public x(x?: number | IAccessor<number> | X | IAccessor<X>, xScale?: Scale<X, number>): any {
     if (x == null) {
       return super.x();
     }
     if (xScale == null) {
-      super.x(<number | Accessor<number>> x);
+      super.x(<number | IAccessor<number>> x);
     } else {
-      super.x(<X | Accessor<X>> x, xScale);
+      super.x(<X | IAccessor<X>> x, xScale);
     }
 
     this._updateStackExtentsAndOffsets();
     return this;
   }
 
-  public y(): Plots.TransformableAccessorScaleBinding<Y, number>;
-  public y(y: number | Accessor<number>): this;
-  public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
-  public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
+  public y(): Plots.ITransformableAccessorScaleBinding<Y, number>;
+  public y(y: number | IAccessor<number>): this;
+  public y(y: Y | IAccessor<Y>, yScale: Scale<Y, number>): this;
+  public y(y?: number | IAccessor<number> | Y | IAccessor<Y>, yScale?: Scale<Y, number>): any {
     if (y == null) {
       return super.y();
     }
     if (yScale == null) {
-      super.y(<number | Accessor<number>> y);
+      super.y(<number | IAccessor<number>> y);
     } else {
-      super.y(<Y | Accessor<Y>> y, yScale);
+      super.y(<Y | IAccessor<Y>> y, yScale);
     }
 
     this._updateStackExtentsAndOffsets();

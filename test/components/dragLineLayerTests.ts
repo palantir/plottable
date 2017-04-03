@@ -1,4 +1,3 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -44,16 +43,16 @@ describe("GuideLineLayer", () => {
       });
 
       it("removes all callbacks on the DragLineLayer on destroy", () => {
-        let callback = () => "foo";
+        const callback = () => "foo";
         dll.onDragStart(callback);
         dll.onDrag(callback);
         dll.onDragEnd(callback);
 
         dll.destroy();
 
-        let dragStartCallbacks = <Plottable.Utils.CallbackSet<Plottable.DragLineCallback<void>>> (<any> dll)._dragStartCallbacks;
-        let dragCallbacks = <Plottable.Utils.CallbackSet<Plottable.DragLineCallback<void>>> (<any> dll)._dragCallbacks;
-        let dragEndCallbacks = <Plottable.Utils.CallbackSet<Plottable.DragLineCallback<void>>> (<any> dll)._dragEndCallbacks;
+        const dragStartCallbacks = <Plottable.Utils.CallbackSet<Plottable.IDragLineCallback<void>>> (<any> dll)._dragStartCallbacks;
+        const dragCallbacks = <Plottable.Utils.CallbackSet<Plottable.IDragLineCallback<void>>> (<any> dll)._dragCallbacks;
+        const dragEndCallbacks = <Plottable.Utils.CallbackSet<Plottable.IDragLineCallback<void>>> (<any> dll)._dragEndCallbacks;
         assert.strictEqual(dragStartCallbacks.size, 0, "dragStart callbacks removed on destroy()");
         assert.strictEqual(dragCallbacks.size, 0, "drag callbacks removed on destroy()");
         assert.strictEqual(dragEndCallbacks.size, 0, "drag end callbacks removed on destroy()");
@@ -61,13 +60,13 @@ describe("GuideLineLayer", () => {
       });
 
       it("correctly disconnects from the internal Drag Interaction on destroy", () => {
-        let dragInteraction = (<any> dll)._dragInteraction;
+        const dragInteraction = (<any> dll)._dragInteraction;
 
         dll.destroy();
 
-        let interactionStartCallbacks = <Plottable.Utils.CallbackSet<Plottable.DragCallback>> dragInteraction._dragStartCallbacks;
-        let interactionCallbacks = <Plottable.Utils.CallbackSet<Plottable.DragCallback>> dragInteraction._dragCallbacks;
-        let interactionEndCallbacks = <Plottable.Utils.CallbackSet<Plottable.DragCallback>> dragInteraction._dragEndCallbacks;
+        const interactionStartCallbacks = <Plottable.Utils.CallbackSet<Plottable.DragCallback>> dragInteraction._dragStartCallbacks;
+        const interactionCallbacks = <Plottable.Utils.CallbackSet<Plottable.DragCallback>> dragInteraction._dragCallbacks;
+        const interactionEndCallbacks = <Plottable.Utils.CallbackSet<Plottable.DragCallback>> dragInteraction._dragEndCallbacks;
         assert.strictEqual(interactionStartCallbacks.size, 0, "Interaction dragStart callbacks removed on destroy()");
         assert.strictEqual(interactionCallbacks.size, 0, "Interaction drag callbacks removed on destroy()");
         assert.strictEqual(interactionEndCallbacks.size, 0, "Interaction drag end callbacks removed on destroy()");
@@ -107,18 +106,18 @@ describe("GuideLineLayer", () => {
             y1: orientation === "vertical" ? 0 : value,
             y2: orientation === "vertical" ? DIV_HEIGHT : value,
           };
-        };
+        }
 
         function getDragPoint(value: number) {
           return {
             x: orientation === "vertical" ? value : halfPoint.x,
             y: orientation === "vertical" ? halfPoint.y : value,
           };
-        };
+        }
 
         function getRelventAttrFromPoint(point: Plottable.Point) {
           return orientation === "vertical" ? point.x : point.y;
-        };
+        }
 
         it("shows the correct cursor", () => {
           dll.renderTo(div);
@@ -142,7 +141,7 @@ describe("GuideLineLayer", () => {
           TestMethods.triggerFakeDragSequence(
             dll.background(),
             getDragPoint(startPosition),
-            getDragPoint(endPosition)
+            getDragPoint(endPosition),
           );
           TestMethods.assertLineAttrs(dll.content().select(GUIDE_LINE_CSSCLASS), getExpectedAttr(endPosition),
             "line was dragged to the final location");
@@ -158,7 +157,7 @@ describe("GuideLineLayer", () => {
           TestMethods.triggerFakeDragSequence(
             dll.background(),
             getDragPoint(startPosition + dll.detectionRadius()),
-            getDragPoint(endPosition)
+            getDragPoint(endPosition),
           );
           TestMethods.assertLineAttrs(dll.content().select(GUIDE_LINE_CSSCLASS), getExpectedAttr(endPosition),
             "line was dragged to the final location");
@@ -174,7 +173,7 @@ describe("GuideLineLayer", () => {
           TestMethods.triggerFakeDragSequence(
             dll.background(),
             getDragPoint(startPosition + 2 * dll.detectionRadius()),
-            getDragPoint(endPosition)
+            getDragPoint(endPosition),
           );
           TestMethods.assertLineAttrs(dll.content().select(GUIDE_LINE_CSSCLASS), getExpectedAttr(startPosition), "line did not move");
           assert.strictEqual(dll.pixelPosition(), startPosition, "pixelPosition was not changed");
@@ -190,7 +189,7 @@ describe("GuideLineLayer", () => {
           TestMethods.triggerFakeDragSequence(
             dll.background(),
             getDragPoint(startPosition),
-            getDragPoint(endPosition)
+            getDragPoint(endPosition),
           );
           TestMethods.assertLineAttrs(dll.content().select(GUIDE_LINE_CSSCLASS), getExpectedAttr(startPosition), "line did not move");
           assert.strictEqual(dll.pixelPosition(), startPosition, "pixelPosition was not changed");
@@ -211,7 +210,7 @@ describe("GuideLineLayer", () => {
           TestMethods.triggerFakeDragSequence(
             dll.background(),
             getDragPoint(startPosition),
-            getDragPoint(endPosition)
+            getDragPoint(endPosition),
           );
           const endValue = scale.invert(endPosition);
           assert.strictEqual(dll.value(), endValue, "value was updated correctly");
@@ -234,7 +233,7 @@ describe("GuideLineLayer", () => {
           TestMethods.triggerFakeDragSequence(
             dll.background(),
             getDragPoint(startPosition),
-            getDragPoint(endPosition)
+            getDragPoint(endPosition),
           );
           const endValue = scale.invert(endPosition);
           assert.strictEqual(dll.value(), endValue, "value was updated correctly");
@@ -293,8 +292,8 @@ describe("GuideLineLayer", () => {
 
       it("calls callback onDrag", () => {
         assert.strictEqual(dll.onDrag(callback), dll, "onDrag() returns the calling DragLineLayer");
-        let midX = startPosition * 3 / 8;
-        let endX = DIV_WIDTH / 4;
+        const midX = startPosition * 3 / 8;
+        const endX = DIV_WIDTH / 4;
         TestMethods.triggerFakeMouseEvent("mousedown", dll.background(), startPosition, DIV_HEIGHT / 2);
         TestMethods.triggerFakeMouseEvent("mousemove", dll.background(), midX, DIV_HEIGHT / 2);
         assert.isTrue(callbackCalled, "callback was called on drag");
@@ -324,11 +323,11 @@ describe("GuideLineLayer", () => {
 
       it("calls callback onDragEnd", () => {
         assert.strictEqual(dll.onDragEnd(callback), dll, "onDragEnd() returns the calling DragLineLayer");
-        let endPosition = DIV_WIDTH / 4;
+        const endPosition = DIV_WIDTH / 4;
         TestMethods.triggerFakeDragSequence(
           dll.background(),
           { x: startPosition, y: DIV_HEIGHT / 2 },
-          { x: endPosition, y: DIV_HEIGHT / 2 }
+          { x: endPosition, y: DIV_HEIGHT / 2 },
         );
         assert.isTrue(callbackCalled, "callback was called on drag end");
         assert.strictEqual(pixelPositionOnCalling, endPosition, "DragLineLayer's state was updated before calling callbacks");
@@ -338,7 +337,7 @@ describe("GuideLineLayer", () => {
         TestMethods.triggerFakeDragSequence(
           dll.background(),
           { x: 0, y: DIV_HEIGHT / 2 },
-          { x: endPosition, y: DIV_HEIGHT / 2 }
+          { x: endPosition, y: DIV_HEIGHT / 2 },
         );
         assert.isFalse(callbackCalled, "callback not called if line was not grabbed");
 
@@ -346,7 +345,7 @@ describe("GuideLineLayer", () => {
         TestMethods.triggerFakeDragSequence(
           dll.background(),
           { x: startPosition, y: DIV_HEIGHT / 2 },
-          { x: endPosition, y: DIV_HEIGHT / 2 }
+          { x: endPosition, y: DIV_HEIGHT / 2 },
         );
         assert.isFalse(callbackCalled, "callback was deregistered successfully");
 

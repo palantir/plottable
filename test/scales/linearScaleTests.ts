@@ -1,5 +1,3 @@
-import * as d3 from "d3";
-
 import { assert } from "chai";
 
 import * as Plottable from "../../src";
@@ -57,15 +55,15 @@ describe("Scales", () => {
       });
 
       it("filters out invalid numbers when using extentOfValues()", () => {
-        let arrayWithBadValues: any[] = [null, NaN, undefined, Infinity, -Infinity, "a string", 1, 1.2];
-        let expectedExtent = [1, 1.2];
-        let extent = scale.extentOfValues(arrayWithBadValues);
+        const arrayWithBadValues: any[] = [null, NaN, undefined, Infinity, -Infinity, "a string", 1, 1.2];
+        const expectedExtent = [1, 1.2];
+        const extent = scale.extentOfValues(arrayWithBadValues);
         assert.deepEqual(extent, expectedExtent, "invalid values were filtered out");
       });
 
       it("does not accept NaN or Infinity as domain", () => {
         let warningCalled = false;
-        let oldWarn = Plottable.Utils.Window.warn;
+        const oldWarn = Plottable.Utils.Window.warn;
         Plottable.Utils.Window.warn = (msg: string) => {
           if (msg.indexOf("NaN or Infinity") > -1) {
             warningCalled = true;
@@ -109,11 +107,11 @@ describe("Scales", () => {
 
       it("can receive custom tick generator", () => {
         scale.domain([0, 10]);
-        let defaultTicks = scale.ticks();
+        const defaultTicks = scale.ticks();
         assert.strictEqual(defaultTicks.length, 11, "ticks were generated correctly with default generator");
         assert.deepEqual(defaultTicks, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "all numbers from 0 to 10 were generated");
-        scale.tickGenerator((_scale) => scale.defaultTicks().filter(tick => tick % 3 === 0));
-        let customTicks = scale.ticks();
+        scale.tickGenerator((_scale) => scale.defaultTicks().filter((tick) => tick % 3 === 0));
+        const customTicks = scale.ticks();
         assert.deepEqual(customTicks, [0, 3, 6, 9], "ticks were generated correctly with custom generator");
       });
     });
@@ -166,10 +164,10 @@ describe("Scales", () => {
 
         assert.deepEqual(scale.domain(), [0, 1], "the default domain is [0, 1]");
 
-        let posProvider = () => [0, 10];
+        const posProvider = () => [0, 10];
         assert.strictEqual(scale.addIncludedValuesProvider(posProvider), scale,
           "Adding an included values provider returns the scale");
-        let negProvider = () => [-10, 0];
+        const negProvider = () => [-10, 0];
         scale.addIncludedValuesProvider(negProvider);
         assert.deepEqual(scale.domain(), [-10, 10], "scale domain accounts for both providers");
 
@@ -195,22 +193,22 @@ describe("Scales", () => {
       });
 
       it("expands single value domains to [value - 1, value + 1] when auto domaining", () => {
-        let singleValue = 15;
+        const singleValue = 15;
         scale.addIncludedValuesProvider((_scale) => [singleValue]);
         assert.deepEqual(scale.domain(), [singleValue - 1, singleValue + 1], "single-value extent was expanded");
       });
 
       it("can force the minimum of the domain with domainMin()", () => {
         scale.padProportion(0);
-        let requestedDomain = [-5, 5];
+        const requestedDomain = [-5, 5];
         scale.addIncludedValuesProvider((_scale) => requestedDomain);
 
-        let minBelowBottom = -10;
+        const minBelowBottom = -10;
         assert.strictEqual(scale.domainMin(minBelowBottom), scale, "the scale is returned by the setter");
         assert.strictEqual(scale.domainMin(), minBelowBottom, "can get the domainMin");
         assert.deepEqual(scale.domain(), [minBelowBottom, requestedDomain[1]], "lower end of domain was set by domainMin()");
 
-        let minInMiddle = 0;
+        const minInMiddle = 0;
         scale.domainMin(minInMiddle);
         assert.deepEqual(scale.domain(), [minInMiddle, requestedDomain[1]], "lower end was set even if requested value cuts off some data");
 
@@ -218,13 +216,13 @@ describe("Scales", () => {
         assert.deepEqual(scale.domain(), requestedDomain, "calling autoDomain() overrides domainMin()");
         assert.strictEqual(scale.domainMin(), scale.domain()[0], "returns autoDomain()-ed min value after autoDomain()-ing");
 
-        let minEqualTop = scale.domain()[1];
+        const minEqualTop = scale.domain()[1];
         scale.domainMin(minEqualTop);
         assert.deepEqual(scale.domain(), [minEqualTop, minEqualTop + 1],
           "domain is set to [min, min + 1] if the requested value is >= to autoDomain()-ed max value");
 
         scale.domainMin(minInMiddle);
-        let requestedDomain2 = [-10, 10];
+        const requestedDomain2 = [-10, 10];
         scale.addIncludedValuesProvider((_scale) => requestedDomain2);
         assert.deepEqual(scale.domain(), [minInMiddle, requestedDomain2[1]],
           "adding new IncludedValuesProvider doesn't change domainMin()");
@@ -232,15 +230,15 @@ describe("Scales", () => {
 
       it("can force the maximum of the domain with domainMax()", () => {
         scale.padProportion(0);
-        let requestedDomain = [-5, 5];
+        const requestedDomain = [-5, 5];
         scale.addIncludedValuesProvider((_scale) => requestedDomain);
 
-        let maxAboveTop = 10;
+        const maxAboveTop = 10;
         assert.strictEqual(scale.domainMax(maxAboveTop), scale, "the scale is returned by the setter");
         assert.deepEqual(scale.domain(), [requestedDomain[0], maxAboveTop], "upper end of domain was set by domainMax()");
         assert.strictEqual(scale.domainMax(), maxAboveTop, "returns the set maximum value");
 
-        let maxInMiddle = 0;
+        const maxInMiddle = 0;
         scale.domainMax(maxInMiddle);
         assert.deepEqual(scale.domain(), [requestedDomain[0], maxInMiddle], "upper end was set even if requested value cuts off some data");
 
@@ -248,13 +246,13 @@ describe("Scales", () => {
         assert.deepEqual(scale.domain(), requestedDomain, "calling autoDomain() overrides domainMax()");
         assert.strictEqual(scale.domainMax(), scale.domain()[1], "returns autoDomain()-ed max value after autoDomain()-ing");
 
-        let maxEqualBottom = scale.domain()[0];
+        const maxEqualBottom = scale.domain()[0];
         scale.domainMax(maxEqualBottom);
         assert.deepEqual(scale.domain(), [maxEqualBottom - 1, maxEqualBottom],
           "domain is set to [max - 1, max] if the requested value is <= to autoDomain()-ed min value");
 
         scale.domainMax(maxInMiddle);
-        let requestedDomain2 = [-10, 10];
+        const requestedDomain2 = [-10, 10];
         scale.addIncludedValuesProvider((_scale) => requestedDomain2);
         assert.deepEqual(scale.domain(), [requestedDomain2[0], maxInMiddle],
           "adding another IncludedValuesProvider doesn't change domainMax()");
@@ -262,18 +260,18 @@ describe("Scales", () => {
 
       it("can force the domain by using domainMin() and domainMax() together", () => {
         scale.padProportion(0);
-        let requestedDomain = [-5, 5];
+        const requestedDomain = [-5, 5];
         scale.addIncludedValuesProvider((_scale) => requestedDomain);
 
-        let desiredMin = -10;
-        let desiredMax = 10;
+        const desiredMin = -10;
+        const desiredMax = 10;
         scale.domainMin(desiredMin);
         scale.domainMax(desiredMax);
         assert.deepEqual(scale.domain(), [desiredMin, desiredMax], "setting domainMin() and domainMax() sets the domain");
 
         scale.autoDomain();
-        let bigMin = 10;
-        let smallMax = -10;
+        const bigMin = 10;
+        const smallMax = -10;
         scale.domainMin(bigMin);
         scale.domainMax(smallMax);
         assert.deepEqual(scale.domain(), [bigMin, smallMax], "setting both is allowed even if it reverses the domain");
@@ -345,8 +343,8 @@ describe("Scales", () => {
       it("can remove the PaddingExceptionProvider", () => {
         scale.addIncludedValuesProvider(() => [10, 13]);
 
-        let paddingExceptionProviderLeft = () => [10];
-        let paddingExceptionProviderBoth = () => [10, 13];
+        const paddingExceptionProviderLeft = () => [10];
+        const paddingExceptionProviderBoth = () => [10, 13];
 
         assert.deepEqual(scale.domain(), [9.5, 13.5], "The domain is padded");
 
@@ -373,9 +371,7 @@ describe("Scales", () => {
 
     describe("Plot interaction", () => {
       function createMockDrawer(dataset: Plottable.Dataset) {
-        let drawer = new Plottable.Drawer(dataset);
-        (<any> drawer)._divElementName = "mock";
-        return drawer;
+        return new Plottable.ProxyDrawer(() => new Plottable.Drawers.SVGDrawer("mock", ""), null);
       }
 
       let data: any[];
@@ -390,8 +386,8 @@ describe("Scales", () => {
       });
 
       it("receives updates from the plot and autodomains accordingly", () => {
-        let div = TestMethods.generateDiv();
-        let plot = new Plottable.Plot();
+        const div = TestMethods.generateDiv();
+        const plot = new Plottable.Plot();
 
         (<any> plot)._createDrawer = (_dataset: Plottable.Dataset) => createMockDrawer(_dataset);
         plot.addDataset(dataset);
@@ -407,22 +403,22 @@ describe("Scales", () => {
       });
 
       it("uses reference counting to keep track of the plots it coordinates", () => {
-        let div1 = TestMethods.generateDiv();
-        let div2 = TestMethods.generateDiv();
+        const div1 = TestMethods.generateDiv();
+        const div2 = TestMethods.generateDiv();
 
-        let plot1 = new Plottable.Plot();
+        const plot1 = new Plottable.Plot();
         (<any> plot1)._createDrawer = (_dataset: Plottable.Dataset) => createMockDrawer(_dataset);
         plot1.addDataset(dataset).attr("x", (d) => d.x, scale);
         plot1.renderTo(div1);
 
-        let plot2 = new Plottable.Plot();
+        const plot2 = new Plottable.Plot();
         (<any> plot2)._createDrawer = (_dataset: Plottable.Dataset) => createMockDrawer(_dataset);
         plot2.addDataset(dataset).attr("x", (d) => d.x, scale);
         plot2.renderTo(div2);
 
         assert.deepEqual(scale.domain(), [0, 5], "correct domain is initially set for the scale");
 
-        let otherScale = new Plottable.Scales.Linear();
+        const otherScale = new Plottable.Scales.Linear();
         plot1.attr("x", (d) => d.x, otherScale);
 
         assert.deepEqual(scale.domain(), [0, 5], "the domain for the scale did not change as it is still attached to plot 2");
@@ -439,32 +435,32 @@ describe("Scales", () => {
       });
 
       it("adjusts to plot detaching, reattaching or destruction", () => {
-        let div = TestMethods.generateDiv();
-        let dataset1 = new Plottable.Dataset([
+        const div = TestMethods.generateDiv();
+        const dataset1 = new Plottable.Dataset([
           {x: 0, y: 0},
           {x: 1, y: 1},
         ]);
-        let dataset2 = new Plottable.Dataset([
+        const dataset2 = new Plottable.Dataset([
           {x: 1, y: 1},
           {x: 2, y: 2},
         ]);
 
-        let xScale = new Plottable.Scales.Linear();
+        const xScale = new Plottable.Scales.Linear();
         xScale.padProportion(0);
-        let yScale = new Plottable.Scales.Linear();
+        const yScale = new Plottable.Scales.Linear();
         yScale.padProportion(0);
 
-        let plot1 = new Plottable.Plots.Line();
+        const plot1 = new Plottable.Plots.Line();
         plot1.addDataset(dataset1);
         plot1.x((d) => d.x, xScale);
         plot1.y((d) => d.y, yScale);
 
-        let plot2 = new Plottable.Plots.Line();
+        const plot2 = new Plottable.Plots.Line();
         plot2.addDataset(dataset2);
         plot2.x((d) => d.x, xScale);
         plot2.y((d) => d.y, yScale);
 
-        let group = new Plottable.Components.Group([plot1, plot2]);
+        const group = new Plottable.Components.Group([plot1, plot2]);
         group.renderTo(div);
 
         assert.deepEqual(xScale.domain(), [0, 2]);

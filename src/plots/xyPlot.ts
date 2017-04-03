@@ -4,12 +4,12 @@
  */
 
 import { Dataset } from "../core/dataset";
-import { Accessor, Point } from "../core/interfaces";
+import { IAccessor, Point } from "../core/interfaces";
 import * as Scales from "../scales";
-import { Scale, ScaleCallback } from "../scales/scale";
+import { IScaleCallback, Scale } from "../scales/scale";
 import * as Utils from "../utils";
 
-import { TransformableAccessorScaleBinding } from "./commons";
+import { ITransformableAccessorScaleBinding } from "./commons";
 import { Plot } from "./plot";
 
 export class XYPlot<X, Y> extends Plot {
@@ -19,8 +19,8 @@ export class XYPlot<X, Y> extends Plot {
 
   private _autoAdjustXScaleDomain = false;
   private _autoAdjustYScaleDomain = false;
-  private _adjustYDomainOnChangeFromXCallback: ScaleCallback<Scale<any, any>>;
-  private _adjustXDomainOnChangeFromYCallback: ScaleCallback<Scale<any, any>>;
+  private _adjustYDomainOnChangeFromXCallback: IScaleCallback<Scale<any, any>>;
+  private _adjustXDomainOnChangeFromYCallback: IScaleCallback<Scale<any, any>>;
 
   private _deferredRendering = false;
   private _cachedDomainX: X[] = [null, null];
@@ -156,14 +156,14 @@ export class XYPlot<X, Y> extends Plot {
   /**
    * Gets the TransformableAccessorScaleBinding for X.
    */
-  public x(): TransformableAccessorScaleBinding<X, number>;
+  public x(): ITransformableAccessorScaleBinding<X, number>;
   /**
    * Sets X to a constant number or the result of an Accessor<number>.
    *
    * @param {number|Accessor<number>} x
    * @returns {XYPlot} The calling XYPlot.
    */
-  public x(x: number | Accessor<number>): this;
+  public x(x: number | IAccessor<number>): this;
   /**
    * Sets X to a scaled constant value or scaled result of an Accessor.
    * The provided Scale will account for the values when autoDomain()-ing.
@@ -172,8 +172,8 @@ export class XYPlot<X, Y> extends Plot {
    * @param {Scale<X, number>} xScale
    * @returns {XYPlot} The calling XYPlot.
    */
-  public x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
-  public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
+  public x(x: X | IAccessor<X>, xScale: Scale<X, number>): this;
+  public x(x?: number | IAccessor<number> | X | IAccessor<X>, xScale?: Scale<X, number>): any {
     if (x == null) {
       return this._propertyBindings.get(XYPlot._X_KEY);
     }
@@ -195,14 +195,14 @@ export class XYPlot<X, Y> extends Plot {
   /**
    * Gets the AccessorScaleBinding for Y.
    */
-  public y(): TransformableAccessorScaleBinding<Y, number>;
+  public y(): ITransformableAccessorScaleBinding<Y, number>;
   /**
    * Sets Y to a constant number or the result of an Accessor<number>.
    *
    * @param {number|Accessor<number>} y
    * @returns {XYPlot} The calling XYPlot.
    */
-  public y(y: number | Accessor<number>): this;
+  public y(y: number | IAccessor<number>): this;
   /**
    * Sets Y to a scaled constant value or scaled result of an Accessor.
    * The provided Scale will account for the values when autoDomain()-ing.
@@ -211,8 +211,8 @@ export class XYPlot<X, Y> extends Plot {
    * @param {Scale<Y, number>} yScale
    * @returns {XYPlot} The calling XYPlot.
    */
-  public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
-  public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
+  public y(y: Y | IAccessor<Y>, yScale: Scale<Y, number>): this;
+  public y(y?: number | IAccessor<number> | Y | IAccessor<Y>, yScale?: Scale<Y, number>): any {
     if (y == null) {
       return this._propertyBindings.get(XYPlot._Y_KEY);
     }
@@ -235,7 +235,7 @@ export class XYPlot<X, Y> extends Plot {
     return this;
   }
 
-  protected _filterForProperty(property: string) {
+  protected _filterForProperty(property: string): IAccessor<boolean> {
     if (property === "x" && this._autoAdjustXScaleDomain) {
       return this._makeFilterByProperty("y");
     } else if (property === "y" && this._autoAdjustYScaleDomain) {

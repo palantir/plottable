@@ -31,9 +31,9 @@ let _animationRequested = false;
 let _isCurrentlyFlushing = false;
 export const Policy = makeEnum(["immediate", "animationFrame", "timeout"]);
 export type Policy = keyof typeof Policy;
-let _renderPolicy: RenderPolicies.RenderPolicy = new RenderPolicies.AnimationFrame();
+let _renderPolicy: RenderPolicies.IRenderPolicy = new RenderPolicies.AnimationFrame();
 
-export function renderPolicy(): RenderPolicies.RenderPolicy;
+export function renderPolicy(): RenderPolicies.IRenderPolicy;
 export function renderPolicy(renderPolicy: Policy): void;
 export function renderPolicy(renderPolicy?: Policy): any {
   if (renderPolicy == null) {

@@ -67,7 +67,7 @@ function showSizeControls(){
 
 "use strict";
 
-var plottableBranches = [];
+var plottableUrls = [];
 var firstBranch;
 var secondBranch;
 var targetWidth;
@@ -206,7 +206,7 @@ function setTestBoxDimensions(){
 //run a single quicktest
 function runQuickTest(result, target, data, branch){
   try {
-    result.run(target, data, plottableBranches[branch]);
+    result.run(target, data, plottableUrls[branch]);
     setTestBoxDimensions();
   } catch (err) {
     setTimeout(function() {throw err; }, 0);
@@ -253,51 +253,42 @@ function evalAndRunTest(name, error, text, firstQTBranch, secondQTBranch) {
 }
 
 //filter all quicktests by category from list_of_quicktests.json & also load sidebar
-function filterQuickTests(category, branchList){
+function filterQuickTests(category, urlList){
   //filter list of quicktests to list of quicktest names to pass to doSomething
   d3.json("list_of_quicktests.json", function (data){
     var paths = data.map(function(quickTestObj) {return quickTestObj.path; });
     if (category !== "all"){
       var pathsInCategory = paths.filter(function(path) {return path.indexOf("tests/" + category) !== -1; });
       var testsInCategory = pathsInCategory.map(function(path) {return path.replace(/.*\/|\.js/g, ""); });
-      loadQuickTestsInCategory(testsInCategory, category, branchList[0], branchList[1]);
+      loadQuickTestsInCategory(testsInCategory, category, urlList[0], urlList[1]);
       populateSidebarList(paths, testsInCategory, category);
     }
     else{
-      loadAllQuickTests(paths, branchList[0], branchList[1]);
+      loadAllQuickTests(paths, urlList[0], urlList[1]);
       populateTotalSidebarList(paths);
     }
   });
 }
 
 //retrieve different plottable objects then push to array
-function loadPlottableBranches(category, branchList){
-  var listOfUrl = [];
-  var branchName1 = branchList[0];
-  var branchName2 = branchList[1];
+function loadPlottableBranches(category, urlList){
+  var url1 = urlList[0];
+  var url2 = urlList[1];
 
-  if (plottableBranches[branchName1] != null  && plottableBranches[branchName2] != null ) {
+  if (plottableUrls[url1] != null  && plottableUrls[url2] != null ) {
     return;
   }
 
-  branchList.forEach(function(branch){
-    if (branch !== "#local") {
-      listOfUrl.push("//rawgit.com/palantir/plottable/" + branch + "/plottable.js");
-    } else {
-      listOfUrl.push("../../plottable.js"); //load local version
-    }
-  });
-
-  $.getScript(listOfUrl[0], function(data, textStatus) {
+  $.getScript(url1, function(data, textStatus) {
     if(textStatus === "success") {
-      plottableBranches[branchName1] = $.extend(true, {}, Plottable);
+      plottableUrls[url1] = $.extend(true, {}, Plottable);
       Plottable = null;
 
-      $.getScript(listOfUrl[1]).then(
+      $.getScript(url2).then(
         function() { //load second
-          plottableBranches[branchName2] = $.extend(true, {}, Plottable);
+          plottableUrls[url2] = $.extend(true, {}, Plottable);
           Plottable = null;
-          filterQuickTests(category, branchList);
+          filterQuickTests(category, urlList);
         },
         function(request, errName, error) {
           throw error;
@@ -315,7 +306,7 @@ function resetDisplayProperties(){
 }
 
 function clearTests(){
-  plottableBranches = [];
+  plottableUrls = [];
   resetDisplayProperties();
   d3.selectAll(".quicktest, .sidebar-quicktest-category ").remove();
 }

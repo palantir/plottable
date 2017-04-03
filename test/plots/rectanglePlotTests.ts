@@ -1,4 +1,3 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -91,8 +90,10 @@ describe("Plots", () => {
         plot.addDataset(new Plottable.Dataset(data));
         plot.renderTo(div);
 
-        const entities = plot.entitiesAt({ x: (xScale.scale(data[2].x) + xScale.scale(data[3].x)) / 2,
-          y: (yScale.scale(data[2].y) + yScale.scale(data[3].y)) / 2, });
+        const entities = plot.entitiesAt({
+          x: (xScale.scale(data[2].x) + xScale.scale(data[3].x)) / 2,
+          y: (yScale.scale(data[2].y) + yScale.scale(data[3].y)) / 2,
+        });
         assert.lengthOf(entities, 1, "found only one entity when querying a point inside a rectangle");
         assert.strictEqual(entities[0].index, 2, "entity retrieved is at index 2");
         div.remove();
@@ -125,9 +126,9 @@ describe("Plots", () => {
 
         const entities = plot.entitiesIn({
           topLeft: { x: (xScale.scale(data[1].x) + xScale.scale(data[2].x)) / 2,
-            y: (yScale.scale(data[2].y) + yScale.scale(data[3].y)) / 2, },
+            y: (yScale.scale(data[2].y) + yScale.scale(data[3].y)) / 2 },
           bottomRight: { x: (xScale.scale(data[2].x) + xScale.scale(data[3].x)) / 2,
-            y: (yScale.scale(data[1].y) + yScale.scale(data[2].y)) / 2, }, });
+            y: (yScale.scale(data[1].y) + yScale.scale(data[2].y)) / 2 } });
         assert.lengthOf(entities, 2, "retrieved 2 entities intersect with the box");
         assert.strictEqual(entities[0].index, 1, "the entity of index 1 is retrieved");
         assert.strictEqual(entities[1].index, 2, "the entity of index 2 is retrieved");
@@ -147,7 +148,7 @@ describe("Plots", () => {
           {
             min: (yScale.scale(data[2].y) + yScale.scale(data[3].y)) / 2,
             max: (yScale.scale(data[1].y) + yScale.scale(data[2].y)) / 2,
-          }
+          },
         );
         assert.lengthOf(entities, 2, "retrieved 2 entities intersect with the box");
         assert.strictEqual(entities[0].index, 1, "the entity of index 1 is retrieved");
@@ -158,7 +159,7 @@ describe("Plots", () => {
       it("retrieves undefined from entityNearest when no entities are rendered", () => {
         plot.addDataset(new Plottable.Dataset([]));
         plot.renderTo(div);
-        let closest = plot.entityNearest({
+        const closest = plot.entityNearest({
           x: plot.width() / 2,
           y: plot.height() / 2,
         });
@@ -414,26 +415,26 @@ describe("Plots", () => {
       });
 
       it("retrieves all selections with no args", () => {
-        let allCells = plot.selections();
+        const allCells = plot.selections();
         assert.strictEqual(allCells.size(), plot.datasets()[0].data().length, "rect for each datum");
-        let selectionData = allCells.data();
+        const selectionData = allCells.data();
         assert.includeMembers(selectionData, plot.datasets()[0].data(), "data in selection data");
         div.remove();
       });
 
       it("retrieves correct selections", () => {
-        let allCells = plot.selections([plot.datasets()[0]]);
+        const allCells = plot.selections([plot.datasets()[0]]);
         assert.strictEqual(allCells.size(), plot.datasets()[0].data().length, "rect for each datum");
-        let selectionData = allCells.data();
+        const selectionData = allCells.data();
         assert.includeMembers(selectionData, plot.datasets()[0].data(), "data in selection data");
         div.remove();
       });
 
       it("skips invalid Datasets", () => {
-        let dummyDataset = new Plottable.Dataset([]);
-        let allCells = plot.selections([plot.datasets()[0], dummyDataset]);
+        const dummyDataset = new Plottable.Dataset([]);
+        const allCells = plot.selections([plot.datasets()[0], dummyDataset]);
         assert.strictEqual(allCells.size(), plot.datasets()[0].data().length, "rect for each datum");
-        let selectionData = allCells.data();
+        const selectionData = allCells.data();
         assert.includeMembers(selectionData, plot.datasets()[0].data(), "data in selection data");
         div.remove();
       });
@@ -486,7 +487,7 @@ describe("Plots", () => {
       });
 
       it("hides labels when rectangles do not offer enough width", () => {
-        let constrainedWidth = 150;
+        const constrainedWidth = 150;
         div.style("width", constrainedWidth + "px");
         plot.renderTo(div);
         plot.labelsEnabled(true);
@@ -558,7 +559,7 @@ describe("Plots", () => {
         plot.datasets()[0].data(overlappingRectangleData);
         plot.renderTo(div);
 
-        let texts = plot.content().selectAll<Element, any>("text");
+        const texts = plot.content().selectAll<Element, any>("text");
         assert.strictEqual(texts.size(), 1, "only top most label is rendered");
         div.remove();
       });

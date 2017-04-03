@@ -1,4 +1,3 @@
-import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -207,8 +206,10 @@ describe("Axes", () => {
           const tickLabelRect = this.getBoundingClientRect();
           tickMarks.each(function(d2, i2) {
             const tickMarkRect = this.getBoundingClientRect();
-              assert.isFalse(Plottable.Utils.DOM.clientRectsOverlap(tickLabelRect, tickMarkRect),
-                `tickMark ${i} and tickLabel ${i2} should not overlap`);
+            assert.isFalse(
+              Plottable.Utils.DOM.clientRectsOverlap(tickLabelRect, tickMarkRect),
+              `tickMark ${i} and tickLabel ${i2} should not overlap`,
+            );
           });
         });
         div.remove();

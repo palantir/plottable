@@ -3,16 +3,10 @@
  * @license MIT
  */
 
-import { Dataset } from "../core/dataset";
+import { SVGDrawer } from "./svgDrawer";
 
-import { Drawer } from "./drawer";
-
-export class Symbol extends Drawer {
-
-  constructor(dataset: Dataset) {
-    super(dataset);
-    this._svgElementName = "path";
-    this._className = "symbol";
+export class SymbolSVGDrawer extends SVGDrawer {
+  constructor() {
+    super("path", "symbol");
   }
-
 }

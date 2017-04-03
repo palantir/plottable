@@ -42,9 +42,7 @@ export function max<T, C>(array: T[], accessor: (t?: T, i?: number) => C, defaul
 export function max(array: any[], firstArg: any, secondArg?: any): any {
   const accessor = typeof(firstArg) === "function" ? firstArg : null;
   const defaultValue = accessor == null ? firstArg : secondArg;
-  /* tslint:disable:ban */
   const maxValue = accessor == null ? d3.max(array) : d3.max(array, accessor);
-  /* tslint:enable:ban */
   return maxValue !== undefined ? maxValue : defaultValue;
 }
 
@@ -57,9 +55,7 @@ export function min<T, C>(array: T[], accessor: (t?: T, i?: number) => C, defaul
 export function min(array: any[], firstArg: any, secondArg?: any): any {
   const accessor = typeof(firstArg) === "function" ? firstArg : null;
   const defaultValue = accessor == null ? firstArg : secondArg;
-  /* tslint:disable:ban */
   const minValue = accessor == null ? d3.min(array) : d3.min(array, accessor);
-  /* tslint:enable:ban */
   return minValue !== undefined ? minValue : defaultValue;
 }
 

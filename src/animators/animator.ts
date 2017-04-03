@@ -7,7 +7,7 @@ import * as d3 from "d3";
 
 import { AttributeToAppliedProjector, SimpleSelection } from "../core/interfaces";
 
-export interface Animator {
+export interface IAnimator {
   /**
    * Applies the supplied attributes to a d3.Selection with some animation.
    *
