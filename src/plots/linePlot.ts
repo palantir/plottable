@@ -70,7 +70,7 @@ export class Line<X> extends XYPlot<X, number> {
 
   private _autorangeSmooth = false;
   private _croppedRenderingEnabled = true;
-
+  private _collapseDenseVerticalLinesEnabled = true;
   private _downsamplingEnabled = false;
 
   /**
@@ -226,8 +226,36 @@ export class Line<X> extends XYPlot<X, number> {
     return this;
   }
 
+  /**
+   * Gets if collapseDenseLines is enabled
+   *
+   * When collapseDenseLines is enabled, vertical or nearly vertical line
+   * segments that have the same floored x coordinate will be bucketed then
+   * drawn, drastically reducing the render time of dense line plots like
+   * timeseries. Only applies to the high performance "canvas" drawer.
+   */
+  public collapseDenseLinesEnabled(): boolean;
+  /**
+   * Sets if collapseDenseLines is enabled
+   *
+   * @returns {Plots.Line} The calling Plots.Line
+   */
+  public collapseDenseLinesEnabled(collapseDenseLines: boolean): this;
+  public collapseDenseLinesEnabled(collapseDenseLines?: boolean): any {
+    if (collapseDenseLines == null) {
+      return this._collapseDenseVerticalLinesEnabled;
+    }
+    this._collapseDenseVerticalLinesEnabled = collapseDenseLines;
+    this.render();
+    return this;
+  }
+
   protected _createDrawer(dataset: Dataset) {
-    return new ProxyDrawer(() => new LineSVGDrawer(), makeLineCanvasDrawStep(() => this._d3LineFactory(dataset)));
+    const canvasDrawer = makeLineCanvasDrawStep(
+      () => this._d3LineFactory(dataset),
+      () => this._collapseDenseVerticalLinesEnabled,
+    );
+    return new ProxyDrawer(() => new LineSVGDrawer(), canvasDrawer);
   }
 
   protected _extentsForProperty(property: string) {

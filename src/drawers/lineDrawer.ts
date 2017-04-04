@@ -39,7 +39,7 @@ export class LineSVGDrawer extends SVGDrawer {
  *
  * TODO put the d3.Line into the attrToAppliedProjector directly
  */
-export function makeLineCanvasDrawStep(d3LineFactory: () => d3.Line<any>, collapseProximateX = true): CanvasDrawStep {
+export function makeLineCanvasDrawStep(d3LineFactory: () => d3.Line<any>, collapseProximateX: () => boolean): CanvasDrawStep {
   return (context: CanvasRenderingContext2D, data: any[][], attrToAppliedProjector: AttributeToAppliedProjector) => {
     const d3Line = d3LineFactory();
     const resolvedAttrs = Object.keys(attrToAppliedProjector).reduce((obj, attrName) => {
@@ -51,8 +51,8 @@ export function makeLineCanvasDrawStep(d3LineFactory: () => d3.Line<any>, collap
 
     context.beginPath();
 
-    if (collapseProximateX) {
-      _collapseLineGeometry(context, data[0]);
+    if (collapseProximateX()) {
+      _collapseLineGeometry(d3Line, context, data[0]);
     } else {
       d3Line.context(context);
       d3Line(data[0]);
@@ -81,8 +81,7 @@ export function makeLineCanvasDrawStep(d3LineFactory: () => d3.Line<any>, collap
    * we can save a lot of render time by just drawing one line from the min to
    * max y-coordinate of all those points.
    */
-  function _collapseLineGeometry(ctx: CanvasRenderingContext2D, data: any[]) {
-    const d3Line = this._d3LineFactory();
+  function _collapseLineGeometry(d3Line: d3.Line<any>, ctx: CanvasRenderingContext2D, data: any[]) {
     const xFn = d3Line.x();
     const yFn = d3Line.y();
 
@@ -150,10 +149,13 @@ export function makeLineCanvasDrawStep(d3LineFactory: () => d3.Line<any>, collap
           if (bucket.min == null) {
             bucket.min = y;
             bucket.max = y;
-          } else if (y < bucket.min) {
-            bucket.min = y;
-          } else if (y > bucket.max) {
-            bucket.max = y;
+          } else {
+            if (y < bucket.min) {
+              bucket.min = y;
+            }
+            if (y > bucket.max) {
+              bucket.max = y;
+            }
           }
         } else {
           // point is outside of bucket
