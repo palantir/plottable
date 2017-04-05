@@ -523,8 +523,7 @@ export class Line<X> extends XYPlot<X, number> {
     const definedProjector = (d: any, i: number, dataset: Dataset) => {
       const positionX = xProjector(d, i, dataset);
       const positionY = yProjector(d, i, dataset);
-      return positionX != null && !Utils.Math.isNaN(positionX) &&
-        positionY != null && !Utils.Math.isNaN(positionY);
+      return Utils.Math.isValidNumber(positionX) && Utils.Math.isValidNumber(positionY);
     };
 
     return d3.line()
