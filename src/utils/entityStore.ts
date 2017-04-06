@@ -79,7 +79,7 @@ export class EntityStore<T extends IPositionedEntity> implements IEntityStore<T>
   public entityNearest(queryPoint: Point, filter?: (entity: T) => boolean) {
     const tree = this._tree;
     let nearest = tree.find(queryPoint.x, queryPoint.y);
-    while (filter !== undefined && !filter(nearest)) {
+    while (filter !== undefined && nearest !== undefined && !filter(nearest)) {
       tree.remove(nearest);
       nearest = tree.find(queryPoint.x, queryPoint.y);
     }
