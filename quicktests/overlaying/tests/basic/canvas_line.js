@@ -36,12 +36,30 @@ function run(div, data, Plottable) {
     [null, xAxis]
   ]);
 
+  const defaultEntityLabel = "Hover for nearest entity";
+  const nearestEntityLabel = div.append("div").style("text-align", "center").text(defaultEntityLabel);
+  const pointer = new Plottable.Interactions.Pointer()
+    .onPointerMove((p) => {
+      const nearestEntity = plot.entityNearest(p);
+      let text = defaultEntityLabel;
+      if (nearestEntity != null) {
+        const datum = nearestEntity.datum;
+        if (datum != null) {
+          text = `Nearest Entity: ${datum.x.toString()} ${datum.y.toFixed(2)}`;
+        }
+      }
+      nearestEntityLabel.text(text);
+    })
+    .onPointerExit(() => {
+      nearestEntityLabel.text(defaultEntityLabel);
+    })
+    .attachTo(plot);
+
   new Plottable.Interactions.PanZoom(xScale, null)
     .attachTo(plot);
-    // .setMinMaxDomainValuesTo(xScale);
-    // .setMinMaxDomainValuesTo(yScale);
 
   table.renderTo(div);
+
   window.addEventListener("resize", () => {
     table.redraw();
   });
