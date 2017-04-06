@@ -60,8 +60,8 @@ export class EntityStore<T extends IPositionedEntity> implements IEntityStore<T>
     this._tree = d3.quadtree<T>()
       // int casting for faster computation. losing sub-pixel precision here is
       // of no concern.
-      .x((d) => d.position.x | 0)
-      .y((d) => d.position.y | 0);
+      .x((d) => Math.floor(d.position.x))
+      .y((d) => Math.floor(d.position.y));
   }
 
   public addAll(entities: T[]) {
