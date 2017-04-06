@@ -38,7 +38,7 @@ function run(div, data, Plottable) {
 
   const defaultEntityLabel = "Hover for nearest entity";
   const nearestEntityLabel = div.append("div").style("text-align", "center").text(defaultEntityLabel);
-  const pointer = new Plottable.Interactions.Pointer()
+  new Plottable.Interactions.Pointer()
     .onPointerMove((p) => {
       const nearestEntity = plot.entityNearest(p);
       let text = defaultEntityLabel;
