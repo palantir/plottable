@@ -373,7 +373,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
 
     const chartBounds = this.bounds();
     let closest: ILightweightPlotEntity;
-    this._getEntityStore().forEach((entity: ILightweightPlotEntity) => {
+    this._getEntityStore().entities().forEach((entity: ILightweightPlotEntity) => {
       if (!this._entityVisibleOnPlot(entity, chartBounds)) {
         return;
       }
@@ -476,7 +476,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
 
   private _entitiesIntersecting(xValOrRange: number | Range, yValOrRange: number | Range): IPlotEntity[] {
     const intersected: IPlotEntity[] = [];
-    this._getEntityStore().forEach((entity) => {
+    this._getEntityStore().entities().forEach((entity) => {
       const selection = d3.select(entity.drawer.getVisualPrimitiveAtIndex(entity.validDatumIndex));
       if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, Utils.DOM.elementBBox(selection))) {
         intersected.push(this._lightweightPlotEntityToPlotEntity(entity));
