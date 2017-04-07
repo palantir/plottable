@@ -54,7 +54,7 @@ export function debounce<T extends Function>(msec: number, callback: T, context?
   let args: any[] = [];
   const deferredCallback = function() {
     callback.apply(context, args);
-  }
+  };
 
   // coerce to T
   return function () {

@@ -12,7 +12,6 @@ import { Dataset, DatasetCallback } from "../core/dataset";
 import {
   AttributeToAppliedProjector,
   AttributeToProjector,
-  Bounds,
   IAccessor,
   Point,
   SimpleSelection,

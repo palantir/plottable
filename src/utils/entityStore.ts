@@ -4,7 +4,7 @@
  */
 
 import * as d3 from "d3";
-import { Point, Bounds } from "../core/interfaces";
+import { Bounds, Point } from "../core/interfaces";
 import { within } from "./mathUtils";
 
 export interface IPositionedEntity {
@@ -75,10 +75,15 @@ export class EntityStore<T extends IPositionedEntity> implements IEntityStore<T>
 
     // filter out of bounds entities if bounds is defined
     if (bounds !== undefined) {
-      entities = entities.filter((e) => within(e.position, bounds));
+      for (let i = 0; i < entities.length; i++) {
+        const entity = entities[i];
+        if (within(entity.position, bounds)) {
+          this._tree.add(entity);
+        }
+      }
+    } else {
+      this._tree.addAll(entities);
     }
-    this._tree.addAll(entities);
-
   }
 
   public entityNearest(queryPoint: Point) {
