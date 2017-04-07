@@ -56,11 +56,18 @@ export class Plot extends Component {
   protected static _ANIMATION_MAX_DURATION = 600;
 
   /**
+   * Debounces rendering and entityStore resets
+   */
+  protected static _DEFERRED_RENDERING_DELAY = 200;
+
+  /**
    * _cachedEntityStore is a cache of all the entities in the plot. It, at times
    * may be undefined and shouldn't be accessed directly. Instead, use _getEntityStore
    * to access the entity store.
    */
   private _cachedEntityStore: Utils.IEntityStore<Plots.ILightweightPlotEntity>;
+  private _deferredResetEntityStore: () => void;
+
   /**
    * Whether the backing datasets have changed since this plot's last render.
    */
@@ -158,6 +165,7 @@ export class Plot extends Component {
     const mainAnimator = new Animators.Easing().maxTotalDuration(Plot._ANIMATION_MAX_DURATION);
     this.animator(Plots.Animator.MAIN, mainAnimator);
     this.animator(Plots.Animator.RESET, new Animators.Null());
+    this._deferredResetEntityStore = Utils.Window.debounce(Plot._DEFERRED_RENDERING_DELAY, this._resetEntityStore);
   }
 
   public anchor(selection: d3.Selection<HTMLElement, any, any, any>) {
@@ -717,7 +725,7 @@ export class Plot extends Component {
       return entityStore;
     } else if (this._cachedEntityStore === undefined) {
       const entityStore = new Utils.EntityStore<Plots.ILightweightPlotEntity>();
-      entityStore.addAll(this._buildLightweightPlotEntities(this.datasets()));
+      entityStore.addAll(this._buildLightweightPlotEntities(this.datasets()), this.bounds());
       this._cachedEntityStore = entityStore;
     }
 
@@ -762,25 +770,19 @@ export class Plot extends Component {
    * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no {Plots.PlotEntity} can be found.
    */
   public entityNearest(queryPoint: Point, bounds = this.bounds()): Plots.IPlotEntity {
-    const entityInBoundsFilter = (entity: Plots.ILightweightPlotEntity) => this._entityVisibleOnPlot(entity, bounds);
-    const nearest = this._getEntityStore().entityNearest(queryPoint, entityInBoundsFilter);
+    const nearest = this._getEntityStore().entityNearest(queryPoint);
     return nearest === undefined ? undefined : this._lightweightPlotEntityToPlotEntity(nearest);
-  }
-
-  protected _entityVisibleOnPlot(entity: Plots.IPlotEntity | Plots.ILightweightPlotEntity, chartBounds: Bounds) {
-    return !(entity.position.x < chartBounds.topLeft.x || entity.position.y < chartBounds.topLeft.y ||
-    entity.position.x > chartBounds.bottomRight.x || entity.position.y > chartBounds.bottomRight.y);
   }
 
   protected _uninstallScaleForKey(scale: Scale<any, any>, key: string) {
     scale.offUpdate(this._renderCallback);
-    scale.offUpdate(this._resetEntityStore);
+    scale.offUpdate(this._deferredResetEntityStore);
     scale.removeIncludedValuesProvider(this._includedValuesProvider);
   }
 
   protected _installScaleForKey(scale: Scale<any, any>, key: string) {
     scale.onUpdate(this._renderCallback);
-    scale.onUpdate(this._resetEntityStore);
+    scale.onUpdate(this._deferredResetEntityStore);
     scale.addIncludedValuesProvider(this._includedValuesProvider);
   }
 

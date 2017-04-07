@@ -4,7 +4,8 @@
  */
 
 import * as d3 from "d3";
-import { Point } from "../core/interfaces";
+import { Point, Bounds } from "../core/interfaces";
+import { within } from "./mathUtils";
 
 export interface IPositionedEntity {
   position: Point;
@@ -16,27 +17,32 @@ export interface IPositionedEntity {
  */
 export interface IEntityStore<T extends IPositionedEntity> {
   /**
-   * Adds all of the supplied entities to the store
+   * Adds all of the supplied entities to the store.
+   *
+   * If the optional bounds argument is provided, only entities within the
+   * bounds will be available to `entityNearest` queries. Regardless, all
+   * entities will be available with the `entities` method.
    *
    * @param {T[]} [entities] Entity array to add to the store. Entities must be
    * positionable
+   * @param {Bounds} [bounds] Optionally add bounds filter for entityNearest
+   * queries
    */
-  addAll(entities: T[]): void;
+  addAll(entities: T[], bounds?: Bounds): void;
 
   /**
-   * Returns closest entity to a given {Point}
+   * Returns the entity closest to a given {Point}
+   *
+   * Note that if a {Bounds} was provided to the `addAll` method, entities
+   * outside those bounds will not be returned by this method.
    *
    * @param {Point} [point] Point around which to search for a closest entity
-   * @param {(entity: T) => boolean} [filter] optional method that is called
-   * while searching for the entity nearest a point. If the filter returns
-   * false, the point is considered invalid and is not considered. If the filter
-   * returns true, the point is considered valid and will be considered.
    * @returns {T} Will return the nearest entity or undefined if none are found
    */
-  entityNearest(point: Point, filter?: (entity: T) => boolean): T;
+  entityNearest(point: Point): T;
 
   /**
-   * Returns the current internal array of entities.
+   * Returns the current internal array of all entities.
    *
    * @returns {T[]} the current internal array of entities.
    */
@@ -58,32 +64,25 @@ export class EntityStore<T extends IPositionedEntity> implements IEntityStore<T>
   constructor() {
     this._entities = [];
     this._tree = d3.quadtree<T>()
-      // int casting for faster computation. losing sub-pixel precision here is
+      // Flooring for faster computation. losing sub-pixel precision here is
       // of no concern.
       .x((d) => Math.floor(d.position.x))
       .y((d) => Math.floor(d.position.y));
   }
 
-  public addAll(entities: T[]) {
+  public addAll(entities: T[], bounds?: Bounds) {
     this._entities.push(...entities);
+
+    // filter out of bounds entities if bounds is defined
+    if (bounds !== undefined) {
+      entities = entities.filter((e) => within(e.position, bounds));
+    }
     this._tree.addAll(entities);
+
   }
 
-  /**
-   * Looks up the nearest data point using the internal quadtree.
-   *
-   * Note that for performance reasons, the optional filter is **DESTRUCTIVE**
-   * and will remove any entities that it encounters during the search that do
-   * not pass the filter.
-   */
-  public entityNearest(queryPoint: Point, filter?: (entity: T) => boolean) {
-    const tree = this._tree;
-    let nearest = tree.find(queryPoint.x, queryPoint.y);
-    while (filter !== undefined && nearest !== undefined && !filter(nearest)) {
-      tree.remove(nearest);
-      nearest = tree.find(queryPoint.x, queryPoint.y);
-    }
-    return nearest;
+  public entityNearest(queryPoint: Point) {
+    return this._tree.find(queryPoint.x, queryPoint.y);
   }
 
   public entities() {

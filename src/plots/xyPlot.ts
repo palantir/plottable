@@ -15,7 +15,6 @@ import { Plot } from "./plot";
 export class XYPlot<X, Y> extends Plot {
   protected static _X_KEY = "x";
   protected static _Y_KEY = "y";
-  private static _DEFERRED_RENDERING_DELAY = 200;
 
   private _autoAdjustXScaleDomain = false;
   private _autoAdjustYScaleDomain = false;
