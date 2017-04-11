@@ -479,7 +479,7 @@ export class Line<X> extends XYPlot<X, number> {
 
     const chartBounds = this.bounds();
     this.entities().forEach((entity) => {
-      if (!this._entityVisibleOnPlot(entity, chartBounds)) {
+      if (!Utils.Math.within(entity.position, chartBounds)) {
         return;
       }
       const xDist = Math.abs(queryPoint.x - entity.position.x);

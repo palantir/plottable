@@ -36,6 +36,35 @@ export function setTimeout(f: Function, time: number, ...args: any[]) {
 }
 
 /**
+ * Debounces the supplied callback and returns a function with the same
+ * arguments.
+ *
+ * The callback is schedule for invocation every time the returned function is
+ * invoked. If the returned function is called within the debounce time, the
+ * previously scheduled call is canceled and the callback is schedule again.
+ *
+ * If debounced, the callback will be called with the most recent arguments.
+ *
+ * @param {number} msec - the debounce time in milliseconds
+ * @param {T} callback - the callback invoked after the debounce time
+ * @param {any} context  - the `this` argument used to invoke the callback
+ */
+export function debounce<T extends Function>(msec: number, callback: T, context?: any): T {
+  let timeoutToken: number = null;
+  let args: any[] = [];
+  const deferredCallback = function() {
+    callback.apply(context, args);
+  };
+
+  // coerce to T
+  return function () {
+    args = Array.prototype.slice.call(arguments);
+    clearTimeout(timeoutToken);
+    timeoutToken = setTimeout(deferredCallback, msec);
+  } as any as T;
+}
+
+/**
  * Sends a deprecation warning to the console. The warning includes the name of the deprecated method,
  * version number of the deprecation, and an optional message.
  *
