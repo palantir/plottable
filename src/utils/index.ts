@@ -19,6 +19,7 @@ export {
   Window
 };
 
+export * from "./bucket";
 export * from "./callbackSet";
 export * from "./coerceD3";
 export * from "./entityStore";

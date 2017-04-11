@@ -51,6 +51,7 @@ function run(div, data, Plottable) {
     const linePlot = new Plottable.Plots.Line()
         .addDataset(dataset)
         .deferredRendering(true)
+        .collapseDenseLinesEnabled(true)
         .renderer("canvas")
         .x((d) => d.x, xScale)
         .y((d) => d.y, yScale);

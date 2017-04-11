@@ -29,6 +29,15 @@ type EdgeIntersections = {
   bottom: Point[],
 };
 
+interface ILineBucket {
+  minY: number;
+  maxY: number;
+  minIndex: number;
+  maxIndex: number;
+  prevX: number;
+  prevIndex: number;
+}
+
 const CURVE_NAME_MAPPING: { [P in CurveName]: d3.CurveFactory | d3.CurveFactoryLineOnly } = {
   linear: d3.curveLinear,
   linearClosed: d3.curveLinearClosed,
@@ -70,7 +79,7 @@ export class Line<X> extends XYPlot<X, number> {
 
   private _autorangeSmooth = false;
   private _croppedRenderingEnabled = true;
-  private _collapseDenseVerticalLinesEnabled = true;
+  private _collapseDenseVerticalLinesEnabled = false;
   private _downsamplingEnabled = false;
 
   /**
@@ -251,10 +260,7 @@ export class Line<X> extends XYPlot<X, number> {
   }
 
   protected _createDrawer(dataset: Dataset) {
-    const canvasDrawer = makeLineCanvasDrawStep(
-      () => this._d3LineFactory(dataset),
-      () => this._collapseDenseVerticalLinesEnabled,
-    );
+    const canvasDrawer = makeLineCanvasDrawStep(() => this._d3LineFactory(dataset));
     return new ProxyDrawer(() => new LineSVGDrawer(), canvasDrawer);
   }
 
@@ -571,6 +577,9 @@ export class Line<X> extends XYPlot<X, number> {
       if (this._downsamplingEnabled) {
         filteredDataIndices = this._filterDownsampling(dataset, filteredDataIndices);
       }
+      if (this._collapseDenseVerticalLinesEnabled) {
+        filteredDataIndices = this._filterDenseLines(dataset, filteredDataIndices);
+      }
       dataToDraw.set(dataset, [filteredDataIndices.map((d, i) => data[d])]);
     });
 
@@ -674,6 +683,76 @@ export class Line<X> extends XYPlot<X, number> {
         filteredIndices.push(indexLast);
       }
     }
+    return filteredIndices;
+  }
+
+  /**
+   * Collapse line geometry
+   *
+   * Assuming that there are many points that are drawn on the same coordinate,
+   * we can save a lot of render time by just drawing one line from the min to
+   * max y-coordinate of all those points.
+   */
+  private _filterDenseLines(dataset: Dataset, indices: number[]) {
+    if (indices.length === 0) {
+      return [];
+    }
+
+    const data = dataset.data();
+    const scaledXAccessor = Plot._scaledAccessor(this.x());
+    const scaledYAccessor = Plot._scaledAccessor(this.y());
+    const xFn = (i: number) => scaledXAccessor(data[i], i, dataset);
+    const yFn = (i: number) => scaledYAccessor(data[i], i, dataset);
+
+    // TODO determine if we should collapse x or y or not collapse at all.
+    // For now, we assume line charts are always a function of x
+    return this._bucketByX(dataset, indices, xFn, yFn);
+  }
+
+  /**
+   * Iterates over the line points collapsing points that fall on the same
+   * floored x coordinate.
+   *
+   * Once all the points with the same x coordinate are detected, we draw a
+   * single line from the min to max y coorindate.
+   *
+   * The "entrance" and "exit" lines to/from this collapsed vertical line are
+   * also drawn. This allows lines with no collapsed segments to render
+   * correctly.
+   */
+  private _bucketByX(
+      dataset: Dataset,
+      indices: number[],
+      xFn: (i: number) => number,
+      yFn: (i: number) => number,
+  ) {
+    const filteredIndices: number[] = [];
+    const data = dataset.data();
+    let bucket: Utils.Bucket = null;
+
+    for (let ii = 0; ii <= indices.length; ++ii) {
+      const i = indices[ii];
+      if (data[i] == null) {
+        continue;
+      }
+
+      const x = Math.floor(xFn(i));
+      const y = yFn(i);
+
+      if (bucket == null) {
+        bucket = new Utils.Bucket(i, x, y);
+      } else if (bucket.isInBucket(x)) {
+        bucket.addToBucket(y, i);
+      } else {
+        filteredIndices.push(...bucket.getUniqueIndices());
+        bucket = new Utils.Bucket(i, x, y);
+      }
+    }
+
+    if (bucket != null) {
+      filteredIndices.push(...bucket.getUniqueIndices());
+    }
+
     return filteredIndices;
   }
 }
