@@ -14,19 +14,22 @@ Plottable is used and developed at [Palantir Technologies](http://palantir.com/)
 - Get Plottable:
   - npm: `npm install --save plottable`
   - yarn: `yarn add plottable`
-  - Bower (**deprecated**): `bower install --save plottable`
   - [unpkg](https://unpkg.com/plottable/plottable.min.js)
-  - [cdnjs URL](https://cdnjs.com/libraries/plottable.js)
-  - [Direct download: plottable.zip](plottable.zip)
 - [Check out examples](http://plottablejs.org/examples/)
 - [Read the tutorials](http://plottablejs.org/tutorials/)
 - [Visit the website, plottablejs.org](http://plottablejs.org/)
 
-**As of 3.0, the plottable.js file is no longer accessible through rawgithub. Use npm or unpkg.**
-
 ## Upgrading to v1.0.0
 
 If you are upgrading from a pre-v1.0.0 version of Plottable to v1.0.0 or later, please use the [Upgrade Guide](https://github.com/palantir/plottable/wiki/Upgrading-to-1.0.0) on the wiki.
+
+## Upgrading to v2.0.0
+
+Check out the full list of changes between v1.16.2 and [v2.0.0](https://github.com/palantir/plottable/wiki/2.0.0-Changes).
+
+## Upgrading to v3.0.0
+
+Check out the full list of changes between v2.9.0 and [v3.0.0](https://github.com/palantir/plottable/wiki/Upgrading-to-3.0.0).
 
 ## We Want To Help!
 
