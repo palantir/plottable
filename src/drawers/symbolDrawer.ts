@@ -26,17 +26,7 @@ export function makeSymbolCanvasDrawStep(
     return (context: CanvasRenderingContext2D, data: any[][], attrToAppliedProjector: AttributeToAppliedProjector) => {
         // create canvas intersection tester
         const { width, height } = context.canvas; // TODO devicePixelRatio?
-        const intersectsCanvasBounds = (x: number, y: number, size: number) => {
-          return (
-            x + size >= 0 && x - size <= width &&
-            y + size >= 0 && y - size <= height
-          );
-        };
-
-        // lazily create offscreen buffer of modest size
-        if (buffer == null) {
-            buffer = new CanvasBuffer(0, 0, 1);
-        }
+        const buffer = new CanvasBuffer(0, 0);//window.devicePixelRatio);
 
         let prevAttrs: any = null;
         let prevSymbolGenerator: any = null;
@@ -47,18 +37,18 @@ export function makeSymbolCanvasDrawStep(
             // check symbol is in viewport
             const attrs = resolveAttributesSubsetWithStyles(attrToAppliedProjector, ["x", "y"], datum, index);
             const symbolSize = sizeProjector()(datum, index, dataset);
-            if (!intersectsCanvasBounds(attrs["x"], attrs["y"], symbolSize)) {
+            if (!squareOverlapsBounds(width, height, attrs["x"], attrs["y"], symbolSize)) {
                 continue;
             }
 
             // check attributes and symbol type
-            const attrsSame = attributesSame(prevAttrs, attrs, Object.keys(ContextStyleAttrs));
+            const attrsSame = isAttributeValuesEqual(prevAttrs, attrs, Object.keys(ContextStyleAttrs));
             const symbolGenerator = symbolProjector()(datum, index, this._dataset);
             if (attrsSame && prevSymbolSize == symbolSize && prevSymbolGenerator == symbolGenerator) {
                 // no-op;
             } else {
                 // make room for bigger symbol if needed
-                if (symbolSize > buffer.pixelWidth || symbolSize > buffer.pixelHeight) {
+                if (symbolSize > buffer.screenWidth || symbolSize > buffer.screenHeight) {
                     buffer.resize(symbolSize, symbolSize, true);
                 }
 
@@ -83,7 +73,14 @@ export function makeSymbolCanvasDrawStep(
     };
 }
 
-function attributesSame(prevAttrs: any, attrs: any, attrKeys: string[]) {
+function squareOverlapsBounds(width: number, height: number, x: number, y: number, size: number) {
+    return (
+        x + size >= 0 && x - size <= width &&
+        y + size >= 0 && y - size <= height
+    );
+};
+
+function isAttributeValuesEqual(prevAttrs: any, attrs: any, attrKeys: string[]) {
     if (prevAttrs == null) {
         return false;
     }

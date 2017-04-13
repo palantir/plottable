@@ -11,7 +11,7 @@ export class CanvasBuffer {
             ctx: CanvasRenderingContext2D,
             screenWidth: number,
             screenHeight: number,
-            devicePixelRatio = 2,
+            devicePixelRatio: number,
         ) {
         const { canvas } = ctx;
         canvas.width = screenWidth * devicePixelRatio;
@@ -30,7 +30,7 @@ export class CanvasBuffer {
     constructor(
         public screenWidth: number,
         public screenHeight: number,
-        public devicePixelRatio = 1,
+        public devicePixelRatio = window.devicePixelRatio,
     ){
         this.pixelWidth = screenWidth * devicePixelRatio;
         this.pixelHeight = screenHeight * devicePixelRatio;
@@ -40,7 +40,7 @@ export class CanvasBuffer {
     }
 
     public blit(ctx: CanvasRenderingContext2D, x = 0, y = 0) {
-        ctx.drawImage(this.canvas, x, y);
+        ctx.drawImage(this.canvas, x, y, this.screenWidth, this.screenHeight);
     }
 
     public blitCenter(ctx: CanvasRenderingContext2D, x = 0, y = 0) {
