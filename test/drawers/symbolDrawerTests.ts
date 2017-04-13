@@ -2,7 +2,8 @@ import { assert } from "chai";
 import * as sinon from "sinon";
 
 import * as Plottable from "../../src";
-import { buffer, makeSymbolCanvasDrawStep } from "../../src/drawers/symbolDrawer";
+import { CanvasBuffer } from "../../src/drawers/canvasBuffer";
+import { makeSymbolCanvasDrawStep } from "../../src/drawers/symbolDrawer";
 
 describe("SymbolCanvasDrawStep", () => {
   let data: any[];
@@ -12,6 +13,7 @@ describe("SymbolCanvasDrawStep", () => {
   let sizeProjectorSpy: sinon.SinonSpy;
   let bufferClearSpy: sinon.SinonSpy;
   let bufferBlitSpy: sinon.SinonSpy;
+  let buffer: CanvasBuffer;
 
   // run once to create buffer spies
   before(() => {
@@ -19,6 +21,7 @@ describe("SymbolCanvasDrawStep", () => {
     symbolProjector = () => () => Plottable.SymbolFactories.circle();
     sizeProjector = () => () => 10;
     performDrawStep();
+    buffer = new CanvasBuffer(0,0);
     bufferClearSpy = sinon.spy(buffer, "clear");
     bufferBlitSpy = sinon.spy(buffer, "blitCenter");
   });
@@ -34,7 +37,7 @@ describe("SymbolCanvasDrawStep", () => {
     symbolProjectorSpy = sinon.spy(symbolProjector);
     sizeProjectorSpy = sinon.spy(sizeProjector);
 
-    const symbolCanvasDrawStep = makeSymbolCanvasDrawStep(dataset, symbolProjectorSpy, sizeProjectorSpy);
+    const symbolCanvasDrawStep = makeSymbolCanvasDrawStep(dataset, symbolProjectorSpy, sizeProjectorSpy, buffer);
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("2d");
     symbolCanvasDrawStep(context, data, {

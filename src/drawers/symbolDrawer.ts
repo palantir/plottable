@@ -16,17 +16,15 @@ export class SymbolSVGDrawer extends SVGDrawer {
     }
 }
 
-// for testing use of buffer
-export let buffer: CanvasBuffer;
-
 export function makeSymbolCanvasDrawStep(
         dataset: Dataset,
         symbolProjector: () => IAccessor<SymbolFactory>,
-        sizeProjector: () => IAccessor<number>): CanvasDrawStep {
+        sizeProjector: () => IAccessor<number>,
+        stepBuffer?: CanvasBuffer,
+    ): CanvasDrawStep {
     return (context: CanvasRenderingContext2D, data: any[][], attrToAppliedProjector: AttributeToAppliedProjector) => {
-        // create canvas intersection tester
-        const { width, height } = context.canvas; // TODO devicePixelRatio?
-        const buffer = new CanvasBuffer(0, 0);//window.devicePixelRatio);
+        const { width, height } = context.canvas;
+        const buffer = (stepBuffer === undefined) ? new CanvasBuffer(0, 0) : stepBuffer;
 
         let prevAttrs: any = null;
         let prevSymbolGenerator: any = null;
