@@ -12,7 +12,6 @@ import { Dataset, DatasetCallback } from "../core/dataset";
 import {
   AttributeToAppliedProjector,
   AttributeToProjector,
-  Bounds,
   IAccessor,
   Point,
   SimpleSelection,
@@ -56,11 +55,18 @@ export class Plot extends Component {
   protected static _ANIMATION_MAX_DURATION = 600;
 
   /**
+   * Debounces rendering and entityStore resets
+   */
+  protected static _DEFERRED_RENDERING_DELAY = 200;
+
+  /**
    * _cachedEntityStore is a cache of all the entities in the plot. It, at times
    * may be undefined and shouldn't be accessed directly. Instead, use _getEntityStore
    * to access the entity store.
    */
   private _cachedEntityStore: Utils.IEntityStore<Plots.ILightweightPlotEntity>;
+  private _deferredResetEntityStore: () => void;
+
   /**
    * Whether the backing datasets have changed since this plot's last render.
    */
@@ -158,13 +164,14 @@ export class Plot extends Component {
     const mainAnimator = new Animators.Easing().maxTotalDuration(Plot._ANIMATION_MAX_DURATION);
     this.animator(Plots.Animator.MAIN, mainAnimator);
     this.animator(Plots.Animator.RESET, new Animators.Null());
+    this._deferredResetEntityStore = Utils.Window.debounce(Plot._DEFERRED_RENDERING_DELAY, this._resetEntityStore);
   }
 
   public anchor(selection: d3.Selection<HTMLElement, any, any, any>) {
     selection = coerceExternalD3(selection);
     super.anchor(selection);
     this._dataChanged = true;
-    this._cachedEntityStore = undefined;
+    this._resetEntityStore();
     this._updateExtents();
     return this;
   }
@@ -244,7 +251,7 @@ export class Plot extends Component {
   protected _onDatasetUpdate() {
     this._updateExtents();
     this._dataChanged = true;
-    this._cachedEntityStore = undefined;
+    this._resetEntityStore();
     this.render();
   }
 
@@ -388,6 +395,7 @@ export class Plot extends Component {
    * Updates the extents associated with each attribute, then autodomains all scales the Plot uses.
    */
   protected _updateExtents() {
+    this._resetEntityStore();
     this._attrBindings.each((_, attr) => this._updateExtentsForAttr(attr));
     this._propertyExtents.each((_, property) => this._updateExtentsForProperty(property));
     this._scales().forEach((scale) => scale.addIncludedValuesProvider(this._includedValuesProvider));
@@ -700,7 +708,7 @@ export class Plot extends Component {
    * @return {Plots.PlotEntity[]}
    */
   public entities(datasets?: Dataset[]): Plots.IPlotEntity[] {
-    return this._getEntityStore(datasets).map((entity) => this._lightweightPlotEntityToPlotEntity(entity));
+    return this._getEntityStore(datasets).entities().map((entity) => this._lightweightPlotEntityToPlotEntity(entity));
   }
 
   /**
@@ -711,17 +719,13 @@ export class Plot extends Component {
    */
   protected _getEntityStore(datasets?: Dataset[]): Utils.IEntityStore<Plots.ILightweightPlotEntity> {
     if (datasets !== undefined) {
-      const EntityStore = new Utils.EntityArray<Plots.ILightweightPlotEntity>();
-      this._buildLightweightPlotEntities(datasets).forEach((entity: Plots.ILightweightPlotEntity) => {
-        EntityStore.add(entity);
-      });
-
-      return EntityStore;
+      const entityStore = new Utils.EntityStore<Plots.ILightweightPlotEntity>();
+      entityStore.addAll(this._buildLightweightPlotEntities(datasets));
+      return entityStore;
     } else if (this._cachedEntityStore === undefined) {
-      this._cachedEntityStore = new Utils.EntityArray<Plots.ILightweightPlotEntity>();
-      this._buildLightweightPlotEntities(this.datasets()).forEach((entity: Plots.ILightweightPlotEntity) => {
-        this._cachedEntityStore.add(entity);
-      });
+      const entityStore = new Utils.EntityStore<Plots.ILightweightPlotEntity>();
+      entityStore.addAll(this._buildLightweightPlotEntities(this.datasets()), this.bounds());
+      this._cachedEntityStore = entityStore;
     }
 
     return this._cachedEntityStore;
@@ -765,26 +769,24 @@ export class Plot extends Component {
    * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no {Plots.PlotEntity} can be found.
    */
   public entityNearest(queryPoint: Point, bounds = this.bounds()): Plots.IPlotEntity {
-    const nearest = this._getEntityStore().entityNearest(queryPoint, (entity: Plots.ILightweightPlotEntity) => {
-      return this._entityVisibleOnPlot(entity, bounds);
-    });
-
+    const nearest = this._getEntityStore().entityNearest(queryPoint);
     return nearest === undefined ? undefined : this._lightweightPlotEntityToPlotEntity(nearest);
-  }
-
-  protected _entityVisibleOnPlot(entity: Plots.IPlotEntity | Plots.ILightweightPlotEntity, chartBounds: Bounds) {
-    return !(entity.position.x < chartBounds.topLeft.x || entity.position.y < chartBounds.topLeft.y ||
-    entity.position.x > chartBounds.bottomRight.x || entity.position.y > chartBounds.bottomRight.y);
   }
 
   protected _uninstallScaleForKey(scale: Scale<any, any>, key: string) {
     scale.offUpdate(this._renderCallback);
+    scale.offUpdate(this._deferredResetEntityStore);
     scale.removeIncludedValuesProvider(this._includedValuesProvider);
   }
 
   protected _installScaleForKey(scale: Scale<any, any>, key: string) {
     scale.onUpdate(this._renderCallback);
+    scale.onUpdate(this._deferredResetEntityStore);
     scale.addIncludedValuesProvider(this._includedValuesProvider);
+  }
+
+  protected _resetEntityStore = () => {
+    this._cachedEntityStore = undefined;
   }
 
   protected _propertyProjectors(): AttributeToProjector {

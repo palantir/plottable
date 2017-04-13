@@ -42,7 +42,8 @@ module.exports = function(grunt) {
     all: ["test/coverage.html"],
     options: {
       // disable coverage for the time being since we intend to replace grunt-blanket-mocha
-      threshold: 0
+      threshold: 0,
+      reporter: "spec"
     }
   };
 
