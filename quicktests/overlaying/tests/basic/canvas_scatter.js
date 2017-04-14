@@ -34,7 +34,6 @@ function run(div, data, Plottable) {
     new Plottable.SymbolFactories.square(),
     new Plottable.SymbolFactories.star(),
   ];
-  var circle = new Plottable.SymbolFactories.circle();
 
   var plot = new Plottable.Plots.Scatter()
     .renderer("canvas")
