@@ -1,10 +1,22 @@
 function makeData() {
   "use strict";
-  // makes 100k random points
-  return Array.apply(null, Array(100*1000)).map(() => ({
-    x: Math.random(),
-    y: Math.random(),
-  }));
+
+  // https://en.wikipedia.org/wiki/Box%E2%80%93Muller_transform
+  function boxMuller(d) {
+    return {
+      x : Math.sqrt(-2 * Math.log(d.x)) * Math.cos(Math.PI * 2 * d.y),
+      y : Math.sqrt(-2 * Math.log(d.x)) * Math.sin(Math.PI * 2 * d.y),
+    }
+  };
+
+  var data = [];
+  for (var i = 0; i < 100*1000; i++) {
+    data.push(boxMuller({
+      x: Math.random(),
+      y: Math.random(),
+    }));
+  }
+  return data;
 }
 
 function run(div, data, Plottable) {
@@ -22,9 +34,12 @@ function run(div, data, Plottable) {
     new Plottable.SymbolFactories.square(),
     new Plottable.SymbolFactories.star(),
   ];
+  var circle = new Plottable.SymbolFactories.circle();
 
-  var plot = new Plottable.Plots.Scatter().addDataset(new Plottable.Dataset(data))
+  var plot = new Plottable.Plots.Scatter()
     .renderer("canvas")
+    .deferredRendering(true)
+    .addDataset(new Plottable.Dataset(data))
     .x((d) => d.x, xScale)
     .y((d) => d.y, yScale)
     .size((d, i) => 6 + (Math.floor(i / 100) % 6) * 4)
@@ -35,10 +50,12 @@ function run(div, data, Plottable) {
     [null, xAxis]
   ]);
 
-  new Plottable.Interactions.PanZoom(xScale, yScale)
-    .attachTo(plot)
-    .setMinMaxDomainValuesTo(xScale)
-    .setMinMaxDomainValuesTo(yScale);
+  var panZoom = new Plottable.Interactions.PanZoom(xScale, yScale).attachTo(plot);
 
+  var label = div.append("div");
+  label.text(Math.floor(data.length/1000) + "K Data Points");
   table.renderTo(div);
+
+  panZoom.setMinMaxDomainValuesTo(xScale);
+  panZoom.setMinMaxDomainValuesTo(yScale);
 }

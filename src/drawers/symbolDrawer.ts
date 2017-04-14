@@ -25,6 +25,8 @@ export function makeSymbolCanvasDrawStep(
     return (context: CanvasRenderingContext2D, data: any[][], attrToAppliedProjector: AttributeToAppliedProjector) => {
         const { width, height } = context.canvas;
         const buffer = (stepBuffer === undefined) ? new CanvasBuffer(0, 0) : stepBuffer;
+        const symbolAccessor = symbolProjector();
+        const sizeAccessor = sizeProjector();
 
         let prevAttrs: any = null;
         let prevSymbolGenerator: any = null;
@@ -34,14 +36,14 @@ export function makeSymbolCanvasDrawStep(
 
             // check symbol is in viewport
             const attrs = resolveAttributesSubsetWithStyles(attrToAppliedProjector, ["x", "y"], datum, index);
-            const symbolSize = sizeProjector()(datum, index, dataset);
+            const symbolSize = sizeAccessor(datum, index, dataset);
             if (!squareOverlapsBounds(width, height, attrs["x"], attrs["y"], symbolSize)) {
                 continue;
             }
 
             // check attributes and symbol type
             const attrsSame = isAttributeValuesEqual(prevAttrs, attrs, Object.keys(ContextStyleAttrs));
-            const symbolGenerator = symbolProjector()(datum, index, this._dataset);
+            const symbolGenerator = symbolAccessor(datum, index, this._dataset);
             if (attrsSame && prevSymbolSize == symbolSize && prevSymbolGenerator == symbolGenerator) {
                 // no-op;
             } else {
