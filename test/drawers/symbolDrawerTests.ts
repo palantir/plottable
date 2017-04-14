@@ -5,7 +5,7 @@ import * as Plottable from "../../src";
 import { CanvasBuffer } from "../../src/drawers/canvasBuffer";
 import { makeSymbolCanvasDrawStep } from "../../src/drawers/symbolDrawer";
 
-describe.only("SymbolCanvasDrawStep", () => {
+describe("SymbolCanvasDrawStep", () => {
   let symbolProjectorSpy: sinon.SinonSpy;
   let sizeProjectorSpy: sinon.SinonSpy;
   let bufferClearSpy: sinon.SinonSpy;
