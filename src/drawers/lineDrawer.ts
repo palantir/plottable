@@ -34,9 +34,8 @@ export function makeLineCanvasDrawStep(d3LineFactory: () => d3.Line<any>): Canva
     const attrs = resolveAttributesSubsetWithStyles(attrToAppliedProjector, [], data[0], 0);
     context.beginPath();
     d3Line.context(context);
-
     d3Line(data[0]);
-
+    context.lineJoin = "round";
     styleContext(context, attrs);
   };
 }
