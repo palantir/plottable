@@ -315,9 +315,9 @@ describe("Interactions", () => {
           TestMethods.triggerFakeMouseEvent("dblclick", component.content(), clickedPoint.x, clickedPoint.y);
 
           runAsserts(() => {
-          assert.equal(singleClickCallback.calledCount, 1, "single click callback only called once on doubleclick");
-          assert.isTrue(doubleClickCallback.called, "double click callback called on doubleclick");
-        }, done);
+            assert.equal(singleClickCallback.calledCount, 1, "single click callback only called once on doubleclick");
+            assert.isTrue(doubleClickCallback.called, "double click callback called on doubleclick");
+          }, done);
         }, 0);
       });
 

@@ -322,7 +322,7 @@ describe("Legend", () => {
       const symbolChecker = (d: any, index: number) => {
         assert.strictEqual(index, expectedIndex, "index passed in is correct");
         expectedIndex++;
-        return (size: number) => "";
+        return (size: number) => d3.symbol();
       };
       legend.symbol(symbolChecker);
 
