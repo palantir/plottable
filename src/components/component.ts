@@ -229,8 +229,8 @@ export class Component {
     const { height, width } = this._sizeFromOffer(availableWidth, availableHeight);
     const xAlignProportion = Component._xAlignToProportion[this._xAlignment];
     const yAlignProportion = Component._yAlignToProportion[this._yAlignment];
-    const originX = origin.x + (availableWidth - this.width()) * xAlignProportion;
-    const originY = origin.y + (availableHeight - this.height()) * yAlignProportion;
+    const originX = origin.x + (availableWidth - width) * xAlignProportion;
+    const originY = origin.y + (availableHeight - height) * yAlignProportion;
 
     this.setBounds(width, height, originX, originY);
     return this;
