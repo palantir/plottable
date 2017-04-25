@@ -226,27 +226,53 @@ export class Component {
       }
     }
 
-    const size = this._sizeFromOffer(availableWidth, availableHeight);
-    this._width = size.width;
-    this._height = size.height;
-
+    const { height, width } = this._sizeFromOffer(availableWidth, availableHeight);
     const xAlignProportion = Component._xAlignToProportion[this._xAlignment];
     const yAlignProportion = Component._yAlignToProportion[this._yAlignment];
-    this._origin = {
-      x: origin.x + (availableWidth - this.width()) * xAlignProportion,
-      y: origin.y + (availableHeight - this.height()) * yAlignProportion,
-    };
-    this._element.styles({
-      left: `${this._origin.x}px`,
-      height: `${this.height()}px`,
-      top: `${this._origin.y}px`,
-      width: `${this.width()}px`,
-    });
+    const originX = origin.x + (availableWidth - width) * xAlignProportion;
+    const originY = origin.y + (availableHeight - height) * yAlignProportion;
 
-    if (this._resizeHandler != null) {
-      this._resizeHandler(size);
+    this.setBounds(width, height, originX, originY);
+    return this;
+  }
+
+  /**
+   * Directly sets component size and, optionally, its origin.
+   *
+   * Preferably, layout is accomplished by placing components in a table.
+   * However, if you need to directly override the component size, you may call
+   * this method.
+   *
+   * Note that this method styles the anchored element, so this is usually only
+   * useful after the component has been anchored. If the component has not been
+   * anchored to an element, the internal properties will be set but no styles
+   * will be applied.
+   *
+   * @param {number} [width] width in pixels
+   * @param {number} [height] height in pixels
+   * @param {number} [originX] left offset in pixels
+   * @param {number} [originY] top offset in pixels
+   */
+  public setBounds(width: number, height: number, originX = 0, originY = 0) {
+    this._width = width;
+    this._height = height;
+    this._origin = {
+      x: originX,
+      y: originY,
+    };
+
+    if (this._element != null) {
+      this._element.styles({
+        left: `${originX}px`,
+        height: `${height}px`,
+        top: `${originY}px`,
+        width: `${width}px`,
+      });
     }
 
+    if (this._resizeHandler != null) {
+      this._resizeHandler({width, height});
+    }
     return this;
   }
 
