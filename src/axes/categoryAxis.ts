@@ -10,6 +10,7 @@ import { Point, SimpleSelection, SpaceRequest } from "../core/interfaces";
 import * as Scales from "../scales";
 import * as Utils from "../utils";
 import { Axis, AxisOrientation } from "./axis";
+import { Component } from "../components/component";
 
 export interface IDownsampleInfo {
   domain: string[];
@@ -140,6 +141,12 @@ export class Category extends Axis<string> {
 
   protected _getTickValues() {
     return this.getDownsampleInfo().domain;
+  }
+
+  protected _sizeFromOffer(availableWidth: number, availableHeight: number) {
+    // hack: continue using Component._sizeFromOffer to prevent angled axis ticks
+    // from overflowing their container
+    return (Component.prototype as any)._sizeFromOffer.call(this, availableWidth, availableHeight);
   }
 
   /**
