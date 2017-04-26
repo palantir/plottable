@@ -9,7 +9,7 @@ import * as Utils from "../utils";
 
 import { SimpleSelection } from "../core/interfaces";
 import { IDrawer } from "./drawer";
-import { AppliedDrawStep } from "./index";
+import { AppliedDrawStep } from "./drawStep";
 
 /**
  * An SVGDrawer draws data by creating DOM elements and setting specific attributes on them

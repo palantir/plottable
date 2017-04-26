@@ -1,8 +1,8 @@
 function makeData() {
   "use strict";
 
-  // makes 10k random points
-  return Array.apply(null, Array(10000)).map(() => ({
+  // makes 1k random points
+  return Array.apply(null, Array(1000)).map(() => ({
     x: Math.random(),
     y: Math.random(),
   }));
