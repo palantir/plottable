@@ -6,7 +6,7 @@
 import * as d3 from "d3";
 import { AttributeToAppliedProjector } from "../core/interfaces";
 import { IDrawer } from "./drawer";
-import { AppliedDrawStep } from "./index";
+import { AppliedDrawStep } from "./drawStep";
 
 export type CanvasDrawStep = (
   context: CanvasRenderingContext2D,
