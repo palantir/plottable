@@ -6,11 +6,11 @@
 import * as d3 from "d3";
 import * as Typesetter from "typesettable";
 
+import { Component } from "../components/component";
 import { Point, SimpleSelection, SpaceRequest } from "../core/interfaces";
 import * as Scales from "../scales";
 import * as Utils from "../utils";
 import { Axis, AxisOrientation } from "./axis";
-import { Component } from "../components/component";
 
 export interface IDownsampleInfo {
   domain: string[];
