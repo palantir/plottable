@@ -86,12 +86,12 @@ describe("Axes", () => {
           const axis = new Plottable.Axes.Numeric(scale, orientation);
           axis.renderTo(div);
 
-          const visibconstickLabels = applyVisibleFilter(axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
+          const visibleTickLabels = applyVisibleFilter(axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
 
-          visibconstickLabels.each(function(d, i) {
+          visibleTickLabels.each(function(d, i) {
             const labelRect = this.getBoundingClientRect();
-            visibconstickLabels.nodes().slice(i + 1).forEach(function(otherVisibconstickLabel, i2) {
-              const labelRect2 = (<Element> otherVisibconstickLabel).getBoundingClientRect();
+            visibleTickLabels.nodes().slice(i + 1).forEach(function(othervisibleTickLabel, i2) {
+              const labelRect2 = (<Element> othervisibleTickLabel).getBoundingClientRect();
               const rectOverlap = Plottable.Utils.DOM.clientRectsOverlap(labelRect, labelRect2);
               assert.isFalse(rectOverlap, `tick label ${i} does not overlap with tick label ${i2}`);
             });
@@ -110,16 +110,16 @@ describe("Axes", () => {
           const axis = new Plottable.Axes.Numeric(scale, orientation);
           axis.renderTo(div);
 
-          const visibconstickLabels = applyVisibleFilter(axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
+          const visibleTickLabels = applyVisibleFilter(axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
 
-          const visibconstickLabelRects = visibconstickLabels.nodes().map((label: Element) => label.getBoundingClientRect());
+          const visibleTickLabelRects = visibleTickLabels.nodes().map((label: Element) => label.getBoundingClientRect());
 
           function getClientRectCenter(rect: ClientRect) {
             return isHorizontalOrientation(orientation) ? rect.left + rect.width / 2 : rect.top + rect.height / 2;
           }
 
-          const interval = getClientRectCenter(visibconstickLabelRects[1]) - getClientRectCenter(visibconstickLabelRects[0]);
-          d3.pairs(visibconstickLabelRects).forEach((rects, i) => {
+          const interval = getClientRectCenter(visibleTickLabelRects[1]) - getClientRectCenter(visibleTickLabelRects[0]);
+          d3.pairs(visibleTickLabelRects).forEach((rects, i) => {
             assert.closeTo(getClientRectCenter(rects[1]) - getClientRectCenter(rects[0]),
               interval, window.Pixel_CloseTo_Requirement, `tick label pair ${i} is spaced the same as the first pair`);
           });
@@ -258,11 +258,11 @@ describe("Axes", () => {
           const axis = new Plottable.Axes.Numeric(scale, orientation);
           axis.renderTo(div);
 
-          const visibconstickLabels = applyVisibleFilter(axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
+          const visibleTickLabels = applyVisibleFilter(axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
           const boundingBox = axis.element().node().getBoundingClientRect();
-          visibconstickLabels.each(function(d, i) {
-            const visibconstickLabelRect = this.getBoundingClientRect();
-            assertBoxInside(visibconstickLabelRect, boundingBox, 0.5, `tick label ${i} is inside the bounding box`);
+          visibleTickLabels.each(function(d, i) {
+            const visibleTickLabelRect = this.getBoundingClientRect();
+            assertBoxInside(visibleTickLabelRect, boundingBox, 0.5, `tick label ${i} is inside the bounding box`);
           });
         });
       });
@@ -275,11 +275,11 @@ describe("Axes", () => {
           const axis = new Plottable.Axes.Numeric(scale, verticalOrientation);
           axis.renderTo(div);
 
-          const visibconstickLabels = applyVisibleFilter(axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
+          const visibleTickLabels = applyVisibleFilter(axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
           const boundingBox = axis.element().node().getBoundingClientRect();
-          visibconstickLabels.each(function(d, i) {
-            const visibconstickLabelRect = this.getBoundingClientRect();
-            assertBoxInside(visibconstickLabelRect, boundingBox, 0, `long tick label ${i} is inside the bounding box`);
+          visibleTickLabels.each(function(d, i) {
+            const visibleTickLabelRect = this.getBoundingClientRect();
+            assertBoxInside(visibleTickLabelRect, boundingBox, 0, `long tick label ${i} is inside the bounding box`);
           });
         });
       });
