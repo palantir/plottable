@@ -125,6 +125,59 @@ describe("Plots", () => {
       });
     });
 
+    describe("Collapse Dense Vertical Lines", () => {
+      const collapsableData = [
+        // start
+        [0, 10],
+        // bucket 1
+        [1,   7],
+        [1.1, 5],
+        [1,   7],
+        [1.1, 5],
+        [1,   7],
+        [1.1, 5],
+        [1,   7],
+        [1.1, 5],
+        // bucket 2
+        [4,   8],
+        [4.1, 2],
+        [4,   8],
+        [4.1, 2],
+        [4,   8],
+        [4.1, 2],
+        // end
+        [10, 10],
+      ]; // data that should be collapsed
+
+      it("can set line collapse flag", () => {
+        const linePlot = new Plottable.Plots.Line<number>();
+        linePlot.collapseDenseLinesEnabled(true);
+        assert.isTrue(linePlot.collapseDenseLinesEnabled());
+
+        linePlot.collapseDenseLinesEnabled(false);
+        assert.isFalse(linePlot.collapseDenseLinesEnabled());
+      });
+
+      it("collapses lines when enabled", () => {
+        const div = TestMethods.generateDiv();
+        const linePlot = new Plottable.Plots.Line<number>();
+
+        linePlot.x((d: any) => d[0]);
+        linePlot.y((d: any) => d[1]);
+        linePlot.addDataset(new Plottable.Dataset(collapsableData));
+        linePlot.collapseDenseLinesEnabled(true);
+
+        const spy = sinon.spy(linePlot, "_bucketByX");
+        linePlot.renderTo(div);
+        div.remove();
+
+        assert.equal(spy.callCount, 1, "called once");
+        assert.isDefined(spy.returnValues, "has returns");
+        assert.isDefined(spy.returnValues[0], "returned valid");
+        assert.equal(spy.returnValues[0].length, 8, "line was collapsed");
+      });
+    });
+
     describe("interpolation", () => {
       let div: d3.Selection<HTMLDivElement, any, any, any>;
       let xScale: Plottable.Scales.Linear;

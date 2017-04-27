@@ -7,9 +7,9 @@ const MSEC_PER_YEAR = 1000 * 60 * 60 * 24 * 356.25;
 // Tweak scale here
 const DATAPOINTS_PER_MINUTE = 1.0;
 const INITIAL_DOMAIN = [new Date(), new Date().valueOf() + MSEC_PER_YEAR];
-const MAX_DOMAIN_EXTENT = 20 * MSEC_PER_YEAR; // 20 years max extent
+const MAX_DOMAIN_EXTENT = 50 * MSEC_PER_YEAR; // years max extent
 const STEP = Math.floor(3.6e6 / DATAPOINTS_PER_MINUTE);
-const LOAD_DELAY_MSEC = 2000;
+const LOAD_DELAY_MSEC = 1000;
 
 function round(v, step) {
     return Math.floor(v/step) * step;
@@ -50,6 +50,8 @@ function run(div, data, Plottable) {
     const yAxis = new Plottable.Axes.Numeric(yScale, "left");
     const linePlot = new Plottable.Plots.Line()
         .addDataset(dataset)
+        .deferredRendering(true)
+        .collapseDenseLinesEnabled(true)
         .renderer("canvas")
         .x((d) => d.x, xScale)
         .y((d) => d.y, yScale);

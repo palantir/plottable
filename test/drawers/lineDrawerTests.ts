@@ -48,11 +48,12 @@ describe("SVGDrawers", () => {
 
 describe("LineCanvasDrawStep", () => {
   const data = [["A", "B", "C"]]; // line normally takes single array of data
+
   it("uses the line factory during canvas drawing", () => {
-    const line = d3.line();
-    const lineDrawStep = makeLineCanvasDrawStep(() => line);
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("2d");
+    const line = d3.line();
+    const lineDrawStep = makeLineCanvasDrawStep(() => line);
     lineDrawStep(context, data, {});
     assert.strictEqual(line.context(), context, "line's context is set");
   });
