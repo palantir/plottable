@@ -6,6 +6,7 @@
 import * as d3 from "d3";
 import * as Typesetter from "typesettable";
 
+import { Component } from "../components/component";
 import { Point, SimpleSelection, SpaceRequest } from "../core/interfaces";
 import * as Scales from "../scales";
 import * as Utils from "../utils";
@@ -140,6 +141,12 @@ export class Category extends Axis<string> {
 
   protected _getTickValues() {
     return this.getDownsampleInfo().domain;
+  }
+
+  protected _sizeFromOffer(availableWidth: number, availableHeight: number) {
+    // hack: continue using Component._sizeFromOffer to prevent angled axis ticks
+    // from overflowing their container
+    return (Component.prototype as any)._sizeFromOffer.call(this, availableWidth, availableHeight);
   }
 
   /**

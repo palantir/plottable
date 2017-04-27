@@ -3,9 +3,10 @@
  * @license MIT
  */
 
+import * as d3 from "d3";
 import { AttributeToAppliedProjector } from "../core/interfaces";
 import { IDrawer } from "./drawer";
-import { AppliedDrawStep } from "./index";
+import { AppliedDrawStep } from "./drawStep";
 
 export type CanvasDrawStep = (
   context: CanvasRenderingContext2D,
@@ -49,5 +50,43 @@ export class CanvasDrawer implements IDrawer {
 
   public remove() {
     // NO op - canvas element owns the canvas; context is free
+  }
+}
+
+export const ContextStyleAttrs = {
+  strokeWidth: "stroke-width", stroke: "stroke", opacity: "opacity", fill: "fill",
+};
+
+export function resolveAttributesSubsetWithStyles(projector: AttributeToAppliedProjector, extraKeys: string[], datum: any, index: number) {
+  const attrKeys = Object.keys(ContextStyleAttrs).concat(extraKeys);
+  const attrs: {[key: string]: any} = {};
+  for (let i = 0; i < attrKeys.length; i++) {
+    const attrKey = attrKeys[i];
+    if (projector.hasOwnProperty(attrKey)) {
+      attrs[attrKey] = projector[attrKey](datum, index);
+    }
+  }
+  return attrs;
+}
+
+export function styleContext(context: CanvasRenderingContext2D, attrs: {[key: string]: any}) {
+  if (attrs[ContextStyleAttrs.strokeWidth]) {
+    context.lineWidth = parseFloat(attrs[ContextStyleAttrs.strokeWidth]);
+  }
+  if (attrs[ContextStyleAttrs.stroke]) {
+    const strokeColor = d3.color(attrs[ContextStyleAttrs.stroke]);
+    if (attrs[ContextStyleAttrs.opacity]) {
+      strokeColor.opacity = attrs[ContextStyleAttrs.opacity];
+    }
+    context.strokeStyle = strokeColor.rgb().toString();
+    context.stroke();
+  }
+  if (attrs[ContextStyleAttrs.fill]) {
+    const fillColor = d3.color(attrs[ContextStyleAttrs.fill]);
+    if (attrs[ContextStyleAttrs.opacity]) {
+      fillColor.opacity = attrs[ContextStyleAttrs.opacity];
+    }
+    context.fillStyle = fillColor.rgb().toString();
+    context.fill();
   }
 }

@@ -6,7 +6,7 @@
 import * as d3 from "d3";
 
 import { CanvasDrawer, CanvasDrawStep } from "./canvasDrawer";
-import { AppliedDrawStep } from "./index";
+import { AppliedDrawStep } from "./drawStep";
 import { SVGDrawer } from "./svgDrawer";
 
 /**

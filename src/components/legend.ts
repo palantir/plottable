@@ -594,7 +594,7 @@ export class Legend extends Component {
       entriesEnter.append("path")
         .attr("d", (symbolEntryPair, columnIndex) => {
           const symbol = symbolEntryPair[0];
-          return self.symbol()(symbol.data.name, rowIndex)(symbol.height * 0.6);
+          return self.symbol()(symbol.data.name, rowIndex)(symbol.height * 0.6)(null);
         })
         .attr("transform", (symbolEntryPair, i) => {
           const symbol = symbolEntryPair[0];

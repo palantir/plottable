@@ -3,18 +3,18 @@
  * @license MIT
  */
 
-import * as Animators from "../animators";
 import { Dataset } from "../core/dataset";
 import { AttributeToProjector, Bounds, IAccessor, Point, Range } from "../core/interfaces";
 import * as SymbolFactories from "../core/symbolFactories";
 import { SymbolFactory } from "../core/symbolFactories";
-import * as Drawers from "../drawers";
 import { ProxyDrawer } from "../drawers/drawer";
-import { SymbolSVGDrawer } from "../drawers/symbolDrawer";
-import * as Scales from "../scales";
+import { makeSymbolCanvasDrawStep, SymbolSVGDrawer } from "../drawers/symbolDrawer";
 import { Scale } from "../scales/scale";
+
+import * as Animators from "../animators";
+import * as Drawers from "../drawers";
+import * as Scales from "../scales";
 import * as Utils from "../utils";
-import { warn } from "../utils/windowUtils";
 import * as Plots from "./";
 import { IAccessorScaleBinding, ILightweightPlotEntity, IPlotEntity, ITransformableAccessorScaleBinding } from "./";
 import { Plot } from "./plot";
@@ -63,10 +63,15 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
     });
   }
 
-  protected _createDrawer() {
-    return new ProxyDrawer(() => new SymbolSVGDrawer(), () => {
-      warn("canvas renderer is not supported on Scatter Plot!");
-    });
+  protected _createDrawer(dataset: Dataset) {
+    return new ProxyDrawer(
+      () => new SymbolSVGDrawer(),
+      makeSymbolCanvasDrawStep(
+        dataset,
+        () => Plot._scaledAccessor(this.symbol()),
+        () => Plot._scaledAccessor(this.size()),
+      ),
+    );
   }
 
   /**
@@ -123,11 +128,11 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
   protected _generateDrawSteps(): Drawers.DrawStep[] {
     const drawSteps: Drawers.DrawStep[] = [];
     if (this._animateOnNextRender()) {
-      const resetAttrToProjector = this._generateAttrToProjector();
+      const attrToProjector = this._generateAttrToProjector();
 
       const symbolProjector = Plot._scaledAccessor(this.symbol());
-      resetAttrToProjector["d"] = (datum: any, index: number, dataset: Dataset) => symbolProjector(datum, index, dataset)(0);
-      drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
+      attrToProjector["d"] = (datum: any, index: number, dataset: Dataset) => symbolProjector(datum, index, dataset)(0)(null);
+      drawSteps.push({ attrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
     }
 
     drawSteps.push({
@@ -135,6 +140,29 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
       animator: this._getAnimator(Plots.Animator.MAIN),
     });
     return drawSteps;
+  }
+
+  protected _propertyProjectors(): AttributeToProjector {
+    const propertyToProjectors = super._propertyProjectors();
+
+    const xProjector = Plot._scaledAccessor(this.x());
+    const yProjector = Plot._scaledAccessor(this.y());
+    propertyToProjectors["x"] = xProjector;
+    propertyToProjectors["y"] = yProjector;
+    propertyToProjectors["transform"] = (datum: any, index: number, dataset: Dataset) => {
+        return "translate(" + xProjector(datum, index, dataset) + "," + yProjector(datum, index, dataset) + ")";
+    };
+    propertyToProjectors["d"] = this._constructSymbolGenerator();
+
+    return propertyToProjectors;
+  }
+
+  protected _constructSymbolGenerator() {
+    const symbolProjector = Plot._scaledAccessor(this.symbol());
+    const sizeProjector = Plot._scaledAccessor(this.size());
+    return (datum: any, index: number, dataset: Dataset) => {
+      return symbolProjector(datum, index, dataset)(sizeProjector(datum, index, dataset))(null);
+    };
   }
 
   protected _entityVisibleOnPlot(entity: ILightweightScatterPlotEntity, bounds: Bounds) {
@@ -149,24 +177,6 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
     };
 
     return Utils.DOM.intersectsBBox(xRange, yRange, translatedBbox);
-  }
-
-  protected _propertyProjectors(): AttributeToProjector {
-    const propertyToProjectors = super._propertyProjectors();
-
-    const xProjector = Plot._scaledAccessor(this.x());
-    const yProjector = Plot._scaledAccessor(this.y());
-
-    const sizeProjector = Plot._scaledAccessor(this.size());
-
-    propertyToProjectors["transform"] = (datum: any, index: number, dataset: Dataset) =>
-    "translate(" + xProjector(datum, index, dataset) + "," + yProjector(datum, index, dataset) + ")";
-
-    const symbolProjector = Plot._scaledAccessor(this.symbol());
-
-    propertyToProjectors["d"] = (datum: any, index: number, dataset: Dataset) =>
-      symbolProjector(datum, index, dataset)(sizeProjector(datum, index, dataset));
-    return propertyToProjectors;
   }
 
   /**

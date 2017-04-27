@@ -183,6 +183,23 @@ export class Axis<D> extends Component {
     return this;
   }
 
+  protected _sizeFromOffer(availableWidth: number, availableHeight: number) {
+    const requestedSpace = this.requestedSpace(availableWidth, availableHeight);
+    if (this.isHorizontal()) {
+      return {
+        width: availableWidth,
+        // always keep the height to be what we request; Axes tell the outside what height they are.
+        // this allows blueprint-chart to put the Axis in document flow by removing absolute positioning
+        height: requestedSpace.minHeight,
+      };
+    } else {
+      return {
+        height: availableHeight,
+        width: requestedSpace.minWidth,
+      };
+    }
+  }
+
   protected _setup() {
     super._setup();
     this._tickMarkContainer = this.content().append("g")
