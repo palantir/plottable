@@ -196,15 +196,19 @@ export class Plot extends Component {
     }
   }
 
-  public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
-    super.computeLayout(origin, availableWidth, availableHeight);
+  public setBounds(width: number, height: number, originX?: number, originY?: number) {
+    super.setBounds(width, height, originX, originY);
     if (this._canvas != null) {
+      const ratio = (window.devicePixelRatio != null) ? window.devicePixelRatio : 1;
       // update canvas width/height taking into account retina displays.
       // This will also clear the canvas of any drawn elements so we should
       // be sure not to computeLayout() without a render() in the future.
-      this._canvas.attr("width", this.width() * window.devicePixelRatio);
-      this._canvas.attr("height", this.height() * window.devicePixelRatio);
-      this._canvas.node().getContext("2d").scale(window.devicePixelRatio, window.devicePixelRatio);
+      this._canvas.attr("width", width * ratio);
+      this._canvas.attr("height", height * ratio);
+
+      // reset the transform then set the scale factor
+      const ctx = this._canvas.node().getContext("2d");
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
     }
     return this;
   }
