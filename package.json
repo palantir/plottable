@@ -12,10 +12,11 @@
   "typings": "build/src/index.d.ts",
   "scripts": {
     "build": "npm-run-all -p lint:tslint build:tsc -s build:webpack",
-    "build:tsc": "tsc -p test/",
+    "build:tsc": "tsc -p .",
     "build:webpack": "webpack",
+    "clean": "rm -rf build",
     "check_version": "echo ${npm_package_version} $(npm view ${npm_package_name} version) | awk '{ if ($1 == $2) { exit 1 }}'",
-    "dist-compile": "grunt dist-compile",
+    "dist": "npm-run-all clean build:tsc",
     "lint": "npm run lint:tslint",
     "lint:tslint": "tslint --project tsconfig.json --type-check",
     "start": "npm-run-all -p start:update-quicktests start:watch-tsc start:watch-quicktests start:webpack-dev-server",
