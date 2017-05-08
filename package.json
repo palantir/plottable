@@ -23,7 +23,7 @@
     "start": "npm-run-all -p start:update-quicktests start:watch-tsc start:watch-quicktests start:webpack-dev-server",
     "start:update-quicktests": "grunt update-quicktests",
     "start:watch-quicktests": "grunt watch-quicktests",
-    "start:watch-tsc": "tsc -w -p test/",
+    "start:watch-tsc": "tsc -w -p .",
     "start:webpack-dev-server": "webpack-dev-server",
     "test": "grunt test-travis"
   },
