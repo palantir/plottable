@@ -39,6 +39,7 @@ If you run into any problems using Plottable, please let us know. We want Plotta
 
 - Clone the repo
 - Install local dependencies `yarn install`
+- Run `yarn build` to build the dependencies
 - Run `yarn start` and it will spin up a server (pointed at http://localhost:9999) and begin compiling the typescript code
 - If you get an EACCESS error at any point, instead of running command with ``sudo`` try first changing permission to following folders:
   - ``usr/local`` by running ``sudo chown -R "$(whoami)" /usr/local``
