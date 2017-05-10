@@ -104,6 +104,10 @@
   transform-origin: 0px 0px 0px;
 }
 
+.plottable text {
+  text-rendering: geometricPrecision;
+}
+
 .plottable .label text {
   font-family: "Helvetica Neue", sans-serif;
   fill: #32313F;
