@@ -242,12 +242,14 @@ describe("Labels", () => {
 
   describe("AxisLabel", () => {
     it("has appropriate css class", () => {
-      const label = new Plottable.Components.AxisLabel("Axis Label");
+      const labelText = "Axis Label";
+      const label = new Plottable.Components.AxisLabel(labelText);
       const div = TestMethods.generateDiv();
       label.renderTo(div);
 
       assert.isTrue(label.hasClass(LABEL_CLASS), "element has label css class");
       assert.isTrue(label.hasClass(Plottable.Components.AxisLabel.AXIS_LABEL_CLASS), "title element has axis-label css class");
+      assert.strictEqual(label.content().text(), labelText, "label doesn't contain the correct text");
       div.remove();
     });
   });
