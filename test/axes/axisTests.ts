@@ -559,8 +559,9 @@ describe("Axis", () => {
     annotationRects.each(function(d, i) {
       const annotationRect = d3.select(this);
       const bbox = this.getBBox();
-      const insideAnnotationArea = bbox.x >= 0 && bbox.x + bbox.width <= axis.width() &&
-        bbox.y >= 0 && bbox.y + bbox.height <= axis.height() - axis.margin();
+      // add 1px fudge factor to avoid floating point rounding errors
+      const insideAnnotationArea = bbox.x >= 0 && bbox.x + bbox.width <= axis.width() + 1 &&
+        bbox.y >= 0 && bbox.y + bbox.height <= axis.height() - axis.margin() + 1;
       if (insideAnnotationArea) {
         assert.strictEqual(annotationRect.attr("visibility"), "visible", `rect ${i} inside margin area should be visible`);
       } else {
