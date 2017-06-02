@@ -4,8 +4,20 @@
  */
 
 import * as d3 from "d3";
+import { Dataset } from "./dataset";
 
-export type Formatter = (d: any) => string;
+/**
+ * A basic formatter function that will be passed a value to format (e.g. the tick value for axes).
+ * A Formatter should return the formatted string representation of the input value.
+ */
+export type Formatter = (value: any) => string;
+
+/**
+ * A formatter function that will be passed the value to format as well as the underlying datum, index, and
+ * dataset that the value came from. Datum-backed visual elements that display labels, such as Bar Plot bars
+ * or Pie Plot sectors, will use this formatter.
+ */
+export type DatumFormatter = (value: any, datum: any, index: number, dataset: Dataset) => string;
 
 interface IPredicatedFormat {
   specifier: string;

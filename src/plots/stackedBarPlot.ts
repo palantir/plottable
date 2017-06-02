@@ -151,7 +151,7 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
       if (maximum.extent !== baselineValue) {
         // only draw sums for values not at the baseline
 
-        const text = this.labelFormatter()(maximum.extent);
+        const text = this.labelFormatter()(maximum.extent, undefined, undefined, undefined);
         const measurement = this._measurer.measure(text);
 
         const primaryTextMeasurement = this._isVertical ? measurement.width : measurement.height;
@@ -170,7 +170,7 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
 
     minimumExtents.forEach((minimum) => {
       if (minimum.extent !== baselineValue) {
-        const text = this.labelFormatter()(minimum.extent);
+        const text = this.labelFormatter()(minimum.extent, undefined, undefined, undefined);
         const measurement = this._measurer.measure(text);
 
         const primaryTextMeasurement = this._isVertical ? measurement.width : measurement.height;
