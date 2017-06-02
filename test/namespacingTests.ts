@@ -1,6 +1,10 @@
-import * as Plottable from "./src";
+/**
+ * @fileoverview Tests the namespace structure to ensure all the exports we want to be available, are.
+ */
 
-var test = [
+import * as Plottable from "../src";
+
+const test = [
   // namespaces and nested namespaces
   Plottable.Animators.Easing,
   Plottable.Animators.Null,
@@ -11,7 +15,7 @@ var test = [
   Plottable.Components.Table,
   Plottable.Configs.SHOW_WARNINGS,
   Plottable.Dispatchers.Key,
-  Plottable.Drawers.Line,
+  Plottable.Drawers.LineSVGDrawer,
   Plottable.Formatters.identity,
   Plottable.Plots.Pie,
   Plottable.Plots.Animator.MAIN,
@@ -30,7 +34,7 @@ var test = [
   Plottable.ComponentContainer,
   Plottable.Dataset,
   Plottable.Dispatcher,
-  Plottable.Drawer,
+  Plottable.ProxyDrawer,
   Plottable.Interaction,
   Plottable.Plot,
   Plottable.QuantitativeScale,
@@ -38,30 +42,29 @@ var test = [
   Plottable.XYPlot,
 ];
 
-type TestInterfaces = Plottable.Axes.DownsampleInfo
-  | Plottable.Axes.TimeAxisConfiguration
-  | Plottable.Plots.AccessorScaleBinding<any, any>
-  | Plottable.Scales.TickGenerators.TickGenerator<any>
-  | Plottable.Scales.PaddingExceptionsProvider<any>
-  | Plottable.Accessor<any>
-  | Plottable.Animator
-  | Plottable.DragLineCallback<any>
-  | Plottable.DragBoxCallback
-  | Plottable.Entity<any>
-  | Plottable.ScaleCallback<any>;
-
+type TestInterfaces = Plottable.Axes.IDownsampleInfo
+    | Plottable.Axes.TimeAxisConfiguration
+    | Plottable.Plots.IAccessorScaleBinding<any, any>
+    | Plottable.Scales.TickGenerators.ITickGenerator<any>
+    | Plottable.Scales.IPaddingExceptionsProvider<any>
+    | Plottable.IAccessor<any>
+    | Plottable.IAnimator
+    | Plottable.IDragLineCallback<any>
+    | Plottable.DragBoxCallback
+    | Plottable.IEntity<any>
+    | Plottable.IScaleCallback<any>;
 
 type TestTypeAliases = Plottable.Bounds
-  | Plottable.ClickCallback
-  | Plottable.DatasetCallback
-  | Plottable.Formatter
-  | Plottable.Point
-  | Plottable.PointerCallback
-  | Plottable.Projector
-  | Plottable.Range
-  | Plottable.SpaceRequest
-  | Plottable.SymbolFactory
-  | Plottable.TransformableScale<any, any>
-  | Plottable.AxisOrientation;
+    | Plottable.ClickCallback
+    | Plottable.DatasetCallback
+    | Plottable.Formatter
+    | Plottable.Point
+    | Plottable.PointerCallback
+    | Plottable.Projector
+    | Plottable.Range
+    | Plottable.SpaceRequest
+    | Plottable.SymbolFactory
+    | Plottable.TransformableScale<any, any>
+    | Plottable.AxisOrientation;
 
 const version = Plottable.version;
