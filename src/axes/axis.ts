@@ -4,7 +4,7 @@
  */
 
 import * as d3 from "d3";
-import * as Typesetter from "typesettable";
+import * as Typesettable from "typesettable";
 
 import { Component } from "../components/component";
 import * as Formatters from "../core/formatters";
@@ -65,8 +65,8 @@ export class Axis<D> extends Component {
   private _annotationsEnabled = false;
   private _annotationTierCount = 1;
   private _annotationContainer: SimpleSelection<void>;
-  private _annotationMeasurer: Typesetter.Measurer;
-  private _annotationWriter: Typesetter.Writer;
+  private _annotationMeasurer: Typesettable.Measurer;
+  private _annotationWriter: Typesettable.Writer;
 
   /**
    * Constructs an Axis.
@@ -213,9 +213,9 @@ export class Axis<D> extends Component {
     this._annotationContainer.append("g").classed("annotation-circle-container", true);
     this._annotationContainer.append("g").classed("annotation-rect-container", true);
     const annotationLabelContainer = this._annotationContainer.append("g").classed("annotation-label-container", true);
-    const typesetterContext = new Typesetter.SvgContext(annotationLabelContainer.node() as SVGElement);
-    this._annotationMeasurer = new Typesetter.CacheMeasurer(typesetterContext);
-    this._annotationWriter = new Typesetter.Writer(this._annotationMeasurer, typesetterContext);
+    const typesetterContext = new Typesettable.SvgContext(annotationLabelContainer.node() as SVGElement);
+    this._annotationMeasurer = new Typesettable.CacheMeasurer(typesetterContext);
+    this._annotationWriter = new Typesettable.Writer(this._annotationMeasurer, typesetterContext);
   }
 
   /*
@@ -336,7 +336,7 @@ export class Axis<D> extends Component {
 
   protected _drawAnnotations() {
     const labelPadding = Axis._ANNOTATION_LABEL_PADDING;
-    const measurements = new Utils.Map<D, Typesetter.IDimensions>();
+    const measurements = new Utils.Map<D, Typesettable.IDimensions>();
     const annotatedTicks = this._annotatedTicksToRender();
     annotatedTicks.forEach((annotatedTick) => {
       const measurement = this._annotationMeasurer.measure(this.annotationFormatter()(annotatedTick));
@@ -485,7 +485,7 @@ export class Axis<D> extends Component {
     return this._annotationMeasurer.measure().height + 2 * Axis._ANNOTATION_LABEL_PADDING;
   }
 
-  private _annotationToTier(measurements: Utils.Map<D, Typesetter.IDimensions>) {
+  private _annotationToTier(measurements: Utils.Map<D, Typesettable.IDimensions>) {
     const annotationTiers: D[][] = [[]];
     const annotationToTier = new Utils.Map<D, number>();
     const dimension = this.isHorizontal() ? this.width() : this.height();
@@ -869,6 +869,6 @@ export class Axis<D> extends Component {
 
   public invalidateCache() {
     super.invalidateCache();
-    (this._annotationMeasurer as Typesetter.CacheMeasurer).reset();
+    (this._annotationMeasurer as Typesettable.CacheMeasurer).reset();
   }
 }

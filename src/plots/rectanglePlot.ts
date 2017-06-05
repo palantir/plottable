@@ -4,7 +4,7 @@
  */
 
 import * as d3 from "d3";
-import * as Typesetter from "typesettable";
+import * as Typesettable from "typesettable";
 
 import * as Animators from "../animators";
 import { Dataset } from "../core/dataset";
@@ -437,9 +437,9 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
     const attrToProjector = this._generateAttrToProjector();
     const labelArea = this._renderArea.append("g").classed("label-area", true);
 
-    const context = new Typesetter.SvgContext(labelArea.node() as SVGElement);
-    const measurer = new Typesetter.CacheMeasurer(context);
-    const writer = new Typesetter.Writer(measurer, context);
+    const context = new Typesettable.SvgContext(labelArea.node() as SVGElement);
+    const measurer = new Typesettable.CacheMeasurer(context);
+    const writer = new Typesettable.Writer(measurer, context);
     const xRange = this.x().scale.range();
     const yRange = this.y().scale.range();
     const xMin = Math.min.apply(null, xRange);

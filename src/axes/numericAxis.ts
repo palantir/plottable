@@ -4,7 +4,7 @@
  */
 
 import * as d3 from "d3";
-import * as Typesetter from "typesettable";
+import * as Typesettable from "typesettable";
 
 import * as Formatters from "../core/formatters";
 import { QuantitativeScale } from "../scales/quantitativeScale";
@@ -15,8 +15,8 @@ export class Numeric extends Axis<number> {
 
   private _tickLabelPositioning = "center";
   private _usesTextWidthApproximation = false;
-  private _measurer: Typesetter.Measurer;
-  private _wrapper: Typesetter.Wrapper;
+  private _measurer: Typesettable.Measurer;
+  private _wrapper: Typesettable.Wrapper;
 
   /**
    * Constructs a Numeric Axis.
@@ -34,9 +34,9 @@ export class Numeric extends Axis<number> {
 
   protected _setup() {
     super._setup();
-    const context = new Typesetter.SvgContext(this._tickLabelContainer.node() as SVGElement, Axis.TICK_LABEL_CLASS);
-    this._measurer = new Typesetter.CacheMeasurer(context);
-    this._wrapper = new Typesetter.Wrapper().maxLines(1);
+    const context = new Typesettable.SvgContext(this._tickLabelContainer.node() as SVGElement, Axis.TICK_LABEL_CLASS);
+    this._measurer = new Typesettable.CacheMeasurer(context);
+    this._wrapper = new Typesettable.Wrapper().maxLines(1);
   }
 
   protected _computeWidth() {
@@ -344,6 +344,6 @@ export class Numeric extends Axis<number> {
 
   public invalidateCache() {
     super.invalidateCache();
-    (this._measurer as Typesetter.CacheMeasurer).reset();
+    (this._measurer as Typesettable.CacheMeasurer).reset();
   }
 }

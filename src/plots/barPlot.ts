@@ -4,7 +4,7 @@
  */
 
 import * as d3 from "d3";
-import * as Typesetter from "typesettable";
+import * as Typesettable from "typesettable";
 
 import * as Animators from "../animators";
 import { Dataset } from "../core/dataset";
@@ -27,8 +27,8 @@ import { XYPlot } from "./xyPlot";
 
 type LabelConfig = {
   labelArea: SimpleSelection<void>;
-  measurer: Typesetter.Measurer;
-  writer: Typesetter.Writer;
+  measurer: Typesettable.Measurer;
+  writer: Typesettable.Writer;
 };
 
 interface IDimensions { width: number; height: number; }
@@ -344,9 +344,9 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   protected _createNodesForDataset(dataset: Dataset): ProxyDrawer {
     const drawer = super._createNodesForDataset(dataset);
     const labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
-    const context = new Typesetter.SvgContext(labelArea.node() as SVGElement);
-    const measurer = new Typesetter.CacheMeasurer(context);
-    const writer = new Typesetter.Writer(measurer, context);
+    const context = new Typesettable.SvgContext(labelArea.node() as SVGElement);
+    const measurer = new Typesettable.CacheMeasurer(context);
+    const writer = new Typesettable.Writer(measurer, context);
     this._labelConfig.set(dataset, { labelArea: labelArea, measurer: measurer, writer: writer });
     return drawer;
   }
@@ -619,7 +619,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     const color = attrToProjector["fill"](datum, index, dataset);
     const labelContainer = this._createLabelContainer(labelArea, labelContainerOrigin, labelOrigin, measurement, showLabelOnBar, color);
 
-    const writeOptions = { xAlign: alignment.x as Typesetter.IXAlign, yAlign: alignment.y as Typesetter.IYAlign };
+    const writeOptions = { xAlign: alignment.x as Typesettable.IXAlign, yAlign: alignment.y as Typesettable.IYAlign };
     writer.write(text, containerDimensions.width, containerDimensions.height, writeOptions, labelContainer.node());
 
     const tooWide = this._isVertical
@@ -628,7 +628,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     return tooWide;
   }
 
-  private _getShowLabelOnBar(barCoordinates: Point, barDimensions: IDimensions, measurement: Typesetter.IDimensions) {
+  private _getShowLabelOnBar(barCoordinates: Point, barDimensions: IDimensions, measurement: Typesettable.IDimensions) {
     if (this._labelsPosition === LabelsPosition.outside) { return false; }
 
     const barCoordinate = this._isVertical ? barCoordinates.y : barCoordinates.x;
@@ -647,7 +647,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   }
 
   private _calculateLabelProperties(
-      barCoordinates: Point, barDimensions: IDimensions, measurement: Typesetter.IDimensions,
+      barCoordinates: Point, barDimensions: IDimensions, measurement: Typesettable.IDimensions,
       showLabelOnBar: boolean, aboveOrLeftOfBaseline: boolean) {
     const barCoordinate = this._isVertical ? barCoordinates.y : barCoordinates.x;
     const barDimension = this._isVertical ? barDimensions.height : barDimensions.width;
@@ -722,7 +722,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   }
 
   private _createLabelContainer(
-      labelArea: SimpleSelection<void>, labelContainerOrigin: Point, labelOrigin: Point, measurement: Typesetter.IDimensions,
+      labelArea: SimpleSelection<void>, labelContainerOrigin: Point, labelOrigin: Point, measurement: Typesettable.IDimensions,
       showLabelOnBar: boolean, color: string) {
     const labelContainer = labelArea.append("g").attr("transform", `translate(${labelContainerOrigin.x}, ${labelContainerOrigin.y})`);
 
