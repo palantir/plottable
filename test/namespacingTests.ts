@@ -4,6 +4,7 @@
 
 import * as Plottable from "../src";
 
+// tslint:disable-next-line:no-unused-variable
 const test = [
   // namespaces and nested namespaces
   Plottable.Animators.Easing,
@@ -67,4 +68,5 @@ type TestTypeAliases = Plottable.Bounds
     | Plottable.TransformableScale<any, any>
     | Plottable.AxisOrientation;
 
+// tslint:disable-next-line:no-unused-variable
 const version = Plottable.version;
