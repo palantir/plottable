@@ -30,7 +30,7 @@ export class Interaction {
   /**
    * @deprecated renamed to .detach().
    */
-  public detachFrom() {
+  public detachFrom(_component: Component) {
     return this.detach();
   }
 

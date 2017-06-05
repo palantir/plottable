@@ -29,7 +29,7 @@ describe("Interactions", () => {
       assert.strictEqual((<any>interaction)._componentAttachedTo, component,
         "the _componentAttachedTo field should contain the component the interaction is attached to");
 
-      interaction.detachFrom(component);
+      interaction.detach();
       assert.isNull((<any>interaction)._componentAttachedTo,
         "the _componentAttachedTo field should be blanked upon detaching");
 
@@ -72,7 +72,7 @@ describe("Interactions", () => {
       assert.isTrue(callbackCalled, "callback called on moving in Component (mouse)");
 
       callbackCalled = false;
-      pointerInteraction.detachFrom(component);
+      pointerInteraction.detach();
 
       triggerMoveEvent(component);
       assert.isFalse(callbackCalled, "callback was removed from component and should not be called");
@@ -80,29 +80,29 @@ describe("Interactions", () => {
       div.remove();
     });
 
-    it("calling detachFrom() on a detached Interaction has no effect", () => {
+    it("calling detach() on a detached Interaction has no effect", () => {
       const div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
       const component = new Plottable.Component();
 
       const clickInteraction = new Plottable.Interactions.Click();
 
       assert.doesNotThrow(() => {
-        clickInteraction.detachFrom(component);
+        clickInteraction.detach();
       }, Error, "detaching an Interaction which was not attached should not throw an error");
 
       clickInteraction.attachTo(component);
-      clickInteraction.detachFrom(component);
+      clickInteraction.detach();
       assert.doesNotThrow(() => {
-        clickInteraction.detachFrom(component);
-      }, Error, "calling detachFrom() twice should not throw an error");
+        clickInteraction.detach();
+      }, Error, "calling detach() twice should not throw an error");
 
       component.renderTo(div);
 
       clickInteraction.attachTo(component);
-      clickInteraction.detachFrom(component);
+      clickInteraction.detach();
       assert.doesNotThrow(() => {
-        clickInteraction.detachFrom(component);
-      }, Error, "calling detachFrom() twice should not throw an error even if the Component is anchored");
+        clickInteraction.detach();
+      }, Error, "calling detach() twice should not throw an error even if the Component is anchored");
 
       div.remove();
 
@@ -133,7 +133,7 @@ describe("Interactions", () => {
       triggerMoveEvent(component2);
       assert.isFalse(callbackCalled, "Round 1 callback not called for component 2");
 
-      pointerInteraction.detachFrom(component1);
+      pointerInteraction.detach();
       pointerInteraction.attachTo(component2);
 
       callbackCalled = false;
