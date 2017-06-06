@@ -59,6 +59,8 @@
   "dependencies": {
     "@types/d3": "^4.5.0",
     "d3": "^4.5.0",
+    "d3-ease": "^1.0.0",
+    "d3-shape": "^1.0.0",
     "typesettable": "^3.0.2"
   }
 }
