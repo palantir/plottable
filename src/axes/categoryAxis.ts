@@ -43,6 +43,11 @@ export class Category extends Axis<string> {
    */
   private _tickLabelMaxLines: number;
 
+  /**
+   * Whether tick labels can break words when being wrapped.
+   */
+  private _tickLabelBreakWords: boolean;
+
   private _measurer: Typesetter.CacheMeasurer;
   private _typesetterContext: Typesetter.ITypesetterContext<any>;
 
@@ -54,6 +59,9 @@ export class Category extends Axis<string> {
     const wrapper = new Typesetter.Wrapper();
     if (this._tickLabelMaxLines != null) {
       wrapper.maxLines(this._tickLabelMaxLines);
+    }
+    if (this._tickLabelBreakWords != null) {
+      wrapper.allowBreakingWords(this._tickLabelBreakWords);
     }
     return wrapper;
   }
@@ -255,6 +263,26 @@ export class Category extends Axis<string> {
       return this._tickLabelMaxLines;
     }
     this._tickLabelMaxLines = maxLines;
+    this.redraw();
+    return this;
+  }
+
+  public tickLabelBreakWords(): boolean;
+  public tickLabelBreakWords(breakWords: boolean): this;
+
+  /**
+   * Set or get the tick label word breaking behavior when wrapping. By default, a Category Axis will line wrap
+   * in the middle of words `breakWords(true)`. Set to false to improve readability, at the cost of longer
+   * labels.
+   * @param breakWords
+   * @returns {boolean | this}
+   */
+  public tickLabelBreakWords(breakWords?: boolean): boolean | this {
+    // allow user to un-set tickLabelMaxLines by passing in null or undefined explicitly
+    if (arguments.length === 0) {
+      return this._tickLabelBreakWords;
+    }
+    this._tickLabelBreakWords = breakWords;
     this.redraw();
     return this;
   }
