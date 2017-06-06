@@ -1,11 +1,12 @@
 function makeData() {
   "use strict";
+  const rand = d3.randomUniform(0, 1);
   const data = [];
   for(var i = 0; i < 50; i++) {
     data.push({
         name: Math.random().toString(16).substr(2),
         category: i % 2 === 0 ? "a" : "b",
-        val: Math.random() * 100
+        val: rand()
     });
   }
   return data;
@@ -14,7 +15,7 @@ function makeData() {
 function run(div, data, Plottable) {
   "use strict";
 
-  var dataset = new Plottable.Dataset(data);
+  const datasets = data.map((d) => new Plottable.Dataset([d]));
 
   var xScale = new Plottable.Scales.Category();
   var xAxis = new Plottable.Axes.Category(xScale, "bottom");
@@ -24,11 +25,12 @@ function run(div, data, Plottable) {
 
   var colorScale = new Plottable.Scales.Color();
 
-  var barPlot = new Plottable.Plots.Bar()
-    .addDataset(dataset)
+  var barPlot = new Plottable.Plots.StackedBar("vertical")
+    .datasets(datasets)
     .x(function (d) { return d.category; }, xScale)
-    .y(function(d) { return d.value; }, yScale)
-    .attr("fill", function(d) { return d.name; }, colorScale);
+    .y(function(d) { return d.val; }, yScale)
+    .attr("fill", function(d) { return d.name; }, colorScale)
+    .labelsEnabled(true);
 
   var grid = new Plottable.Components.Gridlines(null, yScale);
 

@@ -187,7 +187,7 @@ export class Time extends Axis<Date> {
   private _tierHeights: number[];
   private _possibleTimeAxisConfigurations: TimeAxisConfiguration[];
   private _numTiers: number;
-  private _measurer: Typesettable.Measurer;
+  private _measurer: Typesettable.CacheMeasurer;
   private _maxTimeIntervalPrecision: TimeInterval = null;
 
   private _mostPreciseConfigIndex: number;

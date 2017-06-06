@@ -27,7 +27,7 @@ import { XYPlot } from "./xyPlot";
 
 type LabelConfig = {
   labelArea: SimpleSelection<void>;
-  measurer: Typesettable.Measurer;
+  measurer: Typesettable.CacheMeasurer;
   writer: Typesettable.Writer;
 };
 

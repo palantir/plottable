@@ -15,7 +15,7 @@ export class Numeric extends Axis<number> {
 
   private _tickLabelPositioning = "center";
   private _usesTextWidthApproximation = false;
-  private _measurer: Typesettable.Measurer;
+  private _measurer: Typesettable.CacheMeasurer;
   private _wrapper: Typesettable.Wrapper;
 
   /**

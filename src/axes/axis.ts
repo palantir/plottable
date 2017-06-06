@@ -65,7 +65,7 @@ export class Axis<D> extends Component {
   private _annotationsEnabled = false;
   private _annotationTierCount = 1;
   private _annotationContainer: SimpleSelection<void>;
-  private _annotationMeasurer: Typesettable.Measurer;
+  private _annotationMeasurer: Typesettable.CacheMeasurer;
   private _annotationWriter: Typesettable.Writer;
 
   /**
