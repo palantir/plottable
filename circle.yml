@@ -12,7 +12,7 @@ general:
 
 machine:
   node:
-    version: 6.1
+    version: 6.1.0
   environment:
     PATH: "${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin"
 
