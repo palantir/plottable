@@ -131,7 +131,6 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
    * each bar on the independent axis.
    */
   public barEnd(): Plots.ITransformableAccessorScaleBinding<X, number>;
-  public barEnd(end: number | IAccessor<number> | X | IAccessor<X>): this;
   /**
    * Sets the accessor for the bar "end", which is used to compute the width of
    * each bar on the x axis (y axis if horizontal).
@@ -151,6 +150,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
    * This means it will totally ignore the range band width of category scales,
    * so this probably doesn't make sense to use with category axes.
    */
+  public barEnd(end: number | IAccessor<number> | X | IAccessor<X>): this;
   public barEnd(end?: number | IAccessor<number> | X | IAccessor<X>): any {
     if (end == null) {
       return this._propertyBindings.get(Bar._BAR_END_KEY);
@@ -169,7 +169,6 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
    * Gets the current bar alignment
    */
   public barAlignment(): BarAlignment;
-  public barAlignment(align: BarAlignment): this;
   /**
    * Sets the bar alignment. Valid values are `"start"`, `"middle"`, and
    * `"end"`, which determines the meaning of the accessor of the bar's scale
@@ -181,6 +180,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
    * The default value is "middle", which aligns to rect so that it centered on
    * the x coordinate
    */
+  public barAlignment(align: BarAlignment): this;
   public barAlignment(align?: BarAlignment): any {
     if (align == null) {
       return this._barAlignment;
