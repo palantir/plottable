@@ -689,4 +689,8 @@ export class Legend extends Component {
   public fixedHeight() {
     return true;
   }
+
+  public invalidateCache() {
+    this._measurer.reset();
+  }
 }
