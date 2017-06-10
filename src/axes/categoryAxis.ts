@@ -215,17 +215,18 @@ export class Category extends Axis<string> {
     return this;
   }
 
-  public tickLabelMaxWidth(): number;
-  public tickLabelMaxWidth(maxWidth: number): this;
   /**
-   * Set or get the tick label's max width on this axis. When set, tick labels will be truncated with ellipsis to be
+   * Get the tick label max width on this axis.
+   */
+  public tickLabelMaxWidth(): number;
+  /**
+   * Set the tick label's max width on this axis. When set, tick labels will be truncated with ellipsis to be
    * at most `tickLabelMaxWidth()` pixels wide. This ensures the axis doesn't grow to an undesirable width.
    *
-   * Passing no arguments retrieves the value, while passing a number sets the value. Pass undefined to un-set the max
-   * width.
+   * Pass undefined to un-set the max width.
    * @param maxWidth
-   * @returns {number | this}
    */
+  public tickLabelMaxWidth(maxWidth: number): this;
   public tickLabelMaxWidth(maxWidth?: number): number | this {
     // allow user to un-set tickLabelMaxWidth by passing in null or undefined explicitly
     if (arguments.length === 0) {
@@ -236,19 +237,20 @@ export class Category extends Axis<string> {
     return this;
   }
 
-  public tickLabelMaxLines(): number;
-  public tickLabelMaxLines(maxLines: number): this;
-
   /**
-   * Set or get the tick label's max number of wrapped lines on this axis. By default, a Category Axis will line-wrap
+   * Get the tick label max number of wrapped lines on this axis.
+   */
+  public tickLabelMaxLines(): number;
+  /**
+   * Set the tick label's max number of wrapped lines on this axis. By default, a Category Axis will line-wrap
    * long tick labels onto multiple lines in order to fit the width of the axis. When set, long tick labels will be
    * rendered on at most `tickLabelMaxLines()` lines. This ensures the axis doesn't grow to an undesirable height.
    *
-   * Passing no arguments retrieves the value, while passing a number sets the value. Pass undefined to un-set the
-   * max lines.
+   * Pass undefined to un-set the max lines.
    * @param maxLines
-   * @returns {number | this}
    */
+  public tickLabelMaxLines(maxLines: number): this;
+
   public tickLabelMaxLines(maxLines?: number): number | this {
     // allow user to un-set tickLabelMaxLines by passing in null or undefined explicitly
     if (arguments.length === 0) {

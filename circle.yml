@@ -12,12 +12,15 @@ general:
 
 machine:
   node:
-    version: 6.1
+    version: 6.1.0
   environment:
     PATH: "${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin"
 
-# TODO cannot use yarn in circleCI because of https://github.com/yarnpkg/yarn/issues/1016.
-# move to yarn when https://github.com/palantir/plottable/issues/3285 is fixed
+dependencies:
+  override:
+    - yarn
+  cache_directories:
+    - ~/.cache/yarn
 
 test:
   override:
