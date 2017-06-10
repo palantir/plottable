@@ -72,7 +72,7 @@ export class DragLineLayer<D> extends GuideLineLayer<D> {
       this._dragInteraction.offDragStart(interactionDragStartCallback);
       this._dragInteraction.offDrag(interactionDragCallback);
       this._dragInteraction.offDragEnd(interactionDragEndCallback);
-      this._dragInteraction.detachFrom(this);
+      this._dragInteraction.detach();
     };
 
     this._dragStartCallbacks = new Utils.CallbackSet<IDragLineCallback<D>>();

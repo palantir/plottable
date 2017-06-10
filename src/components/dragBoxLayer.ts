@@ -174,7 +174,7 @@ export class DragBoxLayer extends SelectionBoxLayer {
       this._dragInteraction.offDragStart(onDragStartCallback);
       this._dragInteraction.offDrag(onDragCallback);
       this._dragInteraction.offDragEnd(onDragEndCallback);
-      this._dragInteraction.detachFrom(this);
+      this._dragInteraction.detach();
     };
   }
 
@@ -456,7 +456,7 @@ export class DragBoxLayer extends SelectionBoxLayer {
 
   public detach() {
     this._resetState();
-    this._dragInteraction.detachFrom(this);
+    this._dragInteraction.detach();
     super.detach();
     return this;
   }

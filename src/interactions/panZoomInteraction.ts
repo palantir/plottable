@@ -151,7 +151,7 @@ export class PanZoom extends Interaction {
     this._touchDispatcher.offTouchCancel(this._touchCancelCallback);
     this._touchDispatcher = null;
 
-    this._dragInteraction.detachFrom(this._componentAttachedTo);
+    this._dragInteraction.detach();
   }
 
   private _handleTouchStart(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {

@@ -7,20 +7,11 @@ import { Component } from "../components/component";
 import { Point } from "../core/interfaces";
 
 export class Interaction {
-  protected _componentAttachedTo: Component;
-
   private _anchorCallback = (component: Component) => this._anchor(component);
-
   private _isAnchored: boolean;
   private _enabled = true;
 
-  protected _anchor(component: Component) {
-    this._isAnchored = true;
-  }
-
-  protected _unanchor() {
-    this._isAnchored = false;
-  }
+  protected _componentAttachedTo: Component;
 
   /**
    * Attaches this Interaction to a Component.
@@ -36,32 +27,23 @@ export class Interaction {
     return this;
   }
 
-  private _connect() {
-    if (this.enabled() && this._componentAttachedTo != null && !this._isAnchored) {
-      this._componentAttachedTo.onAnchor(this._anchorCallback);
-    }
+  /**
+   * @deprecated renamed to .detach().
+   */
+  public detachFrom(_component: Component) {
+    return this.detach();
   }
 
   /**
-   * Detaches this Interaction from the Component.
+   * Detaches this Interaction from whatever component it was attached to.
    * This Interaction can be reused.
    *
-   * @param {Component} component
    * @returns {Interaction} The calling Interaction.
    */
-  public detachFrom(component: Component) {
+  public detach() {
     this._disconnect();
     this._componentAttachedTo = null;
     return this;
-  }
-
-  private _disconnect() {
-    if (this._isAnchored) {
-      this._unanchor();
-    }
-    if (this._componentAttachedTo != null) {
-      this._componentAttachedTo.offAnchor(this._anchorCallback);
-    }
   }
 
   /**
@@ -88,6 +70,14 @@ export class Interaction {
     return this;
   }
 
+  protected _anchor(component: Component) {
+    this._isAnchored = true;
+  }
+
+  protected _unanchor() {
+    this._isAnchored = false;
+  }
+
   /**
    * Translates an <svg>-coordinate-space point to Component-space coordinates.
    *
@@ -110,7 +100,22 @@ export class Interaction {
    */
   protected _isInsideComponent(p: Point) {
     return 0 <= p.x && 0 <= p.y
-      && p.x <= this._componentAttachedTo.width()
-      && p.y <= this._componentAttachedTo.height();
+        && p.x <= this._componentAttachedTo.width()
+        && p.y <= this._componentAttachedTo.height();
+  }
+
+  private _connect() {
+    if (this.enabled() && this._componentAttachedTo != null && !this._isAnchored) {
+      this._componentAttachedTo.onAnchor(this._anchorCallback);
+    }
+  }
+
+  private _disconnect() {
+    if (this._isAnchored) {
+      this._unanchor();
+    }
+    if (this._componentAttachedTo != null) {
+      this._componentAttachedTo.offAnchor(this._anchorCallback);
+    }
   }
 }
