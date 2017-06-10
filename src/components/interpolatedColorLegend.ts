@@ -18,7 +18,7 @@ import { Component } from "./component";
 export class InterpolatedColorLegend extends Component {
   private static _DEFAULT_NUM_SWATCHES = 11;
 
-  private _measurer: Typesettable.CacheMeasurer;
+  private _measurer: Typesettable.Measurer;
   private _wrapper: Typesettable.Wrapper;
   private _writer: Typesettable.Writer;
   private _scale: Scales.InterpolatedColor;
@@ -169,7 +169,7 @@ export class InterpolatedColorLegend extends Component {
     this._upperLabel = this.content().append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
 
     const context = new Typesettable.SvgContext(this.content().node() as SVGElement);
-    this._measurer = new Typesettable.CacheMeasurer(context);
+    this._measurer = new Typesettable.Measurer(context);
     this._wrapper = new Typesettable.Wrapper();
     this._writer = new Typesettable.Writer(this._measurer, context, this._wrapper);
   }
