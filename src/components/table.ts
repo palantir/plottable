@@ -50,10 +50,10 @@ export class Table extends ComponentContainer {
    * ```
    *
    * @constructor
-   * @param {(Component|null)[][]} [rows=[]] A 2-D array of Components to be added to the Table.
+   * @param {(Component|null|undefined)[][]} [rows=[]] A 2-D array of Components to be added to the Table.
    *   null can be used if a cell is empty.
    */
-  constructor(rows: (Component|null)[][] = []) {
+  constructor(rows: (Component|null|undefined)[][] = []) {
     super();
     this.addClass("table");
     rows.forEach((row, rowIndex) => {
