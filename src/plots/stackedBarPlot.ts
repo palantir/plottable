@@ -12,10 +12,12 @@ import * as Utils from "../utils";
 
 import * as Plots from "./";
 import { Bar, BarOrientation } from "./barPlot";
+import { Formatter, identity } from "../core/formatters";
 
 export class StackedBar<X, Y> extends Bar<X, Y> {
   protected static _STACKED_BAR_LABEL_PADDING = 5;
 
+  private _extremaFormatter: Formatter = identity();
   private _labelArea: SimpleSelection<void>;
   private _measurer: Typesetter.CacheMeasurer;
   private _writer: Typesetter.Writer;
@@ -99,6 +101,30 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
     return this;
   }
 
+  /**
+   * Gets the Formatter for the stacked bar extrema labels.
+   */
+  public extremaFormatter(): Formatter;
+  /**
+   * Sets the Formatter for the stacked bar extrema labels. Extrema labels are the
+   * numbers at the very top and bottom of the stack that aren't associated
+   * with a single datum.
+   *
+   * @param {Formatter} formatter
+   * @returns {this}
+   */
+  public extremaFormatter(formatter: Formatter): this;
+
+  public extremaFormatter(formatter?: Formatter): any {
+    if (arguments.length === 0) {
+      return this._extremaFormatter;
+    } else {
+      this._extremaFormatter = formatter;
+      this.render();
+      return this;
+    }
+  }
+
   protected _setup() {
     super._setup();
     this._labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
@@ -151,7 +177,7 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
       if (maximum.extent !== baselineValue) {
         // only draw sums for values not at the baseline
 
-        const text = this.labelFormatter()(maximum.extent, undefined, undefined, undefined);
+        const text = this.extremaFormatter()(maximum.extent);
         const measurement = this._measurer.measure(text);
 
         const primaryTextMeasurement = this._isVertical ? measurement.width : measurement.height;
@@ -170,7 +196,7 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
 
     minimumExtents.forEach((minimum) => {
       if (minimum.extent !== baselineValue) {
-        const text = this.labelFormatter()(minimum.extent, undefined, undefined, undefined);
+        const text = this.extremaFormatter()(minimum.extent);
         const measurement = this._measurer.measure(text);
 
         const primaryTextMeasurement = this._isVertical ? measurement.width : measurement.height;
