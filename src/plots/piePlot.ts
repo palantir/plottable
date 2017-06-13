@@ -4,7 +4,7 @@
  */
 
 import * as d3 from "d3";
-import * as Typesetter from "typesettable";
+import * as Typesettable from "typesettable";
 
 import * as Animators from "../animators";
 import { Dataset } from "../core/dataset";
@@ -588,9 +588,9 @@ export class Pie extends Plot {
     const attrToProjector = this._generateAttrToProjector();
     const labelArea = this._renderArea.append("g").classed("label-area", true);
 
-    const context = new Typesetter.SvgContext(labelArea.node() as SVGElement);
-    const measurer = new Typesetter.CacheMeasurer(context);
-    const writer = new Typesetter.Writer(measurer, context);
+    const context = new Typesettable.SvgContext(labelArea.node() as SVGElement);
+    const measurer = new Typesettable.CacheMeasurer(context);
+    const writer = new Typesettable.Writer(measurer, context);
     const dataset = this.datasets()[0];
     const data = this._getDataToDraw().get(dataset);
     data.forEach((datum, datumIndex) => {

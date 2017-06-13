@@ -4,7 +4,7 @@
  */
 
 import * as d3 from "d3";
-import * as Typesetter from "typesettable";
+import * as Typesettable from "typesettable";
 
 import { Formatter } from "../core/formatters";
 import * as Formatters from "../core/formatters";
@@ -187,7 +187,7 @@ export class Time extends Axis<Date> {
   private _tierHeights: number[];
   private _possibleTimeAxisConfigurations: TimeAxisConfiguration[];
   private _numTiers: number;
-  private _measurer: Typesetter.Measurer;
+  private _measurer: Typesettable.CacheMeasurer;
   private _maxTimeIntervalPrecision: TimeInterval = null;
 
   private _mostPreciseConfigIndex: number;
@@ -421,8 +421,8 @@ export class Time extends Axis<Date> {
       this._tierBaselines.push(tierContainer.append("line").classed("baseline", true));
     }
 
-    const context = new Typesetter.SvgContext(this._tierLabelContainers[0].node() as SVGElement);
-    this._measurer = new Typesetter.CacheMeasurer(context);
+    const context = new Typesettable.SvgContext(this._tierLabelContainers[0].node() as SVGElement);
+    this._measurer = new Typesettable.CacheMeasurer(context);
   }
 
   private _getTickIntervalValues(config: TimeAxisTierConfiguration): any[] {
@@ -672,6 +672,6 @@ export class Time extends Axis<Date> {
 
   public invalidateCache() {
     super.invalidateCache();
-    (this._measurer as Typesetter.CacheMeasurer).reset();
+    (this._measurer as Typesettable.CacheMeasurer).reset();
   }
 }

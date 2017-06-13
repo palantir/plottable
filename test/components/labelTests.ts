@@ -1,7 +1,7 @@
 import * as d3 from "d3";
 
 import { assert } from "chai";
-import * as Typesetter from "typesettable";
+import * as Typesettable from "typesettable";
 
 import * as Plottable from "../../src";
 import { getTranslateValues } from "../../src/utils/domUtils";
@@ -217,8 +217,8 @@ describe("Labels", () => {
       it("puts space around the label", () => {
         label.renderTo(div);
 
-        const context = new Typesetter.SvgContext(label.content().node() as SVGElement);
-        const measurer = new Typesetter.CacheMeasurer(context);
+        const context = new Typesettable.SvgContext(label.content().node() as SVGElement);
+        const measurer = new Typesettable.CacheMeasurer(context);
         const measure = measurer.measure("testing label");
         assert.operator(label.width(), ">", measure.width, "padding increases size of the component");
         assert.operator(label.width(), "<=", measure.width + 2 * PADDING, "width at most incorporates full padding amount");

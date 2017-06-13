@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import * as Typesetter from "typesettable";
+import * as Typesettable from "typesettable";
 
 import { Dataset } from "../core/dataset";
 import { IAccessor, Point, SimpleSelection } from "../core/interfaces";
@@ -17,8 +17,8 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
   protected static _STACKED_BAR_LABEL_PADDING = 5;
 
   private _labelArea: SimpleSelection<void>;
-  private _measurer: Typesetter.CacheMeasurer;
-  private _writer: Typesetter.Writer;
+  private _measurer: Typesettable.CacheMeasurer;
+  private _writer: Typesettable.Writer;
   private _stackingOrder: Utils.Stacking.IStackingOrder;
   private _stackingResult: Utils.Stacking.StackingResult;
   private _stackedExtent: number[];
@@ -102,9 +102,9 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
   protected _setup() {
     super._setup();
     this._labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
-    const context = new Typesetter.SvgContext(this._labelArea.node() as SVGElement);
-    this._measurer = new Typesetter.CacheMeasurer(context);
-    this._writer = new Typesetter.Writer(this._measurer, context);
+    const context = new Typesettable.SvgContext(this._labelArea.node() as SVGElement);
+    this._measurer = new Typesettable.CacheMeasurer(context);
+    this._writer = new Typesettable.Writer(this._measurer, context);
   }
 
   protected _drawLabels() {
@@ -140,7 +140,7 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
         const writeOptions = {
           xAlign: "center",
           yAlign: "center",
-        } as Typesetter.IWriteOptions;
+        } as Typesettable.IWriteOptions;
         this._writer.write(text, measurement.width, measurement.height, writeOptions, labelContainer.node());
       }
 
