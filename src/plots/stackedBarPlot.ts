@@ -6,13 +6,13 @@
 import * as Typesetter from "typesettable";
 
 import { Dataset } from "../core/dataset";
+import { Formatter, identity } from "../core/formatters";
 import { IAccessor, Point, SimpleSelection } from "../core/interfaces";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
 
 import * as Plots from "./";
 import { Bar, BarOrientation } from "./barPlot";
-import { Formatter, identity } from "../core/formatters";
 
 export class StackedBar<X, Y> extends Bar<X, Y> {
   protected static _STACKED_BAR_LABEL_PADDING = 5;
