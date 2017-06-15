@@ -286,7 +286,8 @@ export class Legend extends Component {
    */
   public formatter(): Formatter;
   /**
-   * Sets the Formatter for the entry texts.
+   * Sets the Formatter for the entry texts. The name of each entry (as defined by the domain of this legend's
+   * Color Scale) will be passed through this formatter before being displayed.
    *
    * @param {Formatter} formatter
    * @returns {Legend} The calling Legend.

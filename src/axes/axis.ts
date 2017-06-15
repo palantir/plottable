@@ -275,11 +275,13 @@ export class Axis<D> extends Component {
   }
 
   /**
-   * Gets the Formatter for the annotations.
+   * Gets the Formatter for the annotations. The annotationFormatter will be passed
+   * each value in annotatedTicks.
    */
   public annotationFormatter(): Formatter;
   /**
-   * Sets the Formatter for the annotations.
+   * Sets the Formatter for the annotations. The annotationFormatter will be passed
+   * each value in annotatedTicks.
    *
    * @returns {Axis} The calling Axis.
    */

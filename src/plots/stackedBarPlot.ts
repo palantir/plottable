@@ -108,7 +108,8 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
   /**
    * Sets the Formatter for the stacked bar extrema labels. Extrema labels are the
    * numbers at the very top and bottom of the stack that aren't associated
-   * with a single datum.
+   * with a single datum. Their value will be passed through this formatter
+   * before being displayed.
    *
    * @param {Formatter} formatter
    * @returns {this}

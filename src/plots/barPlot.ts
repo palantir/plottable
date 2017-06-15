@@ -325,7 +325,10 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
    */
   public labelFormatter(): DatumFormatter;
   /**
-   * Sets the Formatter for the labels.
+   * Sets the Formatter for the labels. The labelFormatter will be fed each bar's
+   * computed height as defined by the `.y()` accessor for vertical bars, or the
+   * width as defined by the `.x()` accessor for horizontal bars, as well as the
+   * datum, datum index, and dataset associated with that bar.
    *
    * @param {Formatter} formatter
    * @returns {Bar} The calling Bar Plot.

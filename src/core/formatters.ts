@@ -9,6 +9,9 @@ import { Dataset } from "./dataset";
 /**
  * A basic formatter function that will be passed a value to format (e.g. the tick value for axes).
  * A Formatter should return the formatted string representation of the input value.
+ *
+ * The value will be different for each use of the formatter - check the documentation of individual
+ * methods to see what will be passed into the formatter.
  */
 export type Formatter = (value: any) => string;
 
@@ -16,6 +19,9 @@ export type Formatter = (value: any) => string;
  * A formatter function that will be passed the value to format as well as the underlying datum, index, and
  * dataset that the value came from. Datum-backed visual elements that display labels, such as Bar Plot bars
  * or Pie Plot sectors, will use this formatter.
+ *
+ * The value will be different for each use of the formatter - check the documentation of individual
+ * methods to see what will be passed into the formatter.
  */
 export type DatumFormatter = (value: any, datum: any, index: number, dataset: Dataset) => string;
 

@@ -9,7 +9,7 @@ import * as Typesetter from "typesettable";
 import * as Animators from "../animators";
 import { Dataset } from "../core/dataset";
 import * as Formatters from "../core/formatters";
-import { DatumFormatter, Formatter } from "../core/formatters";
+import { DatumFormatter } from "../core/formatters";
 import { AttributeToProjector, IAccessor, Point, SimpleSelection } from "../core/interfaces";
 import * as Scales from "../scales";
 import { Scale } from "../scales/scale";
@@ -314,7 +314,9 @@ export class Pie extends Plot {
    */
   public labelFormatter(): DatumFormatter;
   /**
-   * Sets the Formatter for the labels.
+   * Sets the Formatter for the labels. The labelFormatter will be fed each pie
+   * slice's value as computed by the `.sectorValue()` accessor, as well as the
+   * datum, datum index, and dataset associated with that bar.
    *
    * @param {Formatter} formatter
    * @returns {Pie} The calling Pie Plot.
