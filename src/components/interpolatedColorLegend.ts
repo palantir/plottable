@@ -70,11 +70,13 @@ export class InterpolatedColorLegend extends Component {
   }
 
   /**
-   * Gets the Formatter for the labels.
+   * Gets the Formatter for the labels. The domain ticks will be passed through the formatter
+   * before being displayed.
    */
   public formatter(): Formatter;
   /**
-   * Sets the Formatter for the labels.
+   * Sets the Formatter for the labels. The domain ticks will be passed through the formatter
+   * before being displayed.
    *
    * @param {Formatter} formatter
    * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.

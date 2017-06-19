@@ -46,7 +46,7 @@ export { DragBoxCallback } from "./components/dragBoxLayer";
 export { IDragLineCallback } from "./components/dragLineLayer";
 
 export * from "./core/dataset";
-export { Formatter } from "./core/formatters";
+export { Formatter, DatumFormatter } from "./core/formatters";
 export * from "./core/interfaces";
 export { SymbolFactory } from "./core/symbolFactories";
 export { version } from "./core/version";

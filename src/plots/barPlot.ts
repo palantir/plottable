@@ -9,7 +9,7 @@ import * as Typesettable from "typesettable";
 import * as Animators from "../animators";
 import { Dataset } from "../core/dataset";
 import * as Formatters from "../core/formatters";
-import { Formatter } from "../core/formatters";
+import { DatumFormatter } from "../core/formatters";
 import { AttributeToProjector, Bounds, IAccessor, Point, Range, SimpleSelection } from "../core/interfaces";
 import * as Drawers from "../drawers";
 import { ProxyDrawer } from "../drawers/drawer";
@@ -54,7 +54,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   private _baseline: SimpleSelection<void>;
   private _baselineValue: X|Y;
   protected _isVertical: boolean;
-  private _labelFormatter: Formatter = Formatters.identity();
+  private _labelFormatter: DatumFormatter = Formatters.identity();
   private _labelsEnabled = false;
   private _labelsPosition = LabelsPosition.end;
   private _hideBarsIfAnyAreTooWide = true;
@@ -323,15 +323,18 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   /**
    * Gets the Formatter for the labels.
    */
-  public labelFormatter(): Formatter;
+  public labelFormatter(): DatumFormatter;
   /**
-   * Sets the Formatter for the labels.
+   * Sets the Formatter for the labels. The labelFormatter will be fed each bar's
+   * computed height as defined by the `.y()` accessor for vertical bars, or the
+   * width as defined by the `.x()` accessor for horizontal bars, as well as the
+   * datum, datum index, and dataset associated with that bar.
    *
    * @param {Formatter} formatter
    * @returns {Bar} The calling Bar Plot.
    */
-  public labelFormatter(formatter: Formatter): this;
-  public labelFormatter(formatter?: Formatter): any {
+  public labelFormatter(formatter: DatumFormatter): this;
+  public labelFormatter(formatter?: DatumFormatter): any {
     if (formatter == null) {
       return this._labelFormatter;
     } else {
@@ -605,7 +608,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
 
     const barCoordinates = { x: attrToProjector["x"](datum, index, dataset), y: attrToProjector["y"](datum, index, dataset) };
     const barDimensions = { width: attrToProjector["width"](datum, index, dataset), height: attrToProjector["height"](datum, index, dataset) };
-    const text = this._labelFormatter(valueAccessor(datum, index, dataset));
+    const text = this._labelFormatter(value, datum, index, dataset);
     const measurement = measurer.measure(text);
 
     const showLabelOnBar = this._getShowLabelOnBar(barCoordinates, barDimensions, measurement);

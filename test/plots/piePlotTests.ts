@@ -351,17 +351,17 @@ describe("Plots", () => {
 
       it("uses its formatter to format labels", () => {
         const data = [
-          { value: 5 },
-          { value: 15 },
+          { value: 5, name: "a" },
+          { value: 15, name: "b" },
         ];
-        const dataset = new Plottable.Dataset(data);
+        const dataset = new Plottable.Dataset(data).metadata("foo");
         piePlot.addDataset(dataset);
-        piePlot.labelFormatter((n: number) => n + " m");
+        piePlot.labelFormatter((n: number, datum, index, dataset) => `${n}, ${datum.name}, ${index}, ${dataset.metadata()}`);
         piePlot.renderTo(div);
         const texts = div.selectAll<Element, any>("text").nodes().map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 2, "both labels are drawn");
-        assert.strictEqual(texts[0], "5 m", "The formatter was used to format the label for slice index 0");
-        assert.strictEqual(texts[1], "15 m", "The formatter was used to format the label for slice index 1");
+        assert.strictEqual(texts[0], "5, a, 0, foo", "The formatter was used to format the label for slice index 0");
+        assert.strictEqual(texts[1], "15, b, 1, foo", "The formatter was used to format the label for slice index 1");
         div.remove();
       });
 

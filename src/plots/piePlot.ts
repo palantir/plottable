@@ -9,7 +9,7 @@ import * as Typesettable from "typesettable";
 import * as Animators from "../animators";
 import { Dataset } from "../core/dataset";
 import * as Formatters from "../core/formatters";
-import { Formatter } from "../core/formatters";
+import { DatumFormatter } from "../core/formatters";
 import { AttributeToProjector, IAccessor, Point, SimpleSelection } from "../core/interfaces";
 import * as Scales from "../scales";
 import { Scale } from "../scales/scale";
@@ -35,7 +35,7 @@ export class Pie extends Plot {
   private _endAngle: number = 2 * Math.PI;
   private _startAngles: number[];
   private _endAngles: number[];
-  private _labelFormatter: Formatter = Formatters.identity();
+  private _labelFormatter: DatumFormatter = Formatters.identity();
   private _labelsEnabled = false;
   private _strokeDrawers: Utils.Map<Dataset, ArcOutlineSVGDrawer>;
 
@@ -312,15 +312,17 @@ export class Pie extends Plot {
   /**
    * Gets the Formatter for the labels.
    */
-  public labelFormatter(): Formatter;
+  public labelFormatter(): DatumFormatter;
   /**
-   * Sets the Formatter for the labels.
+   * Sets the Formatter for the labels. The labelFormatter will be fed each pie
+   * slice's value as computed by the `.sectorValue()` accessor, as well as the
+   * datum, datum index, and dataset associated with that bar.
    *
    * @param {Formatter} formatter
    * @returns {Pie} The calling Pie Plot.
    */
-  public labelFormatter(formatter: Formatter): this;
-  public labelFormatter(formatter?: Formatter): any {
+  public labelFormatter(formatter: DatumFormatter): this;
+  public labelFormatter(formatter?: DatumFormatter): any {
     if (formatter == null) {
       return this._labelFormatter;
     } else {
@@ -598,7 +600,7 @@ export class Pie extends Plot {
       if (!Utils.Math.isValidNumber(value)) {
         return;
       }
-      value = this._labelFormatter(value);
+      value = this._labelFormatter(value, datum, datumIndex, dataset);
       const measurement = measurer.measure(value);
 
       const theta = (this._endAngles[datumIndex] + this._startAngles[datumIndex]) / 2;

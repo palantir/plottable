@@ -29,13 +29,22 @@ export type TimeInterval = keyof typeof TimeInterval;
 /**
  * Defines a configuration for a Time Axis tier.
  * For details on how ticks are generated see: https://github.com/mbostock/d3/wiki/Time-Scales#ticks
- * interval - A time unit associated with this configuration (seconds, minutes, hours, etc).
- * step - number of intervals between each tick.
- * formatter - formatter used to format tick labels.
  */
 export type TimeAxisTierConfiguration = {
+  /**
+   * The time unit associated with this configuration (seconds, minutes, hours, etc).
+   */
   interval: string;
+
+  /**
+   * Number of intervals between each tick.
+   */
   step: number;
+
+  /**
+   * Formatter used to format tick labels. Tick values will be passed through the formatter
+   * before being displayed.
+   */
   formatter: Formatter;
 };
 

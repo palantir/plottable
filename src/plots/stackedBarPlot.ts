@@ -6,6 +6,7 @@
 import * as Typesettable from "typesettable";
 
 import { Dataset } from "../core/dataset";
+import { Formatter, identity } from "../core/formatters";
 import { IAccessor, Point, SimpleSelection } from "../core/interfaces";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
@@ -16,6 +17,7 @@ import { Bar, BarOrientation } from "./barPlot";
 export class StackedBar<X, Y> extends Bar<X, Y> {
   protected static _STACKED_BAR_LABEL_PADDING = 5;
 
+  private _extremaFormatter: Formatter = identity();
   private _labelArea: SimpleSelection<void>;
   private _measurer: Typesettable.CacheMeasurer;
   private _writer: Typesettable.Writer;
@@ -99,6 +101,31 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
     return this;
   }
 
+  /**
+   * Gets the Formatter for the stacked bar extrema labels.
+   */
+  public extremaFormatter(): Formatter;
+  /**
+   * Sets the Formatter for the stacked bar extrema labels. Extrema labels are the
+   * numbers at the very top and bottom of the stack that aren't associated
+   * with a single datum. Their value will be passed through this formatter
+   * before being displayed.
+   *
+   * @param {Formatter} formatter
+   * @returns {this}
+   */
+  public extremaFormatter(formatter: Formatter): this;
+
+  public extremaFormatter(formatter?: Formatter): any {
+    if (arguments.length === 0) {
+      return this._extremaFormatter;
+    } else {
+      this._extremaFormatter = formatter;
+      this.render();
+      return this;
+    }
+  }
+
   protected _setup() {
     super._setup();
     this._labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
@@ -151,7 +178,7 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
       if (maximum.extent !== baselineValue) {
         // only draw sums for values not at the baseline
 
-        const text = this.labelFormatter()(maximum.extent);
+        const text = this.extremaFormatter()(maximum.extent);
         const measurement = this._measurer.measure(text);
 
         const primaryTextMeasurement = this._isVertical ? measurement.width : measurement.height;
@@ -170,7 +197,7 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
 
     minimumExtents.forEach((minimum) => {
       if (minimum.extent !== baselineValue) {
-        const text = this.labelFormatter()(minimum.extent);
+        const text = this.extremaFormatter()(minimum.extent);
         const measurement = this._measurer.measure(text);
 
         const primaryTextMeasurement = this._isVertical ? measurement.width : measurement.height;
