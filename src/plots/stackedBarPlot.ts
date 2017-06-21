@@ -7,7 +7,7 @@ import * as Typesettable from "typesettable";
 
 import { Dataset } from "../core/dataset";
 import { Formatter, identity } from "../core/formatters";
-import { IAccessor, Point, SimpleSelection } from "../core/interfaces";
+import { Bounds, IAccessor, Point, SimpleSelection } from "../core/interfaces";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
 
@@ -144,12 +144,20 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
     const primaryScale: Scale<any, number> = this._isVertical ? this.x().scale : this.y().scale;
     const secondaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
     const { maximumExtents, minimumExtents } = Utils.Stacking.stackedExtents<Date | string | number>(this._stackingResult);
-    const barWidth = this._getBarPixelWidth();
     const anyTooWide: boolean[] = [];
 
-    const drawLabel = (text: string, measurement: { height: number, width: number }, labelPosition: Point) => {
-      const { x, y } = labelPosition;
-      const { height, width } = measurement;
+    /**
+     * Try drawing the text at the center of the bounds. This method does not draw
+     * the text if the text would overflow outside of the plot.
+     *
+     * @param text
+     * @param bounds
+     * @returns {boolean}
+     */
+    const tryDrawLabel = (text: string, bounds: Bounds, barWidth: number) => {
+      const { x, y } = bounds.topLeft;
+      const width = bounds.bottomRight.x - bounds.topLeft.x;
+      const height = bounds.bottomRight.y - bounds.topLeft.y;
       const tooWide = this._isVertical
         ? ( width > barWidth - (2 * StackedBar._LABEL_PADDING) )
         : ( height > barWidth - (2 * StackedBar._LABEL_PADDING) );
@@ -168,7 +176,7 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
           xAlign: "center",
           yAlign: "center",
         } as Typesettable.IWriteOptions;
-        this._writer.write(text, measurement.width, measurement.height, writeOptions, labelContainer.node());
+        this._writer.write(text, width, height, writeOptions, labelContainer.node());
       }
 
       return tooWide;
@@ -191,7 +199,22 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
           ? secondaryScale.scale(maximum.extent) - secondaryTextMeasurement - StackedBar._STACKED_BAR_LABEL_PADDING
           : primaryScale.scale(maximum.axisValue) - primaryTextMeasurement / 2;
 
-        anyTooWide.push(drawLabel(text, measurement, { x, y }));
+        const { stackedDatum } = maximum;
+        const { originalDatum, originalIndex, originalDataset } = stackedDatum;
+        const barWidth = this.attr("width").accessor(originalDatum, originalIndex, originalDataset);
+
+        const isTooWide = tryDrawLabel(
+            text,
+            {
+              topLeft: { x, y },
+              bottomRight: {
+                x: x + measurement.width,
+                y: y + measurement.height,
+              },
+            },
+            barWidth,
+        );
+        anyTooWide.push(isTooWide);
       }
     });
 
@@ -210,7 +233,18 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
           ? secondaryScale.scale(minimum.extent) + StackedBar._STACKED_BAR_LABEL_PADDING
           : primaryScale.scale(minimum.axisValue) - primaryTextMeasurement / 2;
 
-        anyTooWide.push(drawLabel(text, measurement, { x, y }));
+        const isTooWide = tryDrawLabel(
+            text,
+            {
+              topLeft: { x, y },
+              bottomRight: {
+                x: x + measurement.width,
+                y: y + measurement.height,
+              },
+            },
+            barWidth,
+        );
+        anyTooWide.push(isTooWide);
       }
     });
 

@@ -63,8 +63,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   private _barAlignment: BarAlignment = "middle";
   private _fixedWidth = true;
 
-  private _barPixelWidth = 0;
-  private _updateBarPixelWidthCallback: () => void;
+  private _barPixelThickness = 0;
+  private _updateBarPixelThicknessCallback: () => void;
 
   /**
    * A Bar Plot draws bars growing out from a baseline to some value
@@ -81,10 +81,14 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     this._isVertical = orientation === "vertical";
     this.animator("baseline", new Animators.Null());
     this.attr("fill", new Scales.Color().range()[0]);
-    this.attr("width", () => this._barPixelWidth);
+    // we special case the "width" property to actually represent the bar
+    // thickness (aka the distance between adjacent bar positions); in
+    // _generateAttrToProjector we re-assign "width" to specifically refer
+    // to <rect>'s width attribute
+    this.attr("width", () => this._barPixelThickness);
     this._labelConfig = new Utils.Map<Dataset, LabelConfig>();
     this._baselineValueProvider = () => [this.baselineValue()];
-    this._updateBarPixelWidthCallback = () => this._updateBarPixelWidth();
+    this._updateBarPixelThicknessCallback = () => this._updateBarPixelWidth();
   }
 
   public x(): Plots.ITransformableAccessorScaleBinding<X, number>;
@@ -99,11 +103,11 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       super.x(<number | IAccessor<number>>x);
     } else {
       super.x(< X | IAccessor<X>>x, xScale);
-      xScale.onUpdate(this._updateBarPixelWidthCallback);
+      xScale.onUpdate(this._updateBarPixelThicknessCallback);
     }
 
     this._updateWidthAccesor();
-    this._updateValueScale();
+    this._updateLengthScale();
     return this;
   }
 
@@ -119,11 +123,27 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       super.y(<number | IAccessor<number>>y);
     } else {
       super.y(<Y | IAccessor<Y>>y, yScale);
-      yScale.onUpdate(this._updateBarPixelWidthCallback);
+      yScale.onUpdate(this._updateBarPixelThicknessCallback);
     }
 
-    this._updateValueScale();
+    this._updateLengthScale();
     return this;
+  }
+
+  /**
+   * The binding associated with bar length. Length is the count or value the bar is trying to show.
+   * This is the .y() for a vertical plot and .x() for a horizontal plot.
+   */
+  protected length(): Plots.ITransformableAccessorScaleBinding<any, number> {
+    return this._isVertical ? this.y() : this.x();
+  }
+
+  /**
+   * The binding associated with bar position. Position separates the different bar categories.
+   * This is the .x() for a vertical plot and .y() for a horizontal plot.
+   */
+  protected position(): Plots.ITransformableAccessorScaleBinding<any, number> {
+    return this._isVertical ? this.x() : this.y();
   }
 
   /**
@@ -156,11 +176,11 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       return this._propertyBindings.get(Bar._BAR_END_KEY);
     }
 
-    const binding = (this._isVertical) ? this.x() : this.y();
+    const binding = this.position();
     const scale = binding && binding.scale;
     this._bindProperty(Bar._BAR_END_KEY, end, scale);
     this._updateWidthAccesor();
-    this._updateValueScale();
+    this._updateLengthScale();
     this.render();
     return this;
   }
@@ -238,19 +258,19 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       if (!this._projectorsReady()) {
         return 0;
       }
-      const valueScale = this._isVertical ? this.y().scale : this.x().scale;
-      if (!valueScale) {
+      const lengthScale = this.length().scale;
+      if (!lengthScale) {
         return 0;
       }
 
-      if (valueScale instanceof Scales.Time) {
+      if (lengthScale instanceof Scales.Time) {
         return new Date(0);
       }
 
       return 0;
     }
     this._baselineValue = value;
-    this._updateValueScale();
+    this._updateLengthScale();
     this.render();
     return this;
   }
@@ -262,20 +282,20 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   }
 
   protected _addDataset(dataset: Dataset) {
-    dataset.onUpdate(this._updateBarPixelWidthCallback);
+    dataset.onUpdate(this._updateBarPixelThicknessCallback);
     super._addDataset(dataset);
     return this;
   }
 
   public removeDataset(dataset: Dataset) {
-    dataset.offUpdate(this._updateBarPixelWidthCallback);
+    dataset.offUpdate(this._updateBarPixelThicknessCallback);
     super.removeDataset(dataset);
     this._updateBarPixelWidth();
     return this;
   }
 
   protected _removeDataset(dataset: Dataset) {
-    dataset.offUpdate(this._updateBarPixelWidthCallback);
+    dataset.offUpdate(this._updateBarPixelThicknessCallback);
     super._removeDataset(dataset);
     return this;
   }
@@ -499,21 +519,20 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     return intersected;
   }
 
-  private _updateValueScale() {
+  private _updateLengthScale() {
     if (!this._projectorsReady()) {
       return;
     }
-    const valueScale = this._isVertical ? this.y().scale : this.x().scale;
-    if (valueScale instanceof QuantitativeScale) {
-      const qscale = <QuantitativeScale<any>> valueScale;
-      qscale.addPaddingExceptionsProvider(this._baselineValueProvider);
-      qscale.addIncludedValuesProvider(this._baselineValueProvider);
+    const lengthScale = this.length().scale;
+    if (lengthScale instanceof QuantitativeScale) {
+      lengthScale.addPaddingExceptionsProvider(this._baselineValueProvider);
+      lengthScale.addIncludedValuesProvider(this._baselineValueProvider);
     }
   }
 
   protected _additionalPaint(time: number) {
-    const primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
-    const scaledBaseline = primaryScale.scale(this.baselineValue());
+    const lengthScale: Scale<any, number> = this.length().scale;
+    const scaledBaseline = lengthScale.scale(this.baselineValue());
 
     const baselineAttr: any = {
       "x1": this._isVertical ? 0 : scaledBaseline,
@@ -550,36 +569,40 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     }
 
     const scale = <QuantitativeScale<any>>accScaleBinding.scale;
-    const width = this._barPixelWidth;
+    const width = this._barPixelThickness;
 
     // To account for inverted domains
     extents = extents.map((extent) => d3.extent([
-      scale.invert(this._getAlignedX(scale.scale(extent[0]), width)),
-      scale.invert(this._getAlignedX(scale.scale(extent[0]), width) + width),
-      scale.invert(this._getAlignedX(scale.scale(extent[1]), width)),
-      scale.invert(this._getAlignedX(scale.scale(extent[1]), width) + width),
+      scale.invert(this._getPositionAttr(scale.scale(extent[0]), width)),
+      scale.invert(this._getPositionAttr(scale.scale(extent[0]), width) + width),
+      scale.invert(this._getPositionAttr(scale.scale(extent[1]), width)),
+      scale.invert(this._getPositionAttr(scale.scale(extent[1]), width) + width),
     ]));
 
     return extents;
   }
 
-  protected _getAlignedX(x: number, width: number): number {
+  /**
+   * Return the <rect>'s x or y attr value given the position and thickness of
+   * that bar. This method is responsible for account for barAlignment, in particular.
+   */
+  protected _getPositionAttr(position: number, thickness: number): number {
     // account for flipped vertical axis
     if (!this._isVertical) {
-      x -= width;
-      width *= -1;
+      position -= thickness;
+      thickness *= -1;
     }
 
     switch(this._barAlignment) {
       case "start":
-        return x;
+        return position;
 
       case "end":
-        return x - width;
+        return position - thickness;
 
       case "middle":
       default:
-        return x - width / 2;
+        return position - thickness / 2;
     }
   }
 
@@ -600,21 +623,21 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   private _drawLabel(datum: any, index: number, dataset: Dataset, attrToProjector: AttributeToProjector) {
     const { labelArea, measurer, writer } = this._labelConfig.get(dataset);
 
-    const valueAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
-    const value = valueAccessor(datum, index, dataset);
-    const valueScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
-    const scaledValue = valueScale != null ? valueScale.scale(value) : value;
-    const scaledBaseline = valueScale != null ? valueScale.scale(this.baselineValue()) : this.baselineValue();
+    const lengthAccessor = this.length().accessor;
+    const length = lengthAccessor(datum, index, dataset);
+    const lengthScale: Scale<any, number> = this.length().scale;
+    const scaledLength = lengthScale != null ? lengthScale.scale(length) : length;
+    const scaledBaseline = lengthScale != null ? lengthScale.scale(this.baselineValue()) : this.baselineValue();
 
     const barCoordinates = { x: attrToProjector["x"](datum, index, dataset), y: attrToProjector["y"](datum, index, dataset) };
     const barDimensions = { width: attrToProjector["width"](datum, index, dataset), height: attrToProjector["height"](datum, index, dataset) };
-    const text = this._labelFormatter(value, datum, index, dataset);
+    const text = this._labelFormatter(length, datum, index, dataset);
     const measurement = measurer.measure(text);
 
     const showLabelOnBar = this._getShowLabelOnBar(barCoordinates, barDimensions, measurement);
 
     // show label on right when value === baseline for horizontal plots
-    const aboveOrLeftOfBaseline = this._isVertical ? scaledValue <= scaledBaseline : scaledValue < scaledBaseline;
+    const aboveOrLeftOfBaseline = this._isVertical ? scaledLength <= scaledBaseline : scaledLength < scaledBaseline;
     const { containerDimensions, labelContainerOrigin, labelOrigin, alignment } = this._calculateLabelProperties(
       barCoordinates, barDimensions, measurement, showLabelOnBar, aboveOrLeftOfBaseline,
     );
@@ -751,8 +774,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     const drawSteps: Drawers.DrawStep[] = [];
     if (this._animateOnNextRender()) {
       const resetAttrToProjector = this._generateAttrToProjector();
-      const primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
-      const scaledBaseline = primaryScale.scale(this.baselineValue());
+      const lengthScale: Scale<any, number> = this.length().scale;
+      const scaledBaseline = lengthScale.scale(this.baselineValue());
       const positionAttr = this._isVertical ? "y" : "x";
       const dimensionAttr = this._isVertical ? "height" : "width";
       resetAttrToProjector[positionAttr] = () => scaledBaseline;
@@ -767,38 +790,41 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   }
 
   protected _generateAttrToProjector() {
-    // Primary scale/direction: the "length" of the bars
-    // Secondary scale/direction: the "width" of the bars
     const attrToProjector = super._generateAttrToProjector();
-    const primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
-    const primaryAttr = this._isVertical ? "y" : "x";
-    const secondaryAttr = this._isVertical ? "x" : "y";
-    const scaledBaseline = primaryScale.scale(this.baselineValue());
 
-    const positionF = this._isVertical ? Plot._scaledAccessor(this.x()) : Plot._scaledAccessor(this.y());
-    const widthF = attrToProjector["width"];
-    const originalPositionFn = this._isVertical ? Plot._scaledAccessor(this.y()) : Plot._scaledAccessor(this.x());
-    const heightF = (d: any, i: number, dataset: Dataset) => {
-      return Math.abs(scaledBaseline - originalPositionFn(d, i, dataset));
+    const lengthScale = this.length().scale;
+    const scaledBaseline = lengthScale.scale(this.baselineValue());
+
+    const lengthAttr = this._isVertical ? "y" : "x";
+    const positionAttr = this._isVertical ? "x" : "y";
+
+    const positionF = Plot._scaledAccessor(this.position());
+    const originalLengthFn = Plot._scaledAccessor(this.length());
+    const lengthFn = (d: any, i: number, dataset: Dataset) => {
+      return Math.abs(scaledBaseline - originalLengthFn(d, i, dataset));
     };
 
+    const thicknessF = attrToProjector["width"];
     const gapF = attrToProjector["gap"];
-    const widthMinusGap = gapF == null ? widthF : (d: any, i: number, dataset: Dataset) => {
-      return widthF(d, i, dataset) - gapF(d, i, dataset);
-    };
-    attrToProjector["width"] = this._isVertical ? widthMinusGap : heightF;
-    attrToProjector["height"] = this._isVertical ? heightF : widthMinusGap;
-
-    attrToProjector[secondaryAttr] = (d: any, i: number, dataset: Dataset) => {
-      return this._getAlignedX(positionF(d, i, dataset), widthF(d, i, dataset));
+    const thicknessMinusGap = gapF == null ? thicknessF : (d: any, i: number, dataset: Dataset) => {
+      return thicknessF(d, i, dataset) - gapF(d, i, dataset);
     };
 
-    attrToProjector[primaryAttr] = (d: any, i: number, dataset: Dataset) => {
-      const originalPos = originalPositionFn(d, i, dataset);
-      // If it is past the baseline, it should start at the baselin then width/height
+    // re-interpret "width" attr from representing "thickness" to actually meaning
+    // width (that is, x-direction specific) again
+    attrToProjector["width"] = this._isVertical ? thicknessMinusGap : lengthFn;
+    attrToProjector["height"] = this._isVertical ? lengthFn : thicknessMinusGap;
+
+    attrToProjector[lengthAttr] = (d: any, i: number, dataset: Dataset) => {
+      const originalLength = originalLengthFn(d, i, dataset);
+      // If it is past the baseline, it should start at the baseline then width/height
       // carries it over. If it's not past the baseline, leave it at original position and
       // then width/height carries it to baseline
-      return (originalPos > scaledBaseline) ? scaledBaseline : originalPos;
+      return (originalLength > scaledBaseline) ? scaledBaseline : originalLength;
+    };
+
+    attrToProjector[positionAttr] = (d: any, i: number, dataset: Dataset) => {
+      return this._getPositionAttr(positionF(d, i, dataset), thicknessF(d, i, dataset));
     };
 
     return attrToProjector;
@@ -819,7 +845,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     } else {
       this._fixedWidth = true;
       this._updateBarPixelWidth();
-      this.attr("width", () => this._barPixelWidth);
+      this.attr("width", () => this._barPixelThickness);
     }
   }
 
@@ -829,6 +855,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
    * If the position scale of the plot is a CategoryScale and in bands mode, then the rangeBands function will be used.
    * If the position scale of the plot is a QuantitativeScale, then the bar width is equal to the smallest distance between
    * two adjacent data points, padded for visualisation.
+   *
+   * This doesn't account for explicitly setting the barEnd.
    */
   protected _getBarPixelWidth(): number {
     if (!this._projectorsReady()) {
@@ -864,7 +892,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
 
   private _updateBarPixelWidth() {
     if (this._fixedWidth) {
-      this._barPixelWidth = this._getBarPixelWidth();
+      this._barPixelThickness = this._getBarPixelWidth();
     }
   }
 
@@ -897,7 +925,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   }
 
   protected _uninstallScaleForKey(scale: Scale<any, number>, key: string) {
-    scale.offUpdate(this._updateBarPixelWidthCallback);
+    scale.offUpdate(this._updateBarPixelThicknessCallback);
     super._uninstallScaleForKey(scale, key);
   }
 
