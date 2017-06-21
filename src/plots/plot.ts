@@ -115,6 +115,7 @@ export class Plot extends Component {
    * TODO make this an arrow method instead of re-defining it in constructor()
    */
   protected _renderCallback: IScaleCallback<Scale<any, any>>;
+
   /**
    * Callback that triggers when any Dataset that's bound to this plot Updates.
    *
@@ -256,7 +257,7 @@ export class Plot extends Component {
     this._updateExtents();
     this._dataChanged = true;
     this._resetEntityStore();
-    this.render();
+    this._renderCallback(null);
   }
 
   /**
