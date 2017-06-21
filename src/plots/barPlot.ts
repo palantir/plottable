@@ -48,6 +48,10 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   private static _BAR_AREA_CLASS = "bar-area";
   private static _BAR_END_KEY = "barEnd";
 
+  // we special case the "width" property to represent the bar thickness
+  // (aka the distance between adjacent bar positions); in _generateAttrToProjector
+  // we re-assign "width" to specifically refer to <rect>'s width attribute
+  protected static _BAR_THICKNESS_KEY = "width";
   protected static _LABEL_AREA_CLASS = "bar-label-text-area";
   protected static _LABEL_PADDING = 10;
 
@@ -61,8 +65,12 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   private _labelConfig: Utils.Map<Dataset, LabelConfig>;
   private _baselineValueProvider: () => (X|Y)[];
   private _barAlignment: BarAlignment = "middle";
-  private _fixedWidth = true;
 
+  /**
+   * Whether all the bars in this barPlot have the same pixel thickness.
+   * If so, use the _barPixelThickness property to access the thickness.
+   */
+  private _fixedBarPixelThickness = true;
   private _barPixelThickness = 0;
   private _updateBarPixelThicknessCallback: () => void;
 
@@ -81,11 +89,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     this._isVertical = orientation === "vertical";
     this.animator("baseline", new Animators.Null());
     this.attr("fill", new Scales.Color().range()[0]);
-    // we special case the "width" property to actually represent the bar
-    // thickness (aka the distance between adjacent bar positions); in
-    // _generateAttrToProjector we re-assign "width" to specifically refer
-    // to <rect>'s width attribute
-    this.attr("width", () => this._barPixelThickness);
+    this.attr(Bar._BAR_THICKNESS_KEY, () => this._barPixelThickness);
     this._labelConfig = new Utils.Map<Dataset, LabelConfig>();
     this._baselineValueProvider = () => [this.baselineValue()];
     this._updateBarPixelThicknessCallback = () => this._updateBarPixelWidth();
@@ -106,7 +110,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       xScale.onUpdate(this._updateBarPixelThicknessCallback);
     }
 
-    this._updateWidthAccesor();
+    this._updateThicknessAttr();
     this._updateLengthScale();
     return this;
   }
@@ -179,7 +183,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     const binding = this.position();
     const scale = binding && binding.scale;
     this._bindProperty(Bar._BAR_END_KEY, end, scale);
-    this._updateWidthAccesor();
+    this._updateThicknessAttr();
     this._updateLengthScale();
     this.render();
     return this;
@@ -776,10 +780,10 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       const resetAttrToProjector = this._generateAttrToProjector();
       const lengthScale: Scale<any, number> = this.length().scale;
       const scaledBaseline = lengthScale.scale(this.baselineValue());
-      const positionAttr = this._isVertical ? "y" : "x";
-      const dimensionAttr = this._isVertical ? "height" : "width";
-      resetAttrToProjector[positionAttr] = () => scaledBaseline;
-      resetAttrToProjector[dimensionAttr] = () => 0;
+      const lengthAttr = this._isVertical ? "y" : "x";
+      const thicknessAttr = this._isVertical ? "height" : "width";
+      resetAttrToProjector[lengthAttr] = () => scaledBaseline;
+      resetAttrToProjector[thicknessAttr] = () => 0;
       drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
     }
     drawSteps.push({
@@ -804,7 +808,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       return Math.abs(scaledBaseline - originalLengthFn(d, i, dataset));
     };
 
-    const thicknessF = attrToProjector["width"];
+    const thicknessF = attrToProjector[Bar._BAR_THICKNESS_KEY];
     const gapF = attrToProjector["gap"];
     const thicknessMinusGap = gapF == null ? thicknessF : (d: any, i: number, dataset: Dataset) => {
       return thicknessF(d, i, dataset) - gapF(d, i, dataset);
@@ -830,12 +834,12 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     return attrToProjector;
   }
 
-  protected _updateWidthAccesor() {
+  protected _updateThicknessAttr() {
     const startProj: Plots.ITransformableAccessorScaleBinding<any, number> = this._isVertical ? this.x() : this.y();
     const endProj = this.barEnd();
     if (startProj != null && endProj != null) {
-      this._fixedWidth = false;
-      this.attr("width", (d, i, data) => {
+      this._fixedBarPixelThickness = false;
+      this.attr(Bar._BAR_THICKNESS_KEY, (d, i, data) => {
         let v1 = startProj.accessor(d, i, data);
         let v2 = endProj.accessor(d, i, data);
         v1 = startProj.scale ? startProj.scale.scale(v1) : v1;
@@ -843,9 +847,9 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
         return Math.abs(v2 - v1);
       });
     } else {
-      this._fixedWidth = true;
+      this._fixedBarPixelThickness = true;
       this._updateBarPixelWidth();
-      this.attr("width", () => this._barPixelThickness);
+      this.attr(Bar._BAR_THICKNESS_KEY, () => this._barPixelThickness);
     }
   }
 
@@ -891,7 +895,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   }
 
   private _updateBarPixelWidth() {
-    if (this._fixedWidth) {
+    if (this._fixedBarPixelThickness) {
       this._barPixelThickness = this._getBarPixelWidth();
     }
   }

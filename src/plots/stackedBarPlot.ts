@@ -13,6 +13,7 @@ import * as Utils from "../utils";
 
 import * as Plots from "./";
 import { Bar, BarOrientation } from "./barPlot";
+import { Plot } from "./plot";
 
 export class StackedBar<X, Y> extends Bar<X, Y> {
   protected static _STACKED_BAR_LABEL_PADDING = 5;
@@ -154,19 +155,19 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
      * @param bounds
      * @returns {boolean}
      */
-    const tryDrawLabel = (text: string, bounds: Bounds, barWidth: number) => {
+    const tryDrawLabel = (text: string, bounds: Bounds, barThickness: number) => {
       const { x, y } = bounds.topLeft;
       const width = bounds.bottomRight.x - bounds.topLeft.x;
       const height = bounds.bottomRight.y - bounds.topLeft.y;
-      const tooWide = this._isVertical
-        ? ( width > barWidth - (2 * StackedBar._LABEL_PADDING) )
-        : ( height > barWidth - (2 * StackedBar._LABEL_PADDING) );
+      const textTooLong = this._isVertical
+        ? ( width > barThickness - (2 * StackedBar._LABEL_PADDING) )
+        : ( height > barThickness - (2 * StackedBar._LABEL_PADDING) );
 
       const hideLabel = x < 0
         || y < 0
         || x + width > this.width()
         || y + height > this.height()
-        || tooWide;
+        || textTooLong;
 
       if (!hideLabel) {
         const labelContainer = this._labelArea.append("g").attr("transform", `translate(${x}, ${y})`);
@@ -179,7 +180,7 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
         this._writer.write(text, width, height, writeOptions, labelContainer.node());
       }
 
-      return tooWide;
+      return textTooLong;
     };
 
     maximumExtents.forEach((maximum) => {
@@ -201,7 +202,8 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
 
         const { stackedDatum } = maximum;
         const { originalDatum, originalIndex, originalDataset } = stackedDatum;
-        const barWidth = this.attr("width").accessor(originalDatum, originalIndex, originalDataset);
+
+        const barThickness = Plot._scaledAccessor(this.attr(Bar._BAR_THICKNESS_KEY))(originalDatum, originalIndex, originalDataset);
 
         const isTooWide = tryDrawLabel(
             text,
@@ -212,7 +214,7 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
                 y: y + measurement.height,
               },
             },
-            barWidth,
+            barThickness,
         );
         anyTooWide.push(isTooWide);
       }
@@ -233,6 +235,11 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
           ? secondaryScale.scale(minimum.extent) + StackedBar._STACKED_BAR_LABEL_PADDING
           : primaryScale.scale(minimum.axisValue) - primaryTextMeasurement / 2;
 
+        const { stackedDatum } = minimum;
+        const { originalDatum, originalIndex, originalDataset } = stackedDatum;
+
+        const barThickness = Plot._scaledAccessor(this.attr(Bar._BAR_THICKNESS_KEY))(originalDatum, originalIndex, originalDataset);
+
         const isTooWide = tryDrawLabel(
             text,
             {
@@ -242,7 +249,7 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
                 y: y + measurement.height,
               },
             },
-            barWidth,
+            barThickness,
         );
         anyTooWide.push(isTooWide);
       }
