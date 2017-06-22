@@ -101,6 +101,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask("dev-compile", [
     "exec:yarn:build:tsc",
+    "exec:yarn:build:webpack",
     "update-quicktests"
   ]);
 
