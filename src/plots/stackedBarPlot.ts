@@ -164,13 +164,7 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
         ? ( width > barThickness - (2 * StackedBar._LABEL_PADDING) )
         : ( height > barThickness - (2 * StackedBar._LABEL_PADDING) );
 
-      const hideLabel = x < 0
-        || y < 0
-        || x + width > this.width()
-        || y + height > this.height()
-        || textTooLong;
-
-      if (!hideLabel) {
+      if (!textTooLong) {
         const labelContainer = this._labelArea.append("g").attr("transform", `translate(${x}, ${y})`);
         labelContainer.classed("stacked-bar-label", true);
 
