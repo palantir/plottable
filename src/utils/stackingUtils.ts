@@ -15,9 +15,17 @@ export type GenericStackedDatum<D> = {
   value: number;
   offset: number;
   axisValue: D;
+
+  originalDatum: any;
+  originalIndex: number;
+  originalDataset: Dataset;
 };
 
-export type StackExtent<D> = { extent: number, axisValue: D };
+export type StackExtent<D> = {
+  extent: number;
+  axisValue: D;
+  stackedDatum: GenericStackedDatum<D>;
+};
 
 export type StackedDatum = GenericStackedDatum<string>;
 /**
@@ -85,6 +93,9 @@ export function stack(
         offset: offset,
         value: value,
         axisValue: keyAccessor(datum, index, dataset),
+        originalDatum: datum,
+        originalDataset: dataset,
+        originalIndex: index,
       });
     });
     datasetToKeyToStackedDatum.set(dataset, keyToStackedDatum);
@@ -107,21 +118,23 @@ export function stackedExtents<D>(stackingResult: GenericStackingResult<D>): {
   const minimumExtents = new Utils.Map<string | number, StackExtent<D>>();
 
   stackingResult.forEach((stack) => {
-    stack.forEach((datum, key) => {
+    stack.forEach((datum: GenericStackedDatum<D>, key) => {
       // correctly handle negative bar stacks
       const maximalValue = Utils.Math.max([datum.offset + datum.value, datum.offset], datum.offset);
       const minimalValue = Utils.Math.min([datum.offset + datum.value, datum.offset], datum.offset);
 
+      const { axisValue } = datum;
+
       if (!maximumExtents.has(key)) {
-        maximumExtents.set(key, { extent: maximalValue, axisValue: datum.axisValue });
+        maximumExtents.set(key, { extent: maximalValue, axisValue, stackedDatum: datum });
       } else if (maximumExtents.get(key).extent < maximalValue) {
-        maximumExtents.set(key, { extent: maximalValue, axisValue: datum.axisValue });
+        maximumExtents.set(key, { extent: maximalValue, axisValue, stackedDatum: datum });
       }
 
       if (!minimumExtents.has(key)) {
-        minimumExtents.set(key, { extent: minimalValue, axisValue: datum.axisValue });
+        minimumExtents.set(key, { extent: minimalValue, axisValue, stackedDatum: datum });
       } else if (minimumExtents.get(key).extent > (minimalValue)) {
-        minimumExtents.set(key, { extent: minimalValue, axisValue: datum.axisValue });
+        minimumExtents.set(key, { extent: minimalValue, axisValue, stackedDatum: datum });
       }
     });
   });

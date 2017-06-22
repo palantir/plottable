@@ -328,10 +328,7 @@ export class Plot extends Component {
   protected _generateAttrToProjector(): AttributeToProjector {
     const h: AttributeToProjector = {};
     this._attrBindings.each((binding, attr) => {
-      const accessor = binding.accessor;
-      const scale = binding.scale;
-      const fn = scale ? (d: any, i: number, dataset: Dataset) => scale.scale(accessor(d, i, dataset)) : accessor;
-      h[attr] = fn;
+        h[attr] = Plot._scaledAccessor(binding);
     });
     const propertyProjectors = this._propertyProjectors();
     Object.keys(propertyProjectors).forEach((key) => {
