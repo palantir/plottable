@@ -100,14 +100,14 @@ module.exports = function(grunt) {
   require("load-grunt-tasks")(grunt);
 
   grunt.registerTask("dev-compile", [
-    "exec:yarn:build",
+    "exec:yarn:build:tsc",
     "update-quicktests"
   ]);
 
   grunt.registerTask("default", ["exec:yarn:start"]);
 
   grunt.registerTask("test", ["dev-compile", "test-local"]);
-  grunt.registerTask("test-local", ["blanket_mocha", "lint"]);
+  grunt.registerTask("test-local", ["blanket_mocha"]);
   grunt.registerTask("test-sauce", ["connect", "saucelabs-mocha"]);
 
   grunt.registerTask("watch-quicktests", function() {
@@ -116,13 +116,13 @@ module.exports = function(grunt) {
     grunt.task.run(["watch"]);
   });
 
-  grunt.registerTask("lint", ["jscs", "eslint"]);
+  grunt.registerTask("lint", ["exec:yarn:lint", "jscs", "eslint"]);
 
   // Disable saucelabs on dev environments by checking if SAUCE_USERNAME is an environment variable
   if (process.env.SAUCE_USERNAME) {
-    grunt.registerTask("test-travis", ["dev-compile", "test-local", "test-sauce"]);
+    grunt.registerTask("test-ci", ["dev-compile", "lint", "test-local", "test-sauce"]);
   } else {
-    grunt.registerTask("test-travis", ["dev-compile", "test-local"]);
+    grunt.registerTask("test-ci", ["dev-compile", "lint", "test-local"]);
   }
 
   grunt.registerTask("update-quicktests", function() {

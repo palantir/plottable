@@ -206,6 +206,17 @@ export class Plot extends Component {
     if (this._canvas != null) {
       if (this._bufferCanvas && !this._bufferCanvasValid) {
         // copy current canvas to buffer 1:1
+        //
+        // Why use a buffer canvas?
+        // As soon as we change the size of a canvas with css or attributes, it
+        // clears the contents. Without a buffer canvas, this requires
+        // drag-resizable charts to immediately do a full redraw while you
+        // drag-resize, which can cause jank. To avoid that, this buffer canvas
+        // stores the current canvas contents when the resize starts and redraws
+        // it into the resized canvas. Eventually, the deferred rendering
+        // callback will trigger and do a full-rez redraw. If deferred rendering
+        // is disabled, the buffer copy will be overwritten immediately by a
+        // full redraw.
         this._bufferCanvas.attr("width", this._canvas.attr("width"));
         this._bufferCanvas.attr("height", this._canvas.attr("height"));
         const btx = this._bufferCanvas.node().getContext("2d");

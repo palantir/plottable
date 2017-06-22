@@ -65,7 +65,6 @@ export class DeferredRenderer<X, Y> {
     if (scaleY) {
       this.domainTransformY.setDomain(scaleY.domain());
     }
-    this.resetTransforms();
     this.renderDeferred();
   }
 
