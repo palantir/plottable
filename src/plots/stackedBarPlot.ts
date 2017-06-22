@@ -14,6 +14,7 @@ import * as Utils from "../utils";
 import * as Plots from "./";
 import { Bar, BarOrientation } from "./barPlot";
 import { Plot } from "./plot";
+import { StackExtent } from "../utils/stackingUtils";
 
 export class StackedBar<X, Y> extends Bar<X, Y> {
   protected static _STACKED_BAR_LABEL_PADDING = 5;
@@ -142,8 +143,8 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
     this._labelArea.selectAll("g").remove();
 
     const baselineValue = +this.baselineValue();
-    const primaryScale: Scale<any, number> = this._isVertical ? this.x().scale : this.y().scale;
-    const secondaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
+    const positionScale = this.position().scale;
+    const lengthScale = this.length().scale;
     const { maximumExtents, minimumExtents } = Utils.Stacking.stackedExtents<Date | string | number>(this._stackingResult);
     const anyTooWide: boolean[] = [];
 
@@ -173,86 +174,97 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
         const labelContainer = this._labelArea.append("g").attr("transform", `translate(${x}, ${y})`);
         labelContainer.classed("stacked-bar-label", true);
 
-        const writeOptions = {
+        const writeOptions: Typesettable.IWriteOptions = {
           xAlign: "center",
           yAlign: "center",
-        } as Typesettable.IWriteOptions;
+        };
         this._writer.write(text, width, height, writeOptions, labelContainer.node());
       }
 
       return textTooLong;
     };
 
-    maximumExtents.forEach((maximum) => {
-      if (maximum.extent !== baselineValue) {
-        // only draw sums for values not at the baseline
+    const drawLabelsForExtents = (
+          extents: Utils.Map<string | number, StackExtent<Date | number | string>>,
+          computeLabelTopLeft: (
+              stackEdge: Point,
+              textDimensions: Typesettable.IDimensions,
+              barThickness: number,
+          ) => Point,
+    ) => {
+      extents.forEach((maximum) => {
+        if (maximum.extent !== baselineValue) {
+          // only draw sums for values not at the baseline
 
-        const text = this.extremaFormatter()(maximum.extent);
-        const measurement = this._measurer.measure(text);
+          const text = this.extremaFormatter()(maximum.extent);
+          const textDimensions = this._measurer.measure(text);
 
-        const primaryTextMeasurement = this._isVertical ? measurement.width : measurement.height;
-        const secondaryTextMeasurement = this._isVertical ? measurement.height : measurement.width;
+          const { stackedDatum } = maximum;
+          const { originalDatum, originalIndex, originalDataset } = stackedDatum;
+          const barThickness = Plot._scaledAccessor(this.attr(Bar._BAR_THICKNESS_KEY))(originalDatum, originalIndex, originalDataset);
 
-        const x = this._isVertical
-          ? primaryScale.scale(maximum.axisValue) - primaryTextMeasurement / 2
-          : secondaryScale.scale(maximum.extent) + StackedBar._STACKED_BAR_LABEL_PADDING;
-        const y = this._isVertical
-          ? secondaryScale.scale(maximum.extent) - secondaryTextMeasurement - StackedBar._STACKED_BAR_LABEL_PADDING
-          : primaryScale.scale(maximum.axisValue) - primaryTextMeasurement / 2;
+          /*
+           * The stackEdge is aligned at the edge of the stack in the length dimension,
+           * and in the center of the stack in the thickness dimension.
+           */
+          const stackEdgeLength = lengthScale.scale(maximum.extent);
+          const stackCenterPosition =
+              this._getPositionAttr(positionScale.scale(maximum.axisValue), barThickness) + barThickness / 2;
 
-        const { stackedDatum } = maximum;
-        const { originalDatum, originalIndex, originalDataset } = stackedDatum;
+          const stackEdge = this._isVertical
+              ? {
+                x: stackCenterPosition,
+                y: stackEdgeLength,
+              }
+              : {
+                x: stackEdgeLength,
+                y: stackCenterPosition,
+              };
 
-        const barThickness = Plot._scaledAccessor(this.attr(Bar._BAR_THICKNESS_KEY))(originalDatum, originalIndex, originalDataset);
+          const topLeft = computeLabelTopLeft(stackEdge, textDimensions, barThickness);
 
-        const isTooWide = tryDrawLabel(
-            text,
-            {
-              topLeft: { x, y },
-              bottomRight: {
-                x: x + measurement.width,
-                y: y + measurement.height,
+          const isTooWide = tryDrawLabel(
+              text,
+              {
+                topLeft,
+                bottomRight: {
+                  x: topLeft.x + textDimensions.width,
+                  y: topLeft.y + textDimensions.height,
+                },
               },
-            },
-            barThickness,
-        );
-        anyTooWide.push(isTooWide);
-      }
+              barThickness,
+          );
+          anyTooWide.push(isTooWide);
+        }
+      });
+    };
+
+    drawLabelsForExtents(maximumExtents, (stackEdge, measurement, thickness) => {
+      const primaryTextMeasurement = this._isVertical ? measurement.width : measurement.height;
+      const secondaryTextMeasurement = this._isVertical ? measurement.height : measurement.width;
+
+      return {
+        x: this._isVertical
+            ? stackEdge.x - primaryTextMeasurement / 2
+            : stackEdge.x + StackedBar._STACKED_BAR_LABEL_PADDING,
+        y: this._isVertical
+            ? stackEdge.y - secondaryTextMeasurement - StackedBar._STACKED_BAR_LABEL_PADDING
+            : stackEdge.y - primaryTextMeasurement / 2,
+      };
     });
 
-    minimumExtents.forEach((minimum) => {
-      if (minimum.extent !== baselineValue) {
-        const text = this.extremaFormatter()(minimum.extent);
-        const measurement = this._measurer.measure(text);
+    drawLabelsForExtents(minimumExtents, (stackEdge, measurement, thickness) => {
+      const primaryTextMeasurement = this._isVertical ? measurement.width : measurement.height;
+      const secondaryTextMeasurement = this._isVertical ? measurement.height : measurement.width;
 
-        const primaryTextMeasurement = this._isVertical ? measurement.width : measurement.height;
-        const secondaryTextMeasurement = this._isVertical ? measurement.height : measurement.width;
-
-        const x = this._isVertical
-          ? primaryScale.scale(minimum.axisValue) - primaryTextMeasurement / 2
-          : secondaryScale.scale(minimum.extent) - secondaryTextMeasurement - StackedBar._STACKED_BAR_LABEL_PADDING;
-        const y = this._isVertical
-          ? secondaryScale.scale(minimum.extent) + StackedBar._STACKED_BAR_LABEL_PADDING
-          : primaryScale.scale(minimum.axisValue) - primaryTextMeasurement / 2;
-
-        const { stackedDatum } = minimum;
-        const { originalDatum, originalIndex, originalDataset } = stackedDatum;
-
-        const barThickness = Plot._scaledAccessor(this.attr(Bar._BAR_THICKNESS_KEY))(originalDatum, originalIndex, originalDataset);
-
-        const isTooWide = tryDrawLabel(
-            text,
-            {
-              topLeft: { x, y },
-              bottomRight: {
-                x: x + measurement.width,
-                y: y + measurement.height,
-              },
-            },
-            barThickness,
-        );
-        anyTooWide.push(isTooWide);
-      }
+      return {
+        x: this._isVertical
+            ? stackEdge.x - primaryTextMeasurement / 2
+            : stackEdge.x - secondaryTextMeasurement - StackedBar._STACKED_BAR_LABEL_PADDING,
+        y: this._isVertical
+            ? stackEdge.y + StackedBar._STACKED_BAR_LABEL_PADDING
+            : stackEdge.y - primaryTextMeasurement / 2,
+      };
     });
 
     if (anyTooWide.some((d) => d)) {
@@ -264,18 +276,17 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
     const attrToProjector = super._generateAttrToProjector();
 
     const valueAttr = this._isVertical ? "y" : "x";
-    const keyAttr = this._isVertical ? "x" : "y";
-    const primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
-    const primaryAccessor = this._propertyBindings.get(valueAttr).accessor;
-    const keyAccessor = this._propertyBindings.get(keyAttr).accessor;
-    const normalizedKeyAccessor = (datum: any, index: number, dataset: Dataset) => {
-      return Utils.Stacking.normalizeKey(keyAccessor(datum, index, dataset));
+    const lengthScale = this.length().scale;
+    const lengthAccessor = this.length().accessor;
+    const positionAccessor = this.position().accessor;
+    const normalizedPositionAccessor = (datum: any, index: number, dataset: Dataset) => {
+      return Utils.Stacking.normalizeKey(positionAccessor(datum, index, dataset));
     };
     const getStart = (d: any, i: number, dataset: Dataset) =>
-      primaryScale.scale(this._stackingResult.get(dataset).get(normalizedKeyAccessor(d, i, dataset)).offset);
+      lengthScale.scale(this._stackingResult.get(dataset).get(normalizedPositionAccessor(d, i, dataset)).offset);
     const getEnd = (d: any, i: number, dataset: Dataset) =>
-      primaryScale.scale(+primaryAccessor(d, i, dataset) +
-        this._stackingResult.get(dataset).get(normalizedKeyAccessor(d, i, dataset)).offset);
+      lengthScale.scale(+lengthAccessor(d, i, dataset) +
+        this._stackingResult.get(dataset).get(normalizedPositionAccessor(d, i, dataset)).offset);
 
     const heightF = (d: any, i: number, dataset: Dataset) => {
       return Math.abs(getEnd(d, i, dataset) - getStart(d, i, dataset));
@@ -283,7 +294,8 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
     attrToProjector[this._isVertical ? "height" : "width"] = heightF;
 
     const attrFunction = (d: any, i: number, dataset: Dataset) =>
-      +primaryAccessor(d, i, dataset) < 0 ? getStart(d, i, dataset) : getEnd(d, i, dataset);
+      +lengthAccessor(d, i, dataset) < 0 ? getStart(d, i, dataset) : getEnd(d, i, dataset);
+
     attrToProjector[valueAttr] = (d: any, i: number, dataset: Dataset) =>
       this._isVertical ? attrFunction(d, i, dataset) : attrFunction(d, i, dataset) - heightF(d, i, dataset);
 
@@ -318,12 +330,12 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
     }
 
     const datasets = this.datasets();
-    const keyAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
-    const valueAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
+    const positionAccessor = this.position().accessor;
+    const lengthAccessor = this.length().accessor;
     const filter = this._filterForProperty(this._isVertical ? "y" : "x");
 
-    this._stackingResult = Utils.Stacking.stack(datasets, keyAccessor, valueAccessor, this._stackingOrder);
-    this._stackedExtent = Utils.Stacking.stackedExtent(this._stackingResult, keyAccessor, filter);
+    this._stackingResult = Utils.Stacking.stack(datasets, positionAccessor, lengthAccessor, this._stackingOrder);
+    this._stackedExtent = Utils.Stacking.stackedExtent(this._stackingResult, positionAccessor, filter);
   }
 
   public invalidateCache() {

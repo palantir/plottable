@@ -43,7 +43,7 @@ export const BarAlignment = makeEnum(["start", "middle", "end"]);
 export type BarAlignment = keyof typeof BarAlignment;
 
 export class Bar<X, Y> extends XYPlot<X, Y> {
-  private static _BAR_WIDTH_RATIO = 0.95;
+  private static _BAR_THICKNESS_RATIO = 0.95;
   private static _SINGLE_BAR_DIMENSION_RATIO = 0.4;
   private static _BAR_AREA_CLASS = "bar-area";
   private static _BAR_END_KEY = "barEnd";
@@ -535,7 +535,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   }
 
   protected _additionalPaint(time: number) {
-    const lengthScale: Scale<any, number> = this.length().scale;
+    const lengthScale = this.length().scale;
     const scaledBaseline = lengthScale.scale(this.baselineValue());
 
     const baselineAttr: any = {
@@ -629,7 +629,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
 
     const lengthAccessor = this.length().accessor;
     const length = lengthAccessor(datum, index, dataset);
-    const lengthScale: Scale<any, number> = this.length().scale;
+    const lengthScale = this.length().scale;
     const scaledLength = lengthScale != null ? lengthScale.scale(length) : length;
     const scaledBaseline = lengthScale != null ? lengthScale.scale(this.baselineValue()) : this.baselineValue();
 
@@ -778,7 +778,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     const drawSteps: Drawers.DrawStep[] = [];
     if (this._animateOnNextRender()) {
       const resetAttrToProjector = this._generateAttrToProjector();
-      const lengthScale: Scale<any, number> = this.length().scale;
+      const lengthScale = this.length().scale;
       const scaledBaseline = lengthScale.scale(this.baselineValue());
       const lengthAttr = this._isVertical ? "y" : "x";
       const thicknessAttr = this._isVertical ? "height" : "width";
@@ -854,49 +854,49 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   }
 
   /**
-   * Computes the barPixelWidth of all the bars in the plot.
+   * Computes the barPixelThickness of all the bars in the plot.
    *
    * If the position scale of the plot is a CategoryScale and in bands mode, then the rangeBands function will be used.
-   * If the position scale of the plot is a QuantitativeScale, then the bar width is equal to the smallest distance between
+   * If the position scale of the plot is a QuantitativeScale, then the bar thickness is equal to the smallest distance between
    * two adjacent data points, padded for visualisation.
    *
-   * This doesn't account for explicitly setting the barEnd.
+   * This is ignored when explicitly setting the barEnd.
    */
-  protected _getBarPixelWidth(): number {
+  protected _computeBarPixelThickness(): number {
     if (!this._projectorsReady()) {
       return 0;
     }
-    let barPixelWidth: number;
-    const barScale: Scale<any, number> = this._isVertical ? this.x().scale : this.y().scale;
-    if (barScale instanceof Scales.Category) {
-      barPixelWidth = (<Scales.Category> barScale).rangeBand();
+    let barPixelThickness: number;
+    const positionScale = this.position().scale;
+    if (positionScale instanceof Scales.Category) {
+      barPixelThickness = positionScale.rangeBand();
     } else {
-      const barAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
+      const positionAccessor = this.position().accessor;
 
       const numberBarAccessorData = d3.set(Utils.Array.flatten(this.datasets().map((dataset) => {
-        return dataset.data().map((d, i) => barAccessor(d, i, dataset))
+        return dataset.data().map((d, i) => positionAccessor(d, i, dataset))
           .filter((d) => d != null)
           .map((d) => d.valueOf());
       }))).values().map((value) => +value);
 
       numberBarAccessorData.sort((a, b) => a - b);
 
-      const scaledData = numberBarAccessorData.map((datum) => barScale.scale(datum));
+      const scaledData = numberBarAccessorData.map((datum) => positionScale.scale(datum));
       const barAccessorDataPairs = d3.pairs(scaledData);
       const barWidthDimension = this._isVertical ? this.width() : this.height();
 
-      barPixelWidth = Utils.Math.min(barAccessorDataPairs, (pair: any[], i: number) => {
+      barPixelThickness = Utils.Math.min(barAccessorDataPairs, (pair: any[], i: number) => {
         return Math.abs(pair[1] - pair[0]);
       }, barWidthDimension * Bar._SINGLE_BAR_DIMENSION_RATIO);
 
-      barPixelWidth *= Bar._BAR_WIDTH_RATIO;
+      barPixelThickness *= Bar._BAR_THICKNESS_RATIO;
     }
-    return barPixelWidth;
+    return barPixelThickness;
   }
 
   private _updateBarPixelWidth() {
     if (this._fixedBarPixelThickness) {
-      this._barPixelThickness = this._getBarPixelWidth();
+      this._barPixelThickness = this._computeBarPixelThickness();
     }
   }
 
