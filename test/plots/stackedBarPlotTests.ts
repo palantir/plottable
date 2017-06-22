@@ -143,13 +143,6 @@ describe("Plots", () => {
         stackedBar.destroy();
       });
 
-      it("doesn't show stacked bar labels when columns are too tall", () => {
-        stackedBarPlot.labelsEnabled(true);
-        yScale.domain([0, 3]);
-        const stackedBarLabels = stackedBarPlot.content().selectAll<Element, any>(".stacked-bar-label");
-        assert.strictEqual(stackedBarLabels.size(), 0);
-      });
-
       it("doesn't show stacked bar labels when columns are too narrow", () => {
         stackedBarPlot.labelsEnabled(true);
         xScale.range([0, 20]);
@@ -215,13 +208,6 @@ describe("Plots", () => {
           text.push(d3.select(this).text());
         });
         assert.deepEqual(["-3", "-3"], text);
-      });
-
-      it("doesn't show stacked bar labels when columns are too tall", () => {
-        stackedBarPlot.labelsEnabled(true);
-        yScale.domain([-3, 0]);
-        const stackedBarLabels = stackedBarPlot.content().selectAll<Element, any>(".stacked-bar-label");
-        assert.strictEqual(stackedBarLabels.size(), 0);
       });
 
       it("doesn't show stacked bar labels when columns are too narrow", () => {
@@ -434,13 +420,6 @@ describe("Plots", () => {
           text.push(d3.select(this).text());
         });
         assert.deepEqual(["3", "3"], text);
-      });
-
-      it("doesn't show stacked bar labels when columns are too tall", () => {
-        xScale.domain([0, 3]);
-        stackedBarPlot.labelsEnabled(true);
-        const stackedBarLabels = stackedBarPlot.content().selectAll<Element, any>(".stacked-bar-label");
-        assert.strictEqual(stackedBarLabels.size(), 0);
       });
 
       it("doesn't show stacked bar labels when columns are too narrow", () => {

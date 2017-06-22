@@ -156,7 +156,7 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
      * @param bounds
      * @returns {boolean}
      */
-    const tryDrawLabel = (text: string, bounds: Bounds, barThickness: number) => {
+    const maybeDrawLabel = (text: string, bounds: Bounds, barThickness: number) => {
       const { x, y } = bounds.topLeft;
       const width = bounds.bottomRight.x - bounds.topLeft.x;
       const height = bounds.bottomRight.y - bounds.topLeft.y;
@@ -217,7 +217,7 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
 
           const topLeft = computeLabelTopLeft(stackEdge, textDimensions, barThickness);
 
-          const isTooWide = tryDrawLabel(
+          const isTooWide = maybeDrawLabel(
               text,
               {
                 topLeft,
