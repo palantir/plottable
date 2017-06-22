@@ -10,11 +10,11 @@ import { Formatter, identity } from "../core/formatters";
 import { Bounds, IAccessor, Point, SimpleSelection } from "../core/interfaces";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
+import { StackExtent } from "../utils/stackingUtils";
 
 import * as Plots from "./";
 import { Bar, BarOrientation } from "./barPlot";
 import { Plot } from "./plot";
-import { StackExtent } from "../utils/stackingUtils";
 
 export class StackedBar<X, Y> extends Bar<X, Y> {
   protected static _STACKED_BAR_LABEL_PADDING = 5;
