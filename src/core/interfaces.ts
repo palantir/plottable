@@ -19,6 +19,17 @@ export interface IAccessor<T> {
 }
 
 /**
+ * Converts one range-like value to another. This is useful to, for example,
+ * floor or ceiling a pixel coordinate after the scale has been applied.
+ * Performing the a `Math.floor` inside the accessor is not advised since it
+ * prevents the storage of the scale object for other features like nearest
+ * entity location, computing extents, or deferred rendering.
+ */
+export interface IRangeProjector<T> {
+  (value: T, datum: any, index: number, dataset: Dataset): T;
+}
+
+/**
  * Retrieves a scaled datum property.
  * Essentially passes the result of an Accessor through a Scale.
  * Projectors are exclusively built from Plot._scaledAccessor.

@@ -4,7 +4,7 @@
  */
 
 import { Dataset } from "../core/dataset";
-import { IAccessor, IEntity, Point } from "../core/interfaces";
+import { IAccessor, IEntity, IRangeProjector, Point } from "../core/interfaces";
 import { IDrawer } from "../drawers/drawer";
 import { Plot } from "../plots/plot";
 import { Scale, TransformableScale } from "../scales/scale";
@@ -39,12 +39,27 @@ export interface IAccessorScaleBinding<D, R> {
    * The first argument in `plot.x((d) => d.x, scale)`.
    */
   accessor: IAccessor<any>;
+
   /**
    * The Scale that the accessor's result gets passed through.
    *
    * The second argument in `plot.x((d) => d.x, scale)`.
    */
   scale?: Scale<D, R>;
+
+  /**
+   * Transforms the scaled result of the accessor.
+   *
+   * Normally, the accessors ,`(d) => d.x`, will be wrapped like
+   * `scale.scale((d) => d.x)`. But, this is not sufficient if you want to
+   * modify the scaled value.
+   *
+   * However, moving the scale inside the accessor prevents several useful
+   * features from working properly (including `computeExtents`, `entityNearest`
+   * and `deferredRendering`). So, you may optionally provide this projector
+   * which, if present, will be applied to the scaled accessor result.
+   * */
+  postScale?: IRangeProjector<R>;
 }
 
 /**
@@ -55,6 +70,7 @@ export interface IAccessorScaleBinding<D, R> {
 export interface ITransformableAccessorScaleBinding<D, R> {
   accessor: IAccessor<any>;
   scale?: TransformableScale<D, R>;
+  postScale?: IRangeProjector<R>;
 }
 
 export namespace Animator {

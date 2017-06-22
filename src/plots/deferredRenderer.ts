@@ -1,16 +1,23 @@
+/**
+ * Copyright 2017-present Palantir Technologies
+ * @license MIT
+ */
 
 import { Scale } from "../scales/scale";
 
+/**
+ * Stores the deferred transformation state for a single scale.
+ */
 class DomainTransform<T> {
-  public translate = 0;
   public scale = 0;
+  public translate = 0;
+
   private cachedDomain: T[] = [null, null];
   private lastSeenDomain: T[] = [null, null];
-  private renderCallback: () => void;
 
   public reset() {
-    this.translate = 0;
     this.scale = 1;
+    this.translate = 0;
     this.cachedDomain = this.lastSeenDomain;
   }
 
@@ -24,11 +31,23 @@ class DomainTransform<T> {
     const lastSeenLength = scale.scale(this.lastSeenDomain[1]) - scale.scale(this.lastSeenDomain[0]);
     this.scale = (cachedLength / lastSeenLength) || 1;
     this.translate = scale.scale(this.cachedDomain[0]) - scale.scale(this.lastSeenDomain[0]) * this.scale || 0;
-  };
+  }
 }
 
+/**
+ * Manages deferred rendering callbacks.
+ *
+ * Call `setDomains` when deferred rendering is initially enabled to fix the
+ * current domain values.
+ *
+ * Call `updateDomains` when scale domains change, which uses the domain to
+ * compute CSS-tyle transform parameters passed to `applyTransformCallback`,
+ * mimicking the result of a full re-render. After a deferred timeout, invoke
+ * `applyTransformCallback` again with an identity transform and finally invoke
+ * `renderCallback`, which should actually redraw the plot.
+ */
 export class DeferredRenderer<X, Y> {
-  private static DEFERRED_RENDERING_DELAY = 200;
+  static DEFERRED_RENDERING_DELAY = 200;
 
   private domainTransformX = new DomainTransform<X>();
   private domainTransformY = new DomainTransform<Y>();
@@ -39,19 +58,15 @@ export class DeferredRenderer<X, Y> {
     private applyTransformCallback: (tx: number, ty: number, sx: number, sy: number) => void,
   ) {}
 
-  public reset() {
-      this.domainTransformX.reset();
-      this.domainTransformY.reset();
-  }
-
   public setDomains(scaleX?: Scale<X, any>, scaleY?: Scale<Y, any>) {
     if (scaleX) {
-      this.domainTransformX.setDomain(scaleX);
+      this.domainTransformX.setDomain(scaleX.domain());
     }
     if (scaleY) {
-      this.domainTransformY.setDomain(scaleY);
+      this.domainTransformY.setDomain(scaleY.domain());
     }
-    this.renderCallback();
+    this.resetTransforms();
+    this.renderDeferred();
   }
 
   public updateDomains(scaleX?: Scale<X, any>, scaleY?: Scale<Y, any>) {
@@ -61,18 +76,23 @@ export class DeferredRenderer<X, Y> {
     if (scaleY) {
       this.domainTransformY.updateDomain(scaleY);
     }
-    this.renderCallback();
+    this.renderDeferred();
   }
 
-  public renderDeferred = () => {
+  private renderDeferred = () => {
     this.applyTransform();
     clearTimeout(this.timeoutToken);
     this.timeoutToken = setTimeout(() => {
-      this.reset();
+      this.resetTransforms();
       this.applyTransform();
       this.renderCallback();
     }, DeferredRenderer.DEFERRED_RENDERING_DELAY);
-  };
+  }
+
+  private resetTransforms() {
+    this.domainTransformX.reset();
+    this.domainTransformY.reset();
+  }
 
   private applyTransform() {
     this.applyTransformCallback(
