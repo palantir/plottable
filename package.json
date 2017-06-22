@@ -25,7 +25,8 @@
     "start:watch-quicktests": "grunt watch-quicktests",
     "start:watch-tsc": "tsc -w -p .",
     "start:webpack-dev-server": "webpack-dev-server",
-    "test": "grunt test-travis"
+    "test": "grunt test-local",
+    "test:ci": "grunt test-ci"
   },
   "devDependencies": {
     "@types/chai": "^3.4.34",

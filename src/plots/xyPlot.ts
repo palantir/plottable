@@ -4,12 +4,13 @@
  */
 
 import { Dataset } from "../core/dataset";
-import { IAccessor, Point } from "../core/interfaces";
+import { IAccessor, IRangeProjector, Point } from "../core/interfaces";
 import * as Scales from "../scales";
 import { IScaleCallback, Scale } from "../scales/scale";
 import * as Utils from "../utils";
 
 import { ITransformableAccessorScaleBinding } from "./commons";
+import { DeferredRenderer } from "./deferredRenderer";
 import { Plot } from "./plot";
 
 export class XYPlot<X, Y> extends Plot {
@@ -22,8 +23,7 @@ export class XYPlot<X, Y> extends Plot {
   private _adjustXDomainOnChangeFromYCallback: IScaleCallback<Scale<any, any>>;
 
   private _deferredRendering = false;
-  private _cachedDomainX: X[] = [null, null];
-  private _cachedDomainY: Y[] = [null, null];
+  private _deferredRenderer: DeferredRenderer<X, Y>;
 
   /**
    * An XYPlot is a Plot that displays data along two primary directions, X and Y.
@@ -39,97 +39,43 @@ export class XYPlot<X, Y> extends Plot {
     this._adjustYDomainOnChangeFromXCallback = (scale) => this._adjustYDomainOnChangeFromX();
     this._adjustXDomainOnChangeFromYCallback = (scale) => this._adjustXDomainOnChangeFromY();
 
-    // the pixel space X translate that has occurred since the last time we rendered
-    let _deltaX = 0;
-    // the pixel space Y translate that has occurred since the last time we rendered
-    let _deltaY = 0;
-    // the X scale that has occurred since the last time we rendered
-    let _scalingX = 1;
-    // the Y scale that has occurred since the last time we rendered
-    let _scalingY = 1;
-    // the X scale's domain the last time we rendered
-    let _lastSeenDomainX: X[] = [null, null];
-    // the Y scale's domain the last time we rendered
-    let _lastSeenDomainY: Y[] = [null, null];
-    let _timeoutReference = 0;
-
-    // call this every time the scales change (every pan/zoom event).
-    // this method will "render" now by applying a transform, and then
-    // debounce the true rendering
-    const _registerDeferredRendering = () => {
-      if (this._renderArea == null) {
-        return;
-      }
-      this._renderArea.attr("transform", `translate(${_deltaX}, ${_deltaY}) scale(${_scalingX}, ${_scalingY})`);
-      if (this._canvas != null) {
-        this._canvas.style("transform", `translate(${_deltaX}px, ${_deltaY}px) scale(${_scalingX}, ${_scalingY})`);
-      }
-      clearTimeout(_timeoutReference);
-      _timeoutReference = setTimeout(() => {
-        this._cachedDomainX = _lastSeenDomainX;
-        this._cachedDomainY = _lastSeenDomainY;
-        _deltaX = 0;
-        _deltaY = 0;
-        _scalingX = 1;
-        _scalingY = 1;
-        this.render();
-        this._renderArea.attr("transform", "translate(0, 0) scale(1, 1)");
-        if (this._canvas != null) {
-          this._canvas.style("transform", "translate(0, 0) scale(1, 1)");
-        }
-      }, XYPlot._DEFERRED_RENDERING_DELAY);
-    };
-
-    // calculate the translate and pan that has occurred on this scale since the last time we
-    // rendered with it
-    const _lazyDomainChangeCallbackX = (scale: Scale<X, any>) => {
-      if (!this._isAnchored) {
-        return;
-      }
-      _lastSeenDomainX = scale.domain();
-      _scalingX = (scale.scale(this._cachedDomainX[1]) - scale.scale(this._cachedDomainX[0])) /
-        (scale.scale(_lastSeenDomainX[1]) - scale.scale(_lastSeenDomainX[0])) || 1;
-      _deltaX = scale.scale(this._cachedDomainX[0]) - scale.scale(_lastSeenDomainX[0]) || 0;
-
-      _registerDeferredRendering();
-    };
-
-    const _lazyDomainChangeCallbackY = (scale: Scale<Y, any>) => {
-      if (!this._isAnchored) {
-        return;
-      }
-      _lastSeenDomainY = scale.domain();
-      _scalingY = (scale.scale(this._cachedDomainY[1]) - scale.scale(this._cachedDomainY[0])) /
-        (scale.scale(_lastSeenDomainY[1]) - scale.scale(_lastSeenDomainY[0])) || 1;
-      _deltaY = scale.scale(this._cachedDomainY[0]) - scale.scale(_lastSeenDomainY[0]) * _scalingY || 0;
-
-      _registerDeferredRendering();
-    };
-
-    this._renderCallback = (scale) => {
-      // instead of rendering immediately when a scale has changed (aka in response to a pan/zoom),
-      // simply register the deferred rendering to take place
-      if (this.deferredRendering() && this.x() && this.x().scale === scale) {
-        _lazyDomainChangeCallbackX(scale);
-      } else if (this.deferredRendering() && this.y() && this.y().scale === scale) {
-        _lazyDomainChangeCallbackY(scale);
+    this._renderCallback = () => {
+      if (this.deferredRendering()) {
+        const scaleX = this.x() && this.x().scale;
+        const scaleY = this.y() && this.y().scale;
+        this._deferredRenderer.updateDomains(scaleX, scaleY);
       } else {
         this.render();
       }
     };
+
+    const _applyTransform = (tx: number, ty: number, sx: number, sy: number) => {
+      if (!this._isAnchored) {
+        return;
+      }
+      if (this._renderArea != null) {
+        this._renderArea.attr("transform", `translate(${tx}, ${ty}) scale(${sx}, ${sy})`);
+      }
+      if (this._canvas != null) {
+        this._canvas.style("transform", `translate(${tx}px, ${ty}px) scale(${sx}, ${sy})`);
+      }
+    };
+
+    this._deferredRenderer = new DeferredRenderer<X, Y>(() => this.render(), _applyTransform);
   }
 
   /**
    * Returns the whether or not the rendering is deferred for performance boost.
+   *
    * @return {boolean} The deferred rendering option
    */
   public deferredRendering(): boolean;
   /**
-   * Sets / unsets the deferred rendering option
-   * Activating this option improves the performance of plot interaction (pan / zoom) by
-   * performing lazy renders, only after the interaction has stopped. Because re-rendering
-   * is no longer performed during the interaction, the zooming might experience a small
-   * resolution degradation, before the lazy re-render is performed.
+   * Sets / unsets the deferred rendering option Activating this option improves
+   * the performance of plot interaction (pan / zoom) by performing lazy
+   * renders, only after the interaction has stopped. Because re-rendering is no
+   * longer performed during the interaction, the zooming might experience a
+   * small resolution degradation, before the lazy re-render is performed.
    *
    * This option is intended for cases where performance is an issue.
    */
@@ -139,13 +85,10 @@ export class XYPlot<X, Y> extends Plot {
       return this._deferredRendering;
     }
 
-    if (deferredRendering && this._isAnchored) {
-      if (this.x() && this.x().scale) {
-        this._cachedDomainX = this.x().scale.domain();
-      }
-      if (this.y() && this.y().scale) {
-        this._cachedDomainY = this.y().scale.domain();
-      }
+    if (deferredRendering) {
+      const scaleX = this.x() && this.x().scale;
+      const scaleY = this.y() && this.y().scale;
+      this._deferredRenderer.setDomains(scaleX, scaleY);
     }
 
     this._deferredRendering = deferredRendering;
@@ -171,13 +114,13 @@ export class XYPlot<X, Y> extends Plot {
    * @param {Scale<X, number>} xScale
    * @returns {XYPlot} The calling XYPlot.
    */
-  public x(x: X | IAccessor<X>, xScale: Scale<X, number>): this;
-  public x(x?: number | IAccessor<number> | X | IAccessor<X>, xScale?: Scale<X, number>): any {
+  public x(x: X | IAccessor<X>, xScale: Scale<X, number>, postScale?: IRangeProjector<number>): this;
+  public x(x?: number | IAccessor<number> | X | IAccessor<X>, xScale?: Scale<X, number>, postScale?: IRangeProjector<number>): any {
     if (x == null) {
       return this._propertyBindings.get(XYPlot._X_KEY);
     }
 
-    this._bindProperty(XYPlot._X_KEY, x, xScale);
+    this._bindProperty(XYPlot._X_KEY, x, xScale, postScale);
 
     const width = this.width();
     if (xScale != null && width != null) {
@@ -210,13 +153,13 @@ export class XYPlot<X, Y> extends Plot {
    * @param {Scale<Y, number>} yScale
    * @returns {XYPlot} The calling XYPlot.
    */
-  public y(y: Y | IAccessor<Y>, yScale: Scale<Y, number>): this;
-  public y(y?: number | IAccessor<number> | Y | IAccessor<Y>, yScale?: Scale<Y, number>): any {
+  public y(y: Y | IAccessor<Y>, yScale: Scale<Y, number>, postScale?: IRangeProjector<number>): this;
+  public y(y?: number | IAccessor<number> | Y | IAccessor<Y>, yScale?: Scale<Y, number>, postScale?: IRangeProjector<number>): any {
     if (y == null) {
       return this._propertyBindings.get(XYPlot._Y_KEY);
     }
 
-    this._bindProperty(XYPlot._Y_KEY, y, yScale);
+    this._bindProperty(XYPlot._Y_KEY, y, yScale, postScale);
 
     const height = this.height();
     if (yScale != null && height != null) {

@@ -24,7 +24,7 @@ dependencies:
 
 test:
   override:
-    - yarn test
+    - yarn test:ci
 
 deployment:
   publish-npm-next:

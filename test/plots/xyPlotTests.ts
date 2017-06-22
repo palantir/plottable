@@ -178,7 +178,7 @@ describe("Plots", () => {
         const magnifyAmount = 2;
         xScale.domain(xScale.domain().map((d) => d * magnifyAmount));
         const renderAreaScale = getScaleValues(plot.content().select(".render-area"));
-        assert.deepEqual(renderAreaScale[0], 1 / magnifyAmount, "translates with the same amount as domain shift");
+        assert.deepEqual(renderAreaScale[0], 1 / magnifyAmount, "scales with the same amount as domain change");
 
         div.remove();
       });

@@ -8,7 +8,7 @@ import * as d3Shape from "d3-shape";
 
 import * as Animators from "../animators";
 import { Dataset } from "../core/dataset";
-import { AttributeToProjector, Bounds, IAccessor, Point, Projector, Range } from "../core/interfaces";
+import { AttributeToProjector, Bounds, IAccessor, IRangeProjector, Point, Projector, Range } from "../core/interfaces";
 import * as Drawers from "../drawers";
 import { ProxyDrawer } from "../drawers/drawer";
 import { LineSVGDrawer, makeLineCanvasDrawStep } from "../drawers/lineDrawer";
@@ -101,16 +101,12 @@ export class Line<X> extends XYPlot<X, number> {
 
   public x(): Plots.ITransformableAccessorScaleBinding<X, number>;
   public x(x: number | IAccessor<number>): this;
-  public x(x: X | IAccessor<X>, xScale: Scale<X, number>): this;
-  public x(x?: number | IAccessor<number> | X | IAccessor<X>, xScale?: Scale<X, number>): any {
+  public x(x: X | IAccessor<X>, xScale: Scale<X, number>, postScale?: IRangeProjector<number>): this;
+  public x(x?: number | IAccessor<number> | X | IAccessor<X>, xScale?: Scale<X, number>, postScale?: IRangeProjector<number>): any {
     if (x == null) {
       return super.x();
     } else {
-      if (xScale == null) {
-        super.x(<number | IAccessor<number>>x);
-      } else {
-        super.x(<X | IAccessor<X>>x, xScale);
-      }
+      super.x(x as X | IAccessor<X>, xScale, postScale);
       this._setScaleSnapping();
       return this;
     }
@@ -118,12 +114,12 @@ export class Line<X> extends XYPlot<X, number> {
 
   public y(): Plots.ITransformableAccessorScaleBinding<number, number>;
   public y(y: number | IAccessor<number>): this;
-  public y(y: number | IAccessor<number>, yScale: Scale<number, number>): this;
-  public y(y?: number | IAccessor<number>, yScale?: Scale<number, number>): any {
+  public y(y: number | IAccessor<number>, yScale: Scale<number, number>, postScale?: IRangeProjector<number>): this;
+  public y(y?: number | IAccessor<number>, yScale?: Scale<number, number>, postScale?: IRangeProjector<number>): any {
     if (y == null) {
       return super.y();
     } else {
-      super.y(y, yScale);
+      super.y(y, yScale, postScale);
       this._setScaleSnapping();
       return this;
     }
