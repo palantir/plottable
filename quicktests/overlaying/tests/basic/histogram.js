@@ -37,7 +37,8 @@ function run(svg, data, Plottable) {
         .attr("gap", 1)
         .x((d) => d.start, vert.x)
         .y((d) => d.val, vert.y)
-        .barEnd((d) => d.end, vert.x);
+        .barEnd((d) => d.end, vert.x)
+        .labelsEnabled(true);
     vert.table.add(vbarPlot, 0, 1);
 
     // horizontal bar plot
@@ -48,7 +49,8 @@ function run(svg, data, Plottable) {
         .attr("gap", 1)
         .x((d) => d.val, horiz.x)
         .y((d) => d.start, horiz.y)
-        .barEnd((d) => d.end, horiz.y);
+        .barEnd((d) => d.end, horiz.y)
+        .labelsEnabled(true);
     horiz.table.add(hbarPlot, 0, 1);
 
     // stacked bar plot
@@ -63,7 +65,8 @@ function run(svg, data, Plottable) {
         .attr("fill", (d, i, dataset) => colors[dataset.metadata().series])
         .x((d) => d.start, stack.x)
         .y((d) => d.val, stack.y)
-        .barEnd((d) => d.end, stack.x);
+        .barEnd((d) => d.end, stack.x)
+        .labelsEnabled(true);
     stack.table.add(stackPlot, 0, 1);
 
     const layout = new Plottable.Components.Table([

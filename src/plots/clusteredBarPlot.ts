@@ -55,7 +55,7 @@ export class ClusteredBar<X, Y> extends Bar<X, Y> {
   private _makeInnerScale() {
     const innerScale = new Scales.Category();
     innerScale.domain(this.datasets().map((d, i) => String(i)));
-    const widthProjector = Plot._scaledAccessor(this.attr("width"));
+    const widthProjector = Plot._scaledAccessor(this.attr(Bar._BAR_THICKNESS_KEY));
     innerScale.range([0, widthProjector(null, 0, null)]);
     return innerScale;
   }
