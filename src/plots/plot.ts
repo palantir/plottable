@@ -13,6 +13,7 @@ import {
   AttributeToAppliedProjector,
   AttributeToProjector,
   IAccessor,
+  IRangeProjector,
   Point,
   SimpleSelection,
 } from "../core/interfaces";
@@ -21,11 +22,12 @@ import { ProxyDrawer } from "../drawers/drawer";
 import { AppliedDrawStep, DrawStep } from "../drawers/index";
 import { SVGDrawer } from "../drawers/svgDrawer";
 import * as Scales from "../scales";
-import { IScaleCallback, Scale } from "../scales/scale";
+import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
 import { coerceExternalD3 } from "../utils/coerceD3";
 import { makeEnum } from "../utils/makeEnum";
 import * as Plots from "./commons";
+import { DeferredRenderer } from "./deferredRenderer";
 
 export const Renderer = makeEnum(["svg", "canvas"]);
 export type Renderer = keyof typeof Renderer;
@@ -53,11 +55,6 @@ export class Plot extends Component {
   }
 
   protected static _ANIMATION_MAX_DURATION = 600;
-
-  /**
-   * Debounces rendering and entityStore resets
-   */
-  protected static _DEFERRED_RENDERING_DELAY = 200;
 
   /**
    * _cachedEntityStore is a cache of all the entities in the plot. It, at times
@@ -111,10 +108,12 @@ export class Plot extends Component {
 
   /**
    * Callback that triggers when any scale that's bound to this plot Updates.
+   * This is used by extending classes to defer the actual rendering.
    *
    * TODO make this an arrow method instead of re-defining it in constructor()
    */
-  protected _renderCallback: IScaleCallback<Scale<any, any>>;
+  protected _renderCallback: () => void;
+
   /**
    * Callback that triggers when any Dataset that's bound to this plot Updates.
    *
@@ -123,26 +122,32 @@ export class Plot extends Component {
   private _onDatasetUpdateCallback: DatasetCallback;
 
   /**
-   * Mapping from property names to the AccessorScale that defines that property.
+   * Mapping from property names to the AccessorScale that defines that
+   * property.
    *
-   * e.g. Line may register an "x" -> binding and a "y" -> binding;
-   * Rectangle would register "x", "y", "x2", and "y2"
+   * e.g. Line may register an "x" -> binding and a "y" -> binding; Rectangle
+   * would register "x", "y", "x2", and "y2"
    *
-   * Only subclasses control how they register properties, while attrs can be registered by the user.
-   * By default, only attrs are passed to the _generateDrawStep's attrToProjector; properties are not.
+   * Only subclasses control how they register properties, while attrs can be
+   * registered by the user. By default, only attrs are passed to the
+   * _generateDrawStep's attrToProjector; properties are not.
    */
   protected _propertyBindings: d3.Map<Plots.IAccessorScaleBinding<any, any>>;
   /**
-   * Mapping from property names to the extents ([min, max]) values that that property takes on.
+   * Mapping from property names to the extents ([min, max]) values that that
+   * property takes on.
    */
   protected _propertyExtents: d3.Map<any[]>;
 
   /**
-   * The canvas element that this Plot will render to if using the canvas renderer, or null if not using the SVG
-   * renderer. The node may be parent-less (which means that the plot isn't setup yet but is still using the canvas
-   * renderer).
+   * The canvas element that this Plot will render to if using the canvas
+   * renderer, or null if not using the SVG renderer. The node may be
+   * parent-less (which means that the plot isn't setup yet but is still using
+   * the canvas renderer).
    */
   protected _canvas: d3.Selection<HTMLCanvasElement, any, any, any>;
+  protected _bufferCanvas: d3.Selection<HTMLCanvasElement, any, any, any>;
+  protected _bufferCanvasValid: boolean;
 
   /**
    * A Plot draws some visualization of the inputted Datasets.
@@ -157,14 +162,14 @@ export class Plot extends Component {
     this._attrBindings = d3.map<Plots.IAccessorScaleBinding<any, any>>();
     this._attrExtents = d3.map<any[]>();
     this._includedValuesProvider = (scale: Scale<any, any>) => this._includedValuesForScale(scale);
-    this._renderCallback = (scale) => this.render();
+    this._renderCallback = () => this.render();
     this._onDatasetUpdateCallback = () => this._onDatasetUpdate();
     this._propertyBindings = d3.map<Plots.IAccessorScaleBinding<any, any>>();
     this._propertyExtents = d3.map<any[]>();
     const mainAnimator = new Animators.Easing().maxTotalDuration(Plot._ANIMATION_MAX_DURATION);
     this.animator(Plots.Animator.MAIN, mainAnimator);
     this.animator(Plots.Animator.RESET, new Animators.Null());
-    this._deferredResetEntityStore = Utils.Window.debounce(Plot._DEFERRED_RENDERING_DELAY, this._resetEntityStore);
+    this._deferredResetEntityStore = Utils.Window.debounce(DeferredRenderer.DEFERRED_RENDERING_DELAY, this._resetEntityStore);
   }
 
   public anchor(selection: d3.Selection<HTMLElement, any, any, any>) {
@@ -199,6 +204,27 @@ export class Plot extends Component {
   public setBounds(width: number, height: number, originX?: number, originY?: number) {
     super.setBounds(width, height, originX, originY);
     if (this._canvas != null) {
+      if (this._bufferCanvas && !this._bufferCanvasValid) {
+        // copy current canvas to buffer 1:1
+        //
+        // Why use a buffer canvas?
+        // As soon as we change the size of a canvas with css or attributes, it
+        // clears the contents. Without a buffer canvas, this requires
+        // drag-resizable charts to immediately do a full redraw while you
+        // drag-resize, which can cause jank. To avoid that, this buffer canvas
+        // stores the current canvas contents when the resize starts and redraws
+        // it into the resized canvas. Eventually, the deferred rendering
+        // callback will trigger and do a full-rez redraw. If deferred rendering
+        // is disabled, the buffer copy will be overwritten immediately by a
+        // full redraw.
+        this._bufferCanvas.attr("width", this._canvas.attr("width"));
+        this._bufferCanvas.attr("height", this._canvas.attr("height"));
+        const btx = this._bufferCanvas.node().getContext("2d");
+        btx.drawImage(this._canvas.node(), 0, 0);
+        this._bufferCanvasValid = true;
+      }
+
+      // update canvas size
       const ratio = (window.devicePixelRatio != null) ? window.devicePixelRatio : 1;
       // update canvas width/height taking into account retina displays.
       // This will also clear the canvas of any drawn elements so we should
@@ -209,6 +235,11 @@ export class Plot extends Component {
       // reset the transform then set the scale factor
       const ctx = this._canvas.node().getContext("2d");
       ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+      if (this._bufferCanvas) {
+        // draw buffer to current canvas at new size
+        ctx.drawImage(this._bufferCanvas.node(), 0, 0, width, height);
+      }
     }
     return this;
   }
@@ -256,7 +287,7 @@ export class Plot extends Component {
     this._updateExtents();
     this._dataChanged = true;
     this._resetEntityStore();
-    this.render();
+    this.renderLowPriority();
   }
 
   /**
@@ -293,12 +324,17 @@ export class Plot extends Component {
     return this;
   }
 
-  protected _bindProperty(property: string, valueOrFn: any | Function, scale: Scale<any, any>) {
+  protected _bindProperty(
+      property: string,
+      valueOrFn: any | Function,
+      scale: Scale<any, any>,
+      postScale?: IRangeProjector<any>,
+    ) {
     const binding = this._propertyBindings.get(property);
     const oldScale = binding != null ? binding.scale : null;
 
     const accessor = typeof valueOrFn === "function" ? valueOrFn : () => valueOrFn;
-    this._propertyBindings.set(property, { accessor, scale });
+    this._propertyBindings.set(property, { accessor, scale, postScale });
     this._updateExtentsForProperty(property);
 
     if (oldScale != null) {
@@ -328,10 +364,7 @@ export class Plot extends Component {
   protected _generateAttrToProjector(): AttributeToProjector {
     const h: AttributeToProjector = {};
     this._attrBindings.each((binding, attr) => {
-      const accessor = binding.accessor;
-      const scale = binding.scale;
-      const fn = scale ? (d: any, i: number, dataset: Dataset) => scale.scale(accessor(d, i, dataset)) : accessor;
-      h[attr] = fn;
+      h[attr] = Plot._scaledAccessor(binding);
     });
     const propertyProjectors = this._propertyProjectors();
     Object.keys(propertyProjectors).forEach((key) => {
@@ -349,6 +382,10 @@ export class Plot extends Component {
       this._dataChanged = false;
     }
     return this;
+  }
+
+  public renderLowPriority() {
+    this._renderCallback();
   }
 
   /**
@@ -517,6 +554,7 @@ export class Plot extends Component {
       if (this._canvas == null && renderer === "canvas") {
         // construct the canvas, remove drawer's renderAreas, set drawer's canvas
         this._canvas = d3.select(document.createElement("canvas")).classed("plot-canvas", true);
+        this._bufferCanvas = d3.select(document.createElement("canvas"));
         if (this.element() != null) {
           this._appendCanvasNode();
         }
@@ -527,6 +565,7 @@ export class Plot extends Component {
       } else if (this._canvas != null && renderer == "svg") {
         this._canvas.remove();
         this._canvas = null;
+        this._bufferCanvas = null;
         this._datasetToDrawer.forEach((drawer) => {
           drawer.useSVG(this._renderArea);
         });
@@ -665,6 +704,7 @@ export class Plot extends Component {
       const canvas = this._canvas.node();
       const context = canvas.getContext("2d");
       context.clearRect(0, 0, canvas.width, canvas.height);
+      this._bufferCanvasValid = false;
     }
 
     this.datasets().forEach((ds, i) => {
@@ -798,9 +838,17 @@ export class Plot extends Component {
   }
 
   protected static _scaledAccessor<D, R>(binding: Plots.IAccessorScaleBinding<D, R>) {
-    return binding.scale == null ?
-      binding.accessor :
-      (d: any, i: number, ds: Dataset) => binding.scale.scale(binding.accessor(d, i, ds));
+    const { scale, accessor, postScale } = binding;
+
+    // if provided, apply scale
+    const scaledAccesor = scale == null ? accessor :
+      (d: any, i: number, ds: Dataset) => scale.scale(accessor(d, i, ds));
+
+    // if provided, apply post scale
+    const postScaledAccesor = postScale == null ? scaledAccesor :
+      (d: any, i: number, ds: Dataset) => postScale(scaledAccesor(d, i, ds), d, i, ds);
+
+    return postScaledAccesor;
   }
 
   protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point {

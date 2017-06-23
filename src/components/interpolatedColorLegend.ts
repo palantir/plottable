@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import * as Typesetter from "typesettable";
+import * as Typesettable from "typesettable";
 
 import * as Configs from "../core/config";
 import { Formatter } from "../core/formatters";
@@ -18,9 +18,9 @@ import { Component } from "./component";
 export class InterpolatedColorLegend extends Component {
   private static _DEFAULT_NUM_SWATCHES = 11;
 
-  private _measurer: Typesetter.Measurer;
-  private _wrapper: Typesetter.Wrapper;
-  private _writer: Typesetter.Writer;
+  private _measurer: Typesettable.Measurer;
+  private _wrapper: Typesettable.Wrapper;
+  private _writer: Typesettable.Writer;
   private _scale: Scales.InterpolatedColor;
   private _orientation: String;
   private _textPadding = 5;
@@ -70,11 +70,13 @@ export class InterpolatedColorLegend extends Component {
   }
 
   /**
-   * Gets the Formatter for the labels.
+   * Gets the Formatter for the labels. The domain ticks will be passed through the formatter
+   * before being displayed.
    */
   public formatter(): Formatter;
   /**
-   * Sets the Formatter for the labels.
+   * Sets the Formatter for the labels. The domain ticks will be passed through the formatter
+   * before being displayed.
    *
    * @param {Formatter} formatter
    * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
@@ -168,10 +170,10 @@ export class InterpolatedColorLegend extends Component {
     this._lowerLabel = this.content().append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
     this._upperLabel = this.content().append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
 
-    const context = new Typesetter.SvgContext(this.content().node() as SVGElement);
-    this._measurer = new Typesetter.Measurer(context);
-    this._wrapper = new Typesetter.Wrapper();
-    this._writer = new Typesetter.Writer(this._measurer, context, this._wrapper);
+    const context = new Typesettable.SvgContext(this.content().node() as SVGElement);
+    this._measurer = new Typesettable.Measurer(context);
+    this._wrapper = new Typesettable.Wrapper();
+    this._writer = new Typesettable.Writer(this._measurer, context, this._wrapper);
   }
 
   public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
@@ -223,12 +225,12 @@ export class InterpolatedColorLegend extends Component {
       xAlign: "center",
       yAlign: "center",
       textRotation: 0,
-    } as Typesetter.IWriteOptions;
+    } as Typesettable.IWriteOptions;
     const upperWriteOptions = {
       xAlign: "center",
       yAlign: "center",
       textRotation: 0,
-    } as Typesetter.IWriteOptions;
+    } as Typesettable.IWriteOptions;
 
     let swatchWidth: number;
     let swatchHeight: number;

@@ -4,7 +4,7 @@
  */
 
 import * as d3 from "d3";
-import * as Typesetter from "typesettable";
+import * as Typesettable from "typesettable";
 
 import * as Configs from "../core/config";
 import * as Formatters from "../core/formatters";
@@ -234,9 +234,9 @@ export class Legend extends Component {
   private _maxLinesPerEntry: number;
   private _maxWidth: number;
   private _comparator: (a: string, b: string) => number;
-  private _measurer: Typesetter.Measurer;
-  private _wrapper: Typesetter.Wrapper;
-  private _writer: Typesetter.Writer;
+  private _measurer: Typesettable.CacheMeasurer;
+  private _wrapper: Typesettable.Wrapper;
+  private _writer: Typesettable.Writer;
   private _symbolFactoryAccessor: (datum: any, index: number) => SymbolFactory;
   private _symbolOpacityAccessor: (datum: any, index: number) => number;
   private _redrawCallback: IScaleCallback<Scales.Color>;
@@ -275,10 +275,10 @@ export class Legend extends Component {
     const fakeLegendRow = this.content().append("g").classed(Legend.LEGEND_ROW_CLASS, true);
     const fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
     fakeLegendEntry.append("text");
-    const context = new Typesetter.SvgContext(fakeLegendRow.node() as SVGElement, null, Configs.ADD_TITLE_ELEMENTS);
-    this._measurer = new Typesetter.Measurer(context);
-    this._wrapper = new Typesetter.Wrapper().maxLines(this.maxLinesPerEntry());
-    this._writer = new Typesetter.Writer(this._measurer, context, this._wrapper);
+    const context = new Typesettable.SvgContext(fakeLegendRow.node() as SVGElement, null, Configs.ADD_TITLE_ELEMENTS);
+    this._measurer = new Typesettable.CacheMeasurer(context);
+    this._wrapper = new Typesettable.Wrapper().maxLines(this.maxLinesPerEntry());
+    this._writer = new Typesettable.Writer(this._measurer, context, this._wrapper);
   }
 
   /**
@@ -286,7 +286,8 @@ export class Legend extends Component {
    */
   public formatter(): Formatter;
   /**
-   * Sets the Formatter for the entry texts.
+   * Sets the Formatter for the entry texts. The name of each entry (as defined by the domain of this legend's
+   * Color Scale) will be passed through this formatter before being displayed.
    *
    * @param {Formatter} formatter
    * @returns {Legend} The calling Legend.
@@ -623,7 +624,7 @@ export class Legend extends Component {
             xAlign: "left",
             yAlign: "top",
             textRotation: 0,
-          } as Typesetter.IWriteOptions;
+          } as Typesettable.IWriteOptions;
 
           self._writer.write(self._formatter(column.data.name), column.width, self.height(), writeOptions, textContainer.node());
         });
@@ -688,5 +689,9 @@ export class Legend extends Component {
 
   public fixedHeight() {
     return true;
+  }
+
+  public invalidateCache() {
+    this._measurer.reset();
   }
 }

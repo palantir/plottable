@@ -1,7 +1,7 @@
 {
   "name": "plottable",
   "description": "A modular charting library built on D3",
-  "version": "3.1.1",
+  "version": "3.2.0",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -25,7 +25,8 @@
     "start:watch-quicktests": "grunt watch-quicktests",
     "start:watch-tsc": "tsc -w -p .",
     "start:webpack-dev-server": "webpack-dev-server",
-    "test": "grunt test-travis"
+    "test": "grunt test-local",
+    "test:ci": "grunt test-ci"
   },
   "devDependencies": {
     "@types/chai": "^3.4.34",
@@ -59,6 +60,8 @@
   "dependencies": {
     "@types/d3": "^4.5.0",
     "d3": "^4.5.0",
+    "d3-ease": "^1.0.0",
+    "d3-shape": "^1.0.0",
     "typesettable": "^3.0.2"
   }
 }

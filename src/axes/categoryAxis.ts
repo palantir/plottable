@@ -4,7 +4,7 @@
  */
 
 import * as d3 from "d3";
-import * as Typesetter from "typesettable";
+import * as Typesettable from "typesettable";
 
 import { Component } from "../components/component";
 import { Point, SimpleSelection, SpaceRequest } from "../core/interfaces";
@@ -48,15 +48,15 @@ export class Category extends Axis<string> {
    */
   private _tickLabelBreakWords: boolean;
 
-  private _measurer: Typesetter.CacheMeasurer;
-  private _typesetterContext: Typesetter.ITypesetterContext<any>;
+  private _measurer: Typesettable.CacheMeasurer;
+  private _typesetterContext: Typesettable.ITypesetterContext<any>;
 
   /**
    * A Wrapper configured according to the other properties on this axis.
-   * @returns {Typesetter.Wrapper}
+   * @returns {Typesettable.Wrapper}
    */
   private get _wrapper() {
-    const wrapper = new Typesetter.Wrapper();
+    const wrapper = new Typesettable.Wrapper();
     if (this._tickLabelMaxLines != null) {
       wrapper.maxLines(this._tickLabelMaxLines);
     }
@@ -68,10 +68,10 @@ export class Category extends Axis<string> {
 
   /**
    * A Writer attached to this measurer and wrapper.
-   * @returns {Typesetter.Writer}
+   * @returns {Typesettable.Writer}
    */
   private get _writer() {
-    return new Typesetter.Writer(this._measurer, this._typesetterContext, this._wrapper);
+    return new Typesettable.Writer(this._measurer, this._typesetterContext, this._wrapper);
   }
 
   /**
@@ -90,8 +90,8 @@ export class Category extends Axis<string> {
 
   protected _setup() {
     super._setup();
-    this._typesetterContext = new Typesetter.SvgContext(this._tickLabelContainer.node() as SVGElement);
-    this._measurer = new Typesetter.CacheMeasurer(this._typesetterContext);
+    this._typesetterContext = new Typesettable.SvgContext(this._tickLabelContainer.node() as SVGElement);
+    this._measurer = new Typesettable.CacheMeasurer(this._typesetterContext);
   }
 
   protected _rescale() {
@@ -223,17 +223,18 @@ export class Category extends Axis<string> {
     return this;
   }
 
-  public tickLabelMaxWidth(): number;
-  public tickLabelMaxWidth(maxWidth: number): this;
   /**
-   * Set or get the tick label's max width on this axis. When set, tick labels will be truncated with ellipsis to be
+   * Get the tick label max width on this axis.
+   */
+  public tickLabelMaxWidth(): number;
+  /**
+   * Set the tick label's max width on this axis. When set, tick labels will be truncated with ellipsis to be
    * at most `tickLabelMaxWidth()` pixels wide. This ensures the axis doesn't grow to an undesirable width.
    *
-   * Passing no arguments retrieves the value, while passing a number sets the value. Pass undefined to un-set the max
-   * width.
+   * Pass undefined to un-set the max width.
    * @param maxWidth
-   * @returns {number | this}
    */
+  public tickLabelMaxWidth(maxWidth: number): this;
   public tickLabelMaxWidth(maxWidth?: number): number | this {
     // allow user to un-set tickLabelMaxWidth by passing in null or undefined explicitly
     if (arguments.length === 0) {
@@ -244,19 +245,20 @@ export class Category extends Axis<string> {
     return this;
   }
 
-  public tickLabelMaxLines(): number;
-  public tickLabelMaxLines(maxLines: number): this;
-
   /**
-   * Set or get the tick label's max number of wrapped lines on this axis. By default, a Category Axis will line-wrap
+   * Get the tick label max number of wrapped lines on this axis.
+   */
+  public tickLabelMaxLines(): number;
+  /**
+   * Set the tick label's max number of wrapped lines on this axis. By default, a Category Axis will line-wrap
    * long tick labels onto multiple lines in order to fit the width of the axis. When set, long tick labels will be
    * rendered on at most `tickLabelMaxLines()` lines. This ensures the axis doesn't grow to an undesirable height.
    *
-   * Passing no arguments retrieves the value, while passing a number sets the value. Pass undefined to un-set the
-   * max lines.
+   * Pass undefined to un-set the max lines.
    * @param maxLines
-   * @returns {number | this}
    */
+  public tickLabelMaxLines(maxLines: number): this;
+
   public tickLabelMaxLines(maxLines?: number): number | this {
     // allow user to un-set tickLabelMaxLines by passing in null or undefined explicitly
     if (arguments.length === 0) {
@@ -302,8 +304,8 @@ export class Category extends Axis<string> {
    */
   private _drawTicks(stepWidth: number, ticks: SimpleSelection<string>) {
     const self = this;
-    let xAlign: {[P in AxisOrientation]: Typesetter.IXAlign};
-    let yAlign: {[P in AxisOrientation]: Typesetter.IYAlign};
+    let xAlign: {[P in AxisOrientation]: Typesettable.IXAlign};
+    let yAlign: {[P in AxisOrientation]: Typesettable.IYAlign};
     switch (this.tickLabelAngle()) {
       case 0:
         xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
@@ -327,7 +329,7 @@ export class Category extends Axis<string> {
         yAlign: yAlign[self.orientation()],
         textRotation: self.tickLabelAngle(),
         textShear: self.tickLabelShearAngle(),
-      } as Typesetter.IWriteOptions;
+      } as Typesettable.IWriteOptions;
       if (self._tickLabelMaxWidth != null) {
         // for left-oriented axes, we must move the ticks by the amount we've cut off in order to keep the text
         // aligned with the side of the ticks
@@ -396,10 +398,10 @@ export class Category extends Axis<string> {
     const widthFn = (this.isHorizontal() && this._tickLabelAngle === 0) ? d3.sum : Utils.Math.max;
     const heightFn = (this.isHorizontal() && this._tickLabelAngle === 0) ? Utils.Math.max : d3.sum;
 
-    let usedWidth = widthFn<Typesetter.IWrappingResult, number>(wrappingResults,
-      (t: Typesetter.IWrappingResult) => this._measurer.measure(t.wrappedText).width, 0);
-    let usedHeight = heightFn<Typesetter.IWrappingResult, number>(wrappingResults,
-      (t: Typesetter.IWrappingResult) => this._measurer.measure(t.wrappedText).height, 0);
+    let usedWidth = widthFn<Typesettable.IWrappingResult, number>(wrappingResults,
+      (t: Typesettable.IWrappingResult) => this._measurer.measure(t.wrappedText).width, 0);
+    let usedHeight = heightFn<Typesettable.IWrappingResult, number>(wrappingResults,
+      (t: Typesettable.IWrappingResult) => this._measurer.measure(t.wrappedText).height, 0);
 
     // If the tick labels are rotated, reverse usedWidth and usedHeight
     // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25

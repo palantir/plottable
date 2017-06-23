@@ -4,7 +4,7 @@
  */
 
 import * as d3 from "d3";
-import * as Typesetter from "typesettable";
+import * as Typesettable from "typesettable";
 
 import { Formatter } from "../core/formatters";
 import * as Formatters from "../core/formatters";
@@ -29,13 +29,22 @@ export type TimeInterval = keyof typeof TimeInterval;
 /**
  * Defines a configuration for a Time Axis tier.
  * For details on how ticks are generated see: https://github.com/mbostock/d3/wiki/Time-Scales#ticks
- * interval - A time unit associated with this configuration (seconds, minutes, hours, etc).
- * step - number of intervals between each tick.
- * formatter - formatter used to format tick labels.
  */
 export type TimeAxisTierConfiguration = {
+  /**
+   * The time unit associated with this configuration (seconds, minutes, hours, etc).
+   */
   interval: string;
+
+  /**
+   * Number of intervals between each tick.
+   */
   step: number;
+
+  /**
+   * Formatter used to format tick labels. Tick values will be passed through the formatter
+   * before being displayed.
+   */
   formatter: Formatter;
 };
 
@@ -187,7 +196,7 @@ export class Time extends Axis<Date> {
   private _tierHeights: number[];
   private _possibleTimeAxisConfigurations: TimeAxisConfiguration[];
   private _numTiers: number;
-  private _measurer: Typesetter.Measurer;
+  private _measurer: Typesettable.CacheMeasurer;
   private _maxTimeIntervalPrecision: TimeInterval = null;
 
   private _mostPreciseConfigIndex: number;
@@ -421,8 +430,8 @@ export class Time extends Axis<Date> {
       this._tierBaselines.push(tierContainer.append("line").classed("baseline", true));
     }
 
-    const context = new Typesetter.SvgContext(this._tierLabelContainers[0].node() as SVGElement);
-    this._measurer = new Typesetter.CacheMeasurer(context);
+    const context = new Typesettable.SvgContext(this._tierLabelContainers[0].node() as SVGElement);
+    this._measurer = new Typesettable.CacheMeasurer(context);
   }
 
   private _getTickIntervalValues(config: TimeAxisTierConfiguration): any[] {
@@ -672,6 +681,6 @@ export class Time extends Axis<Date> {
 
   public invalidateCache() {
     super.invalidateCache();
-    (this._measurer as Typesetter.CacheMeasurer).reset();
+    (this._measurer as Typesettable.CacheMeasurer).reset();
   }
 }

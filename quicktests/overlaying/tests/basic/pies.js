@@ -39,7 +39,7 @@ function run(svg, data, Plottable){
           .innerRadius(100)
           .outerRadius(200)
           .labelsEnabled(true)
-          .labelFormatter(function(d){return "Value: " + d; })
+          .labelFormatter(function(v, datum){return datum.key + ": " + v; })
           .attr("fill", function(d){ return d.key; }, cs);
 
   var pies = new Plottable.Components.Group([innerPie, outerPie]);

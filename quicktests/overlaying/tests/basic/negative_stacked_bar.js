@@ -32,6 +32,7 @@ function run(svg, data, Plottable) {
     .attr("fill", function(d) { return d.team; }, colorScale)
     .datasets([dataset1, dataset2, dataset3])
     .labelsEnabled(true)
+    .extremaFormatter((d) => "Total: " + d)
     .animated(true);
 
   if (typeof verticalPlot.labelsFormatter === "function") {
@@ -46,6 +47,7 @@ function run(svg, data, Plottable) {
     .attr("fill", function(d) { return d.team; }, colorScale)
     .datasets([dataset1, dataset2, dataset3])
     .labelsEnabled(true)
+    .extremaFormatter((d) => "Total: " + d)
     .animated(true);
 
   if (typeof verticalPlot.labelsFormatter === "function") {

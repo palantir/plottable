@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import * as Typesetter from "typesettable";
+import * as Typesettable from "typesettable";
 
 import { SimpleSelection, SpaceRequest } from "../core/interfaces";
 
@@ -13,9 +13,9 @@ export class Label extends Component {
   private _textContainer: SimpleSelection<void>;
   private _text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
   private _angle: number;
-  private _measurer: Typesetter.CacheMeasurer;
-  private _wrapper: Typesetter.Wrapper;
-  private _writer: Typesetter.Writer;
+  private _measurer: Typesettable.CacheMeasurer;
+  private _wrapper: Typesettable.Wrapper;
+  private _writer: Typesettable.Writer;
   private _padding: number;
 
   /**
@@ -48,10 +48,10 @@ export class Label extends Component {
   protected _setup() {
     super._setup();
     this._textContainer = this.content().append("g");
-    const context = new Typesetter.SvgContext(this._textContainer.node() as SVGElement);
-    this._measurer = new Typesetter.CacheMeasurer(context);
-    this._wrapper = new Typesetter.Wrapper();
-    this._writer = new Typesetter.Writer(this._measurer, context, this._wrapper);
+    const context = new Typesettable.SvgContext(this._textContainer.node() as SVGElement);
+    this._measurer = new Typesettable.CacheMeasurer(context);
+    this._wrapper = new Typesettable.Wrapper();
+    this._writer = new Typesettable.Writer(this._measurer, context, this._wrapper);
     this.text(this._text);
   }
 
@@ -145,7 +145,7 @@ export class Label extends Component {
 
   public renderImmediately() {
     super.renderImmediately();
-    // HACKHACK Typesetter.remove existing content - #21 on Typesetter.
+    // HACKHACK Typesettable.remove existing content - #21 on Typesettable.
     this._textContainer.selectAll("g").remove();
     const textMeasurement = this._measurer.measure(this._text);
     const heightPadding = Math.max(Math.min((this.height() - textMeasurement.height) / 2, this.padding()), 0);
@@ -154,8 +154,8 @@ export class Label extends Component {
     const writeWidth = this.width() - 2 * widthPadding;
     const writeHeight = this.height() - 2 * heightPadding;
     const writeOptions = {
-      xAlign: this.xAlignment() as Typesetter.IXAlign,
-      yAlign: this.yAlignment() as Typesetter.IYAlign,
+      xAlign: this.xAlignment() as Typesettable.IXAlign,
+      yAlign: this.yAlignment() as Typesettable.IYAlign,
       textRotation: this.angle(),
     };
     this._writer.write(this._text, writeWidth, writeHeight, writeOptions);

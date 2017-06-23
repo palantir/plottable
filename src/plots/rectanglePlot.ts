@@ -4,11 +4,11 @@
  */
 
 import * as d3 from "d3";
-import * as Typesetter from "typesettable";
+import * as Typesettable from "typesettable";
 
 import * as Animators from "../animators";
 import { Dataset } from "../core/dataset";
-import { AttributeToProjector, Bounds, IAccessor, Point, Range } from "../core/interfaces";
+import { AttributeToProjector, Bounds, IAccessor, IRangeProjector, Point, Range } from "../core/interfaces";
 import * as Drawers from "../drawers";
 import { ProxyDrawer } from "../drawers/drawer";
 import { RectangleCanvasDrawStep, RectangleSVGDrawer } from "../drawers/rectangleDrawer";
@@ -127,8 +127,8 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
    * @param {Scale<X, number>} xScale
    * @returns {Plots.Rectangle} The calling Rectangle Plot.
    */
-  public x(x: X | IAccessor<X>, xScale: Scale<X, number>): this;
-  public x(x?: number | IAccessor<number> | X | IAccessor<X>, xScale?: Scale<X, number>): any {
+  public x(x: X | IAccessor<X>, xScale: Scale<X, number>, postScale?: IRangeProjector<number>): this;
+  public x(x?: number | IAccessor<number> | X | IAccessor<X>, xScale?: Scale<X, number>, postScale?: IRangeProjector<number>): any {
     if (x == null) {
       return super.x();
     }
@@ -136,14 +136,14 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
     if (xScale == null) {
       super.x(<number | IAccessor<number>>x);
     } else {
-      super.x(<X | IAccessor<X>>x, xScale);
+      super.x(<X | IAccessor<X>>x, xScale, postScale);
     }
 
     if (xScale != null) {
       const x2Binding = this.x2();
       const x2 = x2Binding && x2Binding.accessor;
       if (x2 != null) {
-        this._bindProperty(Rectangle._X2_KEY, x2, xScale);
+        this._bindProperty(Rectangle._X2_KEY, x2, xScale, x2Binding.postScale);
       }
     }
 
@@ -166,15 +166,15 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
    * @param {number|Accessor<number>|X|Accessor<X>} x2
    * @returns {Plots.Rectangle} The calling Rectangle Plot.
    */
-  public x2(x2: number | IAccessor<number> | X | IAccessor<X>): this;
-  public x2(x2?: number | IAccessor<number> | X | IAccessor<X>): any {
+  public x2(x2: number | IAccessor<number> | X | IAccessor<X>, postScale?: IRangeProjector<number>): this;
+  public x2(x2?: number | IAccessor<number> | X | IAccessor<X>, postScale?: IRangeProjector<number>): any {
     if (x2 == null) {
       return this._propertyBindings.get(Rectangle._X2_KEY);
     }
 
     const xBinding = this.x();
     const xScale = xBinding && xBinding.scale;
-    this._bindProperty(Rectangle._X2_KEY, x2, xScale);
+    this._bindProperty(Rectangle._X2_KEY, x2, xScale, postScale);
 
     this.render();
     return this;
@@ -199,8 +199,8 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
    * @param {Scale<Y, number>} yScale
    * @returns {Plots.Rectangle} The calling Rectangle Plot.
    */
-  public y(y: Y | IAccessor<Y>, yScale: Scale<Y, number>): this;
-  public y(y?: number | IAccessor<number> | Y | IAccessor<Y>, yScale?: Scale<Y, number>): any {
+  public y(y: Y | IAccessor<Y>, yScale: Scale<Y, number>, postScale?: IRangeProjector<number>): this;
+  public y(y?: number | IAccessor<number> | Y | IAccessor<Y>, yScale?: Scale<Y, number>, postScale?: IRangeProjector<number>): any {
     if (y == null) {
       return super.y();
     }
@@ -208,14 +208,14 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
     if (yScale == null) {
       super.y(<number | IAccessor<number>>y);
     } else {
-      super.y(<Y | IAccessor<Y>>y, yScale);
+      super.y(<Y | IAccessor<Y>>y, yScale, postScale);
     }
 
     if (yScale != null) {
       const y2Binding = this.y2();
       const y2 = y2Binding && y2Binding.accessor;
       if (y2 != null) {
-        this._bindProperty(Rectangle._Y2_KEY, y2, yScale);
+        this._bindProperty(Rectangle._Y2_KEY, y2, yScale, y2Binding.postScale);
       }
     }
 
@@ -238,15 +238,15 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
    * @param {number|Accessor<number>|Y|Accessor<Y>} y2
    * @returns {Plots.Rectangle} The calling Rectangle Plot.
    */
-  public y2(y2: number | IAccessor<number> | Y | IAccessor<Y>): this;
-  public y2(y2?: number | IAccessor<number> | Y | IAccessor<Y>): any {
+  public y2(y2: number | IAccessor<number> | Y | IAccessor<Y>, postScale?: IRangeProjector<number>): this;
+  public y2(y2?: number | IAccessor<number> | Y | IAccessor<Y>, postScale?: IRangeProjector<number>): any {
     if (y2 == null) {
       return this._propertyBindings.get(Rectangle._Y2_KEY);
     }
 
     const yBinding = this.y();
     const yScale = yBinding && yBinding.scale;
-    this._bindProperty(Rectangle._Y2_KEY, y2, yScale);
+    this._bindProperty(Rectangle._Y2_KEY, y2, yScale, postScale);
 
     this.render();
     return this;
@@ -437,9 +437,9 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
     const attrToProjector = this._generateAttrToProjector();
     const labelArea = this._renderArea.append("g").classed("label-area", true);
 
-    const context = new Typesetter.SvgContext(labelArea.node() as SVGElement);
-    const measurer = new Typesetter.CacheMeasurer(context);
-    const writer = new Typesetter.Writer(measurer, context);
+    const context = new Typesettable.SvgContext(labelArea.node() as SVGElement);
+    const measurer = new Typesettable.CacheMeasurer(context);
+    const writer = new Typesettable.Writer(measurer, context);
     const xRange = this.x().scale.range();
     const yRange = this.y().scale.range();
     const xMin = Math.min.apply(null, xRange);

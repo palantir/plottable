@@ -302,11 +302,13 @@ describe("Legend", () => {
       verifySymbolHeight();
 
       style.text(".plottable .legend text { font-size: 60px; }");
+      legend.invalidateCache();
       legend.computeLayout();
       legend.render();
       verifySymbolHeight();
 
       style.text(".plottable .legend text { font-size: 10px; }");
+      legend.invalidateCache();
       legend.computeLayout();
       legend.render();
       verifySymbolHeight();
@@ -513,10 +515,6 @@ describe("Legend", () => {
         component: legend,
       };
       TestMethods.assertEntitiesEqual(entities[0], expectedEntity, "returned Entity corresponding to second entry");
-
-      legend.detach();
-      entities = legend.entitiesAt({x: 10, y: 10});
-      assert.lengthOf(entities, 0, "returns no Entities if not anchored");
       div.remove();
     });
 
