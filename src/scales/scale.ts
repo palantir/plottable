@@ -105,6 +105,15 @@ export class Scale<D, R> {
   }
 
   /**
+   * Gets an array of tick values spanning the domain.
+   *
+   * @returns {D[]}
+   */
+  public ticks(): D[] {
+    return this.domain();
+  }
+
+  /**
    * Gets the domain.
    *
    * @returns {D[]} The current domain.

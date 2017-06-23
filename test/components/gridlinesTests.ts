@@ -69,19 +69,29 @@ describe("Gridlines", () => {
     div.remove();
   });
 
-  it("throws error on non-Quantitative Scales", () => {
-    const categoryScale = new Plottable.Scales.Category();
-    // HACKHACK #2661: Cannot assert errors being thrown with description
-    (<any> assert).throw(() => new Plottable.Components.Gridlines(<any> categoryScale, null), Error,
-      "xScale needs to inherit from Scale.QuantitativeScale", "can't set xScale to category scale");
-    (<any> assert).throw(() => new Plottable.Components.Gridlines(null, <any> categoryScale), Error,
-      "yScale needs to inherit from Scale.QuantitativeScale", "can't set yScale to category scale");
+  it("draws gridlines between ticks of its scales and updates when scale update", () => {
+    gridlines.betweenX(true);
+    gridlines.betweenY(true);
 
-    const colorScale = new Plottable.Scales.Color();
-    (<any> assert).throw(() => new Plottable.Components.Gridlines(<any> colorScale, null), Error,
-      "xScale needs to inherit from Scale.QuantitativeScale", "can't set xScale to color scale");
-    (<any> assert).throw(() => new Plottable.Components.Gridlines(null, <any> colorScale), Error,
-      "yScale needs to inherit from Scale.QuantitativeScale", "can't set yScale to color scale");
+    gridlines.renderTo(div);
+
+    const xGridlines = gridlines.content().select(".x-gridlines").selectAll<Element, any>("line");
+    const xTicks = xScale.ticks();
+    assert.strictEqual(xGridlines.size(), xTicks.length - 1, "There is an x gridline for each x tick minus one");
+    xGridlines.each(function(gridline, i) {
+      const x = TestMethods.numAttr(d3.select(this), "x1");
+      const expectedLocation = xScale.scale(xTicks[i]) + (xScale.scale(xTicks[i + 1]) - xScale.scale(xTicks[i])) / 2;
+      assert.closeTo(x, expectedLocation, window.Pixel_CloseTo_Requirement, "x gridline drawn between ticks");
+    });
+
+    const yGridlines = gridlines.content().select(".y-gridlines").selectAll<Element, any>("line");
+    const yTicks = yScale.ticks();
+    assert.strictEqual(yGridlines.size(), yTicks.length - 1, "There is a y gridline for each y tick minus one");
+    yGridlines.each(function(gridline, i) {
+      const y = TestMethods.numAttr(d3.select(this), "y1");
+      const expectedLocation = yScale.scale(yTicks[i]) + (yScale.scale(yTicks[i + 1]) - yScale.scale(yTicks[i])) / 2;
+      assert.closeTo(y, expectedLocation, window.Pixel_CloseTo_Requirement, "y gridline drawn on ticks");
+    });
 
     div.remove();
   });
