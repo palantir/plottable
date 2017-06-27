@@ -9,6 +9,7 @@ import * as Utils from "../utils";
 import { Component } from "../components/component";
 import * as Dispatchers from "./";
 import { Dispatcher } from "./dispatcher";
+import { Translator } from "../utils/transformAwareTranslator";
 
 export type MouseCallback = (p: Point, event: MouseEvent) => void;
 
@@ -200,7 +201,7 @@ export class Mouse extends Dispatcher {
   }
 
   public eventInside(component: Component, event: MouseEvent) {
-    return this._translator.isInside(component, event);
+    return Translator.isEventInside(component, event);
   }
 
   /**

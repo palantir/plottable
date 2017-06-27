@@ -6,6 +6,14 @@
 import * as Utils from "../utils";
 
 export class Dispatcher {
+  /**
+   * Subclasses set these in constructor. Then, these
+   * get attached to the global document in _connect
+   *
+   * eventname is a DOM event name like "mouseup", "touchstart", etc.
+   * The callback is simply registered to the event callback with bubbling.
+   *
+   */
   protected _eventToProcessingFunction: { [eventName: string]: (e: Event) => any; } = {};
   private _eventNameToCallbackSet: { [eventName: string]: Utils.CallbackSet<Function>; } = {};
   private _connected = false;

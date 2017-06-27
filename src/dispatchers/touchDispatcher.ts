@@ -9,6 +9,7 @@ import * as Utils from "../utils";
 import { Component } from "../components/component";
 import * as Dispatchers from "./";
 import { Dispatcher } from "./dispatcher";
+import { Translator } from "../utils/transformAwareTranslator";
 
 export type TouchCallback = (ids: number[], idToPoint: { [id: number]: Point; }, event: TouchEvent) => void;
 
@@ -176,6 +177,6 @@ export class Touch extends Dispatcher {
   }
 
   public eventInside(component: Component, event: TouchEvent) {
-    return this._translator.isInside(component, event);
+    return Translator.isEventInside(component, event);
   }
 }
