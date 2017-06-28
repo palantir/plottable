@@ -7,15 +7,14 @@ import * as Plottable from "../../src";
 import * as TestMethods from "../testMethods";
 
 describe("Translator", () => {
-    it("getTranslator() creates only one Translator per html root", () => {
+    it("getTranslator() creates only one Translator per Component", () => {
         const div = TestMethods.generateDiv();
         const component = new Plottable.Component();
-        sinon.stub(component, "rootElement").returns(div);
 
         const t1 = Plottable.Utils.getTranslator(component);
-        assert.isNotNull(t1, "created a new Translator on a <svg>");
+        assert.isNotNull(t1, "created a new Translator on a Component");
         const t2 = Plottable.Utils.getTranslator(component);
-        assert.strictEqual(t1, t2, "returned the existing Translator if called again with same <svg>");
+        assert.strictEqual(t1, t2, "returned the existing Translator if called again with same Component");
 
         div.remove();
       });
@@ -43,19 +42,6 @@ describe("Translator", () => {
         const boundingClientRect = (<Element> rect.node()).getBoundingClientRect();
         const computedOrigin = translator.computePosition(boundingClientRect.left, boundingClientRect.top);
         TestMethods.assertPointsClose(computedOrigin, divOrigin, 0.5, "translates client coordinates to <svg> coordinates correctly");
-
-        div.remove();
-      });
-
-    it("getTranslator() creates only one Translator per <svg>", () => {
-        const div = TestMethods.generateDiv();
-        const component = new Plottable.Component();
-        sinon.stub(component, "rootElement").returns(div);
-
-        const t1 = Plottable.Utils.getTranslator(component);
-        assert.isNotNull(t1, "created a new Translator on a <svg>");
-        const t2 = Plottable.Utils.getTranslator(component);
-        assert.strictEqual(t1, t2, "returned the existing Translator if called again with same <svg>");
 
         div.remove();
       });
