@@ -703,7 +703,7 @@ export class Plot extends Component {
     if (this.renderer() === "canvas") {
       const canvas = this._canvas.node();
       const context = canvas.getContext("2d");
-      context.clearRect(0, 0, canvas.width, canvas.height);
+      context.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
       this._bufferCanvasValid = false;
     }
 
