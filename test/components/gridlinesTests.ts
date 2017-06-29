@@ -75,7 +75,7 @@ describe("Gridlines", () => {
 
     gridlines.renderTo(div);
 
-    const xGridlines = gridlines.content().select(".x-gridlines").selectAll<Element, any>("line");
+    const xGridlines = gridlines.content().select(".x-gridlines").selectAll<Element, any>(".betweenline");
     const xTicks = xScale.ticks();
     assert.strictEqual(xGridlines.size(), xTicks.length - 1, "There is an x gridline for each x tick minus one");
     xGridlines.each(function(gridline, i) {
@@ -84,7 +84,7 @@ describe("Gridlines", () => {
       assert.closeTo(x, expectedLocation, window.Pixel_CloseTo_Requirement, "x gridline drawn between ticks");
     });
 
-    const yGridlines = gridlines.content().select(".y-gridlines").selectAll<Element, any>("line");
+    const yGridlines = gridlines.content().select(".y-gridlines").selectAll<Element, any>(".betweenline");
     const yTicks = yScale.ticks();
     assert.strictEqual(yGridlines.size(), yTicks.length - 1, "There is a y gridline for each y tick minus one");
     yGridlines.each(function(gridline, i) {

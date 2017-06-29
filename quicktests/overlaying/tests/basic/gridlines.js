@@ -59,26 +59,6 @@ function run(svg, data, Plottable) {
         [plotGroup2, plotGroup3]
     ]);
 
-    /*
-    var xScale = new Plottable.Scales.Category().domain(data.map(d => d.x));
-    var xAxis = new Plottable.Axes.Category(xScale, "bottom");
-    xAxis.tickLabelMaxLines(1);
-    var yScale = new Plottable.Scales.Linear().domain([0, 20]);
-    var yAxis = new Plottable.Axes.Numeric(yScale, "left");
-    var gridlines = new Plottable.Components.Gridlines(xScale, yScale).betweenX(true);
-
-    var plot = new Plottable.Plots.Bar();
-    plot.x(function(d) { return d.x }, xScale);
-    plot.y(function(d) { return d.y }, yScale);
-    plot.addDataset(new Plottable.Dataset(data));
-
-    var plotGroup = new Plottable.Components.Group([plot, gridlines]);
-    var table = new Plottable.Components.Table([
-        [yAxis, plotGroup],
-        [null,  xAxis]
-    ]);
-
-    */
     table.renderTo(svg);
     window.addEventListener("resize", () => table.redraw());
 }
