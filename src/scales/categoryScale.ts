@@ -143,6 +143,10 @@ export class Category extends Scale<string, number> implements ITransformableSca
     return this._rescaleBand(this._d3Scale.bandwidth() * (1 + this.innerPadding()));
   }
 
+  public ticks(): string[] {
+    return this.domain();
+  }
+
   /**
    * Gets the inner padding.
    *

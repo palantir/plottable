@@ -4,31 +4,67 @@
  */
 
 import { Point, SimpleSelection } from "../core/interfaces";
-import { QuantitativeScale } from "../scales/quantitativeScale";
-import { IScaleCallback } from "../scales/scale";
+import { IScaleCallback, Scale } from "../scales/scale";
 
 import { Component } from "./component";
 
+/**
+ * Returns next grid position based on tick value
+ *
+ * @param scale Scale used by the grid
+ * @param between Value denoting whether the grid renders between ticks or on ticks
+ * @param orderedTicks All ticks in order. only needed when rendering lines between ticks
+ */
+function gridPositionFactory(
+  scale: Scale<any, any>,
+  between: boolean,
+  orderedTicks?: any[]) {
+
+  const previousTick: { [index: string ]: string } = {};
+  if (orderedTicks !== undefined) {
+    for(let i = 0; i < orderedTicks.length; i ++) {
+      const previous = orderedTicks[i - 1];
+      const current = orderedTicks[i];
+      previousTick[current] = previous;
+    }
+  }
+
+  return (tickVal: any) => {
+    const position = scale.scale(tickVal);
+
+    if (!between) {
+      return position;
+    }
+
+    let gridPosition: number;
+    const previousPosition = previousTick[tickVal] === undefined
+      ? undefined
+      : scale.scale(previousTick[tickVal]);
+
+    if (previousPosition !== undefined) {
+      gridPosition = previousPosition + (position - previousPosition) / 2;
+    }
+
+    return gridPosition;
+  };
+}
+
 export class Gridlines extends Component {
-  private _xScale: QuantitativeScale<any>;
-  private _yScale: QuantitativeScale<any>;
+  private _betweenX: boolean;
+  private _betweenY: boolean;
+  private _xScale: Scale<any, any>;
+  private _yScale: Scale<any, any>;
   private _xLinesContainer: SimpleSelection<void>;
   private _yLinesContainer: SimpleSelection<void>;
 
-  private _renderCallback: IScaleCallback<QuantitativeScale<any>>;
+  private _renderCallback: IScaleCallback<Scale<any, any>>;
 
   /**
    * @constructor
-   * @param {QuantitativeScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
-   * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
+   * @param {Scale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
+   * @param {Scale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
    */
-  constructor(xScale: QuantitativeScale<any>, yScale: QuantitativeScale<any>) {
-    if (xScale != null && !(QuantitativeScale.prototype.isPrototypeOf(xScale))) {
-      throw new Error("xScale needs to inherit from Scale.QuantitativeScale");
-    }
-    if (yScale != null && !(QuantitativeScale.prototype.isPrototypeOf(yScale))) {
-      throw new Error("yScale needs to inherit from Scale.QuantitativeScale");
-    }
+  constructor(xScale: Scale<any, any>, yScale: Scale<any, any>) {
     super();
     this.addClass("gridlines");
     this._xScale = xScale;
@@ -40,6 +76,62 @@ export class Gridlines extends Component {
     if (this._yScale) {
       this._yScale.onUpdate(this._renderCallback);
     }
+  }
+
+  /**
+   * Gets the between flag for the x axis.
+   *
+   * @returns {boolean} The current state of betweenX
+   */
+  public betweenX(): boolean;
+  /**
+   * Sets the between flag for the x axis. True causes gridlines to render
+   * between ticks. False sets the causes the gridlines to render on the
+   * ticks. Defaults to false.
+   *
+   * @param {boolean} betweenX
+   * @returns {Gridlines} The calling Gridlines.
+   */
+  public betweenX(_betweenX: boolean): this;
+  public betweenX(_betweenX?: boolean): this | boolean {
+    if (_betweenX === undefined) {
+      return this._betweenX;
+    }
+
+    if (_betweenX !== this._betweenX) {
+      this._betweenX = _betweenX;
+      this.render();
+    }
+
+    return this;
+  }
+
+  /**
+   * Gets the between flag for the y axis.
+   *
+   * @returns {boolean} The current state of betweenY
+   */
+  public betweenY(): boolean;
+    /**
+   * Sets the between flag for the y axis. True causes gridlines to render
+   * between ticks. False sets the causes the gridlines to render on the
+   * ticks. Defaults to false.
+   *
+   * @param {boolean} betweenY
+   * @returns {Gridlines} The calling Gridlines.
+   */
+  public betweenY(_betweenY: boolean): this;
+  public betweenY(_betweenY?: boolean): this | boolean {
+    if (_betweenY === undefined) {
+      return this._betweenY;
+    }
+
+    if (_betweenY !== this._betweenY) {
+      this._betweenY = _betweenY;
+      this.render();
+    }
+
+    return this;
   }
 
   public destroy() {
@@ -79,14 +171,15 @@ export class Gridlines extends Component {
 
   private _redrawXLines() {
     if (this._xScale) {
-      const xTicks = this._xScale.ticks();
-      const getScaledXValue = (tickVal: number) => this._xScale.scale(tickVal);
+      const between = this.betweenX();
+      const xTicks = this._xScale.ticks().slice(between ? 1 : 0);
       const xLinesUpdate = this._xLinesContainer.selectAll("line").data(xTicks);
       const xLines = xLinesUpdate.enter().append("line").merge(xLinesUpdate);
-      xLines.attr("x1", getScaledXValue)
+      xLines.attr("x1", gridPositionFactory(this._xScale, between, this._xScale.ticks()))
         .attr("y1", 0)
-        .attr("x2", getScaledXValue)
+        .attr("x2", gridPositionFactory(this._xScale, between, this._xScale.ticks()))
         .attr("y2", this.height())
+        .classed("betweenline", between)
         .classed("zeroline", (t: number) => t === 0);
       xLinesUpdate.exit().remove();
     }
@@ -94,16 +187,18 @@ export class Gridlines extends Component {
 
   private _redrawYLines() {
     if (this._yScale) {
-      const yTicks = this._yScale.ticks();
-      const getScaledYValue = (tickVal: number) => this._yScale.scale(tickVal);
+      const between = this.betweenY();
+      const yTicks = this._yScale.ticks().slice(between ? 1 : 0);
       const yLinesUpdate = this._yLinesContainer.selectAll("line").data(yTicks);
       const yLines = yLinesUpdate.enter().append("line").merge(yLinesUpdate);
       yLines.attr("x1", 0)
-        .attr("y1", getScaledYValue)
+        .attr("y1", gridPositionFactory(this._yScale, between, this._yScale.ticks()))
         .attr("x2", this.width())
-        .attr("y2", getScaledYValue)
+        .attr("y2", gridPositionFactory(this._yScale, between, this._yScale.ticks()))
+        .classed("betweenline", between)
         .classed("zeroline", (t: number) => t === 0);
       yLinesUpdate.exit().remove();
     }
   }
-}
+
+ }
