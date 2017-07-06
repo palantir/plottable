@@ -32,14 +32,12 @@ export class Translator {
     this._measurer = rootContent.append<SVGRectElement>("rect")
         .classed("measurer", true)
         .styles({
-          border: "1px solid red",
-          fill: "none !important",
-          height: "1px",
           opacity: 0,
-          "pointer-events": "none",
-          position: "absolute",
-          stroke: "none !important",
-          width: "1px",
+          visibility: "hidden",
+        }).attrs({
+          height: 1,
+          "stroke-width": 0,
+          width: 1,
         });
   }
 
