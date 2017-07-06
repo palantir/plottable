@@ -52,6 +52,7 @@ describe("Dispatchers", () => {
         div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
         const component = new Plottable.Component();
         component.anchor(div);
+        component.computeLayout();
         touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(component);
         callbackWasCalled = false;
       });

@@ -58,6 +58,7 @@ describe("Dispatchers", () => {
         component = new Plottable.Component();
         div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
         component.anchor(div);
+        component.computeLayout();
 
         mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(component);
       });
