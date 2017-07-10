@@ -20,7 +20,7 @@ function gridPositionFactory(
   between: boolean,
   orderedTicks?: any[]) {
 
-  const previousTick: { [index: string ]: string } = {};
+  const previousTick: { [index: string]: string } = {};
   if (orderedTicks !== undefined) {
     for(let i = 0; i < orderedTicks.length; i ++) {
       const previous = orderedTicks[i - 1];
