@@ -52,8 +52,8 @@ function gridPositionFactory(
 export class Gridlines extends Component {
   private _betweenX: boolean;
   private _betweenY: boolean;
-  private _xScale: Scale<any, any>;
-  private _yScale: Scale<any, any>;
+  private _xScale: Scale<any, any> | null;
+  private _yScale: Scale<any, any> | null;
   private _xLinesContainer: SimpleSelection<void>;
   private _yLinesContainer: SimpleSelection<void>;
 
@@ -64,7 +64,7 @@ export class Gridlines extends Component {
    * @param {Scale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
    * @param {Scale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
    */
-  constructor(xScale: Scale<any, any>, yScale: Scale<any, any>) {
+  constructor(xScale: Scale<any, any> | null, yScale: Scale<any, any> | null) {
     super();
     this.addClass("gridlines");
     this._xScale = xScale;
