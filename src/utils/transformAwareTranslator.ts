@@ -23,6 +23,12 @@ export function getTranslator(component: Component): Translator {
   return translator;
 }
 
+ /**
+ * The translator implements CSS transform aware event measuring. When a Component is rendered an element that
+  * has a css3 transform applied, mouse/touch interactions will be totally misaligned with the actual chart
+  * since browsers don't send transformed values for events. Translator is responsible for re-aligning interaction
+  * events by moving and measuring a special "test" div on every mouse/touch event.
+ */
 export class Translator {
   private static SAMPLE_DISTANCE = 100;
   private _measurer: d3.Selection<SVGRectElement, any, any, any>;
@@ -42,9 +48,11 @@ export class Translator {
   }
 
   /**
-   * Computes the position relative to the component. Converts screen clientX/clientY
-   * coordinates to the coordinates relative to the measurementElement, taking into
-   * account transform() factors from CSS or SVG up the DOM tree.
+   * Computes the position relative to the rootContent, taking into account css3 transforms.
+   *
+   * Move the measurer div to 0,0, get its getBoundingClientRect(), then to 100,000,
+   * getBoundingClientRect() again, and divide the actual spacing by 100 to get the
+   * scale and translate.
    */
   public computePosition(clientX: number, clientY: number): Point {
     // get the origin

@@ -12,7 +12,6 @@ export class Dispatcher {
    *
    * eventname is a DOM event name like "mouseup", "touchstart", etc.
    * The callback is simply registered to the event callback with bubbling.
-   *
    */
   protected _eventToProcessingFunction: { [eventName: string]: (e: Event) => any; } = {};
   private _eventNameToCallbackSet: { [eventName: string]: Utils.CallbackSet<Function>; } = {};
