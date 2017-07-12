@@ -12,59 +12,59 @@ export function getTranslator(component: Component): Translator {
   // The Translator works by first calculating the offset to root of the chart and then calculating
   // the offset from the component to the root. It is imperative that the _measurementElement
   // be added to the root of the hierarchy and nowhere else.
-  const root = component.root().rootElement().node() as Element;
+  const rootContent = component.root().content();
 
-  let translator: Translator = (<any> root)[_TRANSLATOR_KEY];
+  let translator: Translator = (<any> rootContent)[_TRANSLATOR_KEY];
   if (translator == null) {
-    const measurer = <SVGElement> <any>document.createElementNS(root.namespaceURI, "svg");
-
-    measurer.setAttribute("class", "measurer");
-    measurer.setAttribute("style", "opacity: 0; visibility: hidden; position: absolute; width: 1px; height: 1px;");
-
-    root.appendChild(measurer);
-
-    translator = new Translator(d3.select(measurer));
-    (<any> root)[_TRANSLATOR_KEY] = translator;
+    translator = new Translator(rootContent);
+    (<any> rootContent)[_TRANSLATOR_KEY] = translator;
   }
 
   return translator;
 }
 
-/**
- * Applies position as a style and attribute to the svg element
- * as the position of the element varies by the type of parent.
- * When nested within an SVG, the attribute position is respected.
- * When nested within an HTML, the style position is respected.
+ /**
+ * The translator implements CSS transform aware event measuring. When a Component is rendered an element that
+  * has a css3 transform applied, mouse/touch interactions will be totally misaligned with the actual chart
+  * since browsers don't send transformed values for events. Translator is responsible for re-aligning interaction
+  * events by moving and measuring a special "test" div on every mouse/touch event.
  */
-function move(node: SimpleSelection<any>, x: number, y: number) {
-  node.styles({ left: `${x}px`, top: `${y}px` });
-  node.attrs({ x: `${x}`, y: `${y}` });
-}
-
 export class Translator {
   private static SAMPLE_DISTANCE = 100;
-  private _measurementElement: SimpleSelection<void>;
+  private _measurer: d3.Selection<SVGRectElement, any, any, any>;
 
-  constructor(measurementElement: SimpleSelection<void>) {
-    this._measurementElement = measurementElement;
+  constructor(rootContent: SimpleSelection<void>) {
+    // Use a "rect" element inside the root content node to resolve https://github.com/palantir/plottable/issues/3355
+    this._measurer = rootContent.append<SVGRectElement>("rect")
+        .classed("measurer", true)
+        .styles({
+          opacity: 0,
+          visibility: "hidden",
+        }).attrs({
+          height: 1,
+          "stroke-width": 0,
+          width: 1,
+        });
   }
 
   /**
-   * Computes the position relative to the component. Converts screen clientX/clientY
-   * coordinates to the coordinates relative to the measurementElement, taking into
-   * account transform() factors from CSS or SVG up the DOM tree.
+   * Computes the position relative to the rootContent, taking into account css3 transforms.
+   *
+   * Move the measurer div to 0,0, get its getBoundingClientRect(), then to 100,000,
+   * getBoundingClientRect() again, and divide the actual spacing by 100 to get the
+   * scale and translate.
    */
   public computePosition(clientX: number, clientY: number): Point {
     // get the origin
-    move(this._measurementElement, 0, 0);
+    this.moveMeasurer(0, 0);
 
-    let mrBCR = (this._measurementElement.node() as HTMLElement).getBoundingClientRect();
+    let mrBCR = this._measurer.node().getBoundingClientRect();
     const origin = { x: mrBCR.left, y: mrBCR.top };
 
     // calculate the scale
-    move(this._measurementElement, Translator.SAMPLE_DISTANCE, Translator.SAMPLE_DISTANCE);
+    this.moveMeasurer(Translator.SAMPLE_DISTANCE, Translator.SAMPLE_DISTANCE);
 
-    mrBCR = (this._measurementElement.node() as HTMLElement).getBoundingClientRect();
+    mrBCR = this._measurer.node().getBoundingClientRect();
     const testPoint = { x: mrBCR.left, y: mrBCR.top };
 
     // invalid measurements -- SVG might not be in the DOM
@@ -76,9 +76,9 @@ export class Translator {
     const scaleY = (testPoint.y - origin.y) / Translator.SAMPLE_DISTANCE;
 
     // get the true cursor position
-    move(this._measurementElement, ((clientX - origin.x) / scaleX), ((clientY - origin.y) / scaleY));
+    this.moveMeasurer(((clientX - origin.x) / scaleX), ((clientY - origin.y) / scaleY));
 
-    mrBCR = (this._measurementElement.node() as HTMLElement).getBoundingClientRect();
+    mrBCR = this._measurer.node().getBoundingClientRect();
     const trueCursorPosition = { x: mrBCR.left, y: mrBCR.top };
 
     const scaledPosition = {
@@ -89,7 +89,17 @@ export class Translator {
     return scaledPosition;
   }
 
-  public isInside(component: Component, e: Event) {
+  private moveMeasurer(x: number, y: number) {
+    this._measurer.attrs({ x: `${x}`, y: `${y}` });
+  }
+
+  /**
+   * Is the event's target part of the given component's DOM tree?
+   * @param component
+   * @param e
+   * @returns {boolean}
+   */
+  public static isEventInside(component: Component, e: Event) {
     return Utils.DOM.contains(component.root().rootElement().node() as Element, e.target as Element);
   }
 }

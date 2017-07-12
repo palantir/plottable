@@ -200,7 +200,7 @@ export class Mouse extends Dispatcher {
   }
 
   public eventInside(component: Component, event: MouseEvent) {
-    return this._translator.isInside(component, event);
+    return Utils.Translator.isEventInside(component, event);
   }
 
   /**

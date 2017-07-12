@@ -176,6 +176,6 @@ export class Touch extends Dispatcher {
   }
 
   public eventInside(component: Component, event: TouchEvent) {
-    return this._translator.isInside(component, event);
+    return Utils.Translator.isEventInside(component, event);
   }
 }
