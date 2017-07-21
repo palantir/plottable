@@ -37,7 +37,7 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
       () => {
         warn("canvas renderer is not supported on Segment Plot!");
         return null;
-      }
+      },
     );
   }
 

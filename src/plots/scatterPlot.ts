@@ -72,7 +72,7 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
             dataset,
             () => Plot._scaledAccessor(this.symbol()),
             () => Plot._scaledAccessor(this.size()),
-          )
+          ),
         );
       },
     );

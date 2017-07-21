@@ -6,7 +6,7 @@
 import * as d3 from "d3";
 
 import { IEntityBounds } from "../core/interfaces";
-import { CanvasDrawer, CanvasDrawStep } from "./canvasDrawer";
+import { CanvasDrawer } from "./canvasDrawer";
 import { AppliedDrawStep } from "./drawStep";
 import { SVGDrawer } from "./svgDrawer";
 

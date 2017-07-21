@@ -62,17 +62,15 @@ export class CanvasDrawer implements IDrawer {
   }
 }
 
-export const ContextStyleAttrs = {
-  strokeWidth: "stroke-width", stroke: "stroke", opacity: "opacity", fill: "fill",
-};
+export const ContextStyleAttrs = ["stroke", "opacity", "fill", "stroke-width"];
 
 export function resolveAttributesSubsetWithStyles(projector: AttributeToAppliedProjector, extraKeys: string[], datum: any, index: number) {
-  const attrKeys = Object.keys(ContextStyleAttrs).concat(extraKeys);
+  const attrKeys = ContextStyleAttrs.concat(extraKeys);
   return resolveAttributes(projector, attrKeys, datum, index);
 }
 
 export function resolveAttributes(projector: AttributeToAppliedProjector, attrKeys: string[], datum: any, index: number) {
-   const attrs: {[key: string]: any} = {};
+  const attrs: {[key: string]: any} = {};
   for (let i = 0; i < attrKeys.length; i++) {
     const attrKey = attrKeys[i];
     if (projector.hasOwnProperty(attrKey)) {
@@ -83,31 +81,25 @@ export function resolveAttributes(projector: AttributeToAppliedProjector, attrKe
 }
 
 export function styleContext(context: CanvasRenderingContext2D, attrs: {[key: string]: any}) {
-  if (attrs[ContextStyleAttrs.strokeWidth]) {
-    context.lineWidth = parseFloat(attrs[ContextStyleAttrs.strokeWidth]);
-  }
+  const opacity = attrs["opacity"] ? parseFloat(attrs["opacity"]) : 1;
 
-  if (attrs[ContextStyleAttrs.opacity]) {
-    context.globalAlpha = parseFloat(attrs[ContextStyleAttrs.opacity]);
-  } else {
-    context.globalAlpha = 1;
-  }
-
-  if (attrs[ContextStyleAttrs.strokeWidth]) {
-    context.lineWidth = parseFloat(attrs[ContextStyleAttrs.strokeWidth]);
+  if (attrs["stroke-width"]) {
+    context.lineWidth = parseFloat(attrs["stroke-width"]);
   } else {
     context.lineWidth = 1;
   }
 
-  if (attrs[ContextStyleAttrs.stroke]) {
-    const strokeColor = d3.color(attrs[ContextStyleAttrs.stroke]);
-    context.strokeStyle = strokeColor.rgb().toString();
+  if (attrs["stroke"]) {
+    const strokeColor = d3.color(attrs["stroke"]);
+    strokeColor.opacity = opacity;
+    context.strokeStyle = strokeColor.toString();
     context.stroke();
   }
 
-  if (attrs[ContextStyleAttrs.fill]) {
-    const fillColor = d3.color(attrs[ContextStyleAttrs.fill]);
-    context.fillStyle = fillColor.rgb().toString();
+  if (attrs["fill"]) {
+    const fillColor = d3.color(attrs["fill"]);
+    fillColor.opacity = opacity;
+    context.fillStyle = fillColor.toString();
     context.fill();
   }
 }

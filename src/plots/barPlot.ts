@@ -519,7 +519,6 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   private _entitiesIntersecting(xValOrRange: number | Range, yValOrRange: number | Range): IPlotEntity[] {
     const intersected: IPlotEntity[] = [];
     this._getEntityStore().entities().forEach((entity) => {
-      const selection = d3.select(entity.drawer.getVisualPrimitiveAtIndex(entity.validDatumIndex));
       if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, entity.drawer.getClientRectAtIndex(entity.validDatumIndex))) {
         intersected.push(this._lightweightPlotEntityToPlotEntity(entity));
       }

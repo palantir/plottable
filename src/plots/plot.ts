@@ -730,7 +730,8 @@ export class Plot extends Component {
    */
   public selections(datasets = this.datasets()): SimpleSelection<any> {
     if (this.renderer() === "canvas") {
-      return d3.select(null);
+      // return empty selection
+      return d3.selectAll();
     } else {
       const selections: d3.BaseType[] = [];
 

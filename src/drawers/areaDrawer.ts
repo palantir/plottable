@@ -28,15 +28,15 @@ export function makeAreaCanvasDrawStep(
     d3LineFactory: () => d3.Line<any>,
 ): CanvasDrawStep {
   return (context: CanvasRenderingContext2D, data: any[][], attrToAppliedProjector: AttributeToAppliedProjector) => {
+    const areaStyle = resolveAttributes(attrToAppliedProjector, ["fill", "opacity", "stroke-width"], data[0], 0);
+    const opacity = areaStyle["opacity"] ? areaStyle["opacity"] : 1;
     const d3Area = d3AreaFactory();
     context.save();
     context.beginPath();
     d3Area.context(context);
     d3Area(data[0]);
     context.lineJoin = "round";
-    const areaStyle = resolveAttributes(attrToAppliedProjector, ["fill", "opacity"], data[0], 0);
-    areaStyle['opacity'] = areaStyle['opacity'] ? areaStyle['opacity'] : 1;
-    areaStyle['opacity'] *= 0.25;
+    areaStyle["opacity"] = opacity * 0.25;
     styleContext(context, areaStyle);
     context.restore();
 
@@ -46,10 +46,10 @@ export function makeAreaCanvasDrawStep(
     d3Line.context(context);
     d3Line(data[0]);
     context.lineJoin = "round";
-    const lineStyle = resolveAttributes(attrToAppliedProjector, ["stroke", "opacity"], data[0], 0);
-    lineStyle['opacity'] = lineStyle['opacity'] ? lineStyle['opacity'] : 1;
-    lineStyle['opacity'] *= 0.8;
-    styleContext(context, lineStyle);
+    areaStyle["stroke"] = areaStyle["fill"];
+    delete areaStyle["fill"];
+    areaStyle["opacity"] = opacity * 0.8;
+    styleContext(context, areaStyle);
     context.restore();
   };
 }
