@@ -133,9 +133,12 @@ export class Pie extends Plot {
   }
 
   protected _createDrawer() {
-    return new ProxyDrawer(() => new ArcSVGDrawer(), () => {
-      warn("canvas renderer is not supported on Pie Plot!");
-    });
+    return new ProxyDrawer(
+      () => new ArcSVGDrawer(),
+      () => {
+        warn("canvas renderer is not supported on Pie Plot!");
+        return null;
+      });
   }
 
   public entities(datasets = this.datasets()): IPiePlotEntity[] {

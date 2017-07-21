@@ -272,7 +272,10 @@ export class Plot extends Component {
    * a Drawer that draws the correct shapes for this plot.
    */
   protected _createDrawer(dataset: Dataset): ProxyDrawer {
-    return new ProxyDrawer(() => new SVGDrawer("path", ""), () => {});
+    return new ProxyDrawer(
+      () => new SVGDrawer("path", ""),
+      () => null,
+    );
   }
 
   protected _getAnimator(key: string): IAnimator {
@@ -777,12 +780,13 @@ export class Plot extends Component {
 
   protected _lightweightPlotEntityToPlotEntity(entity: Plots.ILightweightPlotEntity) {
     const plotEntity: Plots.IPlotEntity = {
-      datum: entity.datum,
-      position: entity.position,
+      bounds: entity.drawer.getClientRectAtIndex(entity.validDatumIndex),
+      component: entity.component,
       dataset: entity.dataset,
       datasetIndex: entity.datasetIndex,
+      datum: entity.datum,
       index: entity.index,
-      component: entity.component,
+      position: entity.position,
       selection: d3.select(entity.drawer.getVisualPrimitives()[entity.validDatumIndex]),
     };
     return plotEntity;

@@ -74,6 +74,10 @@ export class SVGDrawer implements IDrawer {
     return this.getVisualPrimitives()[index];
   }
 
+  public getClientRectAtIndex(index: number) {
+    return Utils.DOM.elementBBox(d3.select(this.getVisualPrimitiveAtIndex(index)));
+  }
+
   public remove() {
     this._root.remove();
   }

@@ -256,8 +256,10 @@ export class Line<X> extends XYPlot<X, number> {
   }
 
   protected _createDrawer(dataset: Dataset) {
-    const canvasDrawer = makeLineCanvasDrawStep(() => this._d3LineFactory(dataset));
-    return new ProxyDrawer(() => new LineSVGDrawer(), canvasDrawer);
+    return new ProxyDrawer(
+      () => new LineSVGDrawer(),
+      (ctx) => new Drawers.CanvasDrawer(ctx, makeLineCanvasDrawStep(() => this._d3LineFactory(dataset))),
+    );
   }
 
   protected _extentsForProperty(property: string) {

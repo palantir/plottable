@@ -5,6 +5,7 @@
 
 import * as d3 from "d3";
 
+import { IEntityBounds } from "../core/interfaces";
 import { CanvasDrawer, CanvasDrawStep } from "./canvasDrawer";
 import { AppliedDrawStep } from "./drawStep";
 import { SVGDrawer } from "./svgDrawer";
@@ -32,6 +33,11 @@ export interface IDrawer {
   getVisualPrimitiveAtIndex(index: number): Element;
 
   /**
+   * Get the visual primitive for the given *data* index.
+   */
+  getClientRectAtIndex(index: number): IEntityBounds;
+
+  /**
    * Called when the Drawer is no longer needed - implementors may use this to cleanup
    * any resources they've created
    */
@@ -53,7 +59,7 @@ export class ProxyDrawer implements IDrawer {
    */
   constructor(
     private _svgDrawerFactory: () => SVGDrawer,
-    private _canvasDrawStep: CanvasDrawStep) {
+    private _canvasDrawerFactory: (ctx: CanvasRenderingContext2D) => CanvasDrawer) {
   }
 
   /**
@@ -75,7 +81,7 @@ export class ProxyDrawer implements IDrawer {
     if (this._currentDrawer != null) {
       this._currentDrawer.remove();
     }
-    this._currentDrawer = new CanvasDrawer(canvas.node().getContext("2d"), this._canvasDrawStep);
+    this._currentDrawer = this._canvasDrawerFactory(canvas.node().getContext("2d"));
   }
 
   // public for testing
@@ -102,5 +108,9 @@ export class ProxyDrawer implements IDrawer {
 
   public getVisualPrimitiveAtIndex(index: number) {
     return this._currentDrawer.getVisualPrimitiveAtIndex(index);
+  }
+
+  public getClientRectAtIndex(index: number) {
+    return this._currentDrawer.getClientRectAtIndex(index);
   }
 }

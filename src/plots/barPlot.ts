@@ -231,7 +231,10 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   }
 
   protected _createDrawer() {
-    return new ProxyDrawer(() => new RectangleSVGDrawer(Bar._BAR_AREA_CLASS), RectangleCanvasDrawStep);
+    return new ProxyDrawer(
+      () => new RectangleSVGDrawer(Bar._BAR_AREA_CLASS),
+      (ctx) => new Drawers.RectangleCanvasDrawer(ctx),
+    );
   }
 
   protected _setup() {
@@ -418,8 +421,9 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       let primaryDist = 0;
       let secondaryDist = 0;
       const plotPt = this._pixelPoint(entity.datum, entity.index, entity.dataset);
+
       // if we're inside a bar, distance in both directions should stay 0
-      const barBBox = Utils.DOM.elementBBox(d3.select(entity.drawer.getVisualPrimitiveAtIndex(entity.validDatumIndex)));
+      const barBBox = entity.drawer.getClientRectAtIndex(entity.validDatumIndex);
       if (!Utils.DOM.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
         const plotPtPrimary = this._isVertical ? plotPt.x : plotPt.y;
         primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
@@ -516,7 +520,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     const intersected: IPlotEntity[] = [];
     this._getEntityStore().entities().forEach((entity) => {
       const selection = d3.select(entity.drawer.getVisualPrimitiveAtIndex(entity.validDatumIndex));
-      if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, Utils.DOM.elementBBox(selection))) {
+      if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, entity.drawer.getClientRectAtIndex(entity.validDatumIndex))) {
         intersected.push(this._lightweightPlotEntityToPlotEntity(entity));
       }
     });

@@ -66,11 +66,15 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
   protected _createDrawer(dataset: Dataset) {
     return new ProxyDrawer(
       () => new SymbolSVGDrawer(),
-      makeSymbolCanvasDrawStep(
-        dataset,
-        () => Plot._scaledAccessor(this.symbol()),
-        () => Plot._scaledAccessor(this.size()),
-      ),
+      (ctx) => {
+        return new Drawers.CanvasDrawer(ctx,
+          makeSymbolCanvasDrawStep(
+            dataset,
+            () => Plot._scaledAccessor(this.symbol()),
+            () => Plot._scaledAccessor(this.size()),
+          )
+        );
+      },
     );
   }
 

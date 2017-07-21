@@ -3,8 +3,14 @@
  * @license MIT
  */
 
-import { AttributeToAppliedProjector } from "../core/interfaces";
-import { CanvasDrawStep, resolveAttributesSubsetWithStyles, styleContext } from "./canvasDrawer";
+import { AttributeToAppliedProjector, IEntityBounds } from "../core/interfaces";
+import {
+  CanvasDrawer,
+  CanvasDrawStep,
+  resolveAttributes,
+  resolveAttributesSubsetWithStyles,
+  styleContext,
+} from "./canvasDrawer";
 import { SVGDrawer } from "./svgDrawer";
 
 export class RectangleSVGDrawer extends SVGDrawer {
@@ -32,3 +38,20 @@ export const RectangleCanvasDrawStep: CanvasDrawStep = (
   });
   context.restore();
 };
+
+export class RectangleCanvasDrawer extends CanvasDrawer {
+  constructor(ctx: CanvasRenderingContext2D) {
+    super(ctx, RectangleCanvasDrawStep);
+  }
+
+  public getClientRectAtIndex(index: number): IEntityBounds {
+    const datum = this._lastDrawnData[index];
+    const attrs = resolveAttributes(
+      this._lastProjector,
+      ["x", "y", "width", "height"],
+      datum,
+      index,
+    );
+    return attrs as IEntityBounds;
+  }
+}

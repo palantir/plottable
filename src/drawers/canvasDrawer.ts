@@ -4,7 +4,7 @@
  */
 
 import * as d3 from "d3";
-import { AttributeToAppliedProjector } from "../core/interfaces";
+import { AttributeToAppliedProjector, IEntityBounds } from "../core/interfaces";
 import { IDrawer } from "./drawer";
 import { AppliedDrawStep } from "./drawStep";
 
@@ -20,6 +20,9 @@ export type CanvasDrawStep = (
  * This class is immutable (but has internal state) and shouldn't be extended.
  */
 export class CanvasDrawer implements IDrawer {
+  protected _lastDrawnData: any[];
+  protected _lastProjector: AttributeToAppliedProjector;
+
   /**
    * @param _context The context for a canvas that this drawer will draw to.
    * @param _drawStep The draw step logic that actually draws.
@@ -33,10 +36,12 @@ export class CanvasDrawer implements IDrawer {
   }
 
   public draw(data: any[], appliedDrawSteps: AppliedDrawStep[]) {
+    this._lastDrawnData = data;
+    this._lastProjector = appliedDrawSteps[appliedDrawSteps.length - 1].attrToAppliedProjector;
+
     // don't support animations for now; just draw the last draw step immediately
-    const lastDrawStep = appliedDrawSteps[appliedDrawSteps.length - 1];
     this._context.save();
-    this._drawStep(this._context, data, lastDrawStep.attrToAppliedProjector);
+    this._drawStep(this._context, this._lastDrawnData, this._lastProjector);
     this._context.restore();
   }
 
@@ -45,6 +50,10 @@ export class CanvasDrawer implements IDrawer {
   }
 
   public getVisualPrimitiveAtIndex(index: number): Element {
+    return null;
+  }
+
+  public getClientRectAtIndex(index: number): IEntityBounds {
     return null;
   }
 
@@ -59,7 +68,11 @@ export const ContextStyleAttrs = {
 
 export function resolveAttributesSubsetWithStyles(projector: AttributeToAppliedProjector, extraKeys: string[], datum: any, index: number) {
   const attrKeys = Object.keys(ContextStyleAttrs).concat(extraKeys);
-  const attrs: {[key: string]: any} = {};
+  return resolveAttributes(projector, attrKeys, datum, index);
+}
+
+export function resolveAttributes(projector: AttributeToAppliedProjector, attrKeys: string[], datum: any, index: number) {
+   const attrs: {[key: string]: any} = {};
   for (let i = 0; i < attrKeys.length; i++) {
     const attrKey = attrKeys[i];
     if (projector.hasOwnProperty(attrKey)) {
@@ -73,19 +86,27 @@ export function styleContext(context: CanvasRenderingContext2D, attrs: {[key: st
   if (attrs[ContextStyleAttrs.strokeWidth]) {
     context.lineWidth = parseFloat(attrs[ContextStyleAttrs.strokeWidth]);
   }
+
+  if (attrs[ContextStyleAttrs.opacity]) {
+    context.globalAlpha = parseFloat(attrs[ContextStyleAttrs.opacity]);
+  } else {
+    context.globalAlpha = 1;
+  }
+
+  if (attrs[ContextStyleAttrs.strokeWidth]) {
+    context.lineWidth = parseFloat(attrs[ContextStyleAttrs.strokeWidth]);
+  } else {
+    context.lineWidth = 1;
+  }
+
   if (attrs[ContextStyleAttrs.stroke]) {
     const strokeColor = d3.color(attrs[ContextStyleAttrs.stroke]);
-    if (attrs[ContextStyleAttrs.opacity]) {
-      strokeColor.opacity = attrs[ContextStyleAttrs.opacity];
-    }
     context.strokeStyle = strokeColor.rgb().toString();
     context.stroke();
   }
+
   if (attrs[ContextStyleAttrs.fill]) {
     const fillColor = d3.color(attrs[ContextStyleAttrs.fill]);
-    if (attrs[ContextStyleAttrs.opacity]) {
-      fillColor.opacity = attrs[ContextStyleAttrs.opacity];
-    }
     context.fillStyle = fillColor.rgb().toString();
     context.fill();
   }

@@ -32,9 +32,13 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
   }
 
   protected _createDrawer() {
-    return new ProxyDrawer(() => new SegmentSVGDrawer(), () => {
-      warn("canvas renderer is not supported on Segment Plot!");
-    });
+    return new ProxyDrawer(
+      () => new SegmentSVGDrawer(),
+      () => {
+        warn("canvas renderer is not supported on Segment Plot!");
+        return null;
+      }
+    );
   }
 
   protected _generateDrawSteps(): Drawers.DrawStep[] {

@@ -46,7 +46,10 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
   }
 
   protected _createDrawer() {
-    return new ProxyDrawer(() => new RectangleSVGDrawer(), RectangleCanvasDrawStep);
+    return new ProxyDrawer(
+      () => new RectangleSVGDrawer(),
+      (ctx) => new Drawers.RectangleCanvasDrawer(ctx),
+    );
   }
 
   protected _generateAttrToProjector() {

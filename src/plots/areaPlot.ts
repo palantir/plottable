@@ -7,12 +7,12 @@ import * as d3 from "d3";
 
 import { Dataset } from "../core/dataset";
 import { AttributeToProjector, IAccessor, Projector, SimpleSelection } from "../core/interfaces";
-import * as Drawers from "../drawers";
 import * as Scales from "../scales";
 import { QuantitativeScale } from "../scales/quantitativeScale";
 import * as Utils from "../utils";
 
-import { AreaSVGDrawer } from "../drawers/areaDrawer";
+import * as Drawers from "../drawers";
+import { AreaSVGDrawer, makeAreaCanvasDrawStep } from "../drawers/areaDrawer";
 import { ProxyDrawer } from "../drawers/drawer";
 import { LineSVGDrawer } from "../drawers/lineDrawer";
 import { warn } from "../utils/windowUtils";
@@ -147,10 +147,40 @@ export class Area<X> extends Line<X> {
     return lineAttrToProjector;
   }
 
-  protected _createDrawer() {
-    return new ProxyDrawer(() => new AreaSVGDrawer(), () => {
-      warn("canvas renderer not implemented on Area Plot!");
-    });
+  protected _createDrawer(dataset: Dataset) {
+    return new ProxyDrawer(
+      () => new AreaSVGDrawer(),
+      (ctx) => {
+        return new Drawers.CanvasDrawer(ctx, makeAreaCanvasDrawStep(
+          () => {
+            const xProjector = Plot._scaledAccessor(this.x());
+            const yProjector = Plot._scaledAccessor(this.y());
+            const y0Projector = Plot._scaledAccessor(this.y0());
+
+            const definedProjector = (d: any, i: number, dataset: Dataset) => {
+              const positionX = xProjector(d, i, dataset);
+              const positionY = yProjector(d, i, dataset);
+              return Utils.Math.isValidNumber(positionX) && Utils.Math.isValidNumber(positionY);
+            };
+
+            const curveFactory = this._getCurveFactory() as d3.CurveFactory;
+            const areaGenerator = d3.area()
+              .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
+              .y1((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
+              .y0((innerDatum, innerIndex) => y0Projector(innerDatum, innerIndex, dataset))
+              .curve(curveFactory)
+              .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset));
+
+            return areaGenerator;
+          },
+          () => {
+            const xProjector = Plot._scaledAccessor(this.x());
+            const yProjector = this._getResetYFunction();
+            return this._d3LineFactory(dataset, xProjector, yProjector);
+          }
+        ));
+      },
+    );
   }
 
   protected _generateDrawSteps(): Drawers.DrawStep[] {

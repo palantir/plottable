@@ -539,6 +539,7 @@ export class Legend extends Component {
           const symbolTranslate = Utils.DOM.getTranslateValues(symbolElement);
 
           return [{
+            bounds: Utils.DOM.elementBBox(d3.select(rowElement)),
             datum: column.data.name,
             position: {
               x: rowTranslate[0] + symbolTranslate[0],
