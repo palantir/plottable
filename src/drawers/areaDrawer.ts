@@ -7,6 +7,9 @@ import { AttributeToAppliedProjector, SimpleSelection } from "../core/interfaces
 import { CanvasDrawStep, resolveAttributes, styleContext } from "./canvasDrawer";
 import { SVGDrawer } from "./svgDrawer";
 
+const DEFAULT_AREA_FILL_OPACITY = 0.25;
+const DEFAULT_AREA_STROKE_OPACITY = 0.80;
+
 export class AreaSVGDrawer extends SVGDrawer {
   constructor() {
     super("path", "area");
@@ -28,16 +31,25 @@ export function makeAreaCanvasDrawStep(
     d3LineFactory: () => d3.Line<any>,
 ): CanvasDrawStep {
   return (context: CanvasRenderingContext2D, data: any[][], attrToAppliedProjector: AttributeToAppliedProjector) => {
-    const areaStyle = resolveAttributes(attrToAppliedProjector, ["fill", "opacity", "stroke-width"], data[0], 0);
-    const opacity = areaStyle["opacity"] ? areaStyle["opacity"] : 1;
+    const style = resolveAttributes(attrToAppliedProjector, [
+      "fill",
+      "opacity",
+      "stroke-width",
+      "area-fill-opacity",
+      "area-stroke-opacity",
+    ], data[0], 0);
+    const baseOpacity = style["opacity"] != null ? style["opacity"] : 1;
+    const fillOpacity = style["area-fill-opacity"] != null ? style["area-fill-opacity"] : DEFAULT_AREA_FILL_OPACITY;
+    const strokeOpacity = style["area-stroke-opacity"] != null ? style["area-stroke-opacity"] : DEFAULT_AREA_STROKE_OPACITY;
+
     const d3Area = d3AreaFactory();
     context.save();
     context.beginPath();
     d3Area.context(context);
     d3Area(data[0]);
     context.lineJoin = "round";
-    areaStyle["opacity"] = opacity * 0.25;
-    styleContext(context, areaStyle);
+    style["opacity"] = baseOpacity * fillOpacity;
+    styleContext(context, style);
     context.restore();
 
     const d3Line = d3LineFactory();
@@ -46,10 +58,10 @@ export function makeAreaCanvasDrawStep(
     d3Line.context(context);
     d3Line(data[0]);
     context.lineJoin = "round";
-    areaStyle["stroke"] = areaStyle["fill"];
-    delete areaStyle["fill"];
-    areaStyle["opacity"] = opacity * 0.8;
-    styleContext(context, areaStyle);
+    style["stroke"] = style["fill"];
+    delete style["fill"];
+    style["opacity"] = baseOpacity * strokeOpacity;
+    styleContext(context, style);
     context.restore();
   };
 }
