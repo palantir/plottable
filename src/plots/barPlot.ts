@@ -954,4 +954,3 @@ function computeBarPixelThickness(
   }
   return barPixelThickness;
 }
-
