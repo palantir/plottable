@@ -16,7 +16,7 @@ import { ProxyDrawer } from "../drawers/drawer";
 import { RectangleCanvasDrawStep, RectangleSVGDrawer } from "../drawers/rectangleDrawer";
 import * as Scales from "../scales";
 import { QuantitativeScale } from "../scales/quantitativeScale";
-import { IScaleCallback, Scale } from "../scales/scale";
+import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
 import { makeEnum } from "../utils/makeEnum";
 import * as Plots from "./";
@@ -229,13 +229,6 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   public orientation(): BarOrientation {
     return this._isVertical ? "vertical" : "horizontal";
   }
-
-  // public render() {
-  //   this._updateBarPixelWidth();
-  //   this._updateExtents();
-  //   super.render();
-  //   return this;
-  // }
 
   protected _createDrawer() {
     return new ProxyDrawer(() => new RectangleSVGDrawer(Bar._BAR_AREA_CLASS), RectangleCanvasDrawStep);
