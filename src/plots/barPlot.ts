@@ -959,7 +959,6 @@ function computeBarPixelThickness(
 
     barPixelThickness *= Bar._BAR_THICKNESS_RATIO;
   }
-  console.trace("computed bar pixel thickness to", barPixelThickness, "based off", arguments);
   return barPixelThickness;
 }
 
