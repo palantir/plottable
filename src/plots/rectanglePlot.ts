@@ -11,7 +11,7 @@ import { Dataset } from "../core/dataset";
 import { AttributeToProjector, Bounds, IAccessor, IRangeProjector, Point, Range } from "../core/interfaces";
 import * as Drawers from "../drawers";
 import { ProxyDrawer } from "../drawers/drawer";
-import { RectangleCanvasDrawStep, RectangleSVGDrawer } from "../drawers/rectangleDrawer";
+import { RectangleSVGDrawer } from "../drawers/rectangleDrawer";
 import * as Scales from "../scales";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
