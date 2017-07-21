@@ -92,12 +92,12 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     this.attr(Bar._BAR_THICKNESS_KEY, () => this._barPixelThickness);
     this._labelConfig = new Utils.Map<Dataset, LabelConfig>();
     this._baselineValueProvider = () => [this.baselineValue()];
-    this._updateBarPixelThicknessCallback = () => this._updateBarPixelWidth();
+    this._updateBarPixelThicknessCallback = () => this._updateBarPixelThickness();
   }
 
   public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
     super.computeLayout(origin, availableWidth, availableHeight);
-    this._updateBarPixelWidth();
+    this._updateBarPixelThickness();
     this._updateExtents();
     return this;
   }
@@ -281,7 +281,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
 
   public addDataset(dataset: Dataset) {
     super.addDataset(dataset);
-    this._updateBarPixelWidth();
+    this._updateBarPixelThickness();
     return this;
   }
 
@@ -294,7 +294,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   public removeDataset(dataset: Dataset) {
     dataset.offUpdate(this._updateBarPixelThicknessCallback);
     super.removeDataset(dataset);
-    this._updateBarPixelWidth();
+    this._updateBarPixelThickness();
     return this;
   }
 
@@ -312,7 +312,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     }
 
     super.datasets(datasets);
-    this._updateBarPixelWidth();
+    this._updateBarPixelThickness();
     return this;
   }
 
@@ -848,12 +848,12 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       });
     } else {
       this._fixedBarPixelThickness = true;
-      this._updateBarPixelWidth();
+      this._updateBarPixelThickness();
       this.attr(Bar._BAR_THICKNESS_KEY, () => this._barPixelThickness);
     }
   }
 
-  private _updateBarPixelWidth() {
+  private _updateBarPixelThickness() {
     if (this._fixedBarPixelThickness) {
       if (this._projectorsReady()) {
         this._barPixelThickness = computeBarPixelThickness(
@@ -926,7 +926,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
 function computeBarPixelThickness(
     positionBinding: Plots.ITransformableAccessorScaleBinding<any, number>,
     datasets: Dataset[],
-    barWidthDimension: number,
+    plotPositionDimensionLength: number,
 ): number {
   let barPixelThickness: number;
   const positionScale = positionBinding.scale;
@@ -948,7 +948,7 @@ function computeBarPixelThickness(
 
     barPixelThickness = Utils.Math.min(barAccessorDataPairs, (pair: any[], i: number) => {
       return Math.abs(pair[1] - pair[0]);
-    }, barWidthDimension * Bar._SINGLE_BAR_DIMENSION_RATIO);
+    }, plotPositionDimensionLength * Bar._SINGLE_BAR_DIMENSION_RATIO);
 
     barPixelThickness *= Bar._BAR_THICKNESS_RATIO;
   }
