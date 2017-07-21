@@ -35,12 +35,12 @@ export function makeAreaCanvasDrawStep(
       "fill",
       "opacity",
       "stroke-width",
-      "area-fill-opacity",
-      "area-stroke-opacity",
+      "fill-opacity",
+      "stroke-opacity",
     ], data[0], 0);
     const baseOpacity = style["opacity"] != null ? style["opacity"] : 1;
-    const fillOpacity = style["area-fill-opacity"] != null ? style["area-fill-opacity"] : DEFAULT_AREA_FILL_OPACITY;
-    const strokeOpacity = style["area-stroke-opacity"] != null ? style["area-stroke-opacity"] : DEFAULT_AREA_STROKE_OPACITY;
+    const fillOpacity = style["fill-opacity"] != null ? style["fill-opacity"] : DEFAULT_AREA_FILL_OPACITY;
+    const strokeOpacity = style["stroke-opacity"] != null ? style["stroke-opacity"] : DEFAULT_AREA_STROKE_OPACITY;
 
     const d3Area = d3AreaFactory();
     context.save();
