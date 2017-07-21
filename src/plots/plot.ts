@@ -18,6 +18,7 @@ import {
   SimpleSelection,
 } from "../core/interfaces";
 import * as Drawers from "../drawers";
+import { CanvasDrawer } from "../drawers/canvasDrawer";
 import { ProxyDrawer } from "../drawers/drawer";
 import { AppliedDrawStep, DrawStep } from "../drawers/index";
 import { SVGDrawer } from "../drawers/svgDrawer";
@@ -274,7 +275,7 @@ export class Plot extends Component {
   protected _createDrawer(dataset: Dataset): ProxyDrawer {
     return new ProxyDrawer(
       () => new SVGDrawer("path", ""),
-      () => null,
+      (ctx) => new CanvasDrawer(ctx, () => {}),
     );
   }
 

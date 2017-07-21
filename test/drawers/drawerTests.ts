@@ -11,11 +11,12 @@ import * as TestMethods from "../testMethods";
 describe("ProxyDrawer", () => {
   let drawer: ProxyDrawer;
   let svgDrawer: SVGDrawer;
-  const canvasDrawStepSpy = sinon.spy();
+  let canvasDrawer: CanvasDrawer;
 
   beforeEach(() => {
     svgDrawer = new SVGDrawer("test", "foo");
-    drawer = new ProxyDrawer(() => svgDrawer, canvasDrawStepSpy);
+    canvasDrawer = new CanvasDrawer(null, null);
+    drawer = new ProxyDrawer(() => svgDrawer, () => canvasDrawer);
   });
 
   it("useSVG/useCanvas uses the right renderer", () => {
@@ -28,8 +29,7 @@ describe("ProxyDrawer", () => {
     const canvas = d3.select(document.createElement("canvas"));
     drawer.useCanvas(canvas);
     assert.isTrue(removeSpy.called, "old drawer was removed");
-    assert.isTrue(drawer.getDrawer() instanceof CanvasDrawer, "canvas drawer is used");
-    assert.strictEqual((drawer.getDrawer() as CanvasDrawer).getDrawStep(), canvasDrawStepSpy, "canvas drawer passed correct draw step");
+    assert.strictEqual(drawer.getDrawer(), canvasDrawer, "canvas drawer was used");
     svg.remove();
   });
 });
