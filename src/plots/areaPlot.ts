@@ -97,11 +97,6 @@ export class Area<X> extends Line<X> {
     this._updateYScale();
   }
 
-  public addDataset(dataset: Dataset) {
-    super.addDataset(dataset);
-    return this;
-  }
-
   protected _addDataset(dataset: Dataset) {
     const lineDrawer = new LineSVGDrawer();
     if (this._isSetup) {

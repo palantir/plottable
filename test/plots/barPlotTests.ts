@@ -4,6 +4,7 @@ import { assert } from "chai";
 
 import * as Plottable from "../../src";
 import { BarOrientation } from "../../src/plots/barPlot";
+import { entityBounds } from "../../src/utils/domUtils";
 
 import * as TestMethods from "../testMethods";
 
@@ -654,14 +655,16 @@ describe("Plots", () => {
           const datum = data[index];
           const basePosition = baseScale.scale(datum.base);
           const valuePosition = valueScale.scale(datum.value);
+          const element = barPlot.content().selectAll<Element, any>("rect").nodes()[index];
           return {
             datum: datum,
             index: index,
             dataset: dataset,
             datasetIndex: 0,
             position: getPointFromBaseAndValuePositions(basePosition, valuePosition),
-            selection: d3.select(barPlot.content().selectAll<Element, any>("rect").nodes()[index]),
+            selection: d3.select(element),
             component: barPlot,
+            bounds: entityBounds(element),
           };
         }
 

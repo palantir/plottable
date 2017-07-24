@@ -5,7 +5,7 @@
 
 import * as d3 from "d3";
 
-import { Range, SimpleSelection } from "../core/interfaces";
+import { IEntityBounds, Range, SimpleSelection } from "../core/interfaces";
 
 const nativeMath: Math = (<any>window).Math;
 
@@ -35,6 +35,17 @@ export function elementBBox(element: SimpleSelection<any>) {
     bbox = { x: 0, y: 0, width: 0, height: 0 };
   }
   return bbox;
+}
+
+export function entityBounds(element: Element): IEntityBounds {
+  if (element instanceof SVGElement) {
+    return elementBBox(d3.select(element));
+  } else if (element instanceof HTMLElement) {
+    const rect = element.getBoundingClientRect();
+    return { x: rect.left, y: rect.top, width: rect.width, height: rect.height };
+  } else {
+    return { x: 0, y: 0, width: 0, height: 0 };
+  }
 }
 
 /**

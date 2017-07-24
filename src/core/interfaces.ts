@@ -101,7 +101,7 @@ export interface IEntityBounds {
  * An object representing a data-backed visual entity inside a Component.
  */
 export interface IEntity<C extends Component> {
-  bounds?: IEntityBounds; // TODO make non-optional
+  bounds: IEntityBounds;
   component: C;
   datum: any;
   position: Point;
