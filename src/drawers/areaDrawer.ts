@@ -5,7 +5,7 @@
 
 import { AttributeToAppliedProjector, SimpleSelection } from "../core/interfaces";
 import * as Utils from "../utils";
-import { CanvasDrawStep, renderArea, renderLine, resolveAttributes } from "./canvasDrawer";
+import { CanvasDrawStep, renderArea, resolveAttributes } from "./canvasDrawer";
 import { SVGDrawer } from "./svgDrawer";
 
 export class AreaSVGDrawer extends SVGDrawer {
@@ -24,35 +24,17 @@ export class AreaSVGDrawer extends SVGDrawer {
   }
 }
 
+const AREA_FILL_ATTRS = [ "fill", "opacity", "fill-opacity" ];
+
 const DEFAULT_AREA_FILL_STYLE = {
   opacity: 1,
   "fill-opacity": 0.25,
 };
 
-const DEFAULT_AREA_STROKE_STYLE = {
-  opacity: 1,
-  "stroke-opacity": 0.80,
-};
-
-export function makeAreaCanvasDrawStep(
-    d3AreaFactory: () => d3.Area<any>,
-    d3LineFactory: () => d3.Line<any>,
-): CanvasDrawStep {
-  return (context: CanvasRenderingContext2D, data: any[][], attrToAppliedProjector: AttributeToAppliedProjector) => {
-    let fillStyle = resolveAttributes(attrToAppliedProjector, [
-      "fill",
-      "opacity",
-      "fill-opacity",
-    ], data[0], 0);
-    fillStyle = Utils.Object.assign({}, DEFAULT_AREA_FILL_STYLE, fillStyle);
+export function makeAreaCanvasDrawStep(d3AreaFactory: () => d3.Area<any>): CanvasDrawStep {
+  return (context: CanvasRenderingContext2D, data: any[][], projector: AttributeToAppliedProjector) => {
+    const attrs = resolveAttributes(projector, AREA_FILL_ATTRS, data[0], 0);
+    const fillStyle = Utils.Object.assign({}, DEFAULT_AREA_FILL_STYLE, attrs);
     renderArea(context, d3AreaFactory(), data[0], fillStyle);
-
-    let strokeStyle = resolveAttributes(attrToAppliedProjector, [
-      "opacity",
-      "stroke-opacity",
-    ], data[0], 0);
-    strokeStyle["stroke"] = fillStyle["fill"];
-    strokeStyle = Utils.Object.assign({}, DEFAULT_AREA_STROKE_STYLE, strokeStyle);
-    renderLine(context, d3LineFactory(), data[0], strokeStyle);
   };
 }

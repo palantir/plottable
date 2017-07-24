@@ -20,18 +20,15 @@ export class RectangleSVGDrawer extends SVGDrawer {
   }
 }
 
+const RECT_ATTRS = ["x", "y", "width", "height"];
+
 export const RectangleCanvasDrawStep: CanvasDrawStep = (
     context: CanvasRenderingContext2D,
     data: any[],
-    attrToAppliedProjector: AttributeToAppliedProjector) => {
+    projector: AttributeToAppliedProjector) => {
   context.save();
   data.forEach((datum, index) => {
-    const attrs = resolveAttributesSubsetWithStyles(
-      attrToAppliedProjector,
-      ["x", "y", "width", "height"],
-      datum,
-      index,
-    );
+    const attrs = resolveAttributesSubsetWithStyles(projector, RECT_ATTRS, datum, index);
     context.beginPath();
     context.rect(attrs["x"], attrs["y"], attrs["width"], attrs["height"]);
     renderPathWithStyle(context, attrs);
@@ -46,12 +43,7 @@ export class RectangleCanvasDrawer extends CanvasDrawer {
 
   public getClientRectAtIndex(index: number): IEntityBounds {
     const datum = this._lastDrawnData[index];
-    const attrs = resolveAttributes(
-      this._lastProjector,
-      ["x", "y", "width", "height"],
-      datum,
-      index,
-    );
+    const attrs = resolveAttributes(this._lastProjector, RECT_ATTRS, datum, index);
     return attrs as IEntityBounds;
   }
 }
