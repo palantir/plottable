@@ -7,7 +7,12 @@ import { Dataset } from "../core/dataset";
 import { AttributeToAppliedProjector, IAccessor } from "../core/interfaces";
 import { SymbolFactory } from "../core/symbolFactories";
 import { CanvasBuffer } from "./canvasBuffer";
-import { CanvasDrawStep, ContextStyleAttrs, resolveAttributesSubsetWithStyles, styleContext } from "./canvasDrawer";
+import {
+    CanvasDrawStep,
+    ContextStyleAttrs,
+    renderPathWithStyle,
+    resolveAttributesSubsetWithStyles,
+} from "./canvasDrawer";
 import { SVGDrawer } from "./svgDrawer";
 
 export class SymbolSVGDrawer extends SVGDrawer {
@@ -60,7 +65,7 @@ export function makeSymbolCanvasDrawStep(
                 symbolGenerator(symbolSize).context(bufferCtx)(null);
                 bufferCtx.closePath();
 
-                styleContext(bufferCtx, attrs);
+                renderPathWithStyle(bufferCtx, attrs);
 
                 // save the values that are in the buffer
                 prevSymbolGenerator = symbolGenerator;

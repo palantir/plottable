@@ -5,7 +5,7 @@
 
 import * as d3 from "d3";
 import { AttributeToAppliedProjector, SimpleSelection } from "../core/interfaces";
-import { CanvasDrawStep, resolveAttributesSubsetWithStyles, styleContext } from "./canvasDrawer";
+import { CanvasDrawStep, renderLine, resolveAttributesSubsetWithStyles } from "./canvasDrawer";
 import { SVGDrawer } from "./svgDrawer";
 
 export class LineSVGDrawer extends SVGDrawer {
@@ -30,15 +30,7 @@ export class LineSVGDrawer extends SVGDrawer {
  */
 export function makeLineCanvasDrawStep(d3LineFactory: () => d3.Line<any>): CanvasDrawStep {
   return (context: CanvasRenderingContext2D, data: any[][], attrToAppliedProjector: AttributeToAppliedProjector) => {
-    const d3Line = d3LineFactory();
-    const attrs = resolveAttributesSubsetWithStyles(attrToAppliedProjector, [], data[0], 0);
-
-    context.save();
-    context.beginPath();
-    d3Line.context(context);
-    d3Line(data[0]);
-    context.lineJoin = "round";
-    styleContext(context, attrs);
-    context.restore();
+    const lineStyle = resolveAttributesSubsetWithStyles(attrToAppliedProjector, [], data[0], 0);
+    renderLine(context, d3LineFactory(), data[0], lineStyle);
   };
 }

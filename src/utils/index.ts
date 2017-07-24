@@ -7,6 +7,7 @@ import * as Array from "./arrayUtils";
 import * as Color from "./colorUtils";
 import * as DOM from "./domUtils";
 import * as Math from "./mathUtils";
+import * as Object from "./objectUtils";
 import * as Stacking from "./stackingUtils";
 import * as Window from "./windowUtils";
 
@@ -14,6 +15,7 @@ export {
   Array,
   Color,
   DOM,
+  Object,
   Math,
   Stacking,
   Window

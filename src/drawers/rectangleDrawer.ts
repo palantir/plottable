@@ -7,9 +7,9 @@ import { AttributeToAppliedProjector, IEntityBounds } from "../core/interfaces";
 import {
   CanvasDrawer,
   CanvasDrawStep,
+  renderPathWithStyle,
   resolveAttributes,
   resolveAttributesSubsetWithStyles,
-  styleContext,
 } from "./canvasDrawer";
 import { SVGDrawer } from "./svgDrawer";
 
@@ -34,7 +34,7 @@ export const RectangleCanvasDrawStep: CanvasDrawStep = (
     );
     context.beginPath();
     context.rect(attrs["x"], attrs["y"], attrs["width"], attrs["height"]);
-    styleContext(context, attrs);
+    renderPathWithStyle(context, attrs);
   });
   context.restore();
 };

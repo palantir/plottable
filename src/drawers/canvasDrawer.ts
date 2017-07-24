@@ -62,7 +62,14 @@ export class CanvasDrawer implements IDrawer {
   }
 }
 
-export const ContextStyleAttrs = ["stroke", "opacity", "fill", "stroke-width"];
+export const ContextStyleAttrs = [
+  "fill-opacity",
+  "fill",
+  "opacity",
+  "stroke-opacity",
+  "stroke-width",
+  "stroke",
+];
 
 export function resolveAttributesSubsetWithStyles(projector: AttributeToAppliedProjector, extraKeys: string[], datum: any, index: number) {
   const attrKeys = ContextStyleAttrs.concat(extraKeys);
@@ -70,9 +77,8 @@ export function resolveAttributesSubsetWithStyles(projector: AttributeToAppliedP
 }
 
 export function resolveAttributes(projector: AttributeToAppliedProjector, attrKeys: string[], datum: any, index: number) {
-  const attrs: {[key: string]: any} = {};
-  for (let i = 0; i < attrKeys.length; i++) {
-    const attrKey = attrKeys[i];
+  const attrs: Record<string, any> = {};
+  for (const attrKey of attrKeys) {
     if (projector.hasOwnProperty(attrKey)) {
       attrs[attrKey] = projector[attrKey](datum, index);
     }
@@ -80,25 +86,67 @@ export function resolveAttributes(projector: AttributeToAppliedProjector, attrKe
   return attrs;
 }
 
-export function styleContext(context: CanvasRenderingContext2D, attrs: {[key: string]: any}) {
-  const opacity = attrs["opacity"] ? parseFloat(attrs["opacity"]) : 1;
+export interface IStrokeStyle {
+  "stroke-opacity"?: number;
+  "stroke-width"?: number;
+  opacity?: number;
+  stroke?: string;
+}
 
-  if (attrs["stroke-width"]) {
-    context.lineWidth = parseFloat(attrs["stroke-width"]);
-  } else {
-    context.lineWidth = 1;
-  }
+export interface IFillStyle {
+  "fill-opacity"?: number;
+  fill?: string;
+  opacity?: number;
+}
 
-  if (attrs["stroke"]) {
-    const strokeColor = d3.color(attrs["stroke"]);
-    strokeColor.opacity = opacity;
+function getStrokeOpacity(style: Record<string, any>) {
+  const baseOpacity = style["opacity"] != null ? parseFloat(style["opacity"]) : 1;
+  const strokeOpacity = style["stroke-opacity"] != null ? parseFloat(style["stroke-opacity"]) : 1;
+  return strokeOpacity * baseOpacity;
+}
+
+function getFillOpacity(style: Record<string, any>) {
+  const baseOpacity = style["opacity"] != null ? parseFloat(style["opacity"]) : 1;
+  const fillOpacity = style["fill-opacity"] != null ? parseFloat(style["fill-opacity"]) : 1;
+  return fillOpacity * baseOpacity;
+}
+
+function getStrokeWidth(style: Record<string, any>) {
+  return style["stroke-width"] != null ? parseFloat(style["stroke-width"]) : 1;
+}
+
+export function renderArea(context: CanvasRenderingContext2D, d3Area: d3.Area<any>, data: any[], style: IFillStyle & IStrokeStyle) {
+    context.save();
+    context.beginPath();
+    d3Area.context(context);
+    d3Area(data);
+    context.lineJoin = "round";
+    renderPathWithStyle(context, style);
+    context.restore();
+}
+
+export function renderLine(context: CanvasRenderingContext2D, d3Line: d3.Line<any>, data: any[], style: IStrokeStyle) {
+    context.save();
+    context.beginPath();
+    d3Line.context(context);
+    d3Line(data);
+    context.lineJoin = "round";
+    renderPathWithStyle(context, style);
+    context.restore();
+}
+
+export function renderPathWithStyle(context: CanvasRenderingContext2D, style: Record<string, any>) {
+  if (style["stroke"]) {
+    context.lineWidth = getStrokeWidth(style);
+    const strokeColor = d3.color(style["stroke"]);
+    strokeColor.opacity = getStrokeOpacity(style);
     context.strokeStyle = strokeColor.toString();
     context.stroke();
   }
 
-  if (attrs["fill"]) {
-    const fillColor = d3.color(attrs["fill"]);
-    fillColor.opacity = opacity;
+  if (style["fill"]) {
+    const fillColor = d3.color(style["fill"]);
+    fillColor.opacity = getFillOpacity(style);
     context.fillStyle = fillColor.toString();
     context.fill();
   }
