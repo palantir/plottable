@@ -213,7 +213,7 @@ describe("Plots", () => {
       });
 
       describe(`auto bar width calculation when ${orientation}`, () => {
-        const scaleTypes = ["Linear", "ModifiedLog", "Time"];
+        const scaleTypes = ["Linear", "Time"];
         scaleTypes.forEach((scaleType) => {
           describe(`using a ${scaleType} base Scale`, () => {
             let div: d3.Selection<HTMLDivElement, any, any, any>;
@@ -229,9 +229,6 @@ describe("Plots", () => {
               switch (scaleType) {
                 case "Linear":
                   baseScale = new Plottable.Scales.Linear();
-                  break;
-                case "ModifiedLog":
-                  baseScale = new Plottable.Scales.ModifiedLog();
                   break;
                 case "Time":
                   baseScale = new Plottable.Scales.Time();

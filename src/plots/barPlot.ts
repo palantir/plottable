@@ -43,8 +43,8 @@ export const BarAlignment = makeEnum(["start", "middle", "end"]);
 export type BarAlignment = keyof typeof BarAlignment;
 
 export class Bar<X, Y> extends XYPlot<X, Y> {
-  private static _BAR_THICKNESS_RATIO = 0.95;
-  private static _SINGLE_BAR_DIMENSION_RATIO = 0.4;
+  public static _BAR_THICKNESS_RATIO = 0.95;
+  public static _SINGLE_BAR_DIMENSION_RATIO = 0.4;
   private static _BAR_AREA_CLASS = "bar-area";
   private static _BAR_END_KEY = "barEnd";
 
@@ -93,6 +93,13 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     this._labelConfig = new Utils.Map<Dataset, LabelConfig>();
     this._baselineValueProvider = () => [this.baselineValue()];
     this._updateBarPixelThicknessCallback = () => this._updateBarPixelWidth();
+  }
+
+  public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
+    super.computeLayout(origin, availableWidth, availableHeight);
+    this._updateBarPixelWidth();
+    this._updateExtents();
+    return this;
   }
 
   public x(): Plots.ITransformableAccessorScaleBinding<X, number>;
@@ -221,13 +228,6 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
    */
   public orientation(): BarOrientation {
     return this._isVertical ? "vertical" : "horizontal";
-  }
-
-  public render() {
-    this._updateBarPixelWidth();
-    this._updateExtents();
-    super.render();
-    return this;
   }
 
   protected _createDrawer() {
@@ -838,7 +838,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   }
 
   protected _updateThicknessAttr() {
-    const startProj: Plots.ITransformableAccessorScaleBinding<any, number> = this._isVertical ? this.x() : this.y();
+    const startProj = this.position();
     const endProj = this.barEnd();
     if (startProj != null && endProj != null) {
       this._fixedBarPixelThickness = false;
@@ -856,50 +856,17 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     }
   }
 
-  /**
-   * Computes the barPixelThickness of all the bars in the plot.
-   *
-   * If the position scale of the plot is a CategoryScale and in bands mode, then the rangeBands function will be used.
-   * If the position scale of the plot is a QuantitativeScale, then the bar thickness is equal to the smallest distance between
-   * two adjacent data points, padded for visualisation.
-   *
-   * This is ignored when explicitly setting the barEnd.
-   */
-  protected _computeBarPixelThickness(): number {
-    if (!this._projectorsReady()) {
-      return 0;
-    }
-    let barPixelThickness: number;
-    const positionScale = this.position().scale;
-    if (positionScale instanceof Scales.Category) {
-      barPixelThickness = positionScale.rangeBand();
-    } else {
-      const positionAccessor = this.position().accessor;
-
-      const numberBarAccessorData = d3.set(Utils.Array.flatten(this.datasets().map((dataset) => {
-        return dataset.data().map((d, i) => positionAccessor(d, i, dataset))
-          .filter((d) => d != null)
-          .map((d) => d.valueOf());
-      }))).values().map((value) => +value);
-
-      numberBarAccessorData.sort((a, b) => a - b);
-
-      const scaledData = numberBarAccessorData.map((datum) => positionScale.scale(datum));
-      const barAccessorDataPairs = d3.pairs(scaledData);
-      const barWidthDimension = this._isVertical ? this.width() : this.height();
-
-      barPixelThickness = Utils.Math.min(barAccessorDataPairs, (pair: any[], i: number) => {
-        return Math.abs(pair[1] - pair[0]);
-      }, barWidthDimension * Bar._SINGLE_BAR_DIMENSION_RATIO);
-
-      barPixelThickness *= Bar._BAR_THICKNESS_RATIO;
-    }
-    return barPixelThickness;
-  }
-
   private _updateBarPixelWidth() {
     if (this._fixedBarPixelThickness) {
-      this._barPixelThickness = this._computeBarPixelThickness();
+      if (this._projectorsReady()) {
+        this._barPixelThickness = computeBarPixelThickness(
+            this.position(),
+            this.datasets(),
+            this._isVertical ? this.width() : this.height(),
+        );
+      } else {
+        this._barPixelThickness = 0;
+      }
     }
   }
 
@@ -948,4 +915,45 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     });
     return dataToDraw;
   }
+}
+
+/**
+ * Computes the barPixelThickness of all the bars in the plot.
+ *
+ * If the position scale of the plot is a CategoryScale and in bands mode, then the rangeBands function will be used.
+ * If the position scale of the plot is a QuantitativeScale, then the bar thickness is equal to the smallest distance between
+ * two adjacent data points, padded for visualisation.
+ *
+ * This is ignored when explicitly setting the barEnd.
+ */
+function computeBarPixelThickness(
+    positionBinding: Plots.ITransformableAccessorScaleBinding<any, number>,
+    datasets: Dataset[],
+    barWidthDimension: number,
+): number {
+  let barPixelThickness: number;
+  const positionScale = positionBinding.scale;
+  if (positionScale instanceof Scales.Category) {
+    barPixelThickness = positionScale.rangeBand();
+  } else {
+    const positionAccessor = positionBinding.accessor;
+
+    const numberBarAccessorData = d3.set(Utils.Array.flatten(datasets.map((dataset) => {
+      return dataset.data().map((d, i) => positionAccessor(d, i, dataset))
+          .filter((d) => d != null)
+          .map((d) => d.valueOf());
+    }))).values().map((value) => +value);
+
+    numberBarAccessorData.sort((a, b) => a - b);
+
+    const scaledData = numberBarAccessorData.map((datum) => positionScale.scale(datum));
+    const barAccessorDataPairs = d3.pairs(scaledData);
+
+    barPixelThickness = Utils.Math.min(barAccessorDataPairs, (pair: any[], i: number) => {
+      return Math.abs(pair[1] - pair[0]);
+    }, barWidthDimension * Bar._SINGLE_BAR_DIMENSION_RATIO);
+
+    barPixelThickness *= Bar._BAR_THICKNESS_RATIO;
+  }
+  return barPixelThickness;
 }

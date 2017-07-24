@@ -146,7 +146,10 @@ describe("Plots", () => {
       it("doesn't show stacked bar labels when columns are too narrow", () => {
         stackedBarPlot.labelsEnabled(true);
         xScale.range([0, 20]);
+        // HACKHACK send a scale update to update the barPixelThickness
         xScale.domain(xScale.domain());
+        // HACKHACK explicitly re-render with the new barPixelThickness
+        stackedBarPlot.render();
         const stackedBarLabels = stackedBarPlot.content().selectAll<Element, any>(".stacked-bar-label");
         assert.strictEqual(stackedBarLabels.size(), 0);
       });
@@ -213,7 +216,10 @@ describe("Plots", () => {
       it("doesn't show stacked bar labels when columns are too narrow", () => {
         stackedBarPlot.labelsEnabled(true);
         xScale.range([0, 40]);
+        // HACKHACK send a scale update to update the barPixelThickness
         xScale.domain(xScale.domain());
+        // HACKHACK explicitly re-render to cause the barPixelThickness
+        stackedBarPlot.render();
         const stackedBarLabels = stackedBarPlot.content().selectAll<Element, any>(".stacked-bar-label");
         assert.strictEqual(stackedBarLabels.size(), 0);
       });
@@ -425,7 +431,10 @@ describe("Plots", () => {
       it("doesn't show stacked bar labels when columns are too narrow", () => {
         stackedBarPlot.labelsEnabled(true);
         yScale.range([0, 40]);
+        // HACKHACK send a scale update to update the barPixelThickness
         yScale.domain(yScale.domain());
+        // HACKHACK explicitly re-render to cause the barPixelThickness
+        stackedBarPlot.render();
         const stackedBarLabels = stackedBarPlot.content().selectAll<Element, any>(".stacked-bar-label");
         assert.strictEqual(stackedBarLabels.size(), 0);
       });
