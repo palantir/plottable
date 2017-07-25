@@ -71,8 +71,6 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
    * If so, use the _barPixelThickness property to access the thickness.
    */
   private _fixedBarPixelThickness = true;
-  private _barPixelThickness = 0;
-  private _updateBarPixelThicknessCallback: () => void;
 
   /**
    * A Bar Plot draws bars growing out from a baseline to some value
@@ -89,15 +87,13 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     this._isVertical = orientation === "vertical";
     this.animator("baseline", new Animators.Null());
     this.attr("fill", new Scales.Color().range()[0]);
-    this.attr(Bar._BAR_THICKNESS_KEY, () => this._barPixelThickness);
+    this.attr(Bar._BAR_THICKNESS_KEY, () => this._barPixelThickness());
     this._labelConfig = new Utils.Map<Dataset, LabelConfig>();
     this._baselineValueProvider = () => [this.baselineValue()];
-    this._updateBarPixelThicknessCallback = () => this._updateBarPixelThickness();
   }
 
   public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
     super.computeLayout(origin, availableWidth, availableHeight);
-    this._updateBarPixelThickness();
     this._updateExtents();
     return this;
   }
@@ -114,7 +110,6 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       super.x(<number | IAccessor<number>>x);
     } else {
       super.x(< X | IAccessor<X>>x, xScale);
-      xScale.onUpdate(this._updateBarPixelThicknessCallback);
     }
 
     this._updateThicknessAttr();
@@ -134,7 +129,6 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       super.y(<number | IAccessor<number>>y);
     } else {
       super.y(<Y | IAccessor<Y>>y, yScale);
-      yScale.onUpdate(this._updateBarPixelThicknessCallback);
     }
 
     this._updateLengthScale();
@@ -281,25 +275,20 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
 
   public addDataset(dataset: Dataset) {
     super.addDataset(dataset);
-    this._updateBarPixelThickness();
     return this;
   }
 
   protected _addDataset(dataset: Dataset) {
-    dataset.onUpdate(this._updateBarPixelThicknessCallback);
     super._addDataset(dataset);
     return this;
   }
 
   public removeDataset(dataset: Dataset) {
-    dataset.offUpdate(this._updateBarPixelThicknessCallback);
     super.removeDataset(dataset);
-    this._updateBarPixelThickness();
     return this;
   }
 
   protected _removeDataset(dataset: Dataset) {
-    dataset.offUpdate(this._updateBarPixelThicknessCallback);
     super._removeDataset(dataset);
     return this;
   }
@@ -312,7 +301,6 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     }
 
     super.datasets(datasets);
-    this._updateBarPixelThickness();
     return this;
   }
 
@@ -573,7 +561,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     }
 
     const scale = <QuantitativeScale<any>>accScaleBinding.scale;
-    const width = this._barPixelThickness;
+    const width = this._barPixelThickness();
 
     // To account for inverted domains
     extents = extents.map((extent) => d3.extent([
@@ -848,22 +836,23 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       });
     } else {
       this._fixedBarPixelThickness = true;
-      this._updateBarPixelThickness();
-      this.attr(Bar._BAR_THICKNESS_KEY, () => this._barPixelThickness);
+      this.attr(Bar._BAR_THICKNESS_KEY, () => this._barPixelThickness());
     }
   }
 
-  private _updateBarPixelThickness() {
+  private _barPixelThickness() {
     if (this._fixedBarPixelThickness) {
       if (this._projectorsReady()) {
-        this._barPixelThickness = computeBarPixelThickness(
+        return computeBarPixelThickness(
             this.position(),
             this.datasets(),
             this._isVertical ? this.width() : this.height(),
         );
       } else {
-        this._barPixelThickness = 0;
+        return 0;
       }
+    } else {
+      throw new Error("called _barPixelThickness when thickness isn't fixed!");
     }
   }
 
@@ -896,7 +885,6 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   }
 
   protected _uninstallScaleForKey(scale: Scale<any, number>, key: string) {
-    scale.offUpdate(this._updateBarPixelThicknessCallback);
     super._uninstallScaleForKey(scale, key);
   }
 
@@ -953,4 +941,62 @@ function computeBarPixelThickness(
     barPixelThickness *= Bar._BAR_THICKNESS_RATIO;
   }
   return barPixelThickness;
+}
+
+interface ISignature {
+  isDifferent(other: typeof this): boolean;
+}
+
+function sign<T>(a: T) {
+  if (a instanceof Scale) {
+    return signScale(a);
+  } else if a is Array {
+    return signArray()
+  } else if a is primitive {
+    return signPrimitive()
+  }
+}
+
+interface IScaleSignature extends ISignature {
+  ref: RefSignature<Scale>;
+  domain: ArraySignature<number>;
+  range: ArraySignature<number>;
+  id: PrimitiveSignature<number>;
+}
+
+function signRef(a: any): ISignature {
+  return {
+    isDifferent: (other: any) => {
+      return a !== other;
+    }
+  };
+}
+
+function signScale(scale: Scale): IScaleSignature {
+  return {
+    ref: signRef(scale),
+    domain: sign(scale.domain()),
+    range: sign(scale.range()),
+    id: sign(scale.updateId()),
+    isDifferent: (other: IScaleSignature) => {
+      return ref.isDifferent(other.ref) ||
+          domain.isDifferent(other.domain) ||
+          range.isDifferent(other.range) ||
+          id.isDifferent(other.id);
+    },
+  };
+}
+
+function memoize<I, R>(compute: (input: I) => R) {
+  let lastSignature: ISignature = undefined;
+  let lastValue: R;
+
+  return (input: I) => {
+    const inputSignature = sign(input);
+    if(lastSignature.isDifferent(inputSignature)) {
+      lastSignature = inputSignature;
+      lastValue = compute(input);
+    }
+    return lastValue;
+  };
 }
