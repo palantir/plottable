@@ -11,6 +11,7 @@ export class Dataset {
   private _data: any[];
   private _metadata: any;
   private _callbacks: Utils.CallbackSet<DatasetCallback>;
+  private _updateId = 0;
 
   /**
    * A Dataset contains an array of data and some metadata.
@@ -66,7 +67,7 @@ export class Dataset {
       return this._data;
     } else {
       this._data = data;
-      this._callbacks.callCallbacks(this);
+      this._dispatchUpdate();
       return this;
     }
   }
@@ -89,8 +90,17 @@ export class Dataset {
       return this._metadata;
     } else {
       this._metadata = metadata;
-      this._callbacks.callCallbacks(this);
+      this._dispatchUpdate();
       return this;
     }
+  }
+
+  public updateId() {
+    return this._updateId;
+  }
+
+  private _dispatchUpdate() {
+    this._updateId++;
+    this._callbacks.callCallbacks(this);
   }
 }

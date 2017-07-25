@@ -840,10 +840,12 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     }
   }
 
+  private _computeBarPixelThickness = memoizedComputeBarPixelThickness();
+
   private _barPixelThickness() {
     if (this._fixedBarPixelThickness) {
       if (this._projectorsReady()) {
-        return computeBarPixelThickness(
+        return this._computeBarPixelThickness(
             this.position(),
             this.datasets(),
             this._isVertical ? this.width() : this.height(),
@@ -943,60 +945,148 @@ function computeBarPixelThickness(
   return barPixelThickness;
 }
 
-interface ISignature {
-  isDifferent(other: typeof this): boolean;
+function memoizedComputeBarPixelThickness() {
+  return memoize(computeBarPixelThickness);
 }
 
-function sign<T>(a: T) {
-  if (a instanceof Scale) {
-    return signScale(a);
-  } else if a is Array {
-    return signArray()
-  } else if a is primitive {
-    return signPrimitive()
+abstract class Signature {
+  public isDifferent(other: Signature): boolean {
+    // debugger;
+    if (other instanceof this.constructor) {
+      return this.isSignatureDifferent(other as this);
+    } else {
+      return true;
+    }
+  }
+
+  protected abstract isSignatureDifferent(other: this): boolean;
+}
+
+class ArraySignature extends Signature {
+  constructor(private array: Signature[]) {
+    super();
+  }
+
+  isSignatureDifferent(other: ArraySignature) {
+    if (other.array.length !== this.array.length) {
+      return true;
+    } else {
+      for (let i = 0; i < this.array.length; i++) {
+        if (this.array[i].isDifferent(other.array[i])) {
+          return true;
+        }
+      }
+      return false;
+    }
   }
 }
 
-interface IScaleSignature extends ISignature {
-  ref: RefSignature<Scale>;
-  domain: ArraySignature<number>;
-  range: ArraySignature<number>;
-  id: PrimitiveSignature<number>;
+class ReferenceSignature extends Signature {
+  constructor(private ref: any) {
+    super();
+  }
+
+  isSignatureDifferent(other: ReferenceSignature) {
+    return this.ref !== other.ref;
+  }
 }
 
-function signRef(a: any): ISignature {
-  return {
-    isDifferent: (other: any) => {
-      return a !== other;
+interface ISignatureRecord {
+  [key: string]: Signature;
+}
+
+class ObjectSignature extends Signature {
+  constructor(private obj: ISignatureRecord) {
+    super();
+  }
+
+  isSignatureDifferent(other: ObjectSignature) {
+    const myKeys = Object.keys(this.obj);
+    const otherKeys = Object.keys(other.obj);
+
+    if (myKeys.length !== otherKeys.length) {
+      return true;
     }
-  };
+
+    for (const key of myKeys) {
+      if (!other.obj.hasOwnProperty(key)) {
+        return true;
+      }
+      if (this.obj[key].isDifferent(other.obj[key])) {
+        return true;
+      }
+    }
+    return false;
+  }
 }
 
-function signScale(scale: Scale): IScaleSignature {
-  return {
+function signRef(a: any) {
+  return new ReferenceSignature(a);
+}
+
+function signArray(a: any[]) {
+  return new ArraySignature(a.map((element) => sign(element)));
+}
+
+function signObj(obj: { [key: string]: any }) {
+  const signatureRecord: ISignatureRecord = {};
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      signatureRecord[key] = sign(obj[key]);
+    }
+  }
+  return new ObjectSignature(signatureRecord);
+}
+
+function signScale(scale: Scale<any, any>) {
+  const scaleObj = {
+    domain: scale.domain(),
+    range: scale.range(),
+    updateId: scale.updateId(),
     ref: signRef(scale),
-    domain: sign(scale.domain()),
-    range: sign(scale.range()),
-    id: sign(scale.updateId()),
-    isDifferent: (other: IScaleSignature) => {
-      return ref.isDifferent(other.ref) ||
-          domain.isDifferent(other.domain) ||
-          range.isDifferent(other.range) ||
-          id.isDifferent(other.id);
-    },
   };
+  return signObj(scaleObj);
 }
 
-function memoize<I, R>(compute: (input: I) => R) {
-  let lastSignature: ISignature = undefined;
-  let lastValue: R;
+function signDataset(dataset: Dataset) {
+  const datasetObj = {
+    // CAREFUL - sign the actual data array as a ref
+    // so we don't iterate over literally all the data
+    data: signRef(dataset.data()),
+    ref: signRef(dataset),
+    updateId: dataset.updateId(),
+  };
+  return signObj(datasetObj);
+}
 
-  return (input: I) => {
-    const inputSignature = sign(input);
-    if(lastSignature.isDifferent(inputSignature)) {
+function sign<T>(a: T): Signature {
+  if (a instanceof Signature) {
+    return a;
+  } else if (a instanceof Scale) {
+    return signScale(a);
+  } else if (a instanceof Dataset) {
+    return signDataset(a);
+  } else if (a !== null && typeof a === "object") {
+    return signObj(a);
+  } else if(Array.isArray(a)) {
+    return signArray(a);
+  } else {
+    return signRef(a);
+  }
+}
+
+function memoize<F extends Function>(compute: F): F {
+  let lastSignature: Signature = undefined;
+  let lastValue: any;
+
+  const memoizeFn = function(...args: any[]) {
+    const inputSignature = signArray(args);
+    if (lastSignature === undefined
+        || lastSignature.isDifferent(inputSignature)) {
       lastSignature = inputSignature;
-      lastValue = compute(input);
+      lastValue = compute.apply(this, args);
     }
     return lastValue;
   };
+  return memoizeFn as any as F;
 }
