@@ -525,6 +525,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   }
 
   public renderImmediately() {
+    // HACK update bar pixel thickness
+    this._barPixelThickness();
     return this._computeBarPixelThickness.doLocked(() => super.renderImmediately());
   }
 
@@ -858,7 +860,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
         return 0;
       }
     } else {
-      throw new Error("called _barPixelThickness when thickness isn't fixed!");
+      // throw new Error("called _barPixelThickness when thickness isn't fixed!");
+      return 0;
     }
   }
 
@@ -1084,6 +1087,10 @@ type LockedMemoize<F extends Function> = F & {
    * property during the duration of fn. This lets you
    * bypass the performance hit of signing when you
    * know the fn will not mutate the inputs.
+   *
+   * Be sure to force the memoization to the value
+   * you want before calling this!
+   *
    * @param fn
    */
   doLocked<T>(fn: () => T): T;
