@@ -6,7 +6,7 @@ function makeData() {
     var data1 = [];
     var data2 = [];
     var data3 = [];
-    for (var i = 0; i < 1000; i++) {
+    for (var i = 0; i < 3000; i++) {
         data1.push({
             x: new Date(JAN_01_2012 + MILLIS_IN_DAY * i),
             y: Math.random() * 50 - 25,

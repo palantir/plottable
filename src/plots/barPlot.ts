@@ -66,6 +66,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   private _baselineValueProvider: () => (X|Y)[];
   private _barAlignment: BarAlignment = "middle";
 
+  private _computeBarPixelThickness = memoizedComputeBarPixelThickness();
+
   /**
    * Whether all the bars in this barPlot have the same pixel thickness.
    * If so, use the _barPixelThickness property to access the thickness.
@@ -522,6 +524,10 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     }
   }
 
+  public renderImmediately() {
+    return this._computeBarPixelThickness.doLocked(() => super.renderImmediately());
+  }
+
   protected _additionalPaint(time: number) {
     const lengthScale = this.length().scale;
     const scaledBaseline = lengthScale.scale(this.baselineValue());
@@ -840,8 +846,6 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     }
   }
 
-  private _computeBarPixelThickness = memoizedComputeBarPixelThickness();
-
   private _barPixelThickness() {
     if (this._fixedBarPixelThickness) {
       if (this._projectorsReady()) {
@@ -1050,10 +1054,9 @@ function signScale(scale: Scale<any, any>) {
 
 function signDataset(dataset: Dataset) {
   const datasetObj = {
-    // CAREFUL - sign the actual data array as a ref
-    // so we don't iterate over literally all the data
-    data: signRef(dataset.data()),
     ref: signRef(dataset),
+    // only sign updateId since only data() and metadata() exist as properties
+    // and both update updateId
     updateId: dataset.updateId(),
   };
   return signObj(datasetObj);
@@ -1075,11 +1078,26 @@ function sign<T>(a: T): Signature {
   }
 }
 
-function memoize<F extends Function>(compute: F): F {
+type LockedMemoize<F extends Function> = F & {
+  /**
+   * Lock the memoization to always return the cached
+   * property during the duration of fn. This lets you
+   * bypass the performance hit of signing when you
+   * know the fn will not mutate the inputs.
+   * @param fn
+   */
+  doLocked<T>(fn: () => T): T;
+};
+
+function memoize<F extends Function>(compute: F): LockedMemoize<F> {
   let lastSignature: Signature = undefined;
   let lastValue: any;
+  let locked = false;
 
   const memoizeFn = function(...args: any[]) {
+    if (locked) {
+      return lastValue;
+    }
     const inputSignature = signArray(args);
     if (lastSignature === undefined
         || lastSignature.isDifferent(inputSignature)) {
@@ -1087,6 +1105,15 @@ function memoize<F extends Function>(compute: F): F {
       lastValue = compute.apply(this, args);
     }
     return lastValue;
+  } as any as LockedMemoize<F>;
+  memoizeFn.doLocked = function<T>(cb: () => T) {
+    if (locked) {
+      throw new Error("Locking an already locked memoize function!");
+    }
+    locked = true;
+    const retVal = cb.apply(this);
+    locked = false;
+    return retVal;
   };
-  return memoizeFn as any as F;
+  return memoizeFn;
 }
