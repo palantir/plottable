@@ -256,8 +256,10 @@ export class Line<X> extends XYPlot<X, number> {
   }
 
   protected _createDrawer(dataset: Dataset) {
-    const canvasDrawer = makeLineCanvasDrawStep(() => this._d3LineFactory(dataset));
-    return new ProxyDrawer(() => new LineSVGDrawer(), canvasDrawer);
+    return new ProxyDrawer(
+      () => new LineSVGDrawer(),
+      (ctx) => new Drawers.CanvasDrawer(ctx, makeLineCanvasDrawStep(() => this._d3LineFactory(dataset))),
+    );
   }
 
   protected _extentsForProperty(property: string) {
@@ -394,13 +396,13 @@ export class Line<X> extends XYPlot<X, number> {
   protected _generateDrawSteps(): Drawers.DrawStep[] {
     const drawSteps: Drawers.DrawStep[] = [];
     if (this._animateOnNextRender()) {
-      const attrToProjector = this._generateAttrToProjector();
+      const attrToProjector = this._getAttrToProjector();
       attrToProjector["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), this._getResetYFunction());
       drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
     }
 
     drawSteps.push({
-      attrToProjector: this._generateAttrToProjector(),
+      attrToProjector: this._getAttrToProjector(),
       animator: this._getAnimator(Plots.Animator.MAIN),
     });
 

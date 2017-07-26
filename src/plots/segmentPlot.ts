@@ -32,13 +32,17 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
   }
 
   protected _createDrawer() {
-    return new ProxyDrawer(() => new SegmentSVGDrawer(), () => {
-      warn("canvas renderer is not supported on Segment Plot!");
-    });
+    return new ProxyDrawer(
+      () => new SegmentSVGDrawer(),
+      () => {
+        warn("canvas renderer is not supported on Segment Plot!");
+        return null;
+      },
+    );
   }
 
   protected _generateDrawSteps(): Drawers.DrawStep[] {
-    return [{ attrToProjector: this._generateAttrToProjector(), animator: new Animators.Null() }];
+    return [{ attrToProjector: this._getAttrToProjector(), animator: new Animators.Null() }];
   }
 
   protected _updateExtentsForProperty(property: string) {
@@ -228,7 +232,7 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
 
   private _entitiesIntersecting(xRange: Range, yRange: Range): IPlotEntity[] {
     const intersected: IPlotEntity[] = [];
-    const attrToProjector = this._generateAttrToProjector();
+    const attrToProjector = this._getAttrToProjector();
     this.entities().forEach((entity) => {
       if (this._lineIntersectsBox(entity, xRange, yRange, attrToProjector)) {
         intersected.push(entity);

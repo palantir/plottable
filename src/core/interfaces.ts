@@ -88,11 +88,22 @@ export type Bounds = {
 };
 
 /**
+ * Client bounds
+ */
+export interface IEntityBounds {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+/**
  * An object representing a data-backed visual entity inside a Component.
  */
 export interface IEntity<C extends Component> {
+  bounds: IEntityBounds;
+  component: C;
   datum: any;
   position: Point;
   selection: SimpleSelection<any>;
-  component: C;
 }

@@ -10,10 +10,18 @@ import * as Animators from "../animators";
 import { Dataset } from "../core/dataset";
 import * as Formatters from "../core/formatters";
 import { DatumFormatter } from "../core/formatters";
-import { AttributeToProjector, Bounds, IAccessor, Point, Range, SimpleSelection } from "../core/interfaces";
+import {
+  AttributeToProjector,
+  Bounds,
+  IAccessor,
+  IEntityBounds,
+  Point,
+  Range,
+  SimpleSelection,
+} from "../core/interfaces";
 import * as Drawers from "../drawers";
 import { ProxyDrawer } from "../drawers/drawer";
-import { RectangleCanvasDrawStep, RectangleSVGDrawer } from "../drawers/rectangleDrawer";
+import { RectangleSVGDrawer } from "../drawers/rectangleDrawer";
 import * as Scales from "../scales";
 import { QuantitativeScale } from "../scales/quantitativeScale";
 import { Scale } from "../scales/scale";
@@ -217,6 +225,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       return this._barAlignment;
     }
     this._barAlignment = align;
+
+    this._clearAttrToProjectorCache();
     this.render();
     return this;
   }
@@ -231,7 +241,10 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   }
 
   protected _createDrawer() {
-    return new ProxyDrawer(() => new RectangleSVGDrawer(Bar._BAR_AREA_CLASS), RectangleCanvasDrawStep);
+    return new ProxyDrawer(
+      () => new RectangleSVGDrawer(Bar._BAR_AREA_CLASS),
+      (ctx) => new Drawers.RectangleCanvasDrawer(ctx),
+    );
   }
 
   protected _setup() {
@@ -275,6 +288,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     }
     this._baselineValue = value;
     this._updateLengthScale();
+    this._clearAttrToProjectorCache();
     this.render();
     return this;
   }
@@ -339,6 +353,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       if (labelsPosition != null) {
         this._labelsPosition = labelsPosition;
       }
+
+      this._clearAttrToProjectorCache();
       this.render();
       return this;
     }
@@ -363,6 +379,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       return this._labelFormatter;
     } else {
       this._labelFormatter = formatter;
+
+      this._clearAttrToProjectorCache();
       this.render();
       return this;
     }
@@ -398,8 +416,6 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
    * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
    */
   public entityNearest(queryPoint: Point): IPlotEntity {
-    let minPrimaryDist = Infinity;
-    let minSecondaryDist = Infinity;
 
     const queryPtPrimary = this._isVertical ? queryPoint.x : queryPoint.y;
     const queryPtSecondary = this._isVertical ? queryPoint.y : queryPoint.x;
@@ -409,18 +425,33 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     // mouse events) usually have pixel accuracy. We add a tolerance of 0.5 pixels.
     const tolerance = 0.5;
 
+    // PERF: precompute all these values to prevent recomputing for each entity
     const chartBounds = this.bounds();
+    const chartWidth = chartBounds.bottomRight.x - chartBounds.topLeft.x;
+    const chartHeight = chartBounds.bottomRight.y - chartBounds.topLeft.y;
+    const xRange = { min: 0, max: chartWidth };
+    const yRange = { min: 0, max: chartHeight };
+    const originalPositionProjector = (this._isVertical ? Plot._scaledAccessor(this.y()) : Plot._scaledAccessor(this.x()));
+    const scaledBaseline = (<Scale<any, any>> (this._isVertical ? this.y().scale : this.x().scale)).scale(this.baselineValue());
+    const plotPointFactory = (datum: any, index: number, dataset: Dataset, rect: IEntityBounds) => {
+      return this._pixelPointBar(originalPositionProjector(datum, index, dataset), scaledBaseline, rect);
+    };
+
+    let minPrimaryDist = Infinity;
+    let minSecondaryDist = Infinity;
     let closest: ILightweightPlotEntity;
     this._getEntityStore().entities().forEach((entity: ILightweightPlotEntity) => {
-      if (!this._entityVisibleOnPlot(entity, chartBounds)) {
+      const barBBox = this._entityBounds(entity);
+      if (!Utils.DOM.intersectsBBox(xRange, yRange, barBBox)) {
         return;
       }
+
       let primaryDist = 0;
       let secondaryDist = 0;
-      const plotPt = this._pixelPoint(entity.datum, entity.index, entity.dataset);
+
       // if we're inside a bar, distance in both directions should stay 0
-      const barBBox = Utils.DOM.elementBBox(d3.select(entity.drawer.getVisualPrimitiveAtIndex(entity.validDatumIndex)));
       if (!Utils.DOM.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
+        const plotPt = plotPointFactory(entity.datum, entity.index, entity.dataset, barBBox);
         const plotPtPrimary = this._isVertical ? plotPt.x : plotPt.y;
         primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
 
@@ -436,6 +467,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
           secondaryDist = Math.abs(queryPtSecondary - plotPtSecondary);
         }
       }
+
       // if we find a closer bar, record its distance and start new closest lists
       if (primaryDist < minPrimaryDist
         || primaryDist === minPrimaryDist && secondaryDist < minSecondaryDist) {
@@ -450,27 +482,6 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     } else {
       return undefined;
     }
-  }
-
-  protected _entityVisibleOnPlot(entity: Plots.IPlotEntity | Plots.ILightweightPlotEntity, bounds: Bounds) {
-    const chartWidth = bounds.bottomRight.x - bounds.topLeft.x;
-    const chartHeight = bounds.bottomRight.y - bounds.topLeft.y;
-
-    const xRange = { min: 0, max: chartWidth };
-    const yRange = { min: 0, max: chartHeight };
-
-    const attrToProjector = this._generateAttrToProjector();
-
-    const { datum, index, dataset } = entity;
-
-    const barBBox = {
-      x: attrToProjector["x"](datum, index, dataset),
-      y: attrToProjector["y"](datum, index, dataset),
-      width: attrToProjector["width"](datum, index, dataset),
-      height: attrToProjector["height"](datum, index, dataset),
-    };
-
-    return Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
   }
 
   /**
@@ -515,8 +526,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   private _entitiesIntersecting(xValOrRange: number | Range, yValOrRange: number | Range): IPlotEntity[] {
     const intersected: IPlotEntity[] = [];
     this._getEntityStore().entities().forEach((entity) => {
-      const selection = d3.select(entity.drawer.getVisualPrimitiveAtIndex(entity.validDatumIndex));
-      if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, Utils.DOM.elementBBox(selection))) {
+      if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, this._entityBounds(entity))) {
         intersected.push(this._lightweightPlotEntityToPlotEntity(entity));
       }
     });
@@ -612,7 +622,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
 
   protected _drawLabels() {
     const dataToDraw = this._getDataToDraw();
-    const attrToProjector = this._generateAttrToProjector();
+    const attrToProjector = this._getAttrToProjector();
     const anyLabelTooWide = this.datasets().some((dataset) => {
       return dataToDraw.get(dataset).some((datum, index) => {
         return this._drawLabel(datum, index, dataset, attrToProjector);
@@ -777,7 +787,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   protected _generateDrawSteps(): Drawers.DrawStep[] {
     const drawSteps: Drawers.DrawStep[] = [];
     if (this._animateOnNextRender()) {
-      const resetAttrToProjector = this._generateAttrToProjector();
+      const resetAttrToProjector = this._getAttrToProjector();
       const lengthScale = this.length().scale;
       const scaledBaseline = lengthScale.scale(this.baselineValue());
       const lengthAttr = this._isVertical ? "y" : "x";
@@ -787,7 +797,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
     }
     drawSteps.push({
-      attrToProjector: this._generateAttrToProjector(),
+      attrToProjector: this._getAttrToProjector(),
       animator: this._getAnimator(Plots.Animator.MAIN),
     });
     return drawSteps;
@@ -875,24 +885,50 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     return entities;
   }
 
+  protected _entityBounds(entity: Plots.IPlotEntity | Plots.ILightweightPlotEntity) {
+    const { datum, index, dataset } = entity;
+    return this._pixelBounds(datum, index, dataset);
+  }
+
+  /**
+   * The rectangular bounds of a bar. Note that the x/y coordinates are not the
+   * same as the "pixel point" because they are always at the top/left of the
+   * bar.
+   */
+  protected _pixelBounds(datum: any, index: number, dataset: Dataset) {
+    const attrToProjector = this._getAttrToProjector();
+    return {
+      x: attrToProjector["x"](datum, index, dataset),
+      y: attrToProjector["y"](datum, index, dataset),
+      width: attrToProjector["width"](datum, index, dataset),
+      height: attrToProjector["height"](datum, index, dataset),
+    };
+  }
+
+  /**
+   * The "pixel point" of a bar is the farthest point from the baseline.
+   *
+   * For example, in a vertical bar chart with positive bar values, the pixel
+   * point will be at the top of the bar. For negative bar values, the pixel
+   * point will be at the bottom of the bar.
+   */
   protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point {
-    const attrToProjector = this._generateAttrToProjector();
-    const rectX = attrToProjector["x"](datum, index, dataset);
-    const rectY = attrToProjector["y"](datum, index, dataset);
-    const rectWidth = attrToProjector["width"](datum, index, dataset);
-    const rectHeight = attrToProjector["height"](datum, index, dataset);
-    let x: number;
-    let y: number;
+    const rect = this._pixelBounds(datum, index, dataset);
     const originalPosition = (this._isVertical ? Plot._scaledAccessor(this.y()) : Plot._scaledAccessor(this.x()))(datum, index, dataset);
     const scaledBaseline = (<Scale<any, any>> (this._isVertical ? this.y().scale : this.x().scale)).scale(this.baselineValue());
-    if (this._isVertical) {
-      x = rectX + rectWidth / 2;
-      y = originalPosition <= scaledBaseline ? rectY : rectY + rectHeight;
-    } else {
-      x = originalPosition >= scaledBaseline ? rectX + rectWidth : rectX;
-      y = rectY + rectHeight / 2;
-    }
-    return { x: x, y: y };
+    return this._pixelPointBar(originalPosition, scaledBaseline, rect);
+  }
+
+  private _pixelPointBar(originalPosition: number, scaledBaseline: number, rect: IEntityBounds) {
+      let x, y;
+      if (this._isVertical) {
+        x = rect.x + rect.width / 2;
+        y = originalPosition <= scaledBaseline ? rect.y : rect.y + rect.height;
+      } else {
+        x = originalPosition >= scaledBaseline ? rect.x + rect.width : rect.x;
+        y = rect.y + rect.height / 2;
+      }
+      return { x, y };
   }
 
   protected _uninstallScaleForKey(scale: Scale<any, number>, key: string) {
@@ -902,7 +938,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
 
   protected _getDataToDraw(): Utils.Map<Dataset, any[]> {
     const dataToDraw = new Utils.Map<Dataset, any[]>();
-    const attrToProjector = this._generateAttrToProjector();
+    const attrToProjector = this._getAttrToProjector();
     this.datasets().forEach((dataset: Dataset) => {
       const data = dataset.data().filter((d, i) => Utils.Math.isValidNumber(attrToProjector["x"](d, i, dataset)) &&
       Utils.Math.isValidNumber(attrToProjector["y"](d, i, dataset)) &&

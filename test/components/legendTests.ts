@@ -3,7 +3,7 @@ import * as d3 from "d3";
 import { assert } from "chai";
 
 import * as Plottable from "../../src";
-import { getTranslateValues } from "../../src/utils/domUtils";
+import { entityBounds, getTranslateValues } from "../../src/utils/domUtils";
 
 import * as TestMethods from "../testMethods";
 
@@ -504,6 +504,7 @@ describe("Legend", () => {
         position: computeExpectedSymbolPosition(0, 0),
         selection: d3.select(entries.nodes()[0]),
         component: legend,
+        bounds: entityBounds(entries.nodes()[0]),
       };
       TestMethods.assertEntitiesEqual(entities[0], expectedEntity, "returned Entity corresponding to first entry");
 
@@ -513,6 +514,7 @@ describe("Legend", () => {
         position: computeExpectedSymbolPosition(1, 0),
         selection: d3.select(entries.nodes()[1]),
         component: legend,
+        bounds: entityBounds(entries.nodes()[1]),
       };
       TestMethods.assertEntitiesEqual(entities[0], expectedEntity, "returned Entity corresponding to second entry");
       div.remove();
@@ -530,6 +532,7 @@ describe("Legend", () => {
         position: computeExpectedSymbolPosition(0, 0),
         selection: d3.select(entries.nodes()[0]),
         component: legend,
+        bounds: entityBounds(entries.nodes()[0]),
       };
       TestMethods.assertEntitiesEqual(entities[0], expectedEntity, "returned Entity corresponding to first entry");
 
@@ -539,6 +542,7 @@ describe("Legend", () => {
         position: computeExpectedSymbolPosition(0, 1),
         selection: d3.select(entries.nodes()[1]),
         component: legend,
+        bounds: entityBounds(entries.nodes()[1]),
       };
       TestMethods.assertEntitiesEqual(entities[0], expectedEntity, "returned Entity corresponding to second entry");
 

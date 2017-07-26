@@ -9,7 +9,6 @@
     ],
     "interface-name": [true, "always-prefix"],
     "ordered-imports": true,
-    "no-boolean-literal-compare": true,
     "no-consecutive-blank-lines": true,
     "no-console": true,
     "no-inferrable-types": [true, "ignore-params", "ignore-properties"],

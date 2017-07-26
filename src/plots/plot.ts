@@ -18,6 +18,7 @@ import {
   SimpleSelection,
 } from "../core/interfaces";
 import * as Drawers from "../drawers";
+import { CanvasDrawer } from "../drawers/canvasDrawer";
 import { ProxyDrawer } from "../drawers/drawer";
 import { AppliedDrawStep, DrawStep } from "../drawers/index";
 import { SVGDrawer } from "../drawers/svgDrawer";
@@ -272,7 +273,10 @@ export class Plot extends Component {
    * a Drawer that draws the correct shapes for this plot.
    */
   protected _createDrawer(dataset: Dataset): ProxyDrawer {
-    return new ProxyDrawer(() => new SVGDrawer("path", ""), () => {});
+    return new ProxyDrawer(
+      () => new SVGDrawer("path", ""),
+      (ctx) => new CanvasDrawer(ctx, () => {}),
+    );
   }
 
   protected _getAnimator(key: string): IAnimator {
@@ -343,9 +347,10 @@ export class Plot extends Component {
     if (scale != null) {
       this._installScaleForKey(scale, property);
     }
+    this._clearAttrToProjectorCache();
   }
 
-  private _bindAttr(attr: string, valueOrFn: any | Function, scale: Scale<any, any>) {
+  protected _bindAttr(attr: string, valueOrFn: any | Function, scale: Scale<any, any>) {
     const binding = this._attrBindings.get(attr);
     const oldScale = binding != null ? binding.scale : null;
 
@@ -359,6 +364,21 @@ export class Plot extends Component {
     if (scale != null) {
       this._installScaleForKey(scale, attr);
     }
+    this._clearAttrToProjectorCache();
+  }
+
+  private _cachedAttrToProjector: AttributeToProjector;
+
+  protected _clearAttrToProjectorCache() {
+    delete this._cachedAttrToProjector;
+  }
+
+  protected _getAttrToProjector(): AttributeToProjector {
+    if (this._cachedAttrToProjector == null) {
+      this._cachedAttrToProjector = this._generateAttrToProjector();
+    }
+    // return shallow clone of cached projector
+    return Utils.Object.assign({}, this._cachedAttrToProjector);
   }
 
   protected _generateAttrToProjector(): AttributeToProjector {
@@ -644,7 +664,7 @@ export class Plot extends Component {
   }
 
   protected _generateDrawSteps(): Drawers.DrawStep[] {
-    return [{ attrToProjector: this._generateAttrToProjector(), animator: new Animators.Null() }];
+    return [{ attrToProjector: this._getAttrToProjector(), animator: new Animators.Null() }];
   }
 
   protected _additionalPaint(time: number) {
@@ -696,6 +716,8 @@ export class Plot extends Component {
   }
 
   private _paint() {
+    delete this._cachedAttrToProjector;
+
     const drawSteps = this._generateDrawSteps();
     const dataToDraw = this._getDataToDraw();
     const drawers = this.datasets().map((dataset) => this._datasetToDrawer.get(dataset));
@@ -727,7 +749,8 @@ export class Plot extends Component {
    */
   public selections(datasets = this.datasets()): SimpleSelection<any> {
     if (this.renderer() === "canvas") {
-      return d3.select(null);
+      // return empty selection
+      return d3.selectAll();
     } else {
       const selections: d3.BaseType[] = [];
 
@@ -775,14 +798,21 @@ export class Plot extends Component {
     return this._cachedEntityStore;
   }
 
+  protected _entityBounds(entity: Plots.IPlotEntity | Plots.ILightweightPlotEntity) {
+    const { datum, index, dataset } = entity;
+    const { x, y } = this._pixelPoint(datum, index, dataset);
+    return {x, y, width: 0, height: 0};
+  }
+
   protected _lightweightPlotEntityToPlotEntity(entity: Plots.ILightweightPlotEntity) {
     const plotEntity: Plots.IPlotEntity = {
-      datum: entity.datum,
-      position: entity.position,
+      bounds: this._entityBounds(entity),
+      component: entity.component,
       dataset: entity.dataset,
       datasetIndex: entity.datasetIndex,
+      datum: entity.datum,
       index: entity.index,
-      component: entity.component,
+      position: entity.position,
       selection: d3.select(entity.drawer.getVisualPrimitives()[entity.validDatumIndex]),
     };
     return plotEntity;

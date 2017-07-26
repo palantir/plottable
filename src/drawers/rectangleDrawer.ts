@@ -4,7 +4,12 @@
  */
 
 import { AttributeToAppliedProjector } from "../core/interfaces";
-import { CanvasDrawStep, resolveAttributesSubsetWithStyles, styleContext } from "./canvasDrawer";
+import {
+  CanvasDrawer,
+  CanvasDrawStep,
+  renderPathWithStyle,
+  resolveAttributesSubsetWithStyles,
+} from "./canvasDrawer";
 import { SVGDrawer } from "./svgDrawer";
 
 export class RectangleSVGDrawer extends SVGDrawer {
@@ -14,21 +19,24 @@ export class RectangleSVGDrawer extends SVGDrawer {
   }
 }
 
+const RECT_ATTRS = ["x", "y", "width", "height"];
+
 export const RectangleCanvasDrawStep: CanvasDrawStep = (
     context: CanvasRenderingContext2D,
     data: any[],
-    attrToAppliedProjector: AttributeToAppliedProjector) => {
+    projector: AttributeToAppliedProjector) => {
   context.save();
   data.forEach((datum, index) => {
-    const attrs = resolveAttributesSubsetWithStyles(
-      attrToAppliedProjector,
-      ["x", "y", "width", "height"],
-      datum,
-      index,
-    );
+    const attrs = resolveAttributesSubsetWithStyles(projector, RECT_ATTRS, datum, index);
     context.beginPath();
     context.rect(attrs["x"], attrs["y"], attrs["width"], attrs["height"]);
-    styleContext(context, attrs);
+    renderPathWithStyle(context, attrs);
   });
   context.restore();
 };
+
+export class RectangleCanvasDrawer extends CanvasDrawer {
+  constructor(ctx: CanvasRenderingContext2D) {
+    super(ctx, RectangleCanvasDrawStep);
+  }
+}

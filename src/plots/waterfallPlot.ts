@@ -206,7 +206,7 @@ export class Waterfall<X, Y> extends Bar<X, number> {
   }
 
   private _drawConnectors() {
-    const attrToProjector = this._generateAttrToProjector();
+    const attrToProjector = this._getAttrToProjector();
     const dataset = this.datasets()[0];
     for (let datumIndex = 1; datumIndex < dataset.data().length; datumIndex++) {
       const prevIndex = datumIndex - 1;

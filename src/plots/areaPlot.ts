@@ -7,22 +7,21 @@ import * as d3 from "d3";
 
 import { Dataset } from "../core/dataset";
 import { AttributeToProjector, IAccessor, Projector, SimpleSelection } from "../core/interfaces";
-import * as Drawers from "../drawers";
 import * as Scales from "../scales";
 import { QuantitativeScale } from "../scales/quantitativeScale";
 import * as Utils from "../utils";
 
-import { AreaSVGDrawer } from "../drawers/areaDrawer";
+import * as Drawers from "../drawers";
+import { AreaSVGDrawer, makeAreaCanvasDrawStep } from "../drawers/areaDrawer";
 import { ProxyDrawer } from "../drawers/drawer";
-import { LineSVGDrawer } from "../drawers/lineDrawer";
-import { warn } from "../utils/windowUtils";
+import { LineSVGDrawer, makeLineCanvasDrawStep } from "../drawers/lineDrawer";
 import * as Plots from "./";
 import { Line } from "./linePlot";
 import { Plot } from "./plot";
 
 export class Area<X> extends Line<X> {
   private static _Y0_KEY = "y0";
-  private _lineDrawers: Utils.Map<Dataset, LineSVGDrawer>;
+  private _lineDrawers: Utils.Map<Dataset, ProxyDrawer>;
   private _constantBaselineValueProvider: () => number[];
 
   /**
@@ -37,12 +36,7 @@ export class Area<X> extends Line<X> {
     this.attr("fill-opacity", 0.25);
     this.attr("fill", new Scales.Color().range()[0]);
 
-    this._lineDrawers = new Utils.Map<Dataset, LineSVGDrawer>();
-  }
-
-  protected _setup() {
-    super._setup();
-    this._lineDrawers.forEach((lineDrawer) => lineDrawer.attachTo(this._renderArea));
+    this._lineDrawers = new Utils.Map<Dataset, ProxyDrawer>();
   }
 
   public y(): Plots.ITransformableAccessorScaleBinding<number, number>;
@@ -98,19 +92,29 @@ export class Area<X> extends Line<X> {
     this._updateYScale();
   }
 
-  public addDataset(dataset: Dataset) {
-    super.addDataset(dataset);
+  protected _addDataset(dataset: Dataset) {
+    this._lineDrawers.set(dataset, new Drawers.ProxyDrawer(
+      () => new LineSVGDrawer(),
+      (ctx) => new Drawers.CanvasDrawer(ctx, makeLineCanvasDrawStep(() => {
+            const xProjector = Plot._scaledAccessor(this.x());
+            const yProjector = Plot._scaledAccessor(this.y());
+            return this._d3LineFactory(dataset, xProjector, yProjector);
+          }),
+      )),
+    );
+    super._addDataset(dataset);
     return this;
   }
 
-  protected _addDataset(dataset: Dataset) {
-    const lineDrawer = new LineSVGDrawer();
-    if (this._isSetup) {
-      lineDrawer.attachTo(this._renderArea);
+  protected _createNodesForDataset(dataset: Dataset) {
+    super._createNodesForDataset(dataset);
+    const drawer = this._lineDrawers.get(dataset);
+    if (this.renderer() === "svg") {
+      drawer.useSVG(this._renderArea);
+    } else {
+      drawer.useCanvas(this._canvas);
     }
-    this._lineDrawers.set(dataset, lineDrawer);
-    super._addDataset(dataset);
-    return this;
+    return drawer;
   }
 
   protected _removeDatasetNodes(dataset: Dataset) {
@@ -142,29 +146,42 @@ export class Area<X> extends Line<X> {
   }
 
   private _generateLineAttrToProjector() {
-    const lineAttrToProjector = this._generateAttrToProjector();
+    const lineAttrToProjector = this._getAttrToProjector();
     lineAttrToProjector["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), Plot._scaledAccessor(this.y()));
     return lineAttrToProjector;
   }
 
-  protected _createDrawer() {
-    return new ProxyDrawer(() => new AreaSVGDrawer(), () => {
-      warn("canvas renderer not implemented on Area Plot!");
-    });
+  protected _createDrawer(dataset: Dataset) {
+    return new ProxyDrawer(
+      () => new AreaSVGDrawer(),
+      (ctx) => {
+        return new Drawers.CanvasDrawer(ctx, makeAreaCanvasDrawStep(
+          () => {
+            const xProjector = Plot._scaledAccessor(this.x());
+            const yProjector = Plot._scaledAccessor(this.y());
+            const y0Projector = Plot._scaledAccessor(this.y0());
+            const definedProjector = this._createDefinedProjector(xProjector, yProjector);
+            return this._createAreaGenerator(xProjector, yProjector, y0Projector, definedProjector, dataset);
+          },
+        ));
+      },
+    );
   }
 
   protected _generateDrawSteps(): Drawers.DrawStep[] {
     const drawSteps: Drawers.DrawStep[] = [];
     if (this._animateOnNextRender()) {
-      const attrToProjector = this._generateAttrToProjector();
-      attrToProjector["d"] = this._constructAreaProjector(Plot._scaledAccessor(this.x()),
+      const attrToProjector = this._getAttrToProjector();
+      attrToProjector["d"] = this._constructAreaProjector(
+        Plot._scaledAccessor(this.x()),
         this._getResetYFunction(),
-        Plot._scaledAccessor(this.y0()));
+        Plot._scaledAccessor(this.y0()),
+      );
       drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
     }
 
     drawSteps.push({
-      attrToProjector: this._generateAttrToProjector(),
+      attrToProjector: this._getAttrToProjector(),
       animator: this._getAnimator(Plots.Animator.MAIN),
     });
 
@@ -200,13 +217,19 @@ export class Area<X> extends Line<X> {
 
   protected _propertyProjectors(): AttributeToProjector {
     const propertyToProjectors = super._propertyProjectors();
-    propertyToProjectors["d"] = this._constructAreaProjector(Plot._scaledAccessor(this.x()),
+    propertyToProjectors["d"] = this._constructAreaProjector(
+      Plot._scaledAccessor(this.x()),
       Plot._scaledAccessor(this.y()),
-      Plot._scaledAccessor(this.y0()));
+      Plot._scaledAccessor(this.y0()),
+    );
     return propertyToProjectors;
   }
 
   public selections(datasets = this.datasets()): SimpleSelection<any> {
+    if (this.renderer() === "canvas") {
+      return d3.selectAll();
+    }
+
     const allSelections = super.selections(datasets).nodes();
     const lineDrawers = datasets.map((dataset) => this._lineDrawers.get(dataset))
       .filter((drawer) => drawer != null);
@@ -215,12 +238,32 @@ export class Area<X> extends Line<X> {
   }
 
   protected _constructAreaProjector(xProjector: Projector, yProjector: Projector, y0Projector: Projector) {
-    const definedProjector = (d: any, i: number, dataset: Dataset) => {
-      const positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
-      const positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
+    const definedProjector = this._createDefinedProjector(
+      Plot._scaledAccessor(this.x()),
+      Plot._scaledAccessor(this.y()),
+    );
+
+    return (datum: any[], index: number, dataset: Dataset) => {
+      const areaGenerator = this._createAreaGenerator(xProjector, yProjector, y0Projector, definedProjector, dataset);
+      return areaGenerator(datum);
+    };
+  }
+
+  private _createDefinedProjector(xProjector: Projector, yProjector: Projector) {
+    return (d: any, i: number, dataset: Dataset) => {
+      const positionX = xProjector(d, i, dataset);
+      const positionY = yProjector(d, i, dataset);
       return Utils.Math.isValidNumber(positionX) && Utils.Math.isValidNumber(positionY);
     };
-    return (datum: any[], index: number, dataset: Dataset) => {
+  }
+
+  private _createAreaGenerator(
+    xProjector: Projector,
+    yProjector: Projector,
+    y0Projector: Projector,
+    definedProjector: Projector,
+    dataset: Dataset,
+  ) {
       // just runtime error if user passes curveBundle to area plot
       const curveFactory = this._getCurveFactory() as d3.CurveFactory;
       const areaGenerator = d3.area()
@@ -229,7 +272,6 @@ export class Area<X> extends Line<X> {
         .y0((innerDatum, innerIndex) => y0Projector(innerDatum, innerIndex, dataset))
         .curve(curveFactory)
         .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset));
-      return areaGenerator(datum);
-    };
+      return areaGenerator;
   }
 }

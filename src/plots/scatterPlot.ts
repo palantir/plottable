@@ -66,11 +66,15 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
   protected _createDrawer(dataset: Dataset) {
     return new ProxyDrawer(
       () => new SymbolSVGDrawer(),
-      makeSymbolCanvasDrawStep(
-        dataset,
-        () => Plot._scaledAccessor(this.symbol()),
-        () => Plot._scaledAccessor(this.size()),
-      ),
+      (ctx) => {
+        return new Drawers.CanvasDrawer(ctx,
+          makeSymbolCanvasDrawStep(
+            dataset,
+            () => Plot._scaledAccessor(this.symbol()),
+            () => Plot._scaledAccessor(this.size()),
+          ),
+        );
+      },
     );
   }
 
@@ -128,7 +132,7 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
   protected _generateDrawSteps(): Drawers.DrawStep[] {
     const drawSteps: Drawers.DrawStep[] = [];
     if (this._animateOnNextRender()) {
-      const attrToProjector = this._generateAttrToProjector();
+      const attrToProjector = this._getAttrToProjector();
 
       const symbolProjector = Plot._scaledAccessor(this.symbol());
       attrToProjector["d"] = (datum: any, index: number, dataset: Dataset) => symbolProjector(datum, index, dataset)(0)(null);
@@ -136,7 +140,7 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
     }
 
     drawSteps.push({
-      attrToProjector: this._generateAttrToProjector(),
+      attrToProjector: this._getAttrToProjector(),
       animator: this._getAnimator(Plots.Animator.MAIN),
     });
     return drawSteps;

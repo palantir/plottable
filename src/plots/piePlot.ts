@@ -133,9 +133,12 @@ export class Pie extends Plot {
   }
 
   protected _createDrawer() {
-    return new ProxyDrawer(() => new ArcSVGDrawer(), () => {
-      warn("canvas renderer is not supported on Pie Plot!");
-    });
+    return new ProxyDrawer(
+      () => new ArcSVGDrawer(),
+      () => {
+        warn("canvas renderer is not supported on Pie Plot!");
+        return null;
+      });
   }
 
   public entities(datasets = this.datasets()): IPiePlotEntity[] {
@@ -557,7 +560,7 @@ export class Pie extends Plot {
   }
 
   private _generateStrokeDrawSteps() {
-    const attrToProjector = this._generateAttrToProjector();
+    const attrToProjector = this._getAttrToProjector();
     return [{ attrToProjector: attrToProjector, animator: new Animators.Null() }];
   }
 
@@ -587,7 +590,7 @@ export class Pie extends Plot {
   }
 
   private _drawLabels() {
-    const attrToProjector = this._generateAttrToProjector();
+    const attrToProjector = this._getAttrToProjector();
     const labelArea = this._renderArea.append("g").classed("label-area", true);
 
     const context = new Typesettable.SvgContext(labelArea.node() as SVGElement);
