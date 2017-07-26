@@ -26,16 +26,16 @@ function run(svg, data, Plottable) {
 
     var segment = new Plottable.Plots.Segment()
       .x(function(d) { return d.x; }, xScale)
-      .x2(function(d) { return d.x2; }, xScale)
+      .x2(function(d) { return d.x2; })
       .y(function(d) { return d.y; }, yScale)
       .attr("stroke", "#dddddd")
       .addDataset(new Plottable.Dataset(data[0]));
 
     var rectangle = new Plottable.Plots.Rectangle()
       .x(function(d) { return d.x; }, xScale)
-      .x2(function(d) { return d.x2; }, xScale)
+      .x2(function(d) { return d.x2; })
       .y(function(d) { return d.y; }, yScale)
-      .y2(function(d){ return d.y + .1; }, yScale)
+      .y2(function(d){ return d.y + .1; })
       .attr("fill", "#dddddd")
       .addDataset(new Plottable.Dataset(data[1]));
 

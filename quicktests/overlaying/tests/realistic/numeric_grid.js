@@ -23,8 +23,8 @@ function run(svg, data, Plottable) {
   plot.addDataset(new Plottable.Dataset(data));
   plot.x(function(d){ return d.x; }, xScale)
       .y(function(d) { return d.y; }, yScale)
-      .x2(function(d){ return d.x2; }, xScale)
-      .y2(function(d) { return d.y2; }, yScale)
+      .x2(function(d){ return d.x2; })
+      .y2(function(d) { return d.y2; })
       .attr("fill", function(d) { return d.fill; })
       .attr("opacity", .5)
       .attr("stroke", function(){ return "#000000"; })
