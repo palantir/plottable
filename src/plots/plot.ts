@@ -347,7 +347,7 @@ export class Plot extends Component {
     if (scale != null) {
       this._installScaleForKey(scale, property);
     }
-    delete this._cachedAttrToProjector;
+    this._clearAttrToProjectorCache();
   }
 
   protected _bindAttr(attr: string, valueOrFn: any | Function, scale: Scale<any, any>) {
@@ -364,10 +364,14 @@ export class Plot extends Component {
     if (scale != null) {
       this._installScaleForKey(scale, attr);
     }
-    delete this._cachedAttrToProjector;
+    this._clearAttrToProjectorCache();
   }
 
-  protected _cachedAttrToProjector: AttributeToProjector;
+  private _cachedAttrToProjector: AttributeToProjector;
+
+  protected _clearAttrToProjectorCache() {
+    delete this._cachedAttrToProjector;
+  }
 
   protected _getAttrToProjector(): AttributeToProjector {
     if (this._cachedAttrToProjector == null) {

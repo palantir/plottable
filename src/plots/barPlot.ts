@@ -225,7 +225,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       return this._barAlignment;
     }
     this._barAlignment = align;
-    delete this._cachedAttrToProjector;
+
+    this._clearAttrToProjectorCache();
     this.render();
     return this;
   }
@@ -287,7 +288,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     }
     this._baselineValue = value;
     this._updateLengthScale();
-    delete this._cachedAttrToProjector;
+    this._clearAttrToProjectorCache();
     this.render();
     return this;
   }
@@ -352,7 +353,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       if (labelsPosition != null) {
         this._labelsPosition = labelsPosition;
       }
-      delete this._cachedAttrToProjector;
+
+      this._clearAttrToProjectorCache();
       this.render();
       return this;
     }
@@ -377,7 +379,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       return this._labelFormatter;
     } else {
       this._labelFormatter = formatter;
-      delete this._cachedAttrToProjector;
+
+      this._clearAttrToProjectorCache();
       this.render();
       return this;
     }
