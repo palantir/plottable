@@ -3,12 +3,11 @@
  * @license MIT
  */
 
-import { AttributeToAppliedProjector, IEntityBounds } from "../core/interfaces";
+import { AttributeToAppliedProjector } from "../core/interfaces";
 import {
   CanvasDrawer,
   CanvasDrawStep,
   renderPathWithStyle,
-  resolveAttributes,
   resolveAttributesSubsetWithStyles,
 } from "./canvasDrawer";
 import { SVGDrawer } from "./svgDrawer";

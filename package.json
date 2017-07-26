@@ -19,7 +19,7 @@
     "dist": "npm-run-all clean build:tsc dist:sed-version",
     "dist:sed-version": "sed -i.bak -e \"s/exports.version = __VERSION__/exports.version = \\\"${npm_package_version}\\\"/\" build/src/core/version.js",
     "lint": "npm run lint:tslint",
-    "lint:tslint": "tslint --project tsconfig.json --type-check",
+    "lint:tslint": "tslint --project tsconfig.json",
     "start": "npm-run-all -p start:update-quicktests start:watch-tsc start:watch-quicktests start:webpack-dev-server",
     "start:update-quicktests": "grunt update-quicktests",
     "start:watch-quicktests": "grunt watch-quicktests",

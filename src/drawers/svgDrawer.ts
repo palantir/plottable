@@ -7,7 +7,7 @@ import * as d3 from "d3";
 
 import * as Utils from "../utils";
 
-import { AttributeToAppliedProjector, SimpleSelection } from "../core/interfaces";
+import { SimpleSelection } from "../core/interfaces";
 import { IDrawer } from "./drawer";
 import { AppliedDrawStep } from "./drawStep";
 

@@ -794,7 +794,7 @@ export class Plot extends Component {
 
   protected _entityBounds(entity: Plots.IPlotEntity | Plots.ILightweightPlotEntity) {
     const { datum, index, dataset } = entity;
-    const { x, y } = this._pixelPoint(dataset, index, dataset);
+    const { x, y } = this._pixelPoint(datum, index, dataset);
     return {x, y, width: 0, height: 0};
   }
 

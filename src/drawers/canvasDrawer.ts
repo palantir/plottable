@@ -4,7 +4,7 @@
  */
 
 import * as d3 from "d3";
-import { AttributeToAppliedProjector, IEntityBounds } from "../core/interfaces";
+import { AttributeToAppliedProjector } from "../core/interfaces";
 import { IDrawer } from "./drawer";
 import { AppliedDrawStep } from "./drawStep";
 
