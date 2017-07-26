@@ -20,8 +20,6 @@ export type CanvasDrawStep = (
  * This class is immutable (but has internal state) and shouldn't be extended.
  */
 export class CanvasDrawer implements IDrawer {
-  protected _lastDrawnData: any[];
-  protected _lastProjector: AttributeToAppliedProjector;
 
   /**
    * @param _context The context for a canvas that this drawer will draw to.
@@ -36,12 +34,11 @@ export class CanvasDrawer implements IDrawer {
   }
 
   public draw(data: any[], appliedDrawSteps: AppliedDrawStep[]) {
-    this._lastDrawnData = data;
-    this._lastProjector = appliedDrawSteps[appliedDrawSteps.length - 1].attrToAppliedProjector;
+    const projector  = appliedDrawSteps[appliedDrawSteps.length - 1].attrToAppliedProjector;
 
     // don't support animations for now; just draw the last draw step immediately
     this._context.save();
-    this._drawStep(this._context, this._lastDrawnData, this._lastProjector);
+    this._drawStep(this._context, data, projector);
     this._context.restore();
   }
 
