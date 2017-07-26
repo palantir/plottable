@@ -7,7 +7,7 @@ import * as d3 from "d3";
 
 import * as Utils from "../utils";
 
-import { SimpleSelection } from "../core/interfaces";
+import { AttributeToAppliedProjector, SimpleSelection } from "../core/interfaces";
 import { IDrawer } from "./drawer";
 import { AppliedDrawStep } from "./drawStep";
 
@@ -72,10 +72,6 @@ export class SVGDrawer implements IDrawer {
 
   public getVisualPrimitiveAtIndex(index: number) {
     return this.getVisualPrimitives()[index];
-  }
-
-  public getClientRectAtIndex(index: number) {
-    return Utils.DOM.elementBBox(d3.select(this.getVisualPrimitiveAtIndex(index)));
   }
 
   public remove() {

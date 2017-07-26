@@ -347,9 +347,10 @@ export class Plot extends Component {
     if (scale != null) {
       this._installScaleForKey(scale, property);
     }
+    delete this._cachedAttrToProjector;
   }
 
-  private _bindAttr(attr: string, valueOrFn: any | Function, scale: Scale<any, any>) {
+  protected _bindAttr(attr: string, valueOrFn: any | Function, scale: Scale<any, any>) {
     const binding = this._attrBindings.get(attr);
     const oldScale = binding != null ? binding.scale : null;
 
@@ -363,6 +364,17 @@ export class Plot extends Component {
     if (scale != null) {
       this._installScaleForKey(scale, attr);
     }
+    delete this._cachedAttrToProjector;
+  }
+
+  private _cachedAttrToProjector: AttributeToProjector;
+
+  protected _getAttrToProjector(): AttributeToProjector {
+    if (this._cachedAttrToProjector == null) {
+      this._cachedAttrToProjector = this._generateAttrToProjector();
+    }
+    // return shallow clone of cached projector
+    return Utils.Object.assign({}, this._cachedAttrToProjector);
   }
 
   protected _generateAttrToProjector(): AttributeToProjector {
@@ -648,7 +660,7 @@ export class Plot extends Component {
   }
 
   protected _generateDrawSteps(): Drawers.DrawStep[] {
-    return [{ attrToProjector: this._generateAttrToProjector(), animator: new Animators.Null() }];
+    return [{ attrToProjector: this._getAttrToProjector(), animator: new Animators.Null() }];
   }
 
   protected _additionalPaint(time: number) {
@@ -780,9 +792,15 @@ export class Plot extends Component {
     return this._cachedEntityStore;
   }
 
+  protected _entityBounds(entity: Plots.IPlotEntity | Plots.ILightweightPlotEntity) {
+    const { datum, index, dataset } = entity;
+    const { x, y } = this._pixelPoint(dataset, index, dataset);
+    return {x, y, width: 0, height: 0};
+  }
+
   protected _lightweightPlotEntityToPlotEntity(entity: Plots.ILightweightPlotEntity) {
     const plotEntity: Plots.IPlotEntity = {
-      bounds: entity.drawer.getClientRectAtIndex(entity.validDatumIndex),
+      bounds: this._entityBounds(entity),
       component: entity.component,
       dataset: entity.dataset,
       datasetIndex: entity.datasetIndex,

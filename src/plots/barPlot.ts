@@ -434,7 +434,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     let minSecondaryDist = Infinity;
     let closest: ILightweightPlotEntity;
     this._getEntityStore().entities().forEach((entity: ILightweightPlotEntity) => {
-      const barBBox = entity.drawer.getClientRectAtIndex(entity.validDatumIndex);
+      const barBBox = this._entityBounds(entity);
       if (!Utils.DOM.intersectsBBox(xRange, yRange, barBBox)) {
         return;
       }
@@ -519,7 +519,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   private _entitiesIntersecting(xValOrRange: number | Range, yValOrRange: number | Range): IPlotEntity[] {
     const intersected: IPlotEntity[] = [];
     this._getEntityStore().entities().forEach((entity) => {
-      if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, entity.drawer.getClientRectAtIndex(entity.validDatumIndex))) {
+      if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, this._entityBounds(entity))) {
         intersected.push(this._lightweightPlotEntityToPlotEntity(entity));
       }
     });
@@ -615,7 +615,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
 
   protected _drawLabels() {
     const dataToDraw = this._getDataToDraw();
-    const attrToProjector = this._generateAttrToProjector();
+    const attrToProjector = this._getAttrToProjector();
     const anyLabelTooWide = this.datasets().some((dataset) => {
       return dataToDraw.get(dataset).some((datum, index) => {
         return this._drawLabel(datum, index, dataset, attrToProjector);
@@ -780,7 +780,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   protected _generateDrawSteps(): Drawers.DrawStep[] {
     const drawSteps: Drawers.DrawStep[] = [];
     if (this._animateOnNextRender()) {
-      const resetAttrToProjector = this._generateAttrToProjector();
+      const resetAttrToProjector = this._getAttrToProjector();
       const lengthScale = this.length().scale;
       const scaledBaseline = lengthScale.scale(this.baselineValue());
       const lengthAttr = this._isVertical ? "y" : "x";
@@ -790,7 +790,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
     }
     drawSteps.push({
-      attrToProjector: this._generateAttrToProjector(),
+      attrToProjector: this._getAttrToProjector(),
       animator: this._getAnimator(Plots.Animator.MAIN),
     });
     return drawSteps;
@@ -878,14 +878,35 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     return entities;
   }
 
-  protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point {
-    const attrToProjector = this._generateAttrToProjector();
-    const rect = {
+  protected _entityBounds(entity: Plots.IPlotEntity | Plots.ILightweightPlotEntity) {
+    const { datum, index, dataset } = entity;
+    return this._pixelBounds(datum, index, dataset);
+  }
+
+  /**
+   * The rectangular bounds of a bar. Note that the x/y coordinates are not the
+   * same as the "pixel point" because they are always at the top/left of the
+   * bar.
+   */
+  protected _pixelBounds(datum: any, index: number, dataset: Dataset) {
+    const attrToProjector = this._getAttrToProjector();
+    return {
       x: attrToProjector["x"](datum, index, dataset),
       y: attrToProjector["y"](datum, index, dataset),
       width: attrToProjector["width"](datum, index, dataset),
       height: attrToProjector["height"](datum, index, dataset),
     };
+  }
+
+  /**
+   * The "pixel point" of a bar is the farthest point from the baseline.
+   *
+   * For example, in a vertical bar chart with positive bar values, the pixel
+   * point will be at the top of the bar. For negative bar values, the pixel
+   * point will be at the bottom of the bar.
+   */
+  protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point {
+    const rect = this._pixelBounds(datum, index, dataset);
     const originalPosition = (this._isVertical ? Plot._scaledAccessor(this.y()) : Plot._scaledAccessor(this.x()))(datum, index, dataset);
     const scaledBaseline = (<Scale<any, any>> (this._isVertical ? this.y().scale : this.x().scale)).scale(this.baselineValue());
     return this._pixelPointBar(originalPosition, scaledBaseline, rect);
@@ -910,7 +931,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
 
   protected _getDataToDraw(): Utils.Map<Dataset, any[]> {
     const dataToDraw = new Utils.Map<Dataset, any[]>();
-    const attrToProjector = this._generateAttrToProjector();
+    const attrToProjector = this._getAttrToProjector();
     this.datasets().forEach((dataset: Dataset) => {
       const data = dataset.data().filter((d, i) => Utils.Math.isValidNumber(attrToProjector["x"](d, i, dataset)) &&
       Utils.Math.isValidNumber(attrToProjector["y"](d, i, dataset)) &&

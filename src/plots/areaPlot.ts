@@ -146,7 +146,7 @@ export class Area<X> extends Line<X> {
   }
 
   private _generateLineAttrToProjector() {
-    const lineAttrToProjector = this._generateAttrToProjector();
+    const lineAttrToProjector = this._getAttrToProjector();
     lineAttrToProjector["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), Plot._scaledAccessor(this.y()));
     return lineAttrToProjector;
   }
@@ -171,7 +171,7 @@ export class Area<X> extends Line<X> {
   protected _generateDrawSteps(): Drawers.DrawStep[] {
     const drawSteps: Drawers.DrawStep[] = [];
     if (this._animateOnNextRender()) {
-      const attrToProjector = this._generateAttrToProjector();
+      const attrToProjector = this._getAttrToProjector();
       attrToProjector["d"] = this._constructAreaProjector(
         Plot._scaledAccessor(this.x()),
         this._getResetYFunction(),
@@ -181,7 +181,7 @@ export class Area<X> extends Line<X> {
     }
 
     drawSteps.push({
-      attrToProjector: this._generateAttrToProjector(),
+      attrToProjector: this._getAttrToProjector(),
       animator: this._getAnimator(Plots.Animator.MAIN),
     });
 

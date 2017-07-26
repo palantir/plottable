@@ -33,11 +33,6 @@ export interface IDrawer {
   getVisualPrimitiveAtIndex(index: number): Element;
 
   /**
-   * Get the visual primitive for the given *data* index.
-   */
-  getClientRectAtIndex(index: number): IEntityBounds;
-
-  /**
    * Called when the Drawer is no longer needed - implementors may use this to cleanup
    * any resources they've created
    */
@@ -108,9 +103,5 @@ export class ProxyDrawer implements IDrawer {
 
   public getVisualPrimitiveAtIndex(index: number) {
     return this._currentDrawer.getVisualPrimitiveAtIndex(index);
-  }
-
-  public getClientRectAtIndex(index: number) {
-    return this._currentDrawer.getClientRectAtIndex(index);
   }
 }

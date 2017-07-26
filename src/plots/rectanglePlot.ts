@@ -90,7 +90,7 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
   }
 
   protected _generateDrawSteps(): Drawers.DrawStep[] {
-    return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("rectangles") }];
+    return [{ attrToProjector: this._getAttrToProjector(), animator: this._getAnimator("rectangles") }];
   }
 
   protected _updateExtentsForProperty(property: string) {
@@ -262,7 +262,7 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
    * @returns {PlotEntity[]} The PlotEntities at the particular point
    */
   public entitiesAt(point: Point) {
-    const attrToProjector = this._generateAttrToProjector();
+    const attrToProjector = this._getAttrToProjector();
     return this.entities().filter((entity) => {
       const datum = entity.datum;
       const index = entity.index;
@@ -315,7 +315,7 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
 
   private _entitiesIntersecting(xValOrRange: number | Range, yValOrRange: number | Range): IPlotEntity[] {
     const intersected: IPlotEntity[] = [];
-    const attrToProjector = this._generateAttrToProjector();
+    const attrToProjector = this._getAttrToProjector();
     this.entities().forEach((entity) => {
       if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange,
           this._entityBBox(entity.datum, entity.index, entity.dataset, attrToProjector))) {
@@ -384,7 +384,7 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
   }
 
   protected _pixelPoint(datum: any, index: number, dataset: Dataset) {
-    const attrToProjector = this._generateAttrToProjector();
+    const attrToProjector = this._getAttrToProjector();
     const rectX = attrToProjector["x"](datum, index, dataset);
     const rectY = attrToProjector["y"](datum, index, dataset);
     const rectWidth = attrToProjector["width"](datum, index, dataset);
@@ -413,7 +413,7 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
 
   protected _getDataToDraw(): Utils.Map<Dataset, any[]> {
     const dataToDraw = new Utils.Map<Dataset, any[]>();
-    const attrToProjector = this._generateAttrToProjector();
+    const attrToProjector = this._getAttrToProjector();
     this.datasets().forEach((dataset) => {
       const data = dataset.data().filter((d, i) => Utils.Math.isValidNumber(attrToProjector["x"](d, i, dataset)) &&
       Utils.Math.isValidNumber(attrToProjector["y"](d, i, dataset)) &&
@@ -437,7 +437,7 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
   }
 
   private _drawLabel(dataToDraw: Utils.Map<Dataset, any[]>, dataset: Dataset, datasetIndex: number) {
-    const attrToProjector = this._generateAttrToProjector();
+    const attrToProjector = this._getAttrToProjector();
     const labelArea = this._renderArea.append("g").classed("label-area", true);
 
     const context = new Typesettable.SvgContext(labelArea.node() as SVGElement);
@@ -490,7 +490,7 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
 
   private _overlayLabel(labelXRange: Range, labelYRange: Range, datumIndex: number, datasetIndex: number,
                         dataToDraw: Utils.Map<Dataset, any[]>) {
-    const attrToProjector = this._generateAttrToProjector();
+    const attrToProjector = this._getAttrToProjector();
     const datasets = this.datasets();
     for (let i = datasetIndex; i < datasets.length; i++) {
       const dataset = datasets[i];

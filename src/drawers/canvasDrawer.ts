@@ -53,10 +53,6 @@ export class CanvasDrawer implements IDrawer {
     return null;
   }
 
-  public getClientRectAtIndex(index: number): IEntityBounds {
-    return null;
-  }
-
   public remove() {
     // NO op - canvas element owns the canvas; context is free
   }

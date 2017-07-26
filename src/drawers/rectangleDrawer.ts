@@ -40,10 +40,4 @@ export class RectangleCanvasDrawer extends CanvasDrawer {
   constructor(ctx: CanvasRenderingContext2D) {
     super(ctx, RectangleCanvasDrawStep);
   }
-
-  public getClientRectAtIndex(index: number): IEntityBounds {
-    const datum = this._lastDrawnData[index];
-    const attrs = resolveAttributes(this._lastProjector, RECT_ATTRS, datum, index);
-    return attrs as IEntityBounds;
-  }
 }
