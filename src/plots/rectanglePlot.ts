@@ -93,15 +93,6 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
     return [{ attrToProjector: this._getAttrToProjector(), animator: this._getAnimator("rectangles") }];
   }
 
-  protected _updateExtentsForProperty(property: string) {
-    super._updateExtentsForProperty(property);
-    if (property === "x") {
-      super._updateExtentsForProperty("x2");
-    } else if (property === "y") {
-      super._updateExtentsForProperty("y2");
-    }
-  }
-
   protected _filterForProperty(property: string) {
     if (property === "x2") {
       return super._filterForProperty("x");

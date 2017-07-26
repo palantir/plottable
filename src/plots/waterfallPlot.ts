@@ -82,12 +82,12 @@ export class Waterfall<X, Y> extends Bar<X, number> {
     return drawer;
   }
 
-  protected _extentsForProperty(attr: string) {
+  protected getExtentsForProperty(attr: string) {
     const primaryAttr = "y";
     if (attr === primaryAttr) {
       return [this._extent];
     } else {
-      return super._extentsForProperty(attr);
+      return super.getExtentsForProperty(attr);
     }
   }
 

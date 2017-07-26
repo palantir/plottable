@@ -309,12 +309,12 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
     }
   }
 
-  protected _extentsForProperty(attr: string) {
+  protected getExtentsForProperty(attr: string) {
     const primaryAttr = this._isVertical ? "y" : "x";
     if (attr === primaryAttr) {
       return [this._stackedExtent];
     } else {
-      return super._extentsForProperty(attr);
+      return super.getExtentsForProperty(attr);
     }
   }
 

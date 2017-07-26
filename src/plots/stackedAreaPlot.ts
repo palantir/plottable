@@ -174,19 +174,12 @@ export class StackedArea<X> extends Area<X> {
     return this;
   }
 
-  protected _updateExtentsForProperty(property: string) {
-    super._updateExtentsForProperty(property);
-    if ((property === "x" || property === "y") && this._projectorsReady()) {
-      this._updateStackExtentsAndOffsets();
-    }
-  }
-
-  protected _extentsForProperty(attr: string) {
+  protected getExtentsForProperty(attr: string) {
     const primaryAttr = "y";
     if (attr === primaryAttr) {
       return [this._stackedExtent];
     } else {
-      return super._extentsForProperty(attr);
+      return super.getExtentsForProperty(attr);
     }
   }
 

@@ -292,7 +292,6 @@ export class XYPlot<X, Y> extends Plot {
   }
 
   private _updateXExtentsAndAutodomain() {
-    this._updateExtentsForProperty("x");
     const xScale = this.x().scale;
     if (xScale != null) {
       xScale.autoDomain();
@@ -300,7 +299,6 @@ export class XYPlot<X, Y> extends Plot {
   }
 
   private _updateYExtentsAndAutodomain() {
-    this._updateExtentsForProperty("y");
     const yScale = this.y().scale;
     if (yScale != null) {
       yScale.autoDomain();

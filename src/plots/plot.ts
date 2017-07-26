@@ -22,6 +22,7 @@ import { CanvasDrawer } from "../drawers/canvasDrawer";
 import { ProxyDrawer } from "../drawers/drawer";
 import { AppliedDrawStep, DrawStep } from "../drawers/index";
 import { SVGDrawer } from "../drawers/svgDrawer";
+import { memThunk, Thunk } from "../memoize";
 import * as Scales from "../scales";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
@@ -85,7 +86,7 @@ export class Plot extends Component {
   /**
    * Mapping from attribute names to the extents ([min, max]) values that that attribute takes on.
    */
-  private _attrExtents: d3.Map<any[]>;
+  private _attrExtents: { [attr: string]: Thunk<any[][]>; } = {};
   /**
    * Callback that we register onto Scales that get bound to this Plot.
    *
@@ -138,7 +139,7 @@ export class Plot extends Component {
    * Mapping from property names to the extents ([min, max]) values that that
    * property takes on.
    */
-  protected _propertyExtents: d3.Map<any[]>;
+  private _propertyExtents: { [prop: string]: Thunk<any[][]>; } = {};
 
   /**
    * The canvas element that this Plot will render to if using the canvas
@@ -161,12 +162,10 @@ export class Plot extends Component {
     this.addClass("plot");
     this._datasetToDrawer = new Utils.Map<Dataset, ProxyDrawer>();
     this._attrBindings = d3.map<Plots.IAccessorScaleBinding<any, any>>();
-    this._attrExtents = d3.map<any[]>();
     this._includedValuesProvider = (scale: Scale<any, any>) => this._includedValuesForScale(scale);
     this._renderCallback = () => this.render();
     this._onDatasetUpdateCallback = () => this._onDatasetUpdate();
     this._propertyBindings = d3.map<Plots.IAccessorScaleBinding<any, any>>();
-    this._propertyExtents = d3.map<any[]>();
     const mainAnimator = new Animators.Easing().maxTotalDuration(Plot._ANIMATION_MAX_DURATION);
     this.animator(Plots.Animator.MAIN, mainAnimator);
     this.animator(Plots.Animator.RESET, new Animators.Null());
@@ -339,7 +338,6 @@ export class Plot extends Component {
 
     const accessor = typeof valueOrFn === "function" ? valueOrFn : () => valueOrFn;
     this._propertyBindings.set(property, { accessor, scale, postScale });
-    this._updateExtentsForProperty(property);
 
     if (oldScale != null) {
       this._uninstallScaleForKey(oldScale, property);
@@ -356,7 +354,6 @@ export class Plot extends Component {
 
     const accessor = typeof valueOrFn === "function" ? valueOrFn : () => valueOrFn;
     this._attrBindings.set(attr, { accessor, scale });
-    this._updateExtentsForAttr(attr);
 
     if (oldScale != null) {
       this._uninstallScaleForKey(oldScale, attr);
@@ -457,56 +454,49 @@ export class Plot extends Component {
    */
   protected _updateExtents() {
     this._resetEntityStore();
-    this._attrBindings.each((_, attr) => this._updateExtentsForAttr(attr));
-    this._propertyExtents.each((_, property) => this._updateExtentsForProperty(property));
     this._scales().forEach((scale) => scale.addIncludedValuesProvider(this._includedValuesProvider));
-  }
-
-  private _updateExtentsForAttr(attr: string) {
-    // Filters should never be applied to attributes
-    this._updateExtentsForKey(attr, this._attrBindings, this._attrExtents, null);
-  }
-
-  protected _updateExtentsForProperty(property: string) {
-    this._updateExtentsForKey(property, this._propertyBindings, this._propertyExtents, this._filterForProperty(property));
   }
 
   protected _filterForProperty(property: string): IAccessor<boolean> {
     return null;
   }
 
-  private _updateExtentsForKey(key: string, bindings: d3.Map<Plots.IAccessorScaleBinding<any, any>>,
-                               extents: d3.Map<any[]>, filter: IAccessor<boolean>) {
-    const accScaleBinding = bindings.get(key);
-    if (accScaleBinding == null || accScaleBinding.accessor == null) {
-      return;
+  protected getExtentsForAttr(attr: string) {
+    if (this._attrExtents[attr] == null) {
+      const thunk = memThunk(
+          () => this.datasets(),
+          () => this._attrBindings.get(attr),
+          (datasets, accScaleBinding) => {
+            if (accScaleBinding == null || accScaleBinding.accessor == null) {
+              return null;
+            }
+            return datasets.map((dataset) => _computeExtent(dataset, accScaleBinding, null));
+          },
+      );
+      this._attrExtents[attr] = thunk;
     }
-    extents.set(key, this.datasets().map((dataset) => this._computeExtent(dataset, accScaleBinding, filter)));
-  }
-
-  private _computeExtent(dataset: Dataset, accScaleBinding: Plots.IAccessorScaleBinding<any, any>, filter: IAccessor<boolean>): any[] {
-    const accessor = accScaleBinding.accessor;
-    const scale = accScaleBinding.scale;
-
-    if (scale == null) {
-      return [];
-    }
-
-    let data = dataset.data();
-    if (filter != null) {
-      data = data.filter((d, i) => filter(d, i, dataset));
-    }
-    const appliedAccessor = (d: any, i: number) => accessor(d, i, dataset);
-    const mappedData = data.map(appliedAccessor);
-
-    return scale.extentOfValues(mappedData);
+    return this._attrExtents[attr]();
   }
 
   /**
    * Override in subclass to add special extents, such as included values
    */
-  protected _extentsForProperty(property: string) {
-    return this._propertyExtents.get(property);
+  protected getExtentsForProperty(property: string) {
+    if (this._propertyExtents[property] == null) {
+      const thunk = memThunk(
+          () => this.datasets(),
+          () => this._propertyBindings.get(property),
+          () => this._filterForProperty(property),
+          (datasets, accScaleBinding, filter) => {
+            if (accScaleBinding == null || accScaleBinding.accessor == null) {
+              return null;
+            }
+            return datasets.map((dataset) => _computeExtent(dataset, accScaleBinding, filter));
+          },
+      );
+      this._propertyExtents[property] = thunk;
+    }
+    return this._propertyExtents[property]();
   }
 
   private _includedValuesForScale<D>(scale: Scale<D, any>): D[] {
@@ -516,7 +506,7 @@ export class Plot extends Component {
     let includedValues: D[] = [];
     this._attrBindings.each((binding, attr) => {
       if (binding.scale === scale) {
-        const extents = this._attrExtents.get(attr);
+        const extents = this.getExtentsForAttr(attr);
         if (extents != null) {
           includedValues = includedValues.concat(<D[]> d3.merge(extents));
         }
@@ -525,7 +515,7 @@ export class Plot extends Component {
 
     this._propertyBindings.each((binding, property) => {
       if (binding.scale === scale) {
-        const extents = this._extentsForProperty(property);
+        const extents = this.getExtentsForProperty(property);
         if (extents != null) {
           includedValues = includedValues.concat(<D[]> d3.merge(extents));
         }
@@ -889,3 +879,25 @@ export class Plot extends Component {
     return this._animate && this._dataChanged;
   }
 }
+
+function _computeExtent(
+    dataset: Dataset,
+    accScaleBinding: Plots.IAccessorScaleBinding<any, any>,
+    filter: IAccessor<boolean>): any[] {
+  const accessor = accScaleBinding.accessor;
+  const scale = accScaleBinding.scale;
+
+  if (scale == null) {
+    return [];
+  }
+
+  let data = dataset.data();
+  if (filter != null) {
+    data = data.filter((d, i) => filter(d, i, dataset));
+  }
+  const appliedAccessor = (d: any, i: number) => accessor(d, i, dataset);
+  const mappedData = data.map(appliedAccessor);
+
+  return scale.extentOfValues(mappedData);
+}
+
