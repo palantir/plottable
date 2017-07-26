@@ -367,7 +367,7 @@ export class Plot extends Component {
     delete this._cachedAttrToProjector;
   }
 
-  private _cachedAttrToProjector: AttributeToProjector;
+  protected _cachedAttrToProjector: AttributeToProjector;
 
   protected _getAttrToProjector(): AttributeToProjector {
     if (this._cachedAttrToProjector == null) {
@@ -712,6 +712,8 @@ export class Plot extends Component {
   }
 
   private _paint() {
+    delete this._cachedAttrToProjector;
+
     const drawSteps = this._generateDrawSteps();
     const dataToDraw = this._getDataToDraw();
     const drawers = this.datasets().map((dataset) => this._datasetToDrawer.get(dataset));
