@@ -204,25 +204,25 @@ export type Thunk<R> = () => R;
 
 export function memThunk<I1, O>(
     arg1: Thunk<I1>,
-    compute: (arg1: I1) => O,
+    compute: (this: void, arg1: I1) => O,
 ): MemoizedFunction<Thunk<O>>;
 export function memThunk<I1, I2, O>(
     arg1: Thunk<I1>,
     arg2: Thunk<I2>,
-    compute: (arg1: I1, arg2: I2) => O,
+    compute: (this: void, arg1: I1, arg2: I2) => O,
 ): MemoizedFunction<Thunk<O>>;
 export function memThunk<I1, I2, I3, O>(
     arg1: Thunk<I1>,
     arg2: Thunk<I2>,
     arg3: Thunk<I3>,
-    compute: (arg1: I1, arg2: I2, arg3: I3) => O,
+    compute: (this: void, arg1: I1, arg2: I2, arg3: I3) => O,
 ): MemoizedFunction<Thunk<O>>;
 export function memThunk<I1, I2, I3, I4, O>(
     arg1: Thunk<I1>,
     arg2: Thunk<I2>,
     arg3: Thunk<I3>,
     arg4: Thunk<I4>,
-    compute: (arg1: I1, arg2: I2, arg3: I3, arg4: I4) => O,
+    compute: (this: void, arg1: I1, arg2: I2, arg3: I3, arg4: I4) => O,
 ): MemoizedFunction<Thunk<O>>;
 
 export function memThunk<O>(...argsAndCompute: Function[]): Thunk<O> {
@@ -231,7 +231,7 @@ export function memThunk<O>(...argsAndCompute: Function[]): Thunk<O> {
   const memoizedCompute = memoize(compute);
   const memoizedThunk = function () {
     const inputEval = inputs.map((inputFn) => inputFn.apply(this));
-    return memoizedCompute.apply(this, inputEval);
+    return memoizedCompute.apply(undefined, inputEval);
   };
   return memoizedThunk;
 }
