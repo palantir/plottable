@@ -3,10 +3,6 @@ import * as sinon from "sinon";
 
 import * as Plottable from "../../src";
 
-import { memoize } from "../../src/memoize/memoize";
-import { Dataset } from "../../src/core/dataset";
-import { IAccessorScaleBinding } from "../../src/plots/commons";
-import { Plot } from "../../src/plots/plot";
 import { memThunk } from "../../src/memoize/memThunk";
 
 describe("memThunk", () => {

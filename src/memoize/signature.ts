@@ -176,4 +176,3 @@ export class ObjectSignature extends Signature {
         return false;
     }
 }
-
