@@ -52,8 +52,8 @@ describe("Plots", () => {
       stackedPlot.addDataset(ds3);
       stackedPlot.addDataset(ds4);
 
-      const stackOffset1 = (<any> stackedPlot)._stackingResult.get(ds1);
-      const stackOffset4 = (<any> stackedPlot)._stackingResult.get(ds4);
+      const stackOffset1 = (<any> stackedPlot)._stackingResult().get(ds1);
+      const stackOffset4 = (<any> stackedPlot)._stackingResult().get(ds4);
       assert.strictEqual(stackOffset1.get("1").offset, 1, "positive offset was used");
       assert.strictEqual(stackOffset4.get("1").offset, 2, "positive offset was used");
     });
@@ -91,17 +91,17 @@ describe("Plots", () => {
       stackedPlot.addDataset(ds4);
       stackedPlot.addDataset(ds5);
 
-      const stackOffset2 = (<any> stackedPlot)._stackingResult.get(ds2);
-      const stackOffset3 = (<any> stackedPlot)._stackingResult.get(ds3);
-      const stackOffset4 = (<any> stackedPlot)._stackingResult.get(ds4);
-      const stackOffset5 = (<any> stackedPlot)._stackingResult.get(ds5);
+      const stackOffset2 = (<any> stackedPlot)._stackingResult().get(ds2);
+      const stackOffset3 = (<any> stackedPlot)._stackingResult().get(ds3);
+      const stackOffset4 = (<any> stackedPlot)._stackingResult().get(ds4);
+      const stackOffset5 = (<any> stackedPlot)._stackingResult().get(ds5);
 
       assert.strictEqual(stackOffset2.get("1").offset, -2, "stacking on data1 numerical y value");
       assert.strictEqual(stackOffset3.get("1").offset, 3, "stacking on data2 numerical y value");
       assert.strictEqual(stackOffset4.get("1").offset, 8, "stacking on data1 + data3 numerical y values");
       assert.strictEqual(stackOffset5.get("1").offset, -3, "stacking on data2 + data4 numerical y values");
 
-      assert.deepEqual((<any> stackedPlot)._stackedExtent, [-4, 9], "stacked extent is as normal");
+      assert.deepEqual((<any> stackedPlot)._stackedExtent(), [-4, 9], "stacked extent is as normal");
     });
 
     it("stacks correctly on empty data", () => {
@@ -166,8 +166,8 @@ describe("Plots", () => {
       stackedPlot.addDataset(ds3);
       stackedPlot.addDataset(ds4);
 
-      const stackOffset1 = (<any> stackedPlot)._stackingResult.get(ds1);
-      const stackOffset4 = (<any> stackedPlot)._stackingResult.get(ds4);
+      const stackOffset1 = (<any> stackedPlot)._stackingResult().get(ds1);
+      const stackOffset4 = (<any> stackedPlot)._stackingResult().get(ds4);
       assert.strictEqual(stackOffset1.get("1").offset, 1, "positive offset was used");
       assert.strictEqual(stackOffset4.get("1").offset, 2, "positive offset was used");
     });
@@ -205,17 +205,17 @@ describe("Plots", () => {
       stackedPlot.addDataset(ds4);
       stackedPlot.addDataset(ds5);
 
-      const stackOffset2 = (<any> stackedPlot)._stackingResult.get(ds2);
-      const stackOffset3 = (<any> stackedPlot)._stackingResult.get(ds3);
-      const stackOffset4 = (<any> stackedPlot)._stackingResult.get(ds4);
-      const stackOffset5 = (<any> stackedPlot)._stackingResult.get(ds5);
+      const stackOffset2 = (<any> stackedPlot)._stackingResult().get(ds2);
+      const stackOffset3 = (<any> stackedPlot)._stackingResult().get(ds3);
+      const stackOffset4 = (<any> stackedPlot)._stackingResult().get(ds4);
+      const stackOffset5 = (<any> stackedPlot)._stackingResult().get(ds5);
 
       assert.strictEqual(stackOffset2.get("1").offset, -2, "stacking on data1 numerical y value");
       assert.strictEqual(stackOffset3.get("1").offset, 3, "stacking on data2 numerical y value");
       assert.strictEqual(stackOffset4.get("1").offset, 8, "stacking on data1 + data3 numerical y values");
       assert.strictEqual(stackOffset5.get("1").offset, -3, "stacking on data2 + data4 numerical y values");
 
-      assert.deepEqual((<any> stackedPlot)._stackedExtent, [-4, 9], "stacked extent is as normal");
+      assert.deepEqual((<any> stackedPlot)._stackedExtent(), [-4, 9], "stacked extent is as normal");
     });
 
     it("stacks correctly on empty data", () => {
