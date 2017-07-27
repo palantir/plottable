@@ -857,7 +857,7 @@ export class Plot extends Component {
     return {};
   }
 
-  protected static _scaledAccessor<D, R>(binding: Plots.IAccessorScaleBinding<D, R>) {
+  public static _scaledAccessor<D, R>(binding: Plots.IAccessorScaleBinding<D, R>) {
     const { scale, accessor, postScale } = binding;
 
     // if provided, apply scale

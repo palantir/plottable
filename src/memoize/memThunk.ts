@@ -39,6 +39,9 @@ export function memThunk<I1, I2, I3, I4, O>(
  * will output some computed value. It should not use `this` in the body.
  *
  * We memoize and return this pure function.
+ *
+ * This way, memThunk lets you implement a performant, always-up-to-date "computed"
+ * value getter.
  */
 export function memThunk<O>(...argsAndCompute: Function[]): Thunk<O> {
     const inputs = argsAndCompute.slice(0, -1);
