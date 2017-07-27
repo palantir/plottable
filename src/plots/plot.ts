@@ -900,4 +900,3 @@ function _computeExtent(
 
   return scale.extentOfValues(mappedData);
 }
-
