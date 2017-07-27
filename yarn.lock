@@ -195,7 +195,7 @@
 
 "@types/is-plain-object@^0.0.2":
   version "0.0.2"
-  resolved "https://artifactory.palantir.build:443/artifactory/api/npm/all-npm/@types/is-plain-object/-/is-plain-object-0.0.2.tgz#25bca7b656ba23fb03799a060dba201a7952103d"
+  resolved "https://registry.npmjs.org/@types/is-plain-object/-/is-plain-object-0.0.2.tgz#25bca7b656ba23fb03799a060dba201a7952103d"
 
 "@types/mocha@^2.2.27":
   version "2.2.40"
@@ -2946,7 +2946,7 @@ is-path-inside@^1.0.0:
 
 is-plain-object@^2.0.4:
   version "2.0.4"
-  resolved "https://artifactory.palantir.build:443/artifactory/api/npm/all-npm/is-plain-object/-/is-plain-object-2.0.4.tgz#2c163b3fafb1b606d9d17928f05c2a1c38e07677"
+  resolved "https://registry.npmjs.org/is-plain-object/-/is-plain-object-2.0.4.tgz#2c163b3fafb1b606d9d17928f05c2a1c38e07677"
   dependencies:
     isobject "^3.0.1"
 
@@ -3018,7 +3018,7 @@ isobject@^2.0.0:
 
 isobject@^3.0.1:
   version "3.0.1"
-  resolved "https://artifactory.palantir.build:443/artifactory/api/npm/all-npm/isobject/-/isobject-3.0.1.tgz#4e431e92b11a9731636aa1f9c8d1ccbcfdab78df"
+  resolved "https://registry.npmjs.org/isobject/-/isobject-3.0.1.tgz#4e431e92b11a9731636aa1f9c8d1ccbcfdab78df"
 
 isstream@0.1.x, isstream@~0.1.2:
   version "0.1.2"
