@@ -871,7 +871,6 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
         return 0;
       }
     } else {
-      // throw new Error("called _barPixelThickness when thickness isn't fixed!");
       return 0;
     }
   }
