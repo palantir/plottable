@@ -226,7 +226,7 @@ export function memThunk<I1, I2, I3, I4, O>(
 ): MemoizedFunction<Thunk<O>>;
 
 export function memThunk<O>(...argsAndCompute: Function[]): Thunk<O> {
-  const inputs = argsAndCompute.slice(0, argsAndCompute.length - 2);
+  const inputs = argsAndCompute.slice(0, -1);
   const compute = argsAndCompute[argsAndCompute.length - 1];
   const memoizedCompute = memoize(compute);
   const memoizedThunk = function () {
