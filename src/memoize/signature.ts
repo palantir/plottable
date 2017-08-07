@@ -9,6 +9,8 @@
  * we write a recursive Signature interface that holds an immutable snapshot of whatever
  * state the scale/data was in at the time. Then on memoized function invocation we sign the
  * new inputs and compare the signatures to decide if we should recompute.
+ *
+ * We must hand-write a signature for each custom class we wish to support.
  */
 
 import * as isPlainObject from "is-plain-object";
@@ -26,7 +28,7 @@ import { Scale } from "../scales/scale";
  * @param a
  * @returns {Signature}
  */
-export function sign<T>(a: T): Signature {
+export function sign(a: any): Signature {
     if (a instanceof Signature) {
         return a;
     } else if (a instanceof Scale) {
@@ -96,7 +98,6 @@ export function signObj(obj: { [key: string]: any }) {
  */
 export abstract class Signature {
     public isDifferent(other: Signature): boolean {
-        // debugger;
         if (other instanceof this.constructor) {
             return this.isSignatureDifferent(other as this);
         } else {
@@ -142,9 +143,7 @@ export class ReferenceSignature extends Signature {
     }
 }
 
-export interface ISignatureRecord {
-    [key: string]: Signature;
-}
+export type ISignatureRecord = Record<string, Signature>;
 
 /**
  * A signature for a plain js object.

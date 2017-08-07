@@ -8,7 +8,7 @@ import * as Typesettable from "typesettable";
 import { Dataset } from "../core/dataset";
 import { Formatter, identity } from "../core/formatters";
 import { Bounds, Point, SimpleSelection } from "../core/interfaces";
-import { memThunk, Thunk } from "../memoize/index";
+import { memThunk, Thunk } from "../memoize";
 import * as Utils from "../utils";
 import { StackExtent } from "../utils/stackingUtils";
 

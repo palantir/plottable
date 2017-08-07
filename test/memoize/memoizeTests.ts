@@ -40,7 +40,7 @@ describe("memoize()", () => {
 
     it("memoizes datasets and scale bindings", () => {
         const spy = sinon.spy((binding: IAccessorScaleBinding<any, number>, dataset: Dataset) => {
-            const accessor = Plot._scaledAccessor(binding);
+            const accessor = (Plot as any)._scaledAccessor(binding);
             return dataset.data().map((datum, index) => accessor(datum, index, dataset));
         });
         const memFn = memoize(spy);

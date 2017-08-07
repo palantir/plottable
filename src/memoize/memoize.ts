@@ -28,6 +28,30 @@ export interface IMemoizedFunctionMethods {
 
 export type MemoizedFunction<F extends Function> = F & IMemoizedFunctionMethods;
 
+/**
+ * Return a memoized version of the input function. The memoized function
+ * reduces unnecessary invocations of the input by keeping a cache of the
+ * return value of compute:
+ *
+ * <pre>
+ * function compute(a, b) { return a + b }
+ * const memoizedCompute = memoize(compute);
+ *
+ * compute(3, 7) == 10
+ * compute(3, 7) == 10 // cache hit
+ * </pre>
+ *
+ * Cache invalidation is complicated by mutable classes (Scales and Datasets).
+ * The Signature API is built to solve this issue by constructing an immutable
+ * snapshot of Scales/Datasets on memoized function invocation, which is itself
+ * a performance hit. Thus we introduce a "doLocked" method that momentarily
+ * bypasses sign/comparison logic and simply returns the cached value.
+ *
+ * See the Signature API for more information.
+ *
+ * @param {F} compute
+ * @returns {MemoizedFunction<F extends Function>}
+ */
 export function memoize<F extends Function>(compute: F): MemoizedFunction<F> {
     let lastSignature: Signature = undefined;
     let lastValue: any;
@@ -63,8 +87,8 @@ export function memoize<F extends Function>(compute: F): MemoizedFunction<F> {
         return retVal;
     };
 
-    memoizeFn.logPerformance = function() {
-        logPerformance = true;
+    memoizeFn.logPerformance = function(log = true) {
+        logPerformance = log;
         return this;
     };
     return memoizeFn;

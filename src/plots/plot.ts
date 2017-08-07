@@ -470,7 +470,7 @@ export class Plot extends Component {
             if (accScaleBinding == null || accScaleBinding.accessor == null) {
               return null;
             }
-            return datasets.map((dataset) => _computeExtent(dataset, accScaleBinding, null));
+            return datasets.map((dataset) => computeExtent(dataset, accScaleBinding, null));
           },
       );
       this._attrExtents[attr] = thunk;
@@ -491,7 +491,7 @@ export class Plot extends Component {
             if (accScaleBinding == null || accScaleBinding.accessor == null) {
               return null;
             }
-            return datasets.map((dataset) => _computeExtent(dataset, accScaleBinding, filter));
+            return datasets.map((dataset) => computeExtent(dataset, accScaleBinding, filter));
           },
       );
       this._propertyExtents[property] = thunk;
@@ -857,7 +857,7 @@ export class Plot extends Component {
     return {};
   }
 
-  public static _scaledAccessor<D, R>(binding: Plots.IAccessorScaleBinding<D, R>) {
+  protected static _scaledAccessor<D, R>(binding: Plots.IAccessorScaleBinding<D, R>) {
     const { scale, accessor, postScale } = binding;
 
     // if provided, apply scale
@@ -880,7 +880,7 @@ export class Plot extends Component {
   }
 }
 
-function _computeExtent(
+function computeExtent(
     dataset: Dataset,
     accScaleBinding: Plots.IAccessorScaleBinding<any, any>,
     filter: IAccessor<boolean>): any[] {
