@@ -17,6 +17,7 @@ export class Scale<D, R> {
   private _autoDomainAutomatically = true;
   private _domainModificationInProgress = false;
   private _includedValuesProviders: Utils.Set<Scales.IIncludedValuesProvider<D>>;
+  private _updateId = 0;
 
   /**
    * A Scale is a function (in the mathematical sense) that maps values from a domain to a range.
@@ -74,6 +75,7 @@ export class Scale<D, R> {
   }
 
   protected _dispatchUpdate() {
+    this._updateId++;
     this._callbacks.callCallbacks(this);
   }
 
@@ -207,5 +209,9 @@ export class Scale<D, R> {
     this._includedValuesProviders.delete(provider);
     this._autoDomainIfAutomaticMode();
     return this;
+  }
+
+  public updateId() {
+    return this._updateId;
   }
 }

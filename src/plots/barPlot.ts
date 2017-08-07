@@ -74,13 +74,13 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   private _baselineValueProvider: () => (X|Y)[];
   private _barAlignment: BarAlignment = "middle";
 
+  private _computeBarPixelThickness = memoizedComputeBarPixelThickness();
+
   /**
    * Whether all the bars in this barPlot have the same pixel thickness.
    * If so, use the _barPixelThickness property to access the thickness.
    */
   private _fixedBarPixelThickness = true;
-  private _barPixelThickness = 0;
-  private _updateBarPixelThicknessCallback: () => void;
 
   /**
    * A Bar Plot draws bars growing out from a baseline to some value
@@ -97,15 +97,13 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     this._isVertical = orientation === "vertical";
     this.animator("baseline", new Animators.Null());
     this.attr("fill", new Scales.Color().range()[0]);
-    this.attr(Bar._BAR_THICKNESS_KEY, () => this._barPixelThickness);
+    this.attr(Bar._BAR_THICKNESS_KEY, () => this._barPixelThickness());
     this._labelConfig = new Utils.Map<Dataset, LabelConfig>();
     this._baselineValueProvider = () => [this.baselineValue()];
-    this._updateBarPixelThicknessCallback = () => this._updateBarPixelWidth();
   }
 
   public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
     super.computeLayout(origin, availableWidth, availableHeight);
-    this._updateBarPixelWidth();
     this._updateExtents();
     return this;
   }
@@ -122,7 +120,6 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       super.x(<number | IAccessor<number>>x);
     } else {
       super.x(< X | IAccessor<X>>x, xScale);
-      xScale.onUpdate(this._updateBarPixelThicknessCallback);
     }
 
     this._updateThicknessAttr();
@@ -142,7 +139,6 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       super.y(<number | IAccessor<number>>y);
     } else {
       super.y(<Y | IAccessor<Y>>y, yScale);
-      yScale.onUpdate(this._updateBarPixelThicknessCallback);
     }
 
     this._updateLengthScale();
@@ -295,25 +291,20 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
 
   public addDataset(dataset: Dataset) {
     super.addDataset(dataset);
-    this._updateBarPixelWidth();
     return this;
   }
 
   protected _addDataset(dataset: Dataset) {
-    dataset.onUpdate(this._updateBarPixelThicknessCallback);
     super._addDataset(dataset);
     return this;
   }
 
   public removeDataset(dataset: Dataset) {
-    dataset.offUpdate(this._updateBarPixelThicknessCallback);
     super.removeDataset(dataset);
-    this._updateBarPixelWidth();
     return this;
   }
 
   protected _removeDataset(dataset: Dataset) {
-    dataset.offUpdate(this._updateBarPixelThicknessCallback);
     super._removeDataset(dataset);
     return this;
   }
@@ -326,7 +317,6 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     }
 
     super.datasets(datasets);
-    this._updateBarPixelWidth();
     return this;
   }
 
@@ -544,6 +534,12 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     }
   }
 
+  public renderImmediately() {
+    // HACK update bar pixel thickness
+    this._barPixelThickness();
+    return this._computeBarPixelThickness.doLocked(() => super.renderImmediately());
+  }
+
   protected _additionalPaint(time: number) {
     const lengthScale = this.length().scale;
     const scaledBaseline = lengthScale.scale(this.baselineValue());
@@ -583,7 +579,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     }
 
     const scale = <QuantitativeScale<any>>accScaleBinding.scale;
-    const width = this._barPixelThickness;
+    const width = this._barPixelThickness();
 
     // To account for inverted domains
     extents = extents.map((extent) => d3.extent([
@@ -858,22 +854,24 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       });
     } else {
       this._fixedBarPixelThickness = true;
-      this._updateBarPixelWidth();
-      this.attr(Bar._BAR_THICKNESS_KEY, () => this._barPixelThickness);
+      this.attr(Bar._BAR_THICKNESS_KEY, () => this._barPixelThickness());
     }
   }
 
-  private _updateBarPixelWidth() {
+  private _barPixelThickness() {
     if (this._fixedBarPixelThickness) {
       if (this._projectorsReady()) {
-        this._barPixelThickness = computeBarPixelThickness(
+        return this._computeBarPixelThickness(
             this.position(),
             this.datasets(),
             this._isVertical ? this.width() : this.height(),
         );
       } else {
-        this._barPixelThickness = 0;
+        return 0;
       }
+    } else {
+      // throw new Error("called _barPixelThickness when thickness isn't fixed!");
+      return 0;
     }
   }
 
@@ -932,7 +930,6 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   }
 
   protected _uninstallScaleForKey(scale: Scale<any, number>, key: string) {
-    scale.offUpdate(this._updateBarPixelThicknessCallback);
     super._uninstallScaleForKey(scale, key);
   }
 
@@ -962,7 +959,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
 function computeBarPixelThickness(
     positionBinding: Plots.ITransformableAccessorScaleBinding<any, number>,
     datasets: Dataset[],
-    barWidthDimension: number,
+    plotPositionDimensionLength: number,
 ): number {
   let barPixelThickness: number;
   const positionScale = positionBinding.scale;
@@ -984,9 +981,182 @@ function computeBarPixelThickness(
 
     barPixelThickness = Utils.Math.min(barAccessorDataPairs, (pair: any[], i: number) => {
       return Math.abs(pair[1] - pair[0]);
-    }, barWidthDimension * Bar._SINGLE_BAR_DIMENSION_RATIO);
+    }, plotPositionDimensionLength * Bar._SINGLE_BAR_DIMENSION_RATIO);
 
     barPixelThickness *= Bar._BAR_THICKNESS_RATIO;
   }
   return barPixelThickness;
+}
+
+function memoizedComputeBarPixelThickness() {
+  return memoize(computeBarPixelThickness);
+}
+
+abstract class Signature {
+  public isDifferent(other: Signature): boolean {
+    // debugger;
+    if (other instanceof this.constructor) {
+      return this.isSignatureDifferent(other as this);
+    } else {
+      return true;
+    }
+  }
+
+  protected abstract isSignatureDifferent(other: this): boolean;
+}
+
+class ArraySignature extends Signature {
+  constructor(private array: Signature[]) {
+    super();
+  }
+
+  isSignatureDifferent(other: ArraySignature) {
+    if (other.array.length !== this.array.length) {
+      return true;
+    } else {
+      for (let i = 0; i < this.array.length; i++) {
+        if (this.array[i].isDifferent(other.array[i])) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }
+}
+
+class ReferenceSignature extends Signature {
+  constructor(private ref: any) {
+    super();
+  }
+
+  isSignatureDifferent(other: ReferenceSignature) {
+    return this.ref !== other.ref;
+  }
+}
+
+interface ISignatureRecord {
+  [key: string]: Signature;
+}
+
+class ObjectSignature extends Signature {
+  constructor(private obj: ISignatureRecord) {
+    super();
+  }
+
+  isSignatureDifferent(other: ObjectSignature) {
+    const myKeys = Object.keys(this.obj);
+    const otherKeys = Object.keys(other.obj);
+
+    if (myKeys.length !== otherKeys.length) {
+      return true;
+    }
+
+    for (const key of myKeys) {
+      if (!other.obj.hasOwnProperty(key)) {
+        return true;
+      }
+      if (this.obj[key].isDifferent(other.obj[key])) {
+        return true;
+      }
+    }
+    return false;
+  }
+}
+
+function signRef(a: any) {
+  return new ReferenceSignature(a);
+}
+
+function signArray(a: any[]) {
+  return new ArraySignature(a.map((element) => sign(element)));
+}
+
+function signObj(obj: { [key: string]: any }) {
+  const signatureRecord: ISignatureRecord = {};
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      signatureRecord[key] = sign(obj[key]);
+    }
+  }
+  return new ObjectSignature(signatureRecord);
+}
+
+function signScale(scale: Scale<any, any>) {
+  const scaleObj = {
+    domain: scale.domain(),
+    range: scale.range(),
+    updateId: scale.updateId(),
+    ref: signRef(scale),
+  };
+  return signObj(scaleObj);
+}
+
+function signDataset(dataset: Dataset) {
+  const datasetObj = {
+    ref: signRef(dataset),
+    // only sign updateId since only data() and metadata() exist as properties
+    // and both update updateId
+    updateId: dataset.updateId(),
+  };
+  return signObj(datasetObj);
+}
+
+function sign<T>(a: T): Signature {
+  if (a instanceof Signature) {
+    return a;
+  } else if (a instanceof Scale) {
+    return signScale(a);
+  } else if (a instanceof Dataset) {
+    return signDataset(a);
+  } else if (a !== null && typeof a === "object") {
+    return signObj(a);
+  } else if(Array.isArray(a)) {
+    return signArray(a);
+  } else {
+    return signRef(a);
+  }
+}
+
+type LockedMemoize<F extends Function> = F & {
+  /**
+   * Lock the memoization to always return the cached
+   * property during the duration of fn. This lets you
+   * bypass the performance hit of signing when you
+   * know the fn will not mutate the inputs.
+   *
+   * Be sure to force the memoization to the value
+   * you want before calling this!
+   *
+   * @param fn
+   */
+  doLocked<T>(fn: () => T): T;
+};
+
+function memoize<F extends Function>(compute: F): LockedMemoize<F> {
+  let lastSignature: Signature = undefined;
+  let lastValue: any;
+  let locked = false;
+
+  const memoizeFn = function(...args: any[]) {
+    if (locked) {
+      return lastValue;
+    }
+    const inputSignature = signArray(args);
+    if (lastSignature === undefined
+        || lastSignature.isDifferent(inputSignature)) {
+      lastSignature = inputSignature;
+      lastValue = compute.apply(this, args);
+    }
+    return lastValue;
+  } as any as LockedMemoize<F>;
+  memoizeFn.doLocked = function<T>(cb: () => T) {
+    if (locked) {
+      throw new Error("Locking an already locked memoize function!");
+    }
+    locked = true;
+    const retVal = cb.apply(this);
+    locked = false;
+    return retVal;
+  };
+  return memoizeFn;
 }
