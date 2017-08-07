@@ -262,8 +262,8 @@ export class Line<X> extends XYPlot<X, number> {
     );
   }
 
-  protected _extentsForProperty(property: string) {
-    const extents = super._extentsForProperty(property);
+  protected getExtentsForProperty(property: string) {
+    const extents = super.getExtentsForProperty(property);
 
     if (!this._autorangeSmooth) {
       return extents;

@@ -25,7 +25,7 @@ function run(svg, data, Plottable) {
   var bars = new Plottable.Plots.Rectangle()
     .addDataset(ds1)
     .x(function (d) { return d.overall; }, xScale)
-    .x2(function(d) { return d.leadership; }, xScale)
+    .x2(function(d) { return d.leadership; })
     .y(function(d) { return d.company; }, yScale)
     .attr("fill", function() { return "#aaaaaa"; })
     .attr("height", function() { return 20; });

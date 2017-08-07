@@ -189,7 +189,7 @@ export class Area<X> extends Line<X> {
   }
 
   protected _updateYScale() {
-    const extents = this._propertyExtents.get("y0");
+    const extents = this.getExtentsForProperty("y0");
     const extent = Utils.Array.flatten<number>(extents);
     const uniqExtentVals = Utils.Array.uniq<number>(extent);
     const constantBaseline = uniqExtentVals.length === 1 ? uniqExtentVals[0] : null;

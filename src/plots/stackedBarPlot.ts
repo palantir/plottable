@@ -7,12 +7,11 @@ import * as Typesettable from "typesettable";
 
 import { Dataset } from "../core/dataset";
 import { Formatter, identity } from "../core/formatters";
-import { Bounds, IAccessor, Point, SimpleSelection } from "../core/interfaces";
-import { Scale } from "../scales/scale";
+import { Bounds, Point, SimpleSelection } from "../core/interfaces";
+import { memThunk, Thunk } from "../memoize";
 import * as Utils from "../utils";
 import { StackExtent } from "../utils/stackingUtils";
 
-import * as Plots from "./";
 import { Bar, BarOrientation } from "./barPlot";
 import { Plot } from "./plot";
 
@@ -24,8 +23,23 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
   private _measurer: Typesettable.CacheMeasurer;
   private _writer: Typesettable.Writer;
   private _stackingOrder: Utils.Stacking.IStackingOrder;
-  private _stackingResult: Utils.Stacking.StackingResult;
-  private _stackedExtent: number[];
+  private _stackingResult: Thunk<Utils.Stacking.StackingResult> = memThunk(
+      () => this.datasets(),
+      () => this.position().accessor,
+      () => this.length().accessor,
+      () => this._stackingOrder,
+      (datasets, positionAccessor, lengthAccessor, stackingOrder) => {
+        return Utils.Stacking.stack(datasets, positionAccessor, lengthAccessor, stackingOrder);
+      },
+  );
+  private _stackedExtent: Thunk<number[]> = memThunk(
+      this._stackingResult,
+      () => this.position().accessor,
+      () => this._filterForProperty(this._isVertical ? "y" : "x"),
+      (stackingResult, positionAccessor, filter) => {
+        return Utils.Stacking.stackedExtent(stackingResult, positionAccessor, filter);
+      },
+  );
 
   /**
    * A StackedBar Plot stacks bars across Datasets based on the primary value of the bars.
@@ -41,42 +55,6 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
     super(orientation);
     this.addClass("stacked-bar-plot");
     this._stackingOrder = "bottomup";
-    this._stackingResult = new Utils.Map<Dataset, Utils.Map<string, Utils.Stacking.StackedDatum>>();
-    this._stackedExtent = [];
-  }
-
-  public x(): Plots.ITransformableAccessorScaleBinding<X, number>;
-  public x(x: number | IAccessor<number>): this;
-  public x(x: X | IAccessor<X>, xScale: Scale<X, number>): this;
-  public x(x?: number | IAccessor<number> | X | IAccessor<X>, xScale?: Scale<X, number>): any {
-    if (x == null) {
-      return super.x();
-    }
-    if (xScale == null) {
-      super.x(<number | IAccessor<number>> x);
-    } else {
-      super.x(<X | IAccessor<X>> x, xScale);
-    }
-
-    this._updateStackExtentsAndOffsets();
-    return this;
-  }
-
-  public y(): Plots.ITransformableAccessorScaleBinding<Y, number>;
-  public y(y: number | IAccessor<number>): this;
-  public y(y: Y | IAccessor<Y>, yScale: Scale<Y, number>): this;
-  public y(y?: number | IAccessor<number> | Y | IAccessor<Y>, yScale?: Scale<Y, number>): any {
-    if (y == null) {
-      return super.y();
-    }
-    if (yScale == null) {
-      super.y(<number | IAccessor<number>> y);
-    } else {
-      super.y(<Y | IAccessor<Y>> y, yScale);
-    }
-
-    this._updateStackExtentsAndOffsets();
-    return this;
   }
 
   /**
@@ -145,7 +123,7 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
     const baselineValue = +this.baselineValue();
     const positionScale = this.position().scale;
     const lengthScale = this.length().scale;
-    const { maximumExtents, minimumExtents } = Utils.Stacking.stackedExtents<Date | string | number>(this._stackingResult);
+    const { maximumExtents, minimumExtents } = Utils.Stacking.stackedExtents<Date | string | number>(this._stackingResult());
     const anyTooWide: boolean[] = [];
 
     /**
@@ -276,11 +254,12 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
     const normalizedPositionAccessor = (datum: any, index: number, dataset: Dataset) => {
       return Utils.Stacking.normalizeKey(positionAccessor(datum, index, dataset));
     };
+    const stackingResult = this._stackingResult();
     const getStart = (d: any, i: number, dataset: Dataset) =>
-      lengthScale.scale(this._stackingResult.get(dataset).get(normalizedPositionAccessor(d, i, dataset)).offset);
+      lengthScale.scale(stackingResult.get(dataset).get(normalizedPositionAccessor(d, i, dataset)).offset);
     const getEnd = (d: any, i: number, dataset: Dataset) =>
       lengthScale.scale(+lengthAccessor(d, i, dataset) +
-        this._stackingResult.get(dataset).get(normalizedPositionAccessor(d, i, dataset)).offset);
+        stackingResult.get(dataset).get(normalizedPositionAccessor(d, i, dataset)).offset);
 
     const heightF = (d: any, i: number, dataset: Dataset) => {
       return Math.abs(getEnd(d, i, dataset) - getStart(d, i, dataset));
@@ -296,40 +275,13 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
     return attrToProjector;
   }
 
-  protected _onDatasetUpdate() {
-    this._updateStackExtentsAndOffsets();
-    super._onDatasetUpdate();
-    return this;
-  }
-
-  protected _updateExtentsForProperty(property: string) {
-    super._updateExtentsForProperty(property);
-    if ((property === "x" || property === "y") && this._projectorsReady()) {
-      this._updateStackExtentsAndOffsets();
-    }
-  }
-
-  protected _extentsForProperty(attr: string) {
+  protected getExtentsForProperty(attr: string) {
     const primaryAttr = this._isVertical ? "y" : "x";
     if (attr === primaryAttr) {
-      return [this._stackedExtent];
+      return [this._stackedExtent()];
     } else {
-      return super._extentsForProperty(attr);
+      return super.getExtentsForProperty(attr);
     }
-  }
-
-  private _updateStackExtentsAndOffsets() {
-    if (!this._projectorsReady()) {
-      return;
-    }
-
-    const datasets = this.datasets();
-    const positionAccessor = this.position().accessor;
-    const lengthAccessor = this.length().accessor;
-    const filter = this._filterForProperty(this._isVertical ? "y" : "x");
-
-    this._stackingResult = Utils.Stacking.stack(datasets, positionAccessor, lengthAccessor, this._stackingOrder);
-    this._stackedExtent = Utils.Stacking.stackedExtent(this._stackingResult, positionAccessor, filter);
   }
 
   public invalidateCache() {

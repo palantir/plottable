@@ -103,7 +103,7 @@ function run(svg, data, Plottable) {
     var segmentPlot = new Plottable.Plots.Segment()
       .x(getX, xScale)
       .y(getY, yScale)
-      .x2(getX2, xScale)
+      .x2(getX2)
       .addDataset(new Plottable.Dataset(segmentData))
       .attr("stroke", "#888888")
       .attr("stroke-width", 4)

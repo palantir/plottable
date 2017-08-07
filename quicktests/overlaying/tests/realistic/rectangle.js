@@ -44,7 +44,7 @@ function run(svg, data, Plottable) {
   plot.addDataset(new Plottable.Dataset(data));
   plot.x(timeFormatStart, xScale)
   .y(function(d) { return d.team; }, yScale)
-  .x2(timeFormatEnd, xScale)
+  .x2(timeFormatEnd)
   .attr("fill", function(d) { return d.fill; })
   .attr("stroke", function(d) { return d.stroke; });
 

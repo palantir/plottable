@@ -9,6 +9,7 @@ import * as Animators from "../animators";
 import { IAnimator } from "../animators/animator";
 import { Dataset } from "../core/dataset";
 import { AttributeToProjector, IAccessor, Point, SimpleSelection } from "../core/interfaces";
+import { memThunk, Thunk } from "../memoize/index";
 import { QuantitativeScale } from "../scales/quantitativeScale";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
@@ -19,8 +20,23 @@ import { Plot } from "./plot";
 
 export class StackedArea<X> extends Area<X> {
   private _stackingOrder: Utils.Stacking.IStackingOrder;
-  private _stackingResult: Utils.Stacking.StackingResult;
-  private _stackedExtent: number[];
+  private _stackingResult: Thunk<Utils.Stacking.StackingResult> = memThunk(
+      () => this.datasets(),
+      () => this.x().accessor,
+      () => this.y().accessor,
+      () => this._stackingOrder,
+      (datasets, keyAccessor, valueAccessor, stackingOrder) => {
+        return Utils.Stacking.stack(datasets, keyAccessor, valueAccessor, stackingOrder);
+      },
+  );
+  private _stackedExtent: Thunk<number[]> = memThunk(
+      this._stackingResult,
+      () => this.x().accessor,
+      () => this._filterForProperty("y"),
+      (stackingResult, keyAccessor, filter) => {
+        return Utils.Stacking.stackedExtent(stackingResult, keyAccessor, filter);
+      },
+  );
 
   private _baseline: SimpleSelection<void>;
   private _baselineValue = 0;
@@ -34,8 +50,6 @@ export class StackedArea<X> extends Area<X> {
     this._stackingOrder = "bottomup";
     this.addClass("stacked-area-plot");
     this.attr("fill-opacity", 1);
-    this._stackingResult = new Utils.Map<Dataset, Utils.Map<string, Utils.Stacking.StackedDatum>>();
-    this._stackedExtent = [];
     this._baselineValueProvider = () => [this._baselineValue];
     this.croppedRenderingEnabled(false);
   }
@@ -78,7 +92,7 @@ export class StackedArea<X> extends Area<X> {
       super.x(<X | IAccessor<X>> x, xScale);
     }
 
-    this._updateStackExtentsAndOffsets();
+    this._checkSameDomain();
 
     return this;
   }
@@ -96,7 +110,7 @@ export class StackedArea<X> extends Area<X> {
       super.y(<number | IAccessor<number>> y, yScale);
     }
 
-    this._updateStackExtentsAndOffsets();
+    this._checkSameDomain();
 
     return this;
   }
@@ -169,43 +183,28 @@ export class StackedArea<X> extends Area<X> {
   }
 
   protected _onDatasetUpdate() {
-    this._updateStackExtentsAndOffsets();
+    this._checkSameDomain();
     super._onDatasetUpdate();
     return this;
   }
 
-  protected _updateExtentsForProperty(property: string) {
-    super._updateExtentsForProperty(property);
-    if ((property === "x" || property === "y") && this._projectorsReady()) {
-      this._updateStackExtentsAndOffsets();
-    }
-  }
-
-  protected _extentsForProperty(attr: string) {
+  protected getExtentsForProperty(attr: string) {
     const primaryAttr = "y";
     if (attr === primaryAttr) {
-      return [this._stackedExtent];
+      return [this._stackedExtent()];
     } else {
-      return super._extentsForProperty(attr);
+      return super.getExtentsForProperty(attr);
     }
   }
 
-  private _updateStackExtentsAndOffsets() {
+  private _checkSameDomain() {
     if (!this._projectorsReady()) {
       return;
     }
 
     const datasets = this.datasets();
     const keyAccessor = this.x().accessor;
-    const valueAccessor = this.y().accessor;
-    const filter = this._filterForProperty("y");
 
-    this._checkSameDomain(datasets, keyAccessor);
-    this._stackingResult = Utils.Stacking.stack(datasets, keyAccessor, valueAccessor, this._stackingOrder);
-    this._stackedExtent = Utils.Stacking.stackedExtent(this._stackingResult, keyAccessor, filter);
-  }
-
-  private _checkSameDomain(datasets: Dataset[], keyAccessor: IAccessor<any>) {
     const keySets = datasets.map((dataset) => {
       return d3.set(dataset.data().map((datum, i) => keyAccessor(datum, i, dataset).toString())).values();
     });
@@ -243,10 +242,11 @@ export class StackedArea<X> extends Area<X> {
     const normalizedXAccessor = (datum: any, index: number, dataset: Dataset) => {
       return Utils.Stacking.normalizeKey(xAccessor(datum, index, dataset));
     };
+    const stackingResult = this._stackingResult();
     const stackYProjector = (d: any, i: number, dataset: Dataset) =>
-      this.y().scale.scale(+yAccessor(d, i, dataset) + this._stackingResult.get(dataset).get(normalizedXAccessor(d, i, dataset)).offset);
+      this.y().scale.scale(+yAccessor(d, i, dataset) + stackingResult.get(dataset).get(normalizedXAccessor(d, i, dataset)).offset);
     const stackY0Projector = (d: any, i: number, dataset: Dataset) =>
-      this.y().scale.scale(this._stackingResult.get(dataset).get(normalizedXAccessor(d, i, dataset)).offset);
+      this.y().scale.scale(stackingResult.get(dataset).get(normalizedXAccessor(d, i, dataset)).offset);
 
     propertyToProjectors["d"] = this._constructAreaProjector(Plot._scaledAccessor(this.x()), stackYProjector, stackY0Projector);
     return propertyToProjectors;
@@ -256,7 +256,7 @@ export class StackedArea<X> extends Area<X> {
     const pixelPoint = super._pixelPoint(datum, index, dataset);
     const xValue = this.x().accessor(datum, index, dataset);
     const yValue = this.y().accessor(datum, index, dataset);
-    const scaledYValue = this.y().scale.scale(+yValue + this._stackingResult.get(dataset).get(Utils.Stacking.normalizeKey(xValue)).offset);
+    const scaledYValue = this.y().scale.scale(+yValue + this._stackingResult().get(dataset).get(Utils.Stacking.normalizeKey(xValue)).offset);
     return { x: pixelPoint.x, y: scaledYValue };
   }
 
