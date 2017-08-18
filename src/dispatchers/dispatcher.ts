@@ -7,13 +7,22 @@ import * as Utils from "../utils";
 
 export class Dispatcher {
   /**
-   * Subclasses set these in constructor. Then, these
-   * get attached to the global document in _connect
+   * Subclasses set these in constructor. Then, these get attached to the event
+   * target in _connect
    *
-   * eventname is a DOM event name like "mouseup", "touchstart", etc.
-   * The callback is simply registered to the event callback with bubbling.
+   * eventname is a DOM event name like "mouseup", "touchstart", etc. The
+   * callback is simply registered to the event callback with bubbling.
    */
   protected _eventToProcessingFunction: { [eventName: string]: (e: Event) => any; } = {};
+
+  /**
+   * All listeners are registered to this `EventTarget` and events are then
+   * dispatched to callbacks from `_eventNameToCallbackSet` manually.
+   *
+   * Subclasses set their own event target instead of `document`.
+   */
+  protected _eventTarget: EventTarget = document;
+
   private _eventNameToCallbackSet: { [eventName: string]: Utils.CallbackSet<Function>; } = {};
   private _connected = false;
 
@@ -33,7 +42,7 @@ export class Dispatcher {
     }
     Object.keys(this._eventToProcessingFunction).forEach((event: string) => {
       const processingFunction = this._eventToProcessingFunction[event];
-      document.addEventListener(event, processingFunction);
+      this._eventTarget.addEventListener(event, processingFunction);
     });
     this._connected = true;
   }
@@ -42,7 +51,7 @@ export class Dispatcher {
     if (this._connected && this._hasNoCallbacks()) {
       Object.keys(this._eventToProcessingFunction).forEach((event: string) => {
         const processingFunction = this._eventToProcessingFunction[event];
-        document.removeEventListener(event, processingFunction);
+        this._eventTarget.removeEventListener(event, processingFunction);
       });
       this._connected = false;
     }
