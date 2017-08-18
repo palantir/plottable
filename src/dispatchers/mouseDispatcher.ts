@@ -49,8 +49,6 @@ export class Mouse extends Dispatcher {
   private constructor(component: Component) {
     super();
 
-    this._eventTarget = component.root().rootElement().node() as Element;
-
     this._lastMousePosition = { x: -1, y: -1 };
 
     const processMoveCallback = (e: MouseEvent) => this._measureAndDispatch(component, e, Mouse._MOUSEMOVE_EVENT_NAME, "page");

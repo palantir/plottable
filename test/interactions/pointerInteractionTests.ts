@@ -216,7 +216,7 @@ describe("Interactions", () => {
           assert.isFalse(callback.called, `callback not called on moving inside overlay (${MODE_NAME[mode]})`);
         });
 
-        it("does not the onPointerExit callback moving into overlay", () => {
+        it("does not call the onPointerExit callback moving into overlay", () => {
           pointerInteraction.onPointerExit(callback);
 
           triggerPointerEvent(QUARTER_POINT, mode, eventTarget);
