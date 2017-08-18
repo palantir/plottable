@@ -188,8 +188,9 @@ export class Mouse extends Dispatcher {
       throw new Error("Invalid scope '" + scope + "', must be 'element' or 'page'");
     }
     if (scope === "page" || this.eventInside(component, event)) {
-      const x = event.offsetX;
-      const y = event.offsetY;
+      const origin = component.originToRoot();
+      const x = event.offsetX + origin.x;
+      const y = event.offsetY + origin.y;
       this._lastMousePosition = { x, y };
       this._callCallbacksForEvent(eventName, this.lastMousePosition(), event);
     }
