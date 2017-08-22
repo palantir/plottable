@@ -84,6 +84,39 @@ describe("Plots", () => {
         assert.deepEqual(entities3, entities1);
         assert.strictEqual(lightweightPlotEntitySpy.callCount, 4);
       });
+
+      describe("adding entities", () => {
+        let addAllSpy: sinon.SinonSpy;
+
+        beforeEach(() => {
+          addAllSpy = sinon.spy(Plottable.Utils.EntityStore.prototype, "addAll");
+        });
+
+        afterEach(() => {
+          addAllSpy.restore();
+        });
+
+        it("supplies plot bounds from its own origin when adding entities to the store", () => {
+          const dataset = new Plottable.Dataset();
+          plot.addDataset(dataset);
+          const width = 200;
+          const height = 100;
+          const originX = 50;
+          const originY = 20;
+
+          plot.setBounds(width, height, originX, originY);
+          const parentSpaceBounds = plot.bounds();
+
+          plot.entities();
+          const plotLocalBounds = addAllSpy.args[0][1];
+
+          assert.notDeepEqual(parentSpaceBounds, plotLocalBounds);
+          assert.deepEqual(plotLocalBounds, {
+            topLeft: {x: 0, y: 0},
+            bottomRight: {x: width, y: height},
+          });
+        });
+      });
     });
 
     describe("entityNearest", () => {
