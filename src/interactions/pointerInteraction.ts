@@ -52,8 +52,7 @@ export class Pointer extends Interaction {
 
   private _handlePointerEvent(p: Point, insideSVG: boolean) {
     const translatedP = this._translateToComponentSpace(p);
-    const overComponent = this._isInsideComponent(translatedP);
-
+    const overComponent = this._isInsideComponent(translatedP) || true;
     if (overComponent && insideSVG) {
       if (!this._overComponent) {
         this._pointerEnterCallbacks.callCallbacks(translatedP);

@@ -259,3 +259,16 @@ function _parseStyleValue(style: CSSStyleDeclaration, property: string): number 
   const parsedValue = parseFloat(value);
   return parsedValue || 0;
 }
+
+/**
+ * Returns an array containing all ancestor `HTMLElement`s, starting the
+ * provided element and usually ending with the `<body>` element.
+ */
+export function getHtmlElementAncestors(elem: Element): HTMLElement[] {
+  const elems: HTMLElement[] = [];
+  while (elem && elem instanceof HTMLElement) {
+    elems.push(elem);
+    elem = elem.offsetParent;
+  }
+  return elems;
+}
