@@ -1,7 +1,7 @@
 function makeData() {
 }
 
-function run(container, data, Plottable) {
+function run(container) {
   "use strict";
 
   container
@@ -56,7 +56,7 @@ function debugPlot(child) {
     .x(({ x }) => x, xScale)
     .y(({ y }) => y, yScale);
 
-  const pointer = new Plottable.Interactions.Pointer()
+  new Plottable.Interactions.Pointer()
     .onPointerMove((p) => {
       var update = datasetData.slice();
       update.push({
@@ -69,7 +69,7 @@ function debugPlot(child) {
     })
     .attachTo(plot);
 
-  const chart = new Plottable.Components.Table([
+  new Plottable.Components.Table([
     [null, title],
     [yAxis, plot],
     [null, xAxis],
@@ -97,7 +97,7 @@ function debugCursor(child, color) {
     .style("transform", "translate(-5px, -5px)")
     .style("background", color);
 
-  const handleMoveEvent = ({ clientX, clientY, target }) => {
+  const handleMoveEvent = ({ clientX, clientY }) => {
     const xlator = new Plottable.Utils.Translator(child.node());
     const pos = xlator.computePosition(clientX, clientY);
     debug.text(`${clientX.toFixed(0)}, ${clientY.toFixed(0)} -> ${pos.x.toFixed(0)}, ${pos.y.toFixed(0)}`);
