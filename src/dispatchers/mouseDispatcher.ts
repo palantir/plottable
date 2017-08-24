@@ -14,7 +14,6 @@ export type MouseCallback = (p: Point, event: MouseEvent) => void;
 
 export class Mouse extends Dispatcher {
   private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Mouse";
-  private _translator: Utils.Translator;
   private _lastMousePosition: Point;
   private static _MOUSEOVER_EVENT_NAME = "mouseover";
   private static _MOUSEMOVE_EVENT_NAME = "mousemove";
@@ -49,8 +48,6 @@ export class Mouse extends Dispatcher {
    */
   private constructor(component: Component) {
     super();
-
-    this._translator = Utils.getTranslator(component);
 
     this._lastMousePosition = { x: -1, y: -1 };
 
@@ -191,11 +188,11 @@ export class Mouse extends Dispatcher {
       throw new Error("Invalid scope '" + scope + "', must be 'element' or 'page'");
     }
     if (scope === "page" || this.eventInside(component, event)) {
-      const newMousePosition = this._translator.computePosition(event.clientX, event.clientY);
-      if (newMousePosition != null) {
-        this._lastMousePosition = newMousePosition;
-        this._callCallbacksForEvent(eventName, this.lastMousePosition(), event);
-      }
+      const origin = component.originToRoot();
+      const x = event.offsetX + origin.x;
+      const y = event.offsetY + origin.y;
+      this._lastMousePosition = { x, y };
+      this._callCallbacksForEvent(eventName, this.lastMousePosition(), event);
     }
   }
 
