@@ -2,6 +2,8 @@ import { assert } from "chai";
 
 import * as Plottable from "../../src";
 
+import * as TestMethods from "../testMethods";
+
 describe("Utils.Methods", () => {
   it("inRange()", () => {
     assert.isTrue(Plottable.Utils.Math.inRange(0, -1, 1), "basic functionality works");
@@ -152,5 +154,110 @@ describe("Utils.Methods", () => {
 
     range = Plottable.Utils.Math.range(0.6, 2.2, 0.5);
     assert.deepEqual(range, [0.6, 1.1, 1.6, 2.1], "all entries has been generated with float step");
+  });
+
+});
+
+describe("Utils Matrix", () => {
+
+  type Matrix = Plottable.Utils.Math.ICssTransformMatrix;
+  const identity: Matrix = [1, 0, 0, 1, 0, 0];
+
+  const { multiplyMatrix, invertMatrix, applyTransform } = Plottable.Utils.Math;
+
+  const rotationMatrix = (theta: number): Matrix => {
+    return [Math.cos(theta), Math.sin(theta), -Math.sin(theta), Math.cos(theta), 0, 0];
+  };
+
+  const scaleMatrix = (sx: number, sy: number): Matrix => {
+    return [sx, 0, 0, sy, 0, 0];
+  };
+
+  const translationMatrix = (tx: number, ty: number): Matrix => {
+    return [1, 0, 0, 1, tx, ty];
+  };
+
+  const assertMatricesEqual = (a: Matrix, b: Matrix, msg: string, epsilon = 1e-12) => {
+    for (let i = 0; i < 6; i++) {
+      assert.closeTo(a[i], b[i], epsilon, `${msg} (${i})`);
+    }
+  };
+
+  it("multiplication by identity results in same matrix", () => {
+    const m0 = rotationMatrix(Plottable.Utils.Math.degreesToRadians(45));
+    assertMatricesEqual(m0, multiplyMatrix(m0, identity), "multiply identity");
+    assertMatricesEqual(m0, multiplyMatrix(identity, m0), "pre-multiply identity");
+  });
+
+  it("multiplication by rotations returns to identity", () => {
+    // rotate by 60 degrees 6 times => 360 degree rotation
+    const rotate = rotationMatrix(Plottable.Utils.Math.degreesToRadians(60));
+    let m = identity;
+    for (let i = 0; i < 6; i++) {
+      m = multiplyMatrix(m, rotate);
+    }
+    assertMatricesEqual(m, identity, "rotation");
+  });
+
+  it("multiplication by scales returns to identity", () => {
+    const bigger = scaleMatrix(16, 4);
+    const smaller = scaleMatrix(1/16, 1/4);
+    let m = identity;
+    m = multiplyMatrix(m, bigger);
+    m = multiplyMatrix(m, smaller);
+    assertMatricesEqual(m, identity, "scale");
+  });
+
+  it("multiplication by translation returns to identity", () => {
+    const moveFoo = translationMatrix(127, -8);
+    const moveBar = translationMatrix(-127, 8);
+    let m = identity;
+    m = multiplyMatrix(m, moveFoo);
+    m = multiplyMatrix(m, moveBar);
+    assertMatricesEqual(m, identity, "translate");
+  });
+
+  it("inverse of identity is identity", () => {
+    assertMatricesEqual(invertMatrix(identity), identity, "I = I^-1");
+  });
+
+  it("multiplication by inverse returns to identity", () => {
+    let m = identity;
+    m = multiplyMatrix(m, rotationMatrix(Plottable.Utils.Math.degreesToRadians(60)));
+    m = multiplyMatrix(m, translationMatrix(127, -8));
+    m = multiplyMatrix(m, scaleMatrix(16, 4));
+    m = multiplyMatrix(m, invertMatrix(m));
+    assertMatricesEqual(m, identity, "A * A^-1 = I");
+  });
+
+  it("pre-post multiplication order", () => {
+    const rotate = rotationMatrix(Plottable.Utils.Math.degreesToRadians(60));
+    const translate = translationMatrix(127, -8);
+    const scale = scaleMatrix(16, 4);
+
+    let m0 = identity;
+    m0 = multiplyMatrix(m0, rotate);
+    m0 = multiplyMatrix(m0, translate);
+    m0 = multiplyMatrix(m0, scale);
+
+    let m1 = identity;
+    m1 = multiplyMatrix(scale, m1);
+    m1 = multiplyMatrix(translate, m1);
+    m1 = multiplyMatrix(rotate, m1);
+
+    assertMatricesEqual(m0, m1, "multiplication order");
+  });
+
+  it("apply transform to point", () => {
+    // use 3-4-5 triangle identity
+    const point = {x: 0, y: 5};
+    const rotate = rotationMatrix(Plottable.Utils.Math.degreesToRadians(36.87));
+    const rotated = applyTransform(rotate, point);
+    TestMethods.assertPointsClose(rotated, {x: -3, y: 4}, 1e-3, "rotates to 3-4-5 triangle point");
+  });
+
+  it("throws error when trying to invert singular matrix", () => {
+    const m: Matrix = [0, 0, 0, 0, 0, 0];
+    assert.throws(() => invertMatrix(m));
   });
 });

@@ -6,7 +6,7 @@
 import * as d3 from "d3";
 
 import { Bounds, Point } from "../core/interfaces";
-import { getHtmlElementAncestors } from "./domUtils";
+import { getElementTransform, getHtmlElementAncestors } from "./domUtils";
 
 const nativeMath: Math = (<any>window).Math;
 
@@ -178,20 +178,6 @@ export function getCumulativeTransform(element: Element): ICssTransformMatrix {
 }
 
 /**
- * Returns the `ICssTransformMatrix` of an element, if defined in its computed
- * style. Returns `null` if there is no transform on the element.
- */
-export function getElementTransform(elem: Element): ICssTransformMatrix | null {
-  const style = window.getComputedStyle(elem, null);
-  const transform = style.getPropertyValue("-webkit-transform") ||
-    style.getPropertyValue("-moz-transform") ||
-    style.getPropertyValue("-ms-transform") ||
-    style.getPropertyValue("-o-transform") ||
-    style.getPropertyValue("transform");
-  return parseTransform(transform);
-}
-
-/**
  * Straightforward matrix multiplication of homogenized css transform matrices.
  */
 export function multiplyMatrix(a: ICssTransformMatrix, b: ICssTransformMatrix): ICssTransformMatrix {
@@ -226,7 +212,11 @@ export function premultiplyTranslate(v: [number, number], b: ICssTransformMatrix
  * https://stackoverflow.com/questions/2624422/efficient-4x4-matrix-inverse-affine-transform
  */
 export function invertMatrix(a: ICssTransformMatrix): ICssTransformMatrix {
-  const inverseDeterminant = 1 / (a[0] * a[3] - a[1] * a[2]);
+  const determinant = a[0] * a[3] - a[1] * a[2];
+  if (determinant === 0) {
+    throw new Error("singular matrix");
+  }
+  const inverseDeterminant = 1 / determinant;
   return [
     inverseDeterminant * a[3],
     inverseDeterminant * -a[1],
@@ -247,31 +237,4 @@ export function applyTransform(a: ICssTransformMatrix, p: Point): Point {
     x: a[0] * p.x + a[2] * p.y + a[4],
     y: a[1] * p.x + a[3] * p.y + a[5],
   };
-}
-
-const _MATRIX_REGEX = /^matrix\(([^)]+)\)$/;
-const _SPLIT_REGEX = /[, ]+/;
-
-/**
- * Attempts to parse a string such as `"matrix(1, 0, 1, 1, 100, 0)"` into an
- * array such as `[1, 0, 1, 1, 100, 0]`.
- *
- * If unable to do so, `null` is returned.
- */
-function parseTransform(transform: string): ICssTransformMatrix | null {
-  if (transform == null || transform === "none") {
-    return null;
-  }
-
-  const matrixStrings = transform.match(_MATRIX_REGEX);
-  if (matrixStrings == null || matrixStrings.length < 2) {
-    return null;
-  }
-
-  const matrix = matrixStrings[1].split(_SPLIT_REGEX).map((v) => parseFloat(v));
-  if (matrix.length != 6){
-    return null;
-  }
-
-  return matrix as ICssTransformMatrix;
 }

@@ -7,6 +7,7 @@ function run(container, data, Plottable) {
   container
     .style("background", "#DDD")
     .style("position", "relative")
+    .style("overflow", "scroll");
 
   const child0 = container.append("div")
     .style("top", "300px")
@@ -18,7 +19,7 @@ function run(container, data, Plottable) {
     .style("border", "10px solid #888")
     .style("padding", "30px 30px")
 
-  const child2 = d3.select("body").append("div")
+  const child2 = container.append("div")
     .style("top", "800px")
     .style("left", "200px")
     .style("transform", "scale(1, 0.5) rotate(45deg) translate(30px, 50px)");

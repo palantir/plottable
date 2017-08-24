@@ -10,9 +10,10 @@ import { Component } from "../components/component";
 
 const _TRANSLATOR_KEY = "__Plottable_ClientTranslator";
 
+/**
+ * Returns a singleton-ized `Translator` instance associated with the component.
+ */
 export function getTranslator(component: Component): Translator {
-  // The Translator works by first calculating the offset to root of the chart
-  // and then calculating the offset from the component to the root.
   const rootElement = component.element().node() as HTMLElement;
 
   let translator: Translator = (<any> rootElement)[_TRANSLATOR_KEY];
@@ -25,17 +26,22 @@ export function getTranslator(component: Component): Translator {
 }
 
 /**
- * The translator implements CSS transform aware event measuring. We manually
- * compute a composite affine transformation using the computed properties of
- * the ancestors of the root element.
+ * The translator implements CSS transform aware position measuring. We manually
+ * compute a cumulative CSS3 of the root element ancestors up to `<body>`.
  */
 export class Translator {
   constructor(private _rootElement: HTMLElement) {
   }
 
   /**
-   * Computes the position relative to the root element, taking into account
-   * css3 transforms.
+   * Given `document` client coordinates, computes the position relative to the
+   * `Component`'s root element, taking into account the cumulative CSS3
+   * transforms of the root element ancestors up to `<body>`.
+   *
+   * This triggers a layout but doesn't further modify the DOM, so causes a
+   * maximum of one layout per frame.
+   *
+   * Does not support `transform-origin` CSS property other than the default.
    */
   public computePosition(clientX: number, clientY: number): Point {
     const clientPosition = {
@@ -54,12 +60,8 @@ export class Translator {
 
   /**
    * Is the event's target part of the given component's DOM tree?
-   *
-   * @param component
-   * @param e
-   * @returns {boolean}
    */
   public static isEventInside(component: Component, e: Event) {
-    return Utils.DOM.contains(component.element().node() as Element, e.target as Element);
+    return Utils.DOM.contains(component.root().rootElement().node() as Element, e.target as Element);
   }
 }

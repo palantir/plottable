@@ -6,6 +6,7 @@
 import * as d3 from "d3";
 
 import { IEntityBounds, Range, SimpleSelection } from "../core/interfaces";
+import { ICssTransformMatrix } from "./mathUtils";
 
 const nativeMath: Math = (<any>window).Math;
 
@@ -261,7 +262,7 @@ function _parseStyleValue(style: CSSStyleDeclaration, property: string): number 
 }
 
 /**
- * Returns an array containing all ancestor `HTMLElement`s, starting the
+ * Returns an array containing all ancestor `HTMLElement`s, starting at the
  * provided element and usually ending with the `<body>` element.
  */
 export function getHtmlElementAncestors(elem: Element): HTMLElement[] {
@@ -271,4 +272,45 @@ export function getHtmlElementAncestors(elem: Element): HTMLElement[] {
     elem = elem.offsetParent;
   }
   return elems;
+}
+
+/**
+ * Returns the `ICssTransformMatrix` of an element, if defined in its computed
+ * style. Returns `null` if there is no transform on the element.
+ */
+export function getElementTransform(elem: Element): ICssTransformMatrix | null {
+  const style = window.getComputedStyle(elem, null);
+  const transform = style.getPropertyValue("-webkit-transform") ||
+    style.getPropertyValue("-moz-transform") ||
+    style.getPropertyValue("-ms-transform") ||
+    style.getPropertyValue("-o-transform") ||
+    style.getPropertyValue("transform");
+  return parseTransformMatrix(transform);
+}
+
+const _MATRIX_REGEX = /^matrix\(([^)]+)\)$/;
+const _SPLIT_REGEX = /[, ]+/;
+
+/**
+ * Attempts to parse a string such as `"matrix(1, 0, 1, 1, 100, 0)"` into an
+ * array such as `[1, 0, 1, 1, 100, 0]`.
+ *
+ * If unable to do so, `null` is returned.
+ */
+function parseTransformMatrix(transform: string): ICssTransformMatrix | null {
+  if (transform == null || transform === "none") {
+    return null;
+  }
+
+  const matrixStrings = transform.match(_MATRIX_REGEX);
+  if (matrixStrings == null || matrixStrings.length < 2) {
+    return null;
+  }
+
+  const matrix = matrixStrings[1].split(_SPLIT_REGEX).map((v) => parseFloat(v));
+  if (matrix.length != 6){
+    return null;
+  }
+
+  return matrix as ICssTransformMatrix;
 }
