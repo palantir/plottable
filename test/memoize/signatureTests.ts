@@ -34,6 +34,12 @@ describe("Signature API", () => {
             assert.isFalse(sign(fn).isDifferent(sign(fn)));
         });
 
+        it("different date instances referring to same date shouldn't be different", () => {
+            const sig1 = sign(new Date(12345));
+            const sig2 = sign(new Date(12345));
+            assert.isFalse(sig1.isDifferent(sig2));
+        });
+
         it("returns true only when scale has updated", () => {
             const scale = new Plottable.Scales.Linear();
             const sig1 = sign(scale);
