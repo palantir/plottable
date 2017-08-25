@@ -1,7 +1,8 @@
 function makeData() {
+  return [{x: "Frodo", y: 3}, {x: "Sam", y: 2}, {x: "Gollum", y: 4}];
 }
 
-function run(container) {
+function run(container, data) {
   "use strict";
 
   container
@@ -26,17 +27,28 @@ function run(container) {
 
   const child3 = container.append("div")
     .style("position", "absolute")
-    .style("top", "100px")
+    .style("top", "50px")
     .style("left", "400px")
     .style("width", "300px")
     .style("height", "200px")
     .style("border", "5px solid #888")
     .style("padding", "10px 10px")
+    .style("transform", "rotate(15deg)");
+
+  const child4 = container.append("div")
+    .style("position", "absolute")
+    .style("top", "300px")
+    .style("left", "300px")
+    .style("width", "300px")
+    .style("height", "200px")
+    .style("border", "1px solid magenta")
+    .style("transform", "rotate(-10deg)");
 
   debugCursor(child0, "red");
   debugCursor(child1, "lime");
   debugCursor(child2, "dodgerblue");
   debugPlot(child3);
+  debugBarPlot(child4, data);
 }
 
 function debugPlot(child) {
@@ -74,8 +86,33 @@ function debugPlot(child) {
     [yAxis, plot],
     [null, xAxis],
   ]).renderTo(child);
+}
 
-  d3.select(".plottable").style("transform", "rotate(15deg)");
+function debugBarPlot(child, data) {
+  const xScale = new Plottable.Scales.Category();
+  const yScale = new Plottable.Scales.Linear();
+  const xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
+  const yAxis = new Plottable.Axes.Numeric(yScale, "left");
+  const title = new Plottable.Components.TitleLabel("Pan Zoom");
+  const plot = new Plottable.Plots.Bar()
+    .renderer("canvas")
+    .addDataset(new Plottable.Dataset(data))
+    .attr("fill", () => "dodgerblue")
+    .x(({ x }) => x, xScale)
+    .y(({ y }) => y, yScale);
+
+  new Plottable.Interactions.PanZoom(xScale, yScale)
+    .attachTo(plot);
+
+  // new Plottable.Interactions.Pointer()
+  //   .onPointerMove((p) => console.log("Bar pointer", p))
+  //   .attachTo(plot);
+
+  new Plottable.Components.Table([
+    [null, title],
+    [yAxis, plot],
+    [null, xAxis],
+  ]).renderTo(child);
 
 }
 
