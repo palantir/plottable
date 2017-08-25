@@ -31,6 +31,8 @@ import { Scale } from "../scales/scale";
 export function sign(a: any): Signature {
     if (a instanceof Signature) {
         return a;
+    } else if (a instanceof Date) {
+        return signRef(a.valueOf());
     } else if (a instanceof Scale) {
         return signScale(a);
     } else if (a instanceof Dataset) {
