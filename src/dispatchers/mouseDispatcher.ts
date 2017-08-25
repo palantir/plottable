@@ -22,6 +22,7 @@ export class Mouse extends Dispatcher {
   private static _MOUSEUP_EVENT_NAME = "mouseup";
   private static _WHEEL_EVENT_NAME = "wheel";
   private static _DBLCLICK_EVENT_NAME = "dblclick";
+  private _translator: Utils.Translator;
 
   /**
    * Get a Mouse Dispatcher for the component tree.
@@ -50,6 +51,7 @@ export class Mouse extends Dispatcher {
     super();
 
     this._lastMousePosition = { x: -1, y: -1 };
+    this._translator = Utils.getTranslator(component);
 
     const processMoveCallback = (e: MouseEvent) => this._measureAndDispatch(component, e, Mouse._MOUSEMOVE_EVENT_NAME, "page");
     this._eventToProcessingFunction[Mouse._MOUSEOVER_EVENT_NAME] = processMoveCallback;
@@ -188,9 +190,10 @@ export class Mouse extends Dispatcher {
       throw new Error("Invalid scope '" + scope + "', must be 'element' or 'page'");
     }
     if (scope === "page" || this.eventInside(component, event)) {
+      const position = this._translator.computePosition(event.clientX, event.clientY);
       const origin = component.originToRoot();
-      const x = event.offsetX + origin.x;
-      const y = event.offsetY + origin.y;
+      const x = position.x + origin.x;
+      const y = position.y + origin.y;
       this._lastMousePosition = { x, y };
       this._callCallbacksForEvent(eventName, this.lastMousePosition(), event);
     }
