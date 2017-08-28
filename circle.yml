@@ -27,11 +27,6 @@ test:
     - yarn test:ci
 
 deployment:
-  demo:
-    branch: /.*/
-    owner: palantir
-    commands:
-      - ./demo.js || true
   publish-npm-next:
     branch: develop
     owner: palantir
@@ -39,6 +34,11 @@ deployment:
       - echo -e "$NPM_USER\n$NPM_PASS\n$NPM_EMAIL" | npm login
       - ./publishSnapshot.sh
       - ./demo.js
+  demo:
+    branch: /.*/
+    owner: palantir
+    commands:
+      - ./demo.js || true
   publish-npm-latest:
     tag: /v[0-9.]+(-(beta|rc)[0-9.]*)?$/
     owner: palantir
