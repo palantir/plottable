@@ -191,10 +191,7 @@ export class Mouse extends Dispatcher {
     }
     if (scope === "page" || this.eventInside(component, event)) {
       const position = this._translator.computePosition(event.clientX, event.clientY);
-      const origin = component.originToRoot();
-      const x = position.x + origin.x;
-      const y = position.y + origin.y;
-      this._lastMousePosition = { x, y };
+      this._lastMousePosition = position;
       this._callCallbacksForEvent(eventName, this.lastMousePosition(), event);
     }
   }
