@@ -160,14 +160,11 @@ export class Touch extends Dispatcher {
     const touches = event.changedTouches;
     const touchPositions: { [id: number]: Point; } = {};
     const touchIdentifiers: number[] = [];
-    const origin = component.originToRoot();
     for (let i = 0; i < touches.length; i++) {
       const touch = touches[i];
       const touchID = touch.identifier;
       const newTouchPosition = this._translator.computePosition(touch.clientX, touch.clientY);
       if (newTouchPosition != null) {
-        newTouchPosition.x += origin.x;
-        newTouchPosition.y += origin.y;
         touchPositions[touchID] = newTouchPosition;
         touchIdentifiers.push(touchID);
       }

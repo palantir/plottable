@@ -14,7 +14,7 @@ const _TRANSLATOR_KEY = "__Plottable_ClientTranslator";
  * Returns a singleton-ized `Translator` instance associated with the component.
  */
 export function getTranslator(component: Component): Translator {
-  const rootElement = component.element().node() as HTMLElement;
+  const rootElement = component.root().rootElement().node() as HTMLElement;
 
   let translator: Translator = (<any> rootElement)[_TRANSLATOR_KEY];
   if (translator == null) {

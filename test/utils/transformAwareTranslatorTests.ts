@@ -10,7 +10,7 @@ describe("Translator", () => {
     it("getTranslator() creates only one Translator per Component", () => {
         const svg = TestMethods.generateSVG();
         const component = new Plottable.Component();
-        sinon.stub(component, "element").returns(svg);
+        sinon.stub(component, "rootElement").returns(svg);
 
         const t1 = Plottable.Utils.getTranslator(component);
         assert.isNotNull(t1, "created a new Translator on a Component");
@@ -23,7 +23,7 @@ describe("Translator", () => {
     it("converts points to Component space correctly", () => {
         const svg = TestMethods.generateSVG();
         const component = new Plottable.Component();
-        sinon.stub(component, "element").returns(svg);
+        sinon.stub(component, "rootElement").returns(svg);
 
         const rectOrigin: Plottable.Point = {
             x: 19,

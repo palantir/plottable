@@ -27,6 +27,7 @@ const nativeMath: Math = (<any>window).Math;
  * https://developer.mozilla.org/en-US/docs/Web/CSS/transform-function/matrix
  */
 export type ICssTransformMatrix = [number, number, number, number, number, number];
+export type ITranslateVector = [number, number];
 
 const _IDENTITY_TRANSFORM: ICssTransformMatrix = [1, 0, 0, 1, 0, 0];
 
@@ -155,24 +156,31 @@ export function within(p: Point, bounds: Bounds) {
  */
 export function getCumulativeTransform(element: Element): ICssTransformMatrix {
   const elems = getHtmlElementAncestors(element);
-  elems.reverse();
 
   let transform = _IDENTITY_TRANSFORM;
+  let offsetParent: Element = null;
   for (const elem of elems) {
-    // translate coordinates to client origin
-    const offsetX = elem.scrollLeft - elem.offsetLeft - elem.clientLeft;
-    const offsetY = elem.scrollTop - elem.offsetTop - elem.clientTop;
-    transform = premultiplyTranslate([offsetX, offsetY], transform);
-
-    // apply css transform if present
+    // apply css transform from any ancestor element
     const elementTransform = getElementTransform(elem);
     if (elementTransform != null) {
-      const midX = elem.clientWidth/2;
-      const midY = elem.clientHeight/2;
-      transform = premultiplyTranslate([-midX, -midY], transform);
-      transform = multiplyMatrix(invertMatrix(elementTransform), transform);
-      transform = premultiplyTranslate([midX, midY], transform);
+      const midX = elem.clientWidth / 2;
+      const midY = elem.clientHeight / 2;
+      transform = multiplyTranslate(transform, [midX, midY]);
+      transform = multiplyMatrix(transform, invertMatrix(elementTransform));
+      transform = multiplyTranslate(transform, [-midX, -midY]);
     }
+
+    // apply scroll offsets from any ancestor element
+    let offsetX = elem.scrollLeft;
+    let offsetY = elem.scrollTop;
+
+    // apply client+offset from only acenstor "offsetParent"
+    if (offsetParent === null || elem === offsetParent) {
+      offsetX -= elem.offsetLeft + elem.clientLeft;
+      offsetY -= elem.offsetTop + elem.clientTop;
+      offsetParent = elem.offsetParent;
+    }
+    transform = multiplyTranslate(transform, [offsetX, offsetY]);
   }
   return transform;
 }
@@ -196,11 +204,24 @@ export function multiplyMatrix(a: ICssTransformMatrix, b: ICssTransformMatrix): 
  *
  * Equivalent to `multiplyMatrix([1, 0, 0, 1, ...v], b)`
  */
-export function premultiplyTranslate(v: [number, number], b: ICssTransformMatrix): ICssTransformMatrix {
+export function premultiplyTranslate(v: ITranslateVector, b: ICssTransformMatrix): ICssTransformMatrix {
   return [
     b[0], b[1], b[2], b[3],
     b[4] + v[0],
     b[5] + v[1],
+  ];
+}
+
+/**
+ * Appends translation to transformation matrix.
+ *
+ * Equivalent to `multiplyMatrix(a, [1, 0, 0, 1, ...v])`
+ */
+export function multiplyTranslate(a: ICssTransformMatrix, v: ITranslateVector): ICssTransformMatrix {
+  return [
+    a[0], a[1], a[2], a[3],
+    a[0] * v[0] + a[2] * v[1] + a[4],
+    a[1] * v[0] + a[3] * v[1] + a[5],
   ];
 }
 

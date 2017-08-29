@@ -269,7 +269,7 @@ export function getHtmlElementAncestors(elem: Element): HTMLElement[] {
   const elems: HTMLElement[] = [];
   while (elem && elem instanceof HTMLElement) {
     elems.push(elem);
-    elem = elem.offsetParent;
+    elem = elem.parentElement;
   }
   return elems;
 }
