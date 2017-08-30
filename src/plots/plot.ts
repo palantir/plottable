@@ -12,6 +12,7 @@ import { Dataset, DatasetCallback } from "../core/dataset";
 import {
   AttributeToAppliedProjector,
   AttributeToProjector,
+  Bounds,
   IAccessor,
   IRangeProjector,
   Point,
@@ -777,15 +778,27 @@ export class Plot extends Component {
   protected _getEntityStore(datasets?: Dataset[]): Utils.IEntityStore<Plots.ILightweightPlotEntity> {
     if (datasets !== undefined) {
       const entityStore = new Utils.EntityStore<Plots.ILightweightPlotEntity>();
-      entityStore.addAll(this._buildLightweightPlotEntities(datasets));
+      entityStore.addAll(this._buildLightweightPlotEntities(datasets), this._localOriginBounds());
       return entityStore;
     } else if (this._cachedEntityStore === undefined) {
       const entityStore = new Utils.EntityStore<Plots.ILightweightPlotEntity>();
-      entityStore.addAll(this._buildLightweightPlotEntities(this.datasets()), this.bounds());
+      entityStore.addAll(this._buildLightweightPlotEntities(this.datasets()), this._localOriginBounds());
       this._cachedEntityStore = entityStore;
     }
 
     return this._cachedEntityStore;
+  }
+
+  /**
+   * _localOriginBounds returns bounds of the plot from its own origin, rather than from parent origin (as provided by `this.bounds()`)
+   *
+   * @return {Bounds}
+   */
+  protected _localOriginBounds(): Bounds {
+    return {
+      topLeft: { x: 0, y: 0 },
+      bottomRight: { x: this.width(), y: this.height() },
+    };
   }
 
   protected _entityBounds(entity: Plots.IPlotEntity | Plots.ILightweightPlotEntity) {
@@ -828,11 +841,9 @@ export class Plot extends Component {
    * or undefined if no {Plots.PlotEntity} can be found.
    *
    * @param {Point} queryPoint
-   * @param {bounds} Bounds The bounding box within which to search. By default, bounds is the bounds of
-   * the chart, relative to the parent.
    * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no {Plots.PlotEntity} can be found.
    */
-  public entityNearest(queryPoint: Point, bounds = this.bounds()): Plots.IPlotEntity {
+  public entityNearest(queryPoint: Point): Plots.IPlotEntity {
     const nearest = this._getEntityStore().entityNearest(queryPoint);
     return nearest === undefined ? undefined : this._lightweightPlotEntityToPlotEntity(nearest);
   }
