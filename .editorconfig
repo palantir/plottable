@@ -11,7 +11,7 @@ indent_style = space
 [*.{js,ts}]
 indent_size = 2
 
-[{package.json,bower.json,.travis.yml,.tslintrc}]
+[{package.json,.travis.yml,.tslintrc}]
 indent_size = 2
 
 [{tsconfig.json}]

@@ -10,15 +10,8 @@ Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)`;
 /**
  * Builds plottable.js from sources in /build/src. Requirements:
  *
- * Be ready for consumption by bower, a script tag, or requireJS.
+ * Be ready for consumption by a script tag, or requireJS.
  * should specify d3 as an external dependency.
- *
- * Example bower usage:
- *
- * User runs `bower install plottable --save` in their directory.
- * Their bower_components gets plottable and d3. They then add the two
- * files in the right order through script tags, or plug it into requireJS,
- * and reference Plottable globally.
  *
  * Example script tag usage:
  *
@@ -48,7 +41,7 @@ Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)`;
  * User calls define(["plottable"], function (Plottable) { ... })
  *
  * So there's two ideas:
- * (a) Getting the plottable.js file. This is either from bower or from a web url.
+ * (a) Getting the plottable.js file. This is probably from a web url.
  * (b) Referencing the Plottable object/code. This is either globally or by declaring
  *     a dependency on a module named "plottable" (both in AMD and CommonJS).
  */
