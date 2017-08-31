@@ -18,6 +18,8 @@ import { Interaction } from "./interaction";
 export type PanCallback = () => void;
 export type ZoomCallback = () => void;
 
+export type WheelFilter = (wheelEvent: WheelEvent) => boolean;
+
 /**
  * Performs a zoom transformation of the `value` argument scaled by the
  * `zoom` argument about the point defined by the `center` argument.
@@ -37,6 +39,7 @@ export class PanZoom extends Interaction {
   private _dragInteraction: Interactions.Drag;
   private _mouseDispatcher: Dispatchers.Mouse;
   private _touchDispatcher: Dispatchers.Touch;
+  private _wheelFilter: WheelFilter = (e: WheelEvent) => true;
 
   private _touchIds: d3.Map<Point>;
 
@@ -80,6 +83,32 @@ export class PanZoom extends Interaction {
     if (yScale != null) {
       this.addYScale(yScale);
     }
+  }
+
+  /**
+   * Get the backing drag interaction. Useful to customize the panzoom interaction.
+   * @returns {Drag}
+   */
+  public dragInteraction(): Interactions.Drag {
+    return this._dragInteraction;
+  }
+
+  /**
+   * Get the current mouse wheel filter.
+   * @returns {WheelFilter}
+   */
+  public wheelFilter(): WheelFilter;
+  /** Set the current mouse wheel filter. PanZoomInteraction will only zoom
+   * when the wheelFilter evaluates to true for the source wheel event. Use
+   * this to define custom filters (e.g. requires shift to be held down.)
+   */
+  public wheelFilter(filter: WheelFilter): this;
+  public wheelFilter(filter?: WheelFilter) {
+    if (arguments.length === 0) {
+      return this._wheelFilter;
+    }
+    this._wheelFilter = filter;
+    return this;
   }
 
   /**
@@ -258,11 +287,16 @@ export class PanZoom extends Interaction {
   }
 
   private _handleWheelEvent(p: Point, e: WheelEvent) {
+    if (!this._wheelFilter(e)) {
+      return;
+    }
     const translatedP = this._translateToComponentSpace(p);
     if (this._isInsideComponent(translatedP)) {
       e.preventDefault();
 
-      const deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom._PIXELS_PER_LINE : 1);
+      // in cases where only horizontal scroll is present, use that in lieu of nothing.
+      const deltaAmount = e.deltaY !== 0 ? e.deltaY : e.deltaX;
+      const deltaPixelAmount = deltaAmount * (e.deltaMode ? PanZoom._PIXELS_PER_LINE : 1);
       let zoomAmount = Math.pow(2, deltaPixelAmount * .002);
       let centerX = translatedP.x;
       let centerY = translatedP.y;
