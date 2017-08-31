@@ -12,10 +12,20 @@ import { Interaction } from "./interaction";
 
 export type DragCallback = (start: Point, end: Point) => void;
 
+export type MouseFilter = (e: MouseEvent) => boolean;
+
 export class Drag extends Interaction {
+  private static _DEFAULT_MOUSE_FILTER = (event: MouseEvent) => event.button === 0;
+
   private _dragging = false;
   private _constrainedToComponent = true;
   private _mouseDispatcher: Dispatchers.Mouse;
+  /**
+   * Only emit events when the mouseFilter is true for the source mouse
+   * events. Use this to define custom filters (e.g. only right click,
+   * require shift to be held down, etc.)
+   */
+  private _mouseFilter: MouseFilter = Drag._DEFAULT_MOUSE_FILTER;
   private _touchDispatcher: Dispatchers.Touch;
   private _dragOrigin: Point;
   private _dragStartCallbacks = new Utils.CallbackSet<DragCallback>();
@@ -68,7 +78,7 @@ export class Drag extends Interaction {
   }
 
   private _startDrag(point: Point, event: UIEvent) {
-    if (event instanceof MouseEvent && (<MouseEvent> event).button !== 0) {
+    if (event instanceof MouseEvent && !this._mouseFilter(event)) {
       return;
     }
     const translatedP = this._translateToComponentSpace(point);
@@ -124,6 +134,30 @@ export class Drag extends Interaction {
       return this._constrainedToComponent;
     }
     this._constrainedToComponent = constrainedToComponent;
+    return this;
+  }
+
+  /**
+   * Gets the current Mouse Filter. Plottable implements a default Mouse Filter
+   * to only Drag on a primary (left) click.
+   * @returns {MouseFilter}
+   */
+  public mouseFilter(): MouseFilter;
+  /**
+   * Set the current Mouse Filter. DragInteraction will only emit events when
+   * the mouseFilter evaluates to true for the source mouse events. Use this
+   * to define custom filters (e.g. only right click, requires shift to be
+   * held down, etc.)
+   *
+   * @param {MouseFilter} filter
+   * @returns {this}
+   */
+  public mouseFilter(filter: MouseFilter): this;
+  public mouseFilter(filter?: MouseFilter): any {
+    if (arguments.length === 0) {
+      return this._mouseFilter;
+    }
+    this._mouseFilter = filter;
     return this;
   }
 

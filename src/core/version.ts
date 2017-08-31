@@ -11,4 +11,4 @@ declare var __VERSION__: string;
  * real version number during the dist phase for for npm module publishing. Modifying this line should
  * be accompanied by modifying the "sed-version" task in package.json accordingly.
  */
-export let version = __VERSION__;
+export let version = "foo";
