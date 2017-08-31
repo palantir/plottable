@@ -14,7 +14,6 @@ import * as Utils from "../utils";
 
 import * as Interactions from "./";
 import { Interaction } from "./interaction";
-import { MouseFilter } from "./dragInteraction";
 
 export type PanCallback = () => void;
 export type ZoomCallback = () => void;
