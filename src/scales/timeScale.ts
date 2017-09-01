@@ -75,9 +75,18 @@ export class Time extends QuantitativeScale<Date> {
     return this.invert(value).getTime();
   }
 
+  public getTransformationExtent() {
+    const extent = this._getUnboundedExtent();
+    return [extent[0].valueOf(), extent[1].valueOf()] as [number, number];
+  }
+
   public getTransformationDomain() {
     const dates = this.domain();
     return [dates[0].valueOf(), dates[1].valueOf()] as [number, number];
+  }
+
+  public setTransformationDomain([domainMin, domainMax]: [number, number]) {
+    this.domain([new Date(domainMin), new Date(domainMax)]);
   }
 
   protected _getDomain() {
