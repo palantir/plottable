@@ -78,11 +78,23 @@ export interface ITransformableScale {
   scaleTransformation(value: number): number;
 
   /**
+   * Gets the full extent of the transformation domain.
+   */
+  getTransformationExtent(): [number, number];
+
+  /**
    * Returns the current transformed domain of the scale. This must be a
    * numerical range in the same coordinate space used for
    * `scaleTransformation`.
    */
   getTransformationDomain(): [number, number];
+
+  /**
+   * Directly set the transformation domain. Instead of calling `.zoom` or
+   * `.pan` perform calculations relative to the current domain, this can but
+   * used to pan/zoom to an exact domain interval (in transformation space).
+   */
+  setTransformationDomain(domain: [number, number]): void;
 
   /**
    * Returns value in *Transformation Space* for the provided *screen space*.

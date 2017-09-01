@@ -234,8 +234,17 @@ export class Category extends Scale<string, number> implements ITransformableSca
     return this._d3TransformationScale.invert(value);
   }
 
+  public getTransformationExtent() {
+    return TRANSFORMATION_SPACE;
+  }
+
   public getTransformationDomain() {
     return this._d3TransformationScale.domain() as [number, number];
+  }
+
+  public setTransformationDomain(domain: [number, number]) {
+    this._d3TransformationScale.domain(domain);
+    this._dispatchUpdate();
   }
 
   protected _getDomain() {

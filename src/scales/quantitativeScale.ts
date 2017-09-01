@@ -69,7 +69,7 @@ export class QuantitativeScale<D> extends Scale<D, number> implements ITransform
     super._autoDomainIfAutomaticMode();
   }
 
-  protected _getExtent(): D[] {
+  protected _getUnboundedExtent(): D[] {
     const includedValues = this._getAllIncludedValues();
     let extent = this._defaultExtent();
     if (includedValues.length !== 0) {
@@ -79,7 +79,11 @@ export class QuantitativeScale<D> extends Scale<D, number> implements ITransform
       ];
       extent = this._padDomain(combinedExtent);
     }
+    return extent;
+  }
 
+  protected _getExtent(): D[] {
+    const extent = this._getUnboundedExtent();
     if (this._domainMin != null) {
       extent[0] = this._domainMin;
     }
@@ -288,8 +292,16 @@ export class QuantitativeScale<D> extends Scale<D, number> implements ITransform
     throw new Error("Subclasses should override invertedTransformation");
   }
 
+  public getTransformationExtent(): [number, number] {
+    throw new Error("Subclasses should override getTransformationExtent");
+  }
+
   public getTransformationDomain(): [number, number] {
     throw new Error("Subclasses should override getTransformationDomain");
+  }
+
+  public setTransformationDomain(domain: [number, number])  {
+    throw new Error("Subclasses should override setTransformationDomain");
   }
 
   protected _setDomain(values: D[]) {

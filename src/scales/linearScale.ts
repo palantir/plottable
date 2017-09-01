@@ -41,8 +41,16 @@ export class Linear extends QuantitativeScale<number> {
     return this.invert(value);
   }
 
+  public getTransformationExtent() {
+    return this._getUnboundedExtent() as [number, number];
+  }
+
   public getTransformationDomain() {
     return this.domain() as [number, number];
+  }
+
+  public setTransformationDomain(domain: [number, number]) {
+    this.domain(domain);
   }
 
   protected _getDomain() {
