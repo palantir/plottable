@@ -45,7 +45,11 @@ export function colorTest(colorTester: SimpleSelection<any>, className: string) 
   if (colorStyle === "transparent") {
     return null;
   }
-  const rgb = /\((.+)\)/.exec(colorStyle)[1]
+  const match = /\((.+)\)/.exec(colorStyle);
+  if (!match) {
+    return null;
+  }
+  const rgb = match[1]
     .split(",")
     .map((colorValue: string) => {
       const colorNumber = +colorValue;
