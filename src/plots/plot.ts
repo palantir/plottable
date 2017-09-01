@@ -221,7 +221,10 @@ export class Plot extends Component {
         this._bufferCanvas.attr("width", this._canvas.attr("width"));
         this._bufferCanvas.attr("height", this._canvas.attr("height"));
         const btx = this._bufferCanvas.node().getContext("2d");
-        btx.drawImage(this._canvas.node(), 0, 0);
+        // for headless test compat (jest)
+        if (btx) {
+          btx.drawImage(this._canvas.node(), 0, 0);
+        }
         this._bufferCanvasValid = true;
       }
 
@@ -235,11 +238,15 @@ export class Plot extends Component {
 
       // reset the transform then set the scale factor
       const ctx = this._canvas.node().getContext("2d");
-      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
 
-      if (this._bufferCanvas) {
-        // draw buffer to current canvas at new size
-        ctx.drawImage(this._bufferCanvas.node(), 0, 0, width, height);
+      // null check for headless test compat (jest)
+      if (ctx) {
+        ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+        if (this._bufferCanvas) {
+          // draw buffer to current canvas at new size
+          ctx.drawImage(this._bufferCanvas.node(), 0, 0, width, height);
+        }
       }
     }
     return this;
