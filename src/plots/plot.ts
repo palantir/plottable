@@ -783,13 +783,22 @@ export class Plot extends Component {
    * are specified all datasets will be used.
    */
   protected _getEntityStore(datasets?: Dataset[]): Utils.IEntityStore<Plots.ILightweightPlotEntity> {
+    const entityBoundsFactory = (entity: Plots.ILightweightPlotEntity) => this._entityBounds(entity);
     if (datasets !== undefined) {
       const entityStore = new Utils.EntityStore<Plots.ILightweightPlotEntity>();
-      entityStore.addAll(this._buildLightweightPlotEntities(datasets), this._localOriginBounds());
+      entityStore.addAll(
+        this._buildLightweightPlotEntities(datasets),
+        entityBoundsFactory,
+        this._localOriginBounds(),
+      );
       return entityStore;
     } else if (this._cachedEntityStore === undefined) {
       const entityStore = new Utils.EntityStore<Plots.ILightweightPlotEntity>();
-      entityStore.addAll(this._buildLightweightPlotEntities(this.datasets()), this._localOriginBounds());
+      entityStore.addAll(
+        this._buildLightweightPlotEntities(this.datasets()),
+        entityBoundsFactory,
+        this._localOriginBounds(),
+      );
       this._cachedEntityStore = entityStore;
     }
 
@@ -853,6 +862,14 @@ export class Plot extends Component {
   public entityNearest(queryPoint: Point): Plots.IPlotEntity {
     const nearest = this._getEntityStore().entityNearest(queryPoint);
     return nearest === undefined ? undefined : this._lightweightPlotEntityToPlotEntity(nearest);
+  }
+
+  public entitiesInBounds(queryBounds: Bounds): Plots.IPlotEntity[] {
+    const found = this._getEntityStore().entitiesInBounds(queryBounds);
+    if (!found) {
+      return undefined;
+    }
+    return found.map((entity) => this._lightweightPlotEntityToPlotEntity(entity));
   }
 
   protected _uninstallScaleForKey(scale: Scale<any, any>, key: string) {

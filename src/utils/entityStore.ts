@@ -4,8 +4,9 @@
  */
 
 import * as d3 from "d3";
-import { Bounds, Point } from "../core/interfaces";
+import { Bounds, IEntityBounds, Point } from "../core/interfaces";
 import { within } from "./mathUtils";
+import { RTree, RTreeBounds } from "./rTree";
 
 export interface IPositionedEntity {
   position: Point;
@@ -28,7 +29,7 @@ export interface IEntityStore<T extends IPositionedEntity> {
    * @param {Bounds} [bounds] Optionally add bounds filter for entityNearest
    * queries
    */
-  addAll(entities: T[], bounds?: Bounds): void;
+  addAll(entities: T[], entityBoundsFactory: (entity: T) => IEntityBounds, bounds?: Bounds): void;
 
   /**
    * Returns the entity closest to a given {Point}
@@ -40,6 +41,8 @@ export interface IEntityStore<T extends IPositionedEntity> {
    * @returns {T} Will return the nearest entity or undefined if none are found
    */
   entityNearest(point: Point): T;
+
+  entitiesInBounds(bounds: Bounds): T[];
 
   /**
    * Returns the current internal array of all entities.
@@ -60,9 +63,11 @@ export interface IEntityStore<T extends IPositionedEntity> {
 export class EntityStore<T extends IPositionedEntity> implements IEntityStore<T> {
   private _entities: T[];
   private _tree: d3.Quadtree<T>;
+  private _rtree: RTree<T>;
 
   constructor() {
     this._entities = [];
+    this._rtree = new RTree<T>();
     this._tree = d3.quadtree<T>()
       // Flooring for faster computation. losing sub-pixel precision here is
       // of no concern.
@@ -70,7 +75,7 @@ export class EntityStore<T extends IPositionedEntity> implements IEntityStore<T>
       .y((d) => Math.floor(d.position.y));
   }
 
-  public addAll(entities: T[], bounds?: Bounds) {
+  public addAll(entities: T[], entityBoundsFactory: (entity: T) => IEntityBounds, bounds?: Bounds) {
     this._entities.push(...entities);
 
     // filter out of bounds entities if bounds is defined
@@ -79,15 +84,24 @@ export class EntityStore<T extends IPositionedEntity> implements IEntityStore<T>
         const entity = entities[i];
         if (within(entity.position, bounds)) {
           this._tree.add(entity);
+          this._rtree.insert(RTreeBounds.entityBounds(entityBoundsFactory(entity)), entity);
         }
       }
     } else {
       this._tree.addAll(entities);
+      for (let i = 0; i < entities.length; i++) {
+        const entity = entities[i];
+        this._rtree.insert(RTreeBounds.entityBounds(entityBoundsFactory(entity)), entity);
+      }
     }
   }
 
   public entityNearest(queryPoint: Point) {
     return this._tree.find(queryPoint.x, queryPoint.y);
+  }
+
+  public entitiesInBounds(bounds: Bounds) {
+    return this._rtree.intersect(RTreeBounds.bounds(bounds));
   }
 
   public entities() {
