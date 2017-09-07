@@ -14,6 +14,7 @@ import {
   AttributeToProjector,
   Bounds,
   IAccessor,
+  IEntityBounds,
   IRangeProjector,
   Point,
   SimpleSelection,
@@ -864,8 +865,24 @@ export class Plot extends Component {
     return nearest === undefined ? undefined : this._lightweightPlotEntityToPlotEntity(nearest);
   }
 
-  public entitiesInBounds(queryBounds: Bounds): Plots.IPlotEntity[] {
+  public entitiesInBounds(queryBounds: IEntityBounds): Plots.IPlotEntity[] {
     const found = this._getEntityStore().entitiesInBounds(queryBounds);
+    if (!found) {
+      return undefined;
+    }
+    return found.map((entity) => this._lightweightPlotEntityToPlotEntity(entity));
+  }
+
+  public entitiesInBoundsX(queryBounds: IEntityBounds): Plots.IPlotEntity[] {
+    const found = this._getEntityStore().entitiesInXRange(queryBounds);
+    if (!found) {
+      return undefined;
+    }
+    return found.map((entity) => this._lightweightPlotEntityToPlotEntity(entity));
+  }
+
+  public entitiesInBoundsY(queryBounds: IEntityBounds): Plots.IPlotEntity[] {
+    const found = this._getEntityStore().entitiesInYRange(queryBounds);
     if (!found) {
       return undefined;
     }

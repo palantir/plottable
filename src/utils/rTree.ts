@@ -2,6 +2,7 @@
  * Copyright 2017-present Palantir Technologies
  * @license MIT
  */
+
 import { Bounds, IEntityBounds, Point } from "../core/interfaces";
 import {
     IRTreeSplitStrategy,
@@ -9,23 +10,33 @@ import {
     SplitStrategyLinear,
 } from "./rTreeSplitStrategies";
 
-const DEFAULT_NODE_SIZE = 3;
-const DEFAULT_SPLIT_STRATEGY = new SplitStrategyLinear();
+/**
+ * The maximum number of children in an r-tree node before we attempt to split.
+ * This must be >= 2.
+ */
+const DEFAULT_MAX_NODE_CHILDREN = 5;
+
+/**
+ * There are several strategies for splitting nodes that contain overlapping
+ * regions. By default we use `SplitStrategyLinear` which minimizes the change
+ * in node bounding box area.
+ */
+const DEFAULT_SPLIT_STRATEGY: IRTreeSplitStrategy = new SplitStrategyLinear();
 
 /**
  * R-Tree is a multidimensional spatial region tree. It stores entries that have
  * arbitrarily overlapping bounding boxes and supports efficient point and
- * bounding box queries.
+ * bounding box overlap queries.
  *
- * Similar in purpose to a quadtree except quadtrees can only store a single
- * point per entry.
+ * It is similar in purpose to a quadtree except quadtrees can only store a
+ * single point per entry.
  */
 export class RTree<T> {
     private root: RTreeNode<T>;
     private size: number;
 
     constructor(
-        private maxNodeChildren = DEFAULT_NODE_SIZE,
+        private maxNodeChildren = DEFAULT_MAX_NODE_CHILDREN,
         private splitStrategy = DEFAULT_SPLIT_STRATEGY,
     ) {
         this.root = new RTreeNode<T>(true);
@@ -65,14 +76,22 @@ export class RTree<T> {
     }
 
     public locate(xy: Point) {
-        return this.query((mbr) => mbr.contains(xy));
+        return this.query((b) => b.contains(xy));
     }
 
     public intersect(bounds: RTreeBounds) {
-        return this.query((mbr) => mbr.intersects(bounds));
+        return this.query((b) => RTreeBounds.isBoundsOverlapBounds(b, bounds));
     }
 
-    public query(predicate: (mbr: RTreeBounds) => boolean) {
+    public intersectX(bounds: RTreeBounds) {
+        return this.query((b) => RTreeBounds.isBoundsOverlapX(b, bounds));
+    }
+
+    public intersectY(bounds: RTreeBounds) {
+        return this.query((b) => RTreeBounds.isBoundsOverlapY(b, bounds));
+    }
+
+    public query(predicate: (b: RTreeBounds) => boolean) {
         const results: T[] = [];
         if (this.root.bounds != null && !predicate(this.root.bounds)) {
             return results;
@@ -113,10 +132,17 @@ export class RTreeNode<T> {
         public leaf: boolean,
     ) {}
 
+    /**
+     * Returns `true` iff this node has more children than the `maxNodeChildren`
+     * parameter.
+     */
     public overflow(maxNodeChildren: number) {
         return this.entries.length > maxNodeChildren;
     }
 
+    /**
+     * Inserts a child node and updates the ancestry bounds.
+     */
     public insert(node: RTreeNode<T>) {
         this.entries.push(node);
         node.parent = this;
@@ -130,6 +156,11 @@ export class RTreeNode<T> {
         return this;
     }
 
+    /**
+     * Removes a child node and updates the ancestry bounds.
+     *
+     * If the node argument is not a child, do nothing.
+     */
     public remove(node: RTreeNode<T>) {
         const i = this.entries.indexOf(node);
         if (i >= 0) {
@@ -145,21 +176,40 @@ export class RTreeNode<T> {
         return this;
     }
 
+    /**
+     * Chooses an node from then entries that minimizes the area difference that
+     * adding the bounds the each entry would cause.
+     */
     public subtree(bounds: RTreeBounds) {
         const minDiff = Infinity;
         let minEntry = null;
 
-        // choose entry for which the addition least increases the entry"s area
+        // choose entry for which the addition least increases the entry's area
         for (let i = 0; i < this.entries.length; i++) {
             const entry = this.entries[i];
-            const diffArea = RTreeBounds.union(entry.bounds, bounds).area() - entry.bounds.area();
-            if (diffArea < minDiff) {
+            const diffArea = entry.unionAreaDifference(bounds);
+            if (diffArea < minDiff || (
+                    // break ties to node with fewest children
+                    diffArea === minDiff &&
+                    minEntry != null &&
+                    entry.entries.length < minEntry.entries.length
+                )
+            ) {
                 minEntry = entry;
             }
         }
         return minEntry;
     }
 
+    /**
+     * Splits this node by creating two new nodes and dividing the this node's
+     * children between them. This node is removed from its parent and the two
+     * new nodes are added.
+     *
+     * If this node is the root, a new parent node is created.
+     *
+     * Returns the parent node.
+     */
     public split(strategy: IRTreeSplitStrategy): RTreeNode<T> {
         // Remove self from parent.
         if (this.parent != null) {
@@ -179,6 +229,22 @@ export class RTreeNode<T> {
         parent.insert(children[0]);
         parent.insert(children[1]);
         return parent;
+    }
+
+    /**
+     * Returns the difference in area that adding an entry `bounds` to the node
+     * would cause.
+     */
+    public unionAreaDifference(bounds: RTreeBounds) {
+        return Math.abs(RTreeBounds.union(this.bounds, bounds).area() - this.bounds.area());
+    }
+
+    /**
+     * Returns the depth from this node to the deepest leaf descendant.
+     */
+    public maxDepth(): number {
+        if (this.leaf) return 1;
+        return 1 + this.entries.map((e) => e.maxDepth()).reduce((a, b) => Math.max(a, b));
     }
 }
 
@@ -243,6 +309,33 @@ export class RTreeBounds {
         return bounds.reduce((b0, b1) => RTreeBounds.union(b0, b1));
     }
 
+    /**
+     * Returns true if `a` overlaps `b` in the x and y axes.
+     *
+     * Touching counts as overlap.
+     */
+    public static isBoundsOverlapBounds(a: RTreeBounds, b: RTreeBounds) {
+        return RTreeBounds.isBoundsOverlapX(a, b) && RTreeBounds.isBoundsOverlapY(a, b);
+    }
+
+    /**
+     * Returns true if `a` overlaps `b` in the x axis only.
+     *
+     * Touching counts as overlap.
+     */
+    public static isBoundsOverlapX(a: RTreeBounds, b: RTreeBounds) {
+        return !(a.xh < b.xl) && !(a.xl > b.xh);
+    }
+
+    /**
+     * Returns true if `a` overlaps `b` in the y axis only.
+     *
+     * Touching counts as overlap.
+     */
+    public static isBoundsOverlapY(a: RTreeBounds, b: RTreeBounds) {
+        return !(a.yh < b.yl) && !(a.yl > b.yh);
+    }
+
     public width: number;
     public height: number;
     private areaCached: number;
@@ -266,11 +359,5 @@ export class RTreeBounds {
 
     public contains(xy: Point) {
         return this.xl <= xy.x && this.xh >= xy.x && this.yl <= xy.y && this.yh >= xy.y;
-    }
-
-    // http://gamedev.stackexchange.com/questions/586/what-is-the-fastest-way-to-work-out-2d-bounding-box-intersection
-    public intersects(bounds: RTreeBounds) {
-        return Math.abs(this.xl - bounds.xl) * 2 < (this.width + bounds.width) &&
-               Math.abs(this.yl - bounds.yl) * 2 < (this.height + bounds.height);
     }
 }

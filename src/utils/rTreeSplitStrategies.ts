@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import { RTreeBounds, RTreeNode } from "./rTree";
+import { RTreeNode } from "./rTree";
 
 export type NodePair<T> = [RTreeNode<T>, RTreeNode<T>];
 
@@ -11,19 +11,16 @@ export interface IRTreeSplitStrategy {
     split: <T>(entries: RTreeNode<T>[], nodes: NodePair<T>) => void;
 }
 
-export class SplitStrategyTrival implements IRTreeSplitStrategy {
+export class SplitStrategyTrivial implements IRTreeSplitStrategy {
     public split<T>(entries: RTreeNode<T>[], nodes: NodePair<T>) {
         // Create simple middle split
-        const mid = Math.floor(entries.length / 2);
+        const mid = Math.ceil(entries.length / 2);
 
-        const leftEntries = entries.slice(0, mid);
-        for (let i = 0; i < leftEntries.length; i++) {
-            nodes[0].insert(leftEntries[i]);
+        for (let i = 0; i < mid; i++) {
+            nodes[0].insert(entries[i]);
         }
-
-        const rightEntries = entries.slice(0, mid);
-        for (let i = 0; i < rightEntries.length; i++) {
-            nodes[1].insert(rightEntries[i]);
+        for (let i = mid; i < entries.length; i++) {
+            nodes[1].insert(entries[i]);
         }
     }
 }
@@ -31,20 +28,25 @@ export class SplitStrategyTrival implements IRTreeSplitStrategy {
 // Linear split method adapted from https://github.com/imbcmdth/RTree/blob/master/src/rtree.js
 export class SplitStrategyLinear implements IRTreeSplitStrategy {
     public split<T>(entries: RTreeNode<T>[], nodes: NodePair<T>) {
+        // copy entries before we mutate it
         entries = entries.slice();
+
         this.chooseFirstSplit(entries, nodes);
         while (entries.length > 0) {
             this.addNext(entries, nodes);
         }
     }
 
+    /**
+     * Choose the two farthest-apart entries to begin the split.
+     */
     private chooseFirstSplit<T>(entries: RTreeNode<T>[], nodes: NodePair<T>) {
-        let minXH = entries.length - 1;
-        let minYH = entries.length - 1;
-        let maxXL = 0;
-        let maxYL = 0;
-
-        for (let i = entries.length - 2; i >= 0; i--) {
+        // Determine entry indices that have min/max x/y coordinates
+        let minXH = 0;
+        let minYH = 0;
+        let maxXL = entries.length - 1;
+        let maxYL = entries.length - 1;
+        for (let i = 1; i < entries.length - 1; i++) {
             const entry = entries[i];
 
             if (entry.bounds.xl > entries[maxXL].bounds.xl) {
@@ -60,32 +62,47 @@ export class SplitStrategyLinear implements IRTreeSplitStrategy {
             }
         }
 
-        // Choose to split x or y
+        // Choose to split x or y based on greatest difference
         const dx = Math.abs(entries[minXH].bounds.xh - entries[maxXL].bounds.xl);
         const dy = Math.abs(entries[minYH].bounds.yh - entries[maxYL].bounds.yl);
-        const [ i0, i1 ] = dx > dy ? [ minXH, maxXL ] : [ minYH, maxYL ];
+        let [ i0, i1 ] = dx > dy ? [ minXH, maxXL ] : [ minYH, maxYL ];
 
-        // Split off nodes
+        // if no detectable split, just use first/last entries
+        if (i0 === i1) {
+            i0 = 0;
+            i1 = entries.length - 1;
+        }
+
+        // Split off nodes. We splice with the max index first to make sure we
+        // don't change the index of the second splice call
         nodes[0].insert(entries.splice(Math.max(i0, i1), 1)[0]);
         nodes[1].insert(entries.splice(Math.min(i0, i1), 1)[0]);
     }
 
+    /**
+     * Split the next entry. Choose the entry that expands its parent node's
+     * area the least.
+     */
     private addNext<T>(entries: RTreeNode<T>[], nodes: NodePair<T>) {
         let index: number = null;
-        let areaDiff: number = null;
+        let minDiff: number = null;
         let minDiffNode: RTreeNode<T> = null;
 
         for (let i = 0; i < entries.length; i++) {
             const entry = entries[i];
-            const areaDiffs = nodes.map(function (node) {
-                return RTreeBounds.union(entry.bounds, node.bounds).area() - node.bounds.area();
-            });
+            const areaDiff0 = nodes[0].unionAreaDifference(entry.bounds);
+            const areaDiff1 = nodes[1].unionAreaDifference(entry.bounds);
 
-            const diff = Math.abs(areaDiffs[1] - areaDiffs[0]);
-            if (!index || diff < areaDiff) {
+            if (areaDiff0 < minDiff || index == null) {
                 index = i;
-                areaDiff = diff;
-                minDiffNode = areaDiffs[1] < areaDiffs[0] ? nodes[0] : nodes[1];
+                minDiff = areaDiff0;
+                minDiffNode = nodes[0];
+            }
+
+            if (areaDiff1 < minDiff) {
+                index = i;
+                minDiff = areaDiff1;
+                minDiffNode = nodes[1];
             }
         }
 

@@ -169,17 +169,19 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
     };
   }
 
-  protected _entityVisibleOnPlot(entity: ILightweightScatterPlotEntity, bounds: Bounds) {
-    const xRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
-    const yRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
-
-    const translatedBbox = {
-      x: entity.position.x - entity.diameter,
-      y: entity.position.y - entity.diameter,
+  protected _entityBounds(entity: ILightweightScatterPlotEntity) {
+    return {
+      x: entity.position.x - entity.diameter / 2,
+      y: entity.position.y - entity.diameter / 2,
       width: entity.diameter,
       height: entity.diameter,
     };
+  }
 
+  protected _entityVisibleOnPlot(entity: ILightweightScatterPlotEntity, bounds: Bounds) {
+    const xRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
+    const yRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
+    const translatedBbox = this._entityBounds(entity);
     return Utils.DOM.intersectsBBox(xRange, yRange, translatedBbox);
   }
 

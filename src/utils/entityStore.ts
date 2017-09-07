@@ -5,7 +5,6 @@
 
 import * as d3 from "d3";
 import { Bounds, IEntityBounds, Point } from "../core/interfaces";
-import { within } from "./mathUtils";
 import { RTree, RTreeBounds } from "./rTree";
 
 export interface IPositionedEntity {
@@ -42,7 +41,9 @@ export interface IEntityStore<T extends IPositionedEntity> {
    */
   entityNearest(point: Point): T;
 
-  entitiesInBounds(bounds: Bounds): T[];
+  entitiesInBounds(bounds: IEntityBounds): T[];
+  entitiesInXRange(bounds: IEntityBounds): T[];
+  entitiesInYRange(bounds: IEntityBounds): T[];
 
   /**
    * Returns the current internal array of all entities.
@@ -80,18 +81,21 @@ export class EntityStore<T extends IPositionedEntity> implements IEntityStore<T>
 
     // filter out of bounds entities if bounds is defined
     if (bounds !== undefined) {
+      const filterBounds = RTreeBounds.bounds(bounds);
       for (let i = 0; i < entities.length; i++) {
         const entity = entities[i];
-        if (within(entity.position, bounds)) {
+        const entityBounds = RTreeBounds.entityBounds(entityBoundsFactory(entity));
+        if (RTreeBounds.isBoundsOverlapBounds(filterBounds, entityBounds)) {
           this._tree.add(entity);
-          this._rtree.insert(RTreeBounds.entityBounds(entityBoundsFactory(entity)), entity);
+          this._rtree.insert(entityBounds, entity);
         }
       }
     } else {
       this._tree.addAll(entities);
       for (let i = 0; i < entities.length; i++) {
         const entity = entities[i];
-        this._rtree.insert(RTreeBounds.entityBounds(entityBoundsFactory(entity)), entity);
+        const entityBounds = RTreeBounds.entityBounds(entityBoundsFactory(entity));
+        this._rtree.insert(entityBounds, entity);
       }
     }
   }
@@ -100,8 +104,16 @@ export class EntityStore<T extends IPositionedEntity> implements IEntityStore<T>
     return this._tree.find(queryPoint.x, queryPoint.y);
   }
 
-  public entitiesInBounds(bounds: Bounds) {
-    return this._rtree.intersect(RTreeBounds.bounds(bounds));
+  public entitiesInBounds(bounds: IEntityBounds) {
+    return this._rtree.intersect(RTreeBounds.entityBounds(bounds));
+  }
+
+  public entitiesInXRange(bounds: IEntityBounds) {
+    return this._rtree.intersectX(RTreeBounds.entityBounds(bounds));
+  }
+
+  public entitiesInYRange(bounds: IEntityBounds) {
+    return this._rtree.intersectY(RTreeBounds.entityBounds(bounds));
   }
 
   public entities() {

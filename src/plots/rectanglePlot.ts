@@ -295,6 +295,11 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
     return this._entitiesIntersecting(dataXRange, dataYRange);
   }
 
+  protected _entityBounds(entity: Plots.IPlotEntity | Plots.ILightweightPlotEntity) {
+    const { datum, index, dataset } = entity;
+    return this._entityBBox(datum, index, dataset, this._getAttrToProjector());
+  }
+
   private _entityBBox(datum: any, index: number, dataset: Dataset, attrToProjector: AttributeToProjector): SVGRect {
     return {
       x: attrToProjector["x"](datum, index, dataset),
