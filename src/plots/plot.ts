@@ -865,6 +865,9 @@ export class Plot extends Component {
     return nearest === undefined ? undefined : this._lightweightPlotEntityToPlotEntity(nearest);
   }
 
+  /**
+   * Returns the entites whose bounding boxes overlap the parameter.
+   */
   public entitiesInBounds(queryBounds: IEntityBounds): Plots.IPlotEntity[] {
     const found = this._getEntityStore().entitiesInBounds(queryBounds);
     if (!found) {
@@ -873,7 +876,11 @@ export class Plot extends Component {
     return found.map((entity) => this._lightweightPlotEntityToPlotEntity(entity));
   }
 
-  public entitiesInBoundsX(queryBounds: IEntityBounds): Plots.IPlotEntity[] {
+  /**
+   * Returns the entites whose bounding boxes overlap the parameter on the
+   * x-axis.
+   */
+  public entitiesInXRange(queryBounds: IEntityBounds): Plots.IPlotEntity[] {
     const found = this._getEntityStore().entitiesInXRange(queryBounds);
     if (!found) {
       return undefined;
@@ -881,7 +888,11 @@ export class Plot extends Component {
     return found.map((entity) => this._lightweightPlotEntityToPlotEntity(entity));
   }
 
-  public entitiesInBoundsY(queryBounds: IEntityBounds): Plots.IPlotEntity[] {
+  /**
+   * Returns the entites whose bounding boxes overlap the parameter on the
+   * y-axis.
+   */
+  public entitiesInYRange(queryBounds: IEntityBounds): Plots.IPlotEntity[] {
     const found = this._getEntityStore().entitiesInYRange(queryBounds);
     if (!found) {
       return undefined;

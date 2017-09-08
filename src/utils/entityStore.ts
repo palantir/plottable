@@ -25,6 +25,8 @@ export interface IEntityStore<T extends IPositionedEntity> {
    *
    * @param {T[]} [entities] Entity array to add to the store. Entities must be
    * positionable
+   * @param [entityBoundsFactory] A factory method for producing {IEntityBounds}
+   * for each entity.
    * @param {Bounds} [bounds] Optionally add bounds filter for entityNearest
    * queries
    */
@@ -41,8 +43,27 @@ export interface IEntityStore<T extends IPositionedEntity> {
    */
   entityNearest(point: Point): T;
 
+  /**
+   * Returns the entites whose bounding boxes overlap the parameter.
+   *
+   * @param {IEntityBounds} [bounds] The query bounding box.
+   */
   entitiesInBounds(bounds: IEntityBounds): T[];
+
+  /**
+   * Returns the entites whose bounding boxes overlap the parameter on the
+   * x-axis.
+   *
+   * @param {IEntityBounds} [bounds] The query bounding box.
+   */
   entitiesInXRange(bounds: IEntityBounds): T[];
+
+  /**
+   * Returns the entites whose bounding boxes overlap the parameter on the
+   * y-axis.
+   *
+   * @param {IEntityBounds} [bounds] The query bounding box.
+   */
   entitiesInYRange(bounds: IEntityBounds): T[];
 
   /**
