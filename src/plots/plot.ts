@@ -14,8 +14,10 @@ import {
   AttributeToProjector,
   Bounds,
   IAccessor,
+  IEntityBounds,
   IRangeProjector,
   Point,
+  Range,
   SimpleSelection,
 } from "../core/interfaces";
 import * as Drawers from "../drawers";
@@ -107,7 +109,7 @@ export class Plot extends Component {
    * all the dots to size 0), and then they do the "main" animation into the correct visualization
    * (e.g. scatter plot dots grow to their specified size).
    */
-  private _animators: {[animator: string]: IAnimator} = {};
+  private _animators: { [animator: string]: IAnimator } = {};
 
   /**
    * Callback that triggers when any scale that's bound to this plot Updates.
@@ -282,7 +284,7 @@ export class Plot extends Component {
   protected _createDrawer(dataset: Dataset): ProxyDrawer {
     return new ProxyDrawer(
       () => new SVGDrawer("path", ""),
-      (ctx) => new CanvasDrawer(ctx, () => {}),
+      (ctx) => new CanvasDrawer(ctx, () => { }),
     );
   }
 
@@ -325,8 +327,10 @@ export class Plot extends Component {
    * @returns {Plot} The calling Plot.
    */
   public attr<A>(attr: string, attrValue: A | IAccessor<A>, scale: Scale<A, number | string>): this;
-  public attr<A>(attr: string, attrValue?: number | string | IAccessor<number> | IAccessor<string> | A | IAccessor<A>,
-                 scale?: Scale<A, number | string>): any {
+  public attr<A>(
+    attr: string, attrValue?: number | string | IAccessor<number> | IAccessor<string> | A | IAccessor<A>,
+    scale?: Scale<A, number | string>,
+  ): any {
     if (attrValue == null) {
       return this._attrBindings.get(attr);
     }
@@ -336,11 +340,11 @@ export class Plot extends Component {
   }
 
   protected _bindProperty(
-      property: string,
-      valueOrFn: any | Function,
-      scale: Scale<any, any>,
-      postScale?: IRangeProjector<any>,
-    ) {
+    property: string,
+    valueOrFn: any | Function,
+    scale: Scale<any, any>,
+    postScale?: IRangeProjector<any>,
+  ) {
     const binding = this._propertyBindings.get(property);
     const oldScale = binding != null ? binding.scale : null;
 
@@ -472,14 +476,14 @@ export class Plot extends Component {
   protected getExtentsForAttr(attr: string) {
     if (this._attrExtents[attr] == null) {
       const thunk = memThunk(
-          () => this.datasets(),
-          () => this._attrBindings.get(attr),
-          (datasets, accScaleBinding) => {
-            if (accScaleBinding == null || accScaleBinding.accessor == null) {
-              return null;
-            }
-            return datasets.map((dataset) => computeExtent(dataset, accScaleBinding, null));
-          },
+        () => this.datasets(),
+        () => this._attrBindings.get(attr),
+        (datasets, accScaleBinding) => {
+          if (accScaleBinding == null || accScaleBinding.accessor == null) {
+            return null;
+          }
+          return datasets.map((dataset) => computeExtent(dataset, accScaleBinding, null));
+        },
       );
       this._attrExtents[attr] = thunk;
     }
@@ -492,15 +496,15 @@ export class Plot extends Component {
   protected getExtentsForProperty(property: string) {
     if (this._propertyExtents[property] == null) {
       const thunk = memThunk(
-          () => this.datasets(),
-          () => this._propertyBindings.get(property),
-          () => this._filterForProperty(property),
-          (datasets, accScaleBinding, filter) => {
-            if (accScaleBinding == null || accScaleBinding.accessor == null) {
-              return null;
-            }
-            return datasets.map((dataset) => computeExtent(dataset, accScaleBinding, filter));
-          },
+        () => this.datasets(),
+        () => this._propertyBindings.get(property),
+        () => this._filterForProperty(property),
+        (datasets, accScaleBinding, filter) => {
+          if (accScaleBinding == null || accScaleBinding.accessor == null) {
+            return null;
+          }
+          return datasets.map((dataset) => computeExtent(dataset, accScaleBinding, filter));
+        },
       );
       this._propertyExtents[property] = thunk;
     }
@@ -516,7 +520,7 @@ export class Plot extends Component {
       if (binding.scale === scale) {
         const extents = this.getExtentsForAttr(attr);
         if (extents != null) {
-          includedValues = includedValues.concat(<D[]> d3.merge(extents));
+          includedValues = includedValues.concat(<D[]>d3.merge(extents));
         }
       }
     });
@@ -525,7 +529,7 @@ export class Plot extends Component {
       if (binding.scale === scale) {
         const extents = this.getExtentsForProperty(property);
         if (extents != null) {
-          includedValues = includedValues.concat(<D[]> d3.merge(extents));
+          includedValues = includedValues.concat(<D[]>d3.merge(extents));
         }
       }
     });
@@ -783,13 +787,22 @@ export class Plot extends Component {
    * are specified all datasets will be used.
    */
   protected _getEntityStore(datasets?: Dataset[]): Utils.IEntityStore<Plots.ILightweightPlotEntity> {
+    const entityBoundsFactory = (entity: Plots.ILightweightPlotEntity) => this._entityBounds(entity);
     if (datasets !== undefined) {
       const entityStore = new Utils.EntityStore<Plots.ILightweightPlotEntity>();
-      entityStore.addAll(this._buildLightweightPlotEntities(datasets), this._localOriginBounds());
+      entityStore.addAll(
+        this._buildLightweightPlotEntities(datasets),
+        entityBoundsFactory,
+        this._localOriginBounds(),
+      );
       return entityStore;
     } else if (this._cachedEntityStore === undefined) {
       const entityStore = new Utils.EntityStore<Plots.ILightweightPlotEntity>();
-      entityStore.addAll(this._buildLightweightPlotEntities(this.datasets()), this._localOriginBounds());
+      entityStore.addAll(
+        this._buildLightweightPlotEntities(this.datasets()),
+        entityBoundsFactory,
+        this._localOriginBounds(),
+      );
       this._cachedEntityStore = entityStore;
     }
 
@@ -811,7 +824,7 @@ export class Plot extends Component {
   protected _entityBounds(entity: Plots.IPlotEntity | Plots.ILightweightPlotEntity) {
     const { datum, index, dataset } = entity;
     const { x, y } = this._pixelPoint(datum, index, dataset);
-    return {x, y, width: 0, height: 0};
+    return { x, y, width: 0, height: 0 };
   }
 
   protected _lightweightPlotEntityToPlotEntity(entity: Plots.ILightweightPlotEntity) {
@@ -853,6 +866,78 @@ export class Plot extends Component {
   public entityNearest(queryPoint: Point): Plots.IPlotEntity {
     const nearest = this._getEntityStore().entityNearest(queryPoint);
     return nearest === undefined ? undefined : this._lightweightPlotEntityToPlotEntity(nearest);
+  }
+
+  /**
+   * Gets the Entities that intersect the Bounds.
+   *
+   * @param {Bounds} bounds
+   * @returns {PlotEntity[]}
+   */
+  public entitiesIn(bounds: Bounds): Plots.IPlotEntity[];
+  /**
+   * Gets the Entities that intersect the area defined by the ranges.
+   *
+   * @param {Range} xRange
+   * @param {Range} yRange
+   * @returns {PlotEntity[]}
+   */
+  public entitiesIn(xRange: Range, yRange: Range): Plots.IPlotEntity[];
+  public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): Plots.IPlotEntity[] {
+    let queryBounds: IEntityBounds;
+    if (yRange == null) {
+      const bounds = xRangeOrBounds as Bounds;
+      queryBounds = {
+        x: bounds.topLeft.x,
+        y: bounds.topLeft.y,
+        width: bounds.bottomRight.x - bounds.topLeft.x,
+        height: bounds.bottomRight.y - bounds.topLeft.y,
+      };
+    } else {
+      const xRange = xRangeOrBounds as Range;
+      queryBounds = {
+        x: xRange.min,
+        y: yRange.min,
+        width: xRange.max - xRange.min,
+        height: yRange.max - yRange.min,
+      };
+    }
+    return this.entitiesInBounds(queryBounds);
+  }
+
+  /**
+   * Returns the entites whose bounding boxes overlap the parameter.
+   */
+  public entitiesInBounds(queryBounds: IEntityBounds): Plots.IPlotEntity[] {
+    const found = this._getEntityStore().entitiesInBounds(queryBounds);
+    if (!found) {
+      return undefined;
+    }
+    return found.map((entity) => this._lightweightPlotEntityToPlotEntity(entity));
+  }
+
+  /**
+   * Returns the entites whose bounding boxes overlap the parameter on the
+   * x-axis.
+   */
+  public entitiesInXRange(queryBounds: IEntityBounds): Plots.IPlotEntity[] {
+    const found = this._getEntityStore().entitiesInXRange(queryBounds);
+    if (!found) {
+      return undefined;
+    }
+    return found.map((entity) => this._lightweightPlotEntityToPlotEntity(entity));
+  }
+
+  /**
+   * Returns the entites whose bounding boxes overlap the parameter on the
+   * y-axis.
+   */
+  public entitiesInYRange(queryBounds: IEntityBounds): Plots.IPlotEntity[] {
+    const found = this._getEntityStore().entitiesInYRange(queryBounds);
+    if (!found) {
+      return undefined;
+    }
+    return found.map((entity) => this._lightweightPlotEntityToPlotEntity(entity));
   }
 
   protected _uninstallScaleForKey(scale: Scale<any, any>, key: string) {
@@ -899,9 +984,9 @@ export class Plot extends Component {
 }
 
 function computeExtent(
-    dataset: Dataset,
-    accScaleBinding: Plots.IAccessorScaleBinding<any, any>,
-    filter: IAccessor<boolean>): any[] {
+  dataset: Dataset,
+  accScaleBinding: Plots.IAccessorScaleBinding<any, any>,
+  filter: IAccessor<boolean>): any[] {
   const accessor = accScaleBinding.accessor;
   const scale = accScaleBinding.scale;
 

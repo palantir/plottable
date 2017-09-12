@@ -108,7 +108,7 @@ describe("Plots", () => {
           const parentSpaceBounds = plot.bounds();
 
           plot.entities();
-          const plotLocalBounds = addAllSpy.args[0][1];
+          const plotLocalBounds = addAllSpy.args[0][2];
 
           assert.notDeepEqual(parentSpaceBounds, plotLocalBounds);
           assert.deepEqual(plotLocalBounds, {

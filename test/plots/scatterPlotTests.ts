@@ -342,11 +342,11 @@ describe("Plots", () => {
         plot.renderTo(div);
 
         const entities = plot.entitiesIn({
-          min: xScale.scale(1.001),
-          max: xScale.scale(1.001),
+          min: xScale.scale(1) + 10,
+          max: xScale.scale(1) + 10,
         }, {
-          min: yScale.scale(1.001),
-          max: yScale.scale(1.001),
+          min: yScale.scale(1) + 10,
+          max: yScale.scale(1) + 10,
         });
 
         assert.lengthOf(entities, 0, "no Entities retrieved");

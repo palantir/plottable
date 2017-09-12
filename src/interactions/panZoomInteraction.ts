@@ -17,6 +17,7 @@ import { Interaction } from "./interaction";
 
 export type PanCallback = () => void;
 export type ZoomCallback = () => void;
+export type PanZoomUpdateCallback = () => void;
 
 export type WheelFilter = (wheelEvent: WheelEvent) => boolean;
 
@@ -57,6 +58,7 @@ export class PanZoom extends Interaction {
 
   private _panEndCallbacks = new Utils.CallbackSet<PanCallback>();
   private _zoomEndCallbacks = new Utils.CallbackSet<ZoomCallback>();
+  private _panZoomUpdateCallbacks = new Utils.CallbackSet<PanZoomUpdateCallback>();
 
   /**
    * A PanZoom Interaction updates the domains of an x-scale and/or a y-scale
@@ -124,6 +126,8 @@ export class PanZoom extends Interaction {
     this.yScales().forEach((yScale) => {
       yScale.pan(this._constrainedTranslation(yScale, translateAmount.y));
     });
+
+    this._panZoomUpdateCallbacks.callCallbacks();
   }
 
   /**
@@ -153,6 +157,8 @@ export class PanZoom extends Interaction {
 
       yScale.zoom(zoomAmount, yCenter);
     });
+
+    this._panZoomUpdateCallbacks.callCallbacks();
   }
 
   protected _anchor(component: Component) {
@@ -804,6 +810,29 @@ export class PanZoom extends Interaction {
    */
   public offZoomEnd(callback: ZoomCallback) {
     this._zoomEndCallbacks.delete(callback);
+    return this;
+  }
+
+  /**
+   * Adds a callback to be called when any pan or zoom update occurs. This is
+   * called on every frame, so be sure your callback is fast.
+   *
+   * @param {PanZoomUpdateCallback} callback
+   * @returns {this} The calling PanZoom Interaction.
+   */
+  public onPanZoomUpdate(callback: PanZoomUpdateCallback) {
+    this._panZoomUpdateCallbacks.add(callback);
+    return this;
+  }
+
+  /**
+   * Removes a callback that would be called when any pan or zoom update occurs.
+   *
+   * @param {PanZoomUpdateCallback} callback
+   * @returns {this} The calling PanZoom Interaction.
+   */
+  public offPanZoomUpdate(callback: PanZoomUpdateCallback) {
+    this._panZoomUpdateCallbacks.delete(callback);
     return this;
   }
 }

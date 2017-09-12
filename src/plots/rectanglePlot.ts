@@ -8,7 +8,7 @@ import * as Typesettable from "typesettable";
 
 import * as Animators from "../animators";
 import { Dataset } from "../core/dataset";
-import { AttributeToProjector, Bounds, IAccessor, IRangeProjector, Point, Range } from "../core/interfaces";
+import { AttributeToProjector, IAccessor, IRangeProjector, Point, Range } from "../core/interfaces";
 import * as Drawers from "../drawers";
 import { ProxyDrawer } from "../drawers/drawer";
 import { RectangleSVGDrawer } from "../drawers/rectangleDrawer";
@@ -266,33 +266,9 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
     });
   }
 
-  /**
-   * Gets the Entities that intersect the Bounds.
-   *
-   * @param {Bounds} bounds
-   * @returns {PlotEntity[]}
-   */
-  public entitiesIn(bounds: Bounds): IPlotEntity[];
-  /**
-   * Gets the Entities that intersect the area defined by the ranges.
-   *
-   * @param {Range} xRange
-   * @param {Range} yRange
-   * @returns {PlotEntity[]}
-   */
-  public entitiesIn(xRange: Range, yRange: Range): IPlotEntity[];
-  public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): IPlotEntity[] {
-    let dataXRange: Range;
-    let dataYRange: Range;
-    if (yRange == null) {
-      const bounds = (<Bounds> xRangeOrBounds);
-      dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
-      dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
-    } else {
-      dataXRange = (<Range> xRangeOrBounds);
-      dataYRange = yRange;
-    }
-    return this._entitiesIntersecting(dataXRange, dataYRange);
+  protected _entityBounds(entity: Plots.IPlotEntity | Plots.ILightweightPlotEntity) {
+    const { datum, index, dataset } = entity;
+    return this._entityBBox(datum, index, dataset, this._getAttrToProjector());
   }
 
   private _entityBBox(datum: any, index: number, dataset: Dataset, attrToProjector: AttributeToProjector): SVGRect {
@@ -302,18 +278,6 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
       width: attrToProjector["width"](datum, index, dataset),
       height: attrToProjector["height"](datum, index, dataset),
     };
-  }
-
-  private _entitiesIntersecting(xValOrRange: number | Range, yValOrRange: number | Range): IPlotEntity[] {
-    const intersected: IPlotEntity[] = [];
-    const attrToProjector = this._getAttrToProjector();
-    this.entities().forEach((entity) => {
-      if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange,
-          this._entityBBox(entity.datum, entity.index, entity.dataset, attrToProjector))) {
-        intersected.push(entity);
-      }
-    });
-    return intersected;
   }
 
   /**

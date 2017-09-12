@@ -8,7 +8,7 @@ import * as d3Shape from "d3-shape";
 
 import * as Animators from "../animators";
 import { Dataset } from "../core/dataset";
-import { AttributeToProjector, Bounds, IAccessor, IRangeProjector, Point, Projector, Range } from "../core/interfaces";
+import { AttributeToProjector, IAccessor, IRangeProjector, Point, Projector } from "../core/interfaces";
 import * as Drawers from "../drawers";
 import { ProxyDrawer } from "../drawers/drawer";
 import { LineSVGDrawer, makeLineCanvasDrawStep } from "../drawers/lineDrawer";
@@ -430,44 +430,6 @@ export class Line<X> extends XYPlot<X, number> {
     } else {
       return [];
     }
-  }
-
-  /**
-   * Gets the Entities that intersect the Bounds.
-   *
-   * @param {Bounds} bounds
-   * @returns {PlotEntity[]}
-   */
-  public entitiesIn(bounds: Bounds): IPlotEntity[];
-  /**
-   * Gets the Entities that intersect the area defined by the ranges.
-   *
-   * @param {Range} xRange
-   * @param {Range} yRange
-   * @returns {PlotEntity[]}
-   */
-  public entitiesIn(xRange: Range, yRange: Range): IPlotEntity[];
-  public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): IPlotEntity[] {
-    let dataXRange: Range;
-    let dataYRange: Range;
-    if (yRange == null) {
-      const bounds = (<Bounds> xRangeOrBounds);
-      dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
-      dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
-    } else {
-      dataXRange = (<Range> xRangeOrBounds);
-      dataYRange = yRange;
-    }
-
-    const xProjector = Plot._scaledAccessor(this.x());
-    const yProjector = Plot._scaledAccessor(this.y());
-    return this.entities().filter((entity) => {
-      const { datum, index, dataset } = entity;
-
-      const x = xProjector(datum, index, dataset);
-      const y = yProjector(datum, index, dataset);
-      return dataXRange.min <= x && x <= dataXRange.max && dataYRange.min <= y && y <= dataYRange.max;
-    });
   }
 
   /**

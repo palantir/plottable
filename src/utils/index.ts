@@ -8,6 +8,7 @@ import * as Color from "./colorUtils";
 import * as DOM from "./domUtils";
 import * as Math from "./mathUtils";
 import * as Object from "./objectUtils";
+import * as RTree from "./rTree";
 import * as Stacking from "./stackingUtils";
 import * as Window from "./windowUtils";
 
@@ -17,6 +18,7 @@ export {
   DOM,
   Object,
   Math,
+  RTree,
   Stacking,
   Window
 };
