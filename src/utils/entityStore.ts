@@ -56,7 +56,7 @@ export interface IEntityStore<T extends IPositionedEntity> {
    *
    * @param {IEntityBounds} [bounds] The query bounding box.
    */
-  entitiesInXRange(bounds: IEntityBounds): T[];
+  entitiesInXBounds(bounds: IEntityBounds): T[];
 
   /**
    * Returns the entites whose bounding boxes overlap the parameter on the
@@ -64,7 +64,7 @@ export interface IEntityStore<T extends IPositionedEntity> {
    *
    * @param {IEntityBounds} [bounds] The query bounding box.
    */
-  entitiesInYRange(bounds: IEntityBounds): T[];
+  entitiesInYBounds(bounds: IEntityBounds): T[];
 
   /**
    * Returns the current internal array of all entities.
@@ -129,11 +129,11 @@ export class EntityStore<T extends IPositionedEntity> implements IEntityStore<T>
     return this._rtree.intersect(RTreeBounds.entityBounds(bounds));
   }
 
-  public entitiesInXRange(bounds: IEntityBounds) {
+  public entitiesInXBounds(bounds: IEntityBounds) {
     return this._rtree.intersectX(RTreeBounds.entityBounds(bounds));
   }
 
-  public entitiesInYRange(bounds: IEntityBounds) {
+  public entitiesInYBounds(bounds: IEntityBounds) {
     return this._rtree.intersectY(RTreeBounds.entityBounds(bounds));
   }
 

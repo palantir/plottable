@@ -88,7 +88,7 @@ export type Bounds = {
 };
 
 /**
- * Client bounds
+ * Client bounds in pixel-space.
  */
 export interface IEntityBounds {
   x: number;

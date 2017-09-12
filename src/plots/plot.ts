@@ -869,6 +869,8 @@ export class Plot extends Component {
   }
 
   /**
+   * @deprecated Use `entitiesInBounds` instead
+   *
    * Gets the Entities that intersect the Bounds.
    *
    * @param {Bounds} bounds
@@ -876,6 +878,8 @@ export class Plot extends Component {
    */
   public entitiesIn(bounds: Bounds): Plots.IPlotEntity[];
   /**
+   * @deprecated Use `entitiesInBounds` instead
+   *
    * Gets the Entities that intersect the area defined by the ranges.
    *
    * @param {Range} xRange
@@ -907,6 +911,8 @@ export class Plot extends Component {
 
   /**
    * Returns the entites whose bounding boxes overlap the parameter.
+   *
+   * `queryBounds` are in pixel space, measured from the origin of this plot.
    */
   public entitiesInBounds(queryBounds: IEntityBounds): Plots.IPlotEntity[] {
     const found = this._getEntityStore().entitiesInBounds(queryBounds);
@@ -917,11 +923,13 @@ export class Plot extends Component {
   }
 
   /**
-   * Returns the entites whose bounding boxes overlap the parameter on the
-   * x-axis.
+   * Returns the entites whose bounding boxes overlap the `queryBounds`
+   * parameter on the x-axis.
+   *
+   * `queryBounds` are in pixel space, measured from the origin of this plot.
    */
-  public entitiesInXRange(queryBounds: IEntityBounds): Plots.IPlotEntity[] {
-    const found = this._getEntityStore().entitiesInXRange(queryBounds);
+  public entitiesInXBounds(queryBounds: IEntityBounds): Plots.IPlotEntity[] {
+    const found = this._getEntityStore().entitiesInXBounds(queryBounds);
     if (!found) {
       return undefined;
     }
@@ -929,11 +937,13 @@ export class Plot extends Component {
   }
 
   /**
-   * Returns the entites whose bounding boxes overlap the parameter on the
-   * y-axis.
+   * Returns the entites whose bounding boxes overlap the `queryBounds`
+   * parameter on the y-axis.
+   *
+   * `queryBounds` are in pixel space, measured from the origin of this plot.
    */
-  public entitiesInYRange(queryBounds: IEntityBounds): Plots.IPlotEntity[] {
-    const found = this._getEntityStore().entitiesInYRange(queryBounds);
+  public entitiesInYBounds(queryBounds: IEntityBounds): Plots.IPlotEntity[] {
+    const found = this._getEntityStore().entitiesInYBounds(queryBounds);
     if (!found) {
       return undefined;
     }
