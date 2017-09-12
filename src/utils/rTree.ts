@@ -28,8 +28,13 @@ const DEFAULT_SPLIT_STRATEGY: IRTreeSplitStrategy = new SplitStrategyLinear();
  * arbitrarily overlapping bounding boxes and supports efficient point and
  * bounding box overlap queries.
  *
+ * Average search time complexity is O(log_M(N)) where M = max children per node
+ * and N is number of values stored in tree.
+ *
  * It is similar in purpose to a quadtree except quadtrees can only store a
- * single point per entry.
+ * single point per entry. Also, the space-partitioning structure of quadtrees
+ * provides guarantees that any given value has no neighbors closer than its
+ * node's bounds, whereas r-trees provide no such guarantees.
  */
 export class RTree<T> {
     private root: RTreeNode<T>;
