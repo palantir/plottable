@@ -12,7 +12,6 @@ import * as Formatters from "../core/formatters";
 import { DatumFormatter } from "../core/formatters";
 import {
   AttributeToProjector,
-  Bounds,
   IAccessor,
   IEntityBounds,
   Point,
@@ -483,35 +482,6 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
    */
   public entitiesAt(p: Point) {
     return this._entitiesIntersecting(p.x, p.y);
-  }
-
-  /**
-   * Gets the Entities that intersect the Bounds.
-   *
-   * @param {Bounds} bounds
-   * @returns {PlotEntity[]}
-   */
-  public entitiesIn(bounds: Bounds): IPlotEntity[];
-  /**
-   * Gets the Entities that intersect the area defined by the ranges.
-   *
-   * @param {Range} xRange
-   * @param {Range} yRange
-   * @returns {PlotEntity[]}
-   */
-  public entitiesIn(xRange: Range, yRange: Range): IPlotEntity[];
-  public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): IPlotEntity[] {
-    let dataXRange: Range;
-    let dataYRange: Range;
-    if (yRange == null) {
-      const bounds = (<Bounds> xRangeOrBounds);
-      dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
-      dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
-    } else {
-      dataXRange = (<Range> xRangeOrBounds);
-      dataYRange = yRange;
-    }
-    return this._entitiesIntersecting(dataXRange, dataYRange);
   }
 
   private _entitiesIntersecting(xValOrRange: number | Range, yValOrRange: number | Range): IPlotEntity[] {

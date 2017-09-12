@@ -4,7 +4,7 @@
  */
 
 import { Dataset } from "../core/dataset";
-import { AttributeToProjector, Bounds, IAccessor, Point, Range } from "../core/interfaces";
+import { AttributeToProjector, Bounds, IAccessor, Point } from "../core/interfaces";
 import * as SymbolFactories from "../core/symbolFactories";
 import { SymbolFactory } from "../core/symbolFactories";
 import { ProxyDrawer } from "../drawers/drawer";
@@ -186,50 +186,12 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
   }
 
   /**
-   * Gets the Entities that intersect the Bounds.
-   *
-   * @param {Bounds} bounds
-   * @returns {PlotEntity[]}
-   */
-  public entitiesIn(bounds: Bounds): IPlotEntity[];
-  /**
-   * Gets the Entities that intersect the area defined by the ranges.
-   *
-   * @param {Range} xRange
-   * @param {Range} yRange
-   * @returns {PlotEntity[]}
-   */
-  public entitiesIn(xRange: Range, yRange: Range): IPlotEntity[];
-  public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): IPlotEntity[] {
-    let dataXRange: Range;
-    let dataYRange: Range;
-    if (yRange == null) {
-      const bounds = (<Bounds> xRangeOrBounds);
-      dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
-      dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
-    } else {
-      dataXRange = (<Range> xRangeOrBounds);
-      dataYRange = yRange;
-    }
-    const xProjector = Plot._scaledAccessor(this.x());
-    const yProjector = Plot._scaledAccessor(this.y());
-    return this.entities().filter((entity) => {
-      const datum = entity.datum;
-      const index = entity.index;
-      const dataset = entity.dataset;
-      const x = xProjector(datum, index, dataset);
-      const y = yProjector(datum, index, dataset);
-      return dataXRange.min <= x && x <= dataXRange.max && dataYRange.min <= y && y <= dataYRange.max;
-    });
-  }
-
-  /**
    * Gets the Entities at a particular Point.
    *
    * @param {Point} p
    * @returns {PlotEntity[]}
    */
-  public entitiesAt(p: Point) {
+  public entitiesAt(p: Point): IPlotEntity[] {
     const xProjector = Plot._scaledAccessor(this.x());
     const yProjector = Plot._scaledAccessor(this.y());
     const sizeProjector = Plot._scaledAccessor(this.size());
