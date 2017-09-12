@@ -46,6 +46,7 @@ Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)`;
  *     a dependency on a module named "plottable" (both in AMD and CommonJS).
  */
 module.exports = {
+  devtool: "source-map",
   entry: "./build/src/index.js",
   output: {
     filename: "plottable.js",
