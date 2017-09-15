@@ -206,6 +206,7 @@ export class Plot extends Component {
 
   public setBounds(width: number, height: number, originX?: number, originY?: number) {
     super.setBounds(width, height, originX, originY);
+    this._resetEntityStore();
     if (this._canvas != null) {
       if (this._bufferCanvas && !this._bufferCanvasValid) {
         // copy current canvas to buffer 1:1
