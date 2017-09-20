@@ -513,9 +513,6 @@ export class Plot extends Component {
   }
 
   private _includedValuesForScale<D>(scale: Scale<D, any>): D[] {
-    if (!this._isAnchored) {
-      return [];
-    }
     let includedValues: D[] = [];
     this._attrBindings.each((binding, attr) => {
       if (binding.scale === scale) {
