@@ -8,10 +8,10 @@ import { AttributeToAppliedProjector, IAccessor } from "../core/interfaces";
 import { SymbolFactory } from "../core/symbolFactories";
 import { CanvasBuffer } from "./canvasBuffer";
 import {
-    CanvasDrawStep,
-    ContextStyleAttrs,
-    renderPathWithStyle,
-    resolveAttributesSubsetWithStyles,
+  CanvasDrawStep,
+  ContextStyleAttrs, getStrokeWidth,
+  renderPathWithStyle,
+  resolveAttributesSubsetWithStyles,
 } from "./canvasDrawer";
 import { SVGDrawer } from "./svgDrawer";
 
@@ -54,8 +54,12 @@ export function makeSymbolCanvasDrawStep(
                 // no-op;
             } else {
                 // make room for bigger symbol if needed
-                if (symbolSize > buffer.screenWidth || symbolSize > buffer.screenHeight) {
-                    buffer.resize(symbolSize, symbolSize, true);
+                const strokeWidth = getStrokeWidth(attrs);
+
+                // +1 to account for subpixel aliasing
+                const wantedBufferSize = symbolSize + strokeWidth + 1;
+                if (wantedBufferSize > buffer.screenWidth || wantedBufferSize > buffer.screenHeight) {
+                    buffer.resize(wantedBufferSize, wantedBufferSize, true);
                 }
 
                 // draw actual symbol into buffer
@@ -84,7 +88,7 @@ function squareOverlapsBounds(width: number, height: number, x: number, y: numbe
         x + size >= 0 && x - size <= width &&
         y + size >= 0 && y - size <= height
     );
-};
+}
 
 function isAttributeValuesEqual(prevAttrs: any, attrs: any, attrKeys: string[]) {
     if (prevAttrs == null) {

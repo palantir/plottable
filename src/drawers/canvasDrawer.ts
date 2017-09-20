@@ -104,7 +104,7 @@ function getFillOpacity(style: Record<string, any>) {
   return fillOpacity * baseOpacity;
 }
 
-function getStrokeWidth(style: Record<string, any>) {
+export function getStrokeWidth(style: Record<string, any>) {
   return style["stroke-width"] != null ? parseFloat(style["stroke-width"]) : 1;
 }
 
