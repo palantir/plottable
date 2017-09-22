@@ -69,8 +69,8 @@ export class QuantitativeScale<D> extends Scale<D, number> implements ITransform
     super._autoDomainIfAutomaticMode();
   }
 
-  protected _getUnboundedExtent(): D[] {
-    const includedValues = this._getAllIncludedValues();
+  protected _getUnboundedExtent(ignoreAttachState = false): D[] {
+    const includedValues = this._getAllIncludedValues(ignoreAttachState);
     let extent = this._defaultExtent();
     if (includedValues.length !== 0) {
       const combinedExtent = [

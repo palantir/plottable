@@ -39,10 +39,10 @@ export class Scale<D, R> {
     return []; // this should be overwritten
   }
 
-  protected _getAllIncludedValues(): D[] {
+  protected _getAllIncludedValues(ignoreAttachState = false): D[] {
     let providerArray: D[] = [];
     this._includedValuesProviders.forEach((provider: Scales.IIncludedValuesProvider<D>) => {
-      const extents = provider(this);
+      const extents = provider(this, ignoreAttachState);
       providerArray = providerArray.concat(extents);
     });
     return providerArray;

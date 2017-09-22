@@ -26,10 +26,14 @@ import { Scale } from "./scale";
  * A function that supplies domain values to be included into a Scale.
  *
  * @param {Scale} scale
+ * @param {boolean} ignoreAnchorState - by default the provider will produce no
+ *  results if it is not "attached" to the DOM. Setting this flag to `true` will
+ *  force this provider to compute its values even before it is attached to the
+ *  DOM.
  * @returns {D[]} An array of values that should be included in the Scale.
  */
 export interface IIncludedValuesProvider<D> {
-  (scale: Scale<D, any>): D[];
+  (scale: Scale<D, any>, ignoreAnchorState?: boolean): D[];
 }
 
 /**
