@@ -32,7 +32,6 @@ import { IPlotEntity } from "./";
 import { ILightweightPlotEntity } from "./commons";
 import { Plot } from "./plot";
 import { XYPlot } from "./xyPlot";
-import {boundsIntersects} from "../utils/mathUtils";
 
 type LabelConfig = {
   labelArea: SimpleSelection<void>;
@@ -939,7 +938,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     if (!isValid) {
       return false;
     }
-    return boundsIntersects(
+    return Utils.Math.boundsIntersects(
       pixelX, pixelY, pixelWidth, pixelHeight,
       0, 0, plotWidth, plotHeight,
     );
