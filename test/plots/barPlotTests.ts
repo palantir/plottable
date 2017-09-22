@@ -432,6 +432,14 @@ describe("Plots", () => {
           });
         });
 
+        it("only draws labels for bars in the viewport", () => {
+          barPlot.labelsEnabled(true);
+          // center on the middle bar
+          baseScale.domain([-0.1, 0.1]);
+          const labels = barPlot.content().selectAll("text");
+          assert.strictEqual(labels.size(), 1, "only one label");
+        });
+
         it("hides the labels if bars are too thin to show them", () => {
           div.style(baseSizeAttr, getDivBaseSizeDimension(div) / 10 + "px");
           barPlot.redraw();
@@ -493,80 +501,22 @@ describe("Plots", () => {
           }
         });
 
-        it("hides labels cut off by lower end of base scale", () => {
+        it("shifts on-bar-label to off-bar-label", () => {
           barPlot.labelsEnabled(true);
-          data.forEach((d, i) => {
-            const textsBeforeRendering = barPlot.content().selectAll<SVGTextElement, any>("text");
-            const centerOfText = getCenterOfText(textsBeforeRendering.nodes()[i]);
-            const centerValue = baseScale.invert(isVertical ? centerOfText.x : centerOfText.y);
-            baseScale.domain([centerValue, centerValue + (DEFAULT_DOMAIN[1] - DEFAULT_DOMAIN[0])]);
+          const labels = barPlot.content().selectAll<Element, any>(".on-bar-label, .off-bar-label");
+          const lastLabel = d3.select(labels.nodes()[4]);
+          assert.isDefined(lastLabel.select(".off-bar-label"), "last bar starts on-bar");
+          const centerOfText = getCenterOfText(<SVGElement> lastLabel.select("text").node());
+          const centerValue = valueScale.invert(isVertical ? centerOfText.y : centerOfText.x);
 
-            const textsAfterRendering = barPlot.content().selectAll<SVGTextElement, any>("text");
-            assert.strictEqual(d3.select(textsAfterRendering.nodes()[i]).style("visibility"), "hidden",
-              `label for bar with index ${i} is hidden`);
-          });
+          // shift the plot such that the last bar's on-bar label is cut off
+          valueScale.domain([centerValue, centerValue + (DEFAULT_DOMAIN[1] - DEFAULT_DOMAIN[0])]);
+
+          const newLabels = barPlot.content().selectAll<Element, any>(".on-bar-label, .off-bar-label");
+          assert.strictEqual(newLabels.size(), 1, "only one label is drawn now");
+          assert.isTrue(d3.select(newLabels.nodes()[0]).classed("off-bar-label"),
+            "cut off on-bar label was switched to off-bar");
           div.remove();
-        });
-
-        it("hides labels cut off by upper end of base scale", () => {
-          barPlot.labelsEnabled(true);
-          data.forEach((d, i) => {
-            const textsBeforeRendering = barPlot.content().selectAll<SVGTextElement, any>("text");
-            const centerOfText = getCenterOfText(textsBeforeRendering.nodes()[i]);
-            const centerValue = baseScale.invert(isVertical ? centerOfText.x : centerOfText.y);
-            baseScale.domain([centerValue - (DEFAULT_DOMAIN[1] - DEFAULT_DOMAIN[0]), centerValue]);
-
-            const textsAfterRendering = barPlot.content().selectAll<SVGTextElement, any>("text");
-            assert.strictEqual(d3.select(textsAfterRendering.nodes()[i]).style("visibility"), "hidden",
-              `label for bar with index ${i} is hidden`);
-          });
-        });
-
-        it("hides or shifts labels cut off by lower end of value scale", () => {
-          barPlot.labelsEnabled(true);
-          const labelsBeforeRendering = barPlot.content().selectAll<Element, any>(".on-bar-label, .off-bar-label");
-          const centerValues = labelsBeforeRendering.select<SVGTextElement>("text").nodes().map((textNode) => {
-            const centerOfText = getCenterOfText(<SVGElement> textNode);
-            return valueScale.invert(isVertical ? centerOfText.y : centerOfText.x);
-          });
-          const wasOriginallyOnBar = labelsBeforeRendering.nodes().map((label) => d3.select(label).classed("on-bar-label"));
-
-          data.forEach((d, i) => {
-            const centerValue = centerValues[i];
-            valueScale.domain([centerValue, centerValue + (DEFAULT_DOMAIN[1] - DEFAULT_DOMAIN[0])]);
-            const labels = barPlot.content().selectAll<Element, any>(".on-bar-label, .off-bar-label");
-            if (wasOriginallyOnBar[i] && d.value > 0) {
-              assert.isTrue(d3.select(labels.nodes()[i]).classed("off-bar-label"),
-                `cut off on-bar label was switched to off-bar (index ${i})`);
-            } else {
-              const textNode = labels.select("text").nodes()[i];
-              assert.strictEqual(d3.select(textNode).style("visibility"), "hidden", `label for bar with index ${i} is hidden`);
-            }
-          });
-          div.remove();
-        });
-
-        it("hides or shifts labels cut off by upper end of value scale", () => {
-          barPlot.labelsEnabled(true);
-          const labelsBeforeRendering = barPlot.content().selectAll<Element, any>(".on-bar-label, .off-bar-label");
-          const centerValues = labelsBeforeRendering.select("text").nodes().map((textNode) => {
-            const centerOfText = getCenterOfText(<SVGElement> textNode);
-            return valueScale.invert(isVertical ? centerOfText.y : centerOfText.x);
-          });
-          const wasOriginallyOnBar = labelsBeforeRendering.nodes().map((label) => d3.select(label).classed("on-bar-label"));
-
-          data.forEach((d, i) => {
-            const centerValue = centerValues[i];
-            valueScale.domain([centerValue - (DEFAULT_DOMAIN[1] - DEFAULT_DOMAIN[0]), centerValue]);
-            const labels = barPlot.content().selectAll<Element, any>(".on-bar-label, .off-bar-label");
-            if (wasOriginallyOnBar[i] && d.value < 0) {
-              assert.isTrue(d3.select(labels.nodes()[i]).classed("off-bar-label"),
-                `cut-off on-bar label was switched to off-bar (index ${i})`);
-            } else {
-              const textNode = labels.select("text").nodes()[i];
-              assert.strictEqual(d3.select(textNode).style("visibility"), "hidden", `label for bar with index ${i} is hidden`);
-            }
-          });
         });
 
         // HACKHACK: This test is a bit hacky, but it seems to be testing for a bug fixed in

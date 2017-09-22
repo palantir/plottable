@@ -16,7 +16,7 @@ import { Bar, BarOrientation } from "./barPlot";
 import { Plot } from "./plot";
 
 export class StackedBar<X, Y> extends Bar<X, Y> {
-  protected static _STACKED_BAR_LABEL_PADDING = 5;
+  protected static _EXTREMA_LABEL_MARGIN_FROM_BAR = 5;
 
   private _extremaFormatter: Formatter = identity();
   private _labelArea: SimpleSelection<void>;
@@ -139,8 +139,8 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
       const width = bounds.bottomRight.x - bounds.topLeft.x;
       const height = bounds.bottomRight.y - bounds.topLeft.y;
       const textTooLong = this._isVertical
-        ? ( width > barThickness - (2 * StackedBar._LABEL_PADDING) )
-        : ( height > barThickness - (2 * StackedBar._LABEL_PADDING) );
+        ? width > barThickness
+        : height > barThickness;
 
       if (!textTooLong) {
         const labelContainer = this._labelArea.append("g").attr("transform", `translate(${x}, ${y})`);
@@ -157,31 +157,44 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
     };
 
     const drawLabelsForExtents = (
-          extents: Utils.Map<string | number, StackExtent<Date | number | string>>,
+          stacks: Utils.Map<string | number, StackExtent<Date | number | string>>,
           computeLabelTopLeft: (
               stackEdge: Point,
               textDimensions: Typesettable.IDimensions,
               barThickness: number,
           ) => Point,
     ) => {
-      extents.forEach((maximum) => {
-        if (maximum.extent !== baselineValue) {
+      const attrToProjector = this._generateAttrToProjector();
+      const plotWidth = this.width();
+      const plotHeight = this.height();
+      stacks.forEach((stack) => {
+        if (stack.extent !== baselineValue) {
           // only draw sums for values not at the baseline
 
-          const text = this.extremaFormatter()(maximum.extent);
+          const text = this.extremaFormatter()(stack.extent);
           const textDimensions = this._measurer.measure(text);
 
-          const { stackedDatum } = maximum;
+          const { stackedDatum } = stack;
           const { originalDatum, originalIndex, originalDataset } = stackedDatum;
+          // only consider stack extents that are on the screen
+          if (!this._isDatumOnScreen(
+              attrToProjector,
+              plotWidth,
+              plotHeight,
+              originalDatum,
+              originalIndex,
+              originalDataset)) {
+            return;
+          }
           const barThickness = Plot._scaledAccessor(this.attr(Bar._BAR_THICKNESS_KEY))(originalDatum, originalIndex, originalDataset);
 
           /*
            * The stackEdge is aligned at the edge of the stack in the length dimension,
            * and in the center of the stack in the thickness dimension.
            */
-          const stackEdgeLength = lengthScale.scale(maximum.extent);
+          const stackEdgeLength = lengthScale.scale(stack.extent);
           const stackCenterPosition =
-              this._getPositionAttr(positionScale.scale(maximum.axisValue), barThickness) + barThickness / 2;
+              this._getPositionAttr(positionScale.scale(stack.axisValue), barThickness) + barThickness / 2;
 
           const stackEdge = this._isVertical
               ? {
@@ -218,9 +231,9 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
       return {
         x: this._isVertical
             ? stackEdge.x - primaryTextMeasurement / 2
-            : stackEdge.x + StackedBar._STACKED_BAR_LABEL_PADDING,
+            : stackEdge.x + StackedBar._EXTREMA_LABEL_MARGIN_FROM_BAR,
         y: this._isVertical
-            ? stackEdge.y - secondaryTextMeasurement - StackedBar._STACKED_BAR_LABEL_PADDING
+            ? stackEdge.y - secondaryTextMeasurement
             : stackEdge.y - primaryTextMeasurement / 2,
       };
     });
@@ -232,9 +245,9 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
       return {
         x: this._isVertical
             ? stackEdge.x - primaryTextMeasurement / 2
-            : stackEdge.x - secondaryTextMeasurement - StackedBar._STACKED_BAR_LABEL_PADDING,
+            : stackEdge.x - secondaryTextMeasurement,
         y: this._isVertical
-            ? stackEdge.y + StackedBar._STACKED_BAR_LABEL_PADDING
+            ? stackEdge.y + StackedBar._EXTREMA_LABEL_MARGIN_FROM_BAR
             : stackEdge.y - primaryTextMeasurement / 2,
       };
     });

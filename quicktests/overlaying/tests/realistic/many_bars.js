@@ -43,6 +43,9 @@ function run(div, datas, Plottable) {
         .datasets([ds1, ds2, ds3, ds4])
         .x(function (d) { return d.x; }, xScale)
         .y(function (d) { return d.y; }, yScale)
+        .labelsEnabled(true, "middle")
         .attr("fill", function (d, i, ds) { return ds.metadata()}, colorScale);
     plot.renderTo(div);
+
+    new Plottable.Interactions.PanZoom(xScale, null).attachTo(plot).setMinMaxDomainValuesTo(xScale);
 }

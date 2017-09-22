@@ -473,7 +473,7 @@ describe("Plots", () => {
       // HACKHACK #2795: correct off-bar label logic to be implemented
       it("doesn't show any off-bar labels", () => {
         stackedBarPlot.labelsEnabled(true);
-        xScale.domain([0, 50]);
+        xScale.domain([0, 90]);
         const offBarLabels = stackedBarPlot.content().selectAll<Element, any>(".off-bar-label");
         assert.operator(offBarLabels.size(), ">", 0, "some off-bar labels are drawn");
         offBarLabels.each(function(d, i) {
