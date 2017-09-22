@@ -620,7 +620,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     const text = this._labelFormatter(length, datum, index, dataset);
     const measurement = measurer.measure(text);
 
-    const showLabelOnBar = this._getShowLabelOnBar(barCoordinates, barDimensions, measurement);
+    const showLabelOnBar = this._shouldShowLabelOnBar(barCoordinates, barDimensions, measurement);
 
     // show label on right when value === baseline for horizontal plots
     const aboveOrLeftOfBaseline = this._isVertical ? scaledLength <= scaledBaseline : scaledLength < scaledBaseline;
@@ -640,22 +640,29 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     return tooWide;
   }
 
-  private _getShowLabelOnBar(barCoordinates: Point, barDimensions: IDimensions, measurement: Typesettable.IDimensions) {
+  /**
+   * Labels are "on-bar" by default, but if the bar is not long enough to fit the text,
+   * we can try putting the label "off-bar", if there's enough space outside of the bar
+   * to fit it.
+   */
+  private _shouldShowLabelOnBar(barCoordinates: Point, barDimensions: IDimensions, labelDimensions: Typesettable.IDimensions) {
     if (this._labelsPosition === LabelsPosition.outside) { return false; }
 
-    const barCoordinate = this._isVertical ? barCoordinates.y : barCoordinates.x;
-    const barDimension = this._isVertical ? barDimensions.height : barDimensions.width;
-    const plotDimension = this._isVertical ? this.height() : this.width();
-    const measurementDimension = this._isVertical ? measurement.height : measurement.width;
+    const barStart = this._isVertical ? barCoordinates.y : barCoordinates.x;
+    const barLength = this._isVertical ? barDimensions.height : barDimensions.width;
+    const totalLength = this._isVertical ? this.height() : this.width();
+    const labelLength = this._isVertical ? labelDimensions.height : labelDimensions.width;
 
-    let effectiveBarDimension = barDimension;
-    if (barCoordinate + barDimension > plotDimension) {
-      effectiveBarDimension = plotDimension - barCoordinate;
-    } else if (barCoordinate < 0) {
-      effectiveBarDimension = barCoordinate + barDimension;
+    const barEnd = barStart + barLength;
+
+    let barLengthVisibleOnScreen = barLength;
+    if (barEnd > totalLength) {
+      barLengthVisibleOnScreen = totalLength - barStart;
+    } else if (barStart < 0) {
+      barLengthVisibleOnScreen = barEnd;
     }
 
-    return (measurementDimension <= effectiveBarDimension);
+    return (labelLength + Bar._LABEL_MARGIN_INSIDE_BAR <= barLengthVisibleOnScreen);
   }
 
   private _calculateLabelProperties(
@@ -745,13 +752,6 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     } else {
       labelContainer.classed("off-bar-label", true);
     }
-
-    const hideLabel =
-      labelOrigin.x < 0 ||
-      labelOrigin.y < 0 ||
-      labelOrigin.x + measurement.width > this.width() ||
-      labelOrigin.y + measurement.height > this.height();
-    labelContainer.style("visibility", hideLabel ? "hidden" : "inherit");
 
     return labelContainer;
   }
