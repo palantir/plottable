@@ -61,7 +61,11 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   // we re-assign "width" to specifically refer to <rect>'s width attribute
   protected static _BAR_THICKNESS_KEY = "width";
   protected static _LABEL_AREA_CLASS = "bar-label-text-area";
-  protected static _LABEL_PADDING = 10;
+  /**
+   * In the case of "start" or "end" LabelPositions, put the label this many px away
+   * from the bar's length distance edge
+   */
+  protected static _LABEL_MARGIN_INSIDE_BAR = 10;
 
   private _baseline: SimpleSelection<void>;
   private _baselineValue: X|Y;
@@ -670,16 +674,16 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       switch (position) {
         case "topLeft":
           alignmentDimension = this._isVertical ? "top" : "left";
-          labelContainerOriginCoordinate += Bar._LABEL_PADDING;
-          labelOriginCoordinate += Bar._LABEL_PADDING;
+          labelContainerOriginCoordinate += Bar._LABEL_MARGIN_INSIDE_BAR;
+          labelOriginCoordinate += Bar._LABEL_MARGIN_INSIDE_BAR;
           return;
         case "center":
           labelOriginCoordinate += (barDimension + measurementDimension) / 2;
           return;
         case "bottomRight":
           alignmentDimension = this._isVertical ? "bottom" : "right";
-          labelContainerOriginCoordinate -= Bar._LABEL_PADDING;
-          labelOriginCoordinate += containerDimension - Bar._LABEL_PADDING - measurementDimension;
+          labelContainerOriginCoordinate -= Bar._LABEL_MARGIN_INSIDE_BAR;
+          labelOriginCoordinate += containerDimension - Bar._LABEL_MARGIN_INSIDE_BAR - measurementDimension;
           return;
       }
     };
@@ -699,13 +703,13 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     } else {
       if (aboveOrLeftOfBaseline) {
         alignmentDimension = this._isVertical ? "top" : "left";
-        containerDimension = barDimension + Bar._LABEL_PADDING + measurementDimension;
-        labelContainerOriginCoordinate -= Bar._LABEL_PADDING + measurementDimension;
-        labelOriginCoordinate -= Bar._LABEL_PADDING + measurementDimension;
+        containerDimension = barDimension + Bar._LABEL_MARGIN_INSIDE_BAR + measurementDimension;
+        labelContainerOriginCoordinate -= Bar._LABEL_MARGIN_INSIDE_BAR + measurementDimension;
+        labelOriginCoordinate -= Bar._LABEL_MARGIN_INSIDE_BAR + measurementDimension;
       } else {
         alignmentDimension = this._isVertical ? "bottom" : "right";
-        containerDimension = barDimension + Bar._LABEL_PADDING + measurementDimension;
-        labelOriginCoordinate += barDimension + Bar._LABEL_PADDING;
+        containerDimension = barDimension + Bar._LABEL_MARGIN_INSIDE_BAR + measurementDimension;
+        labelOriginCoordinate += barDimension + Bar._LABEL_MARGIN_INSIDE_BAR;
       }
     }
 

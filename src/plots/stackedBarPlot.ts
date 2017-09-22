@@ -16,7 +16,7 @@ import { Bar, BarOrientation } from "./barPlot";
 import { Plot } from "./plot";
 
 export class StackedBar<X, Y> extends Bar<X, Y> {
-  protected static _STACKED_BAR_LABEL_PADDING = 5;
+  protected static _EXTREMA_LABEL_MARGIN_FROM_BAR = 5;
 
   private _extremaFormatter: Formatter = identity();
   private _labelArea: SimpleSelection<void>;
@@ -231,9 +231,9 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
       return {
         x: this._isVertical
             ? stackEdge.x - primaryTextMeasurement / 2
-            : stackEdge.x + StackedBar._STACKED_BAR_LABEL_PADDING,
+            : stackEdge.x + StackedBar._EXTREMA_LABEL_MARGIN_FROM_BAR,
         y: this._isVertical
-            ? stackEdge.y - secondaryTextMeasurement - StackedBar._STACKED_BAR_LABEL_PADDING
+            ? stackEdge.y - secondaryTextMeasurement
             : stackEdge.y - primaryTextMeasurement / 2,
       };
     });
@@ -245,9 +245,9 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
       return {
         x: this._isVertical
             ? stackEdge.x - primaryTextMeasurement / 2
-            : stackEdge.x - secondaryTextMeasurement - StackedBar._STACKED_BAR_LABEL_PADDING,
+            : stackEdge.x - secondaryTextMeasurement,
         y: this._isVertical
-            ? stackEdge.y + StackedBar._STACKED_BAR_LABEL_PADDING
+            ? stackEdge.y + StackedBar._EXTREMA_LABEL_MARGIN_FROM_BAR
             : stackEdge.y - primaryTextMeasurement / 2,
       };
     });
