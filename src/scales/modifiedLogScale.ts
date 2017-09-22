@@ -108,7 +108,7 @@ export class ModifiedLog extends QuantitativeScale<number> {
   }
 
   public getTransformationExtent() {
-    return this._getUnboundedExtent() as [number, number];
+    return this._getUnboundedExtent(true) as [number, number];
   }
 
   public getTransformationDomain() {

@@ -165,7 +165,9 @@ export class Plot extends Component {
     this.addClass("plot");
     this._datasetToDrawer = new Utils.Map<Dataset, ProxyDrawer>();
     this._attrBindings = d3.map<Plots.IAccessorScaleBinding<any, any>>();
-    this._includedValuesProvider = (scale: Scale<any, any>) => this._includedValuesForScale(scale);
+    this._includedValuesProvider = (scale: Scale<any, any>, ignoreAnchorState: boolean) => {
+      return this._includedValuesForScale(scale, ignoreAnchorState);
+    };
     this._renderCallback = () => this.render();
     this._onDatasetUpdateCallback = () => this._onDatasetUpdate();
     this._propertyBindings = d3.map<Plots.IAccessorScaleBinding<any, any>>();
@@ -512,7 +514,11 @@ export class Plot extends Component {
     return this._propertyExtents[property]();
   }
 
-  private _includedValuesForScale<D>(scale: Scale<D, any>): D[] {
+  private _includedValuesForScale<D>(scale: Scale<D, any>, ignoreAttachState?: boolean): D[] {
+    if (!this._isAnchored && !ignoreAttachState) {
+      return [];
+    }
+
     let includedValues: D[] = [];
     this._attrBindings.each((binding, attr) => {
       if (binding.scale === scale) {

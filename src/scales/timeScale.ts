@@ -76,7 +76,7 @@ export class Time extends QuantitativeScale<Date> {
   }
 
   public getTransformationExtent() {
-    const extent = this._getUnboundedExtent();
+    const extent = this._getUnboundedExtent(true);
     return [extent[0].valueOf(), extent[1].valueOf()] as [number, number];
   }
 
