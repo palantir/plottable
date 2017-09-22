@@ -32,6 +32,7 @@ import { IPlotEntity } from "./";
 import { ILightweightPlotEntity } from "./commons";
 import { Plot } from "./plot";
 import { XYPlot } from "./xyPlot";
+import {boundsIntersects} from "../utils/mathUtils";
 
 type LabelConfig = {
   labelArea: SimpleSelection<void>;
@@ -631,8 +632,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     writer.write(text, containerDimensions.width, containerDimensions.height, writeOptions, labelContainer.node());
 
     const tooWide = this._isVertical
-      ? barDimensions.width < (measurement.width + Bar._LABEL_PADDING * 2)
-      : barDimensions.height < (measurement.height + Bar._LABEL_PADDING * 2);
+      ? barDimensions.width < (measurement.width)
+      : barDimensions.height < (measurement.height);
     return tooWide;
   }
 
@@ -651,7 +652,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       effectiveBarDimension = barCoordinate + barDimension;
     }
 
-    return (measurementDimension + 2 * Bar._LABEL_PADDING <= effectiveBarDimension);
+    return (measurementDimension <= effectiveBarDimension);
   }
 
   private _calculateLabelProperties(
@@ -907,14 +908,41 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   protected _getDataToDraw(): Utils.Map<Dataset, any[]> {
     const dataToDraw = new Utils.Map<Dataset, any[]>();
     const attrToProjector = this._getAttrToProjector();
+    const plotWidth = this.width();
+    const plotHeight = this.height();
     this.datasets().forEach((dataset: Dataset) => {
-      const data = dataset.data().filter((d, i) => Utils.Math.isValidNumber(attrToProjector["x"](d, i, dataset)) &&
-      Utils.Math.isValidNumber(attrToProjector["y"](d, i, dataset)) &&
-      Utils.Math.isValidNumber(attrToProjector["width"](d, i, dataset)) &&
-      Utils.Math.isValidNumber(attrToProjector["height"](d, i, dataset)));
+      const data = dataset.data().filter((d, i) => {
+        return this._isDatumOnScreen(attrToProjector, plotWidth, plotHeight, d, i, dataset);
+      });
       dataToDraw.set(dataset, data);
     });
     return dataToDraw;
+  }
+
+  protected _isDatumOnScreen(
+    attrToProjector: AttributeToProjector,
+    plotWidth: number,
+    plotHeight: number,
+    d: any,
+    i: number,
+    dataset: Dataset,
+  ) {
+    const pixelX = attrToProjector["x"](d, i, dataset);
+    const pixelY = attrToProjector["y"](d, i, dataset);
+    const pixelWidth = attrToProjector["width"](d, i, dataset);
+    const pixelHeight = attrToProjector["height"](d, i, dataset);
+    const isValid = Utils.Math.isValidNumber(pixelX) &&
+      Utils.Math.isValidNumber(pixelY) &&
+      Utils.Math.isValidNumber(pixelWidth) &&
+      Utils.Math.isValidNumber(pixelHeight);
+
+    if (!isValid) {
+      return false;
+    }
+    return boundsIntersects(
+      pixelX, pixelY, pixelWidth, pixelHeight,
+      0, 0, plotWidth, plotHeight,
+    );
   }
 }
 

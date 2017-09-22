@@ -143,6 +143,22 @@ export function within(p: Point, bounds: Bounds) {
 }
 
 /**
+ * Returns whether the first bounds intersects the second bounds.
+ * Pass primitive numbers directly for performance.
+ *
+ * Assumes width and heights are positive.
+ */
+export function boundsIntersects(
+  aX: number, aY: number, aWidth: number, aHeight: number,
+  bX: number, bY: number, bWidth: number, bHeight: number,
+) {
+  return aX <= bX + bWidth &&
+         bX <= aX + aWidth &&
+         aY <= bY + bHeight &&
+         bY <= aY + aHeight;
+}
+
+/**
  * Returns a `ICssTransformMatrix` representing the cumulative transformation of
  * the element and all its parents. This transform converts from top-level
  * clientX/clientY coordinates (such as document mouse events) to internal
