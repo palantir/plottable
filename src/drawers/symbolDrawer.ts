@@ -39,6 +39,9 @@ export function makeSymbolCanvasDrawStep(
         let prevSymbolSize: number = null;
         for (let index = 0; index < data.length; index++) {
             const datum = data[index];
+            if (datum == null) {
+                continue;
+            }
 
             // check symbol is in viewport
             const attrs = resolveAttributesSubsetWithStyles(attrToAppliedProjector, ["x", "y"], datum, index);

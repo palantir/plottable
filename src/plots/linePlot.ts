@@ -540,7 +540,10 @@ export class Line<X> extends XYPlot<X, number> {
       if (this._collapseDenseVerticalLinesEnabled) {
         filteredDataIndices = this._filterDenseLines(dataset, filteredDataIndices);
       }
-      dataToDraw.set(dataset, [filteredDataIndices.map((d, i) => data[d])]);
+
+      const sparseArray = data.map(() => null);
+      filteredDataIndices.forEach((i) => sparseArray[i] = data[i]);
+      dataToDraw.set(dataset, [sparseArray]);
     });
 
     return dataToDraw;

@@ -597,6 +597,9 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     const attrToProjector = this._getAttrToProjector();
     const anyLabelTooWide = this.datasets().some((dataset) => {
       return dataToDraw.get(dataset).some((datum, index) => {
+        if (datum == null) {
+          return false;
+        }
         return this._drawLabel(datum, index, dataset, attrToProjector);
       });
     });
@@ -914,8 +917,9 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     const plotWidth = this.width();
     const plotHeight = this.height();
     this.datasets().forEach((dataset: Dataset) => {
-      const data = dataset.data().filter((d, i) => {
-        return this._isDatumOnScreen(attrToProjector, plotWidth, plotHeight, d, i, dataset);
+      const data = dataset.data().map((d, i) => {
+        const isValid = this._isDatumOnScreen(attrToProjector, plotWidth, plotHeight, d, i, dataset);
+        return isValid ? d : null;
       });
       dataToDraw.set(dataset, data);
     });

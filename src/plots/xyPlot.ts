@@ -353,7 +353,7 @@ export class XYPlot<X, Y> extends Plot {
   protected _getDataToDraw(): Utils.Map<Dataset, any[]> {
     const dataToDraw: Utils.Map<Dataset, any[]> = super._getDataToDraw();
 
-    const definedFunction = (d: any, i: number, dataset: Dataset) => {
+    const isValid = (d: any, i: number, dataset: Dataset) => {
       const positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
       const positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
       return Utils.Math.isValidNumber(positionX) &&
@@ -361,7 +361,8 @@ export class XYPlot<X, Y> extends Plot {
     };
 
     this.datasets().forEach((dataset) => {
-      dataToDraw.set(dataset, dataToDraw.get(dataset).filter((d, i) => definedFunction(d, i, dataset)));
+      const sparseData = dataToDraw.get(dataset).map((d, i) => isValid(d, i, dataset) ? d : null);
+      dataToDraw.set(dataset, sparseData);
     });
     return dataToDraw;
   }

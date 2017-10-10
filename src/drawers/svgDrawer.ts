@@ -99,7 +99,13 @@ export class SVGDrawer implements IDrawer {
   }
 
   private _createAndDestroyDOMElements(data: any[]) {
-    const dataElementsUpdate = this._root.selectAll<Element, any>(this.selector()).data(data);
+    // Whereas canvas renders can cope with null data values, svg renderer
+    // attribute accessors assume non-null data values, so we must filter them
+    // out. Unfortunately, this means the index passed to each accessor will
+    // not necessarily match the index of the datum in the dataset.
+    const dataElementsUpdate = this._root.selectAll<Element, any>(this.selector())
+      .data(data.filter((d) => d != null));
+
     this._selection =
       dataElementsUpdate
         .enter()
