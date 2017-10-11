@@ -395,7 +395,7 @@ export class PanZoom extends Interaction {
     }
 
     // add fallback to prevent overflowing both min and max
-    if (maxDomain != null && maxDomain != null) {
+    if (minDomain != null && maxDomain != null) {
       const maxRange = scale.scaleTransformation(maxDomain);
       const currentMaxRange = scale.scaleTransformation(scaleDomainMax);
       const testMaxRange = zoomAt(currentMaxRange, zoomAmount, centerPoint);
@@ -407,7 +407,7 @@ export class PanZoom extends Interaction {
       // If we overflow both, use some algebra to solve for centerPoint and
       // zoomAmount that will make the domain match the min/max exactly.
       // Algebra brought to you by Wolfram Alpha.
-      if (testMaxRange > maxRange != reversed || testMinRange < minRange != reversed) {
+      if (testMaxRange > maxRange != reversed && testMinRange < minRange != reversed) {
         const denominator = (currentMaxRange - currentMinRange + minRange - maxRange);
         if (denominator === 0) {
           // In this case the domains already match, so just return no-op values.
