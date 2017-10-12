@@ -103,8 +103,8 @@ export class SVGDrawer implements IDrawer {
     // attribute accessors assume non-null data values, so we must filter them
     // out. Unfortunately, this means the index passed to each accessor will
     // not necessarily match the index of the datum in the dataset.
-    const dataElementsUpdate = this._root.selectAll<Element, any>(this.selector())
-      .data(data.filter((d) => d != null));
+    const filteredData = data.filter((d) => d != null);
+    const dataElementsUpdate = this._root.selectAll<Element, any>(this.selector()).data(filteredData);
 
     this._selection =
       dataElementsUpdate
