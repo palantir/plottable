@@ -514,7 +514,8 @@ export class Pie extends Plot {
     const sectorValueAccessor = Plot._scaledAccessor(this.sectorValue());
     const ds = this.datasets()[0];
     const data = dataToDraw.get(ds);
-    dataToDraw.set(ds, data.filter((d, i) => Pie._isValidData(sectorValueAccessor(d, i, ds))));
+    const filteredData = data.filter((d, i) => Pie._isValidData(sectorValueAccessor(d, i, ds)));
+    dataToDraw.set(ds, filteredData);
     return dataToDraw;
   }
 
