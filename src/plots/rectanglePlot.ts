@@ -370,10 +370,14 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
     const dataToDraw = new Utils.Map<Dataset, any[]>();
     const attrToProjector = this._getAttrToProjector();
     this.datasets().forEach((dataset) => {
-      const data = dataset.data().filter((d, i) => Utils.Math.isValidNumber(attrToProjector["x"](d, i, dataset)) &&
-      Utils.Math.isValidNumber(attrToProjector["y"](d, i, dataset)) &&
-      Utils.Math.isValidNumber(attrToProjector["width"](d, i, dataset)) &&
-      Utils.Math.isValidNumber(attrToProjector["height"](d, i, dataset)));
+      const data = dataset.data().map((d, i) => {
+        const isValid = (
+          Utils.Math.isValidNumber(attrToProjector["x"](d, i, dataset)) &&
+          Utils.Math.isValidNumber(attrToProjector["y"](d, i, dataset)) &&
+          Utils.Math.isValidNumber(attrToProjector["width"](d, i, dataset)) &&
+          Utils.Math.isValidNumber(attrToProjector["height"](d, i, dataset)));
+        return isValid ? d : null;
+      });
       dataToDraw.set(dataset, data);
     });
     return dataToDraw;
@@ -406,6 +410,10 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
     const yMax = Math.max.apply(null, yRange);
     const data = dataToDraw.get(dataset);
     data.forEach((datum, datumIndex) => {
+      if (datum == null) {
+        return;
+      }
+
       const label = "" + this.label()(datum, datumIndex, dataset);
       const measurement = measurer.measure(label);
 

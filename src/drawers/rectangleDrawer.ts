@@ -27,6 +27,9 @@ export const RectangleCanvasDrawStep: CanvasDrawStep = (
     projector: AttributeToAppliedProjector) => {
   context.save();
   data.forEach((datum, index) => {
+    if (datum == null) {
+      return;
+    }
     const attrs = resolveAttributesSubsetWithStyles(projector, RECT_ATTRS, datum, index);
     context.beginPath();
     context.rect(attrs["x"], attrs["y"], attrs["width"], attrs["height"]);
