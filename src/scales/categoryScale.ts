@@ -4,11 +4,12 @@
  */
 
 import * as d3 from "d3";
+
+import { zoomOut } from "../interactions/panZoomConstraints";
 import * as Utils from "../utils";
 
 import {ITransformableScale} from "./";
 import {Scale} from "./scale";
-import {zoomOut} from "../interactions/panZoomConstraints";
 
 const TRANSFORMATION_SPACE = [0, 1] as [number, number];
 

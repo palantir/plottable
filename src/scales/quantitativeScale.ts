@@ -4,13 +4,14 @@
  */
 
 import * as d3 from "d3";
+
+import { zoomOut } from "../interactions/panZoomConstraints";
 import * as Utils from "../utils";
 
 import * as Scales from "./";
 import {ITransformableScale} from "./";
 import {Scale} from "./scale";
 import * as TickGenerators from "./tickGenerators";
-import {zoomOut} from "../interactions/panZoomConstraints";
 
 export class QuantitativeScale<D> extends Scale<D, number> implements ITransformableScale {
   protected static _DEFAULT_NUM_TICKS = 10;

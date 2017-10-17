@@ -14,7 +14,7 @@ import * as Utils from "../utils";
 
 import * as Interactions from "./";
 import {Interaction} from "./interaction";
-import { isRangeReversed, constrainedZoom } from "./panZoomConstraints";
+import { constrainedTranslation, constrainedZoom } from "./panZoomConstraints";
 
 export type PanCallback = () => void;
 export type ZoomCallback = () => void;
@@ -329,6 +329,10 @@ export class PanZoom extends Interaction {
     );
   }
 
+  private _constrainedTranslation(scale: TransformableScale<any, number>, translation: number) {
+    return constrainedTranslation(scale, translation, this.minDomainValue(scale), this.maxDomainValue(scale));
+  }
+
   private _setupDragInteraction() {
     this._dragInteraction.constrainedToComponent(false);
 
@@ -349,33 +353,6 @@ export class PanZoom extends Interaction {
     });
 
     this._dragInteraction.onDragEnd(() => this._panEndCallbacks.callCallbacks());
-  }
-
-  /**
-   * Returns a new translation value that respects domain min/max value
-   * constraints.
-   */
-  private _constrainedTranslation(scale: TransformableScale<any, number>, translation: number) {
-    const [ scaleDomainMin, scaleDomainMax ] = scale.getTransformationDomain();
-    const reversed = isRangeReversed(scale);
-
-    if (translation > 0 !== reversed) {
-      const bound = this.maxDomainValue(scale);
-      if (bound != null) {
-        const currentMaxRange = scale.scaleTransformation(scaleDomainMax);
-        const maxRange = scale.scaleTransformation(bound);
-        translation = (reversed ? Math.max : Math.min)(currentMaxRange + translation, maxRange) - currentMaxRange;
-      }
-    } else {
-      const bound = this.minDomainValue(scale);
-      if (bound != null) {
-        const currentMinRange = scale.scaleTransformation(scaleDomainMin);
-        const minRange = scale.scaleTransformation(bound);
-        translation = (reversed ? Math.min : Math.max)(currentMinRange + translation, minRange) - currentMinRange;
-      }
-    }
-
-    return translation;
   }
 
   private _nonLinearScaleWithExtents(scale: TransformableScale<any, number>) {

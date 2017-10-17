@@ -1,17 +1,9 @@
 /**
- * Copyright 2014-present Palantir Technologies
+ * Copyright 2017-present Palantir Technologies
  * @license MIT
  */
 
 import {TransformableScale} from "../scales/scale";
-
-/**
- * Returns true iff the scale.range[1] < scale.range[0].
- */
-export function isRangeReversed(scale: TransformableScale<any, number>): boolean {
-  const range = scale.range();
-  return range[1] < range[0];
-}
 
 /**
  * Return `value` if its distance to `center` was scaled by `zoom`.
@@ -85,7 +77,7 @@ function constrainZoomExtents(
  * 4. Out of bounds on both ends. Set the centerPoint to the center of the bounds, and zoomAmount such that the
  *    domain will perfectly line up at the bounds.
  */
-export function constrainZoomValues(
+function constrainZoomValues(
   scale: TransformableScale<any, number>,
   zoomAmount: number,
   centerPoint: number,
@@ -103,57 +95,93 @@ export function constrainZoomValues(
     return { centerPoint, zoomAmount };
   }
 
+  minDomainValue = minDomainValue == null ? -Infinity : minDomainValue;
+  maxDomainValue = maxDomainValue == null ? Infinity : maxDomainValue;
   const [ scaleDomainMin, scaleDomainMax ] = scale.getTransformationDomain();
 
-  if (maxDomainValue != null) {
-    // compute max range point if zoom applied
-    const maxRange = scale.scaleTransformation(maxDomainValue);
-    const currentMaxRange = scale.scaleTransformation(scaleDomainMax);
-    const testMaxRange = zoomOut(currentMaxRange, zoomAmount, centerPoint);
+  const maxRange = scale.scaleTransformation(maxDomainValue);
+  const currentMaxRange = scale.scaleTransformation(scaleDomainMax);
+  const newMaxRange = zoomOut(currentMaxRange, zoomAmount, centerPoint);
 
-    // move the center point to prevent max overflow, if necessary
-    if (testMaxRange > maxRange != reversed) {
-      centerPoint = getZoomOutCenter(currentMaxRange, zoomAmount, maxRange);
+  const minRange = scale.scaleTransformation(minDomainValue);
+  const currentMinRange = scale.scaleTransformation(scaleDomainMin);
+  const newMinRange = zoomOut(currentMinRange, zoomAmount, centerPoint);
+
+  const minMaxLength = Math.abs(maxRange - minRange);
+  const newRangeLength = Math.abs(newMaxRange - newMinRange);
+
+  if (newRangeLength > minMaxLength) {
+    // set the new zoom amount
+    const wantedZoomAmount = (maxRange - minRange) / (currentMaxRange - currentMinRange);
+    if (wantedZoomAmount !== 1) {
+      // only solve for centerPoint if wantedZoomAmount isn't 1 to prevent NaN.
+      const wantedCenterPoint = getZoomOutCenter(currentMaxRange, wantedZoomAmount, maxRange);
+      return {
+        centerPoint: wantedCenterPoint,
+        zoomAmount: wantedZoomAmount,
+      };
+    } else {
+      return {
+        centerPoint,
+        zoomAmount: wantedZoomAmount,
+      };
+    }
+  } else {
+    if (newMaxRange > maxRange != reversed) {
+      // prevent out of bounds on max edge.
+      return {
+        centerPoint: getZoomOutCenter(currentMaxRange, zoomAmount, maxRange),
+        zoomAmount,
+      };
+    } else if (newMinRange < minRange != reversed) {
+      // prevent out of bounds on min edge.
+      return {
+        centerPoint: getZoomOutCenter(currentMinRange, zoomAmount, minRange),
+        zoomAmount,
+      };
+    } else {
+      return { centerPoint, zoomAmount };
     }
   }
-
-  if (minDomainValue != null) {
-    // compute min range point if zoom applied
-    const minRange = scale.scaleTransformation(minDomainValue);
-    const currentMinRange = scale.scaleTransformation(scaleDomainMin);
-    const testMinRange = zoomOut(currentMinRange, zoomAmount, centerPoint);
-
-    // move the center point to prevent min overflow, if necessary
-    if (testMinRange < minRange != reversed) {
-      centerPoint = getZoomOutCenter(currentMinRange, zoomAmount, minRange);
-    }
-  }
-
-  // add fallback to prevent overflowing both min and max
-  if (minDomainValue != null && maxDomainValue != null) {
-    const maxRange = scale.scaleTransformation(maxDomainValue);
-    const currentMaxRange = scale.scaleTransformation(scaleDomainMax);
-    const testMaxRange = zoomOut(currentMaxRange, zoomAmount, centerPoint);
-
-    const minRange = scale.scaleTransformation(minDomainValue);
-    const currentMinRange = scale.scaleTransformation(scaleDomainMin);
-    const testMinRange = zoomOut(currentMinRange, zoomAmount, centerPoint);
-
-    // If we overflow both, use some algebra to solve for centerPoint and
-    // zoomAmount that will make the domain match the min/max exactly.
-    // Algebra brought to you by Wolfram Alpha.
-    if (testMaxRange > maxRange != reversed && testMinRange < minRange != reversed) {
-      const denominator = (currentMaxRange - currentMinRange + minRange - maxRange);
-      if (denominator === 0) {
-        // In this case the domains already match, so just return no-op values.
-        centerPoint = (currentMaxRange + currentMinRange) / 2;
-        zoomAmount = 1;
-      } else {
-        centerPoint = (currentMaxRange * minRange - currentMinRange * maxRange) / denominator;
-        zoomAmount = (maxRange - minRange) / (currentMaxRange - currentMinRange);
-      }
-    }
-  }
-
-  return { centerPoint, zoomAmount };
 }
+
+/**
+ * Returns a new translation value that respects domain min/max value
+ * constraints.
+ */
+export function constrainedTranslation(
+  scale: TransformableScale<any, number>,
+  translation: number,
+  minDomainValue: number,
+  maxDomainValue: number,
+) {
+  const [ scaleDomainMin, scaleDomainMax ] = scale.getTransformationDomain();
+  const reversed = isRangeReversed(scale);
+
+  if (translation > 0 !== reversed) {
+    const bound = maxDomainValue;
+    if (bound != null) {
+      const currentMaxRange = scale.scaleTransformation(scaleDomainMax);
+      const maxRange = scale.scaleTransformation(bound);
+      translation = (reversed ? Math.max : Math.min)(currentMaxRange + translation, maxRange) - currentMaxRange;
+    }
+  } else {
+    const bound = minDomainValue;
+    if (bound != null) {
+      const currentMinRange = scale.scaleTransformation(scaleDomainMin);
+      const minRange = scale.scaleTransformation(bound);
+      translation = (reversed ? Math.min : Math.max)(currentMinRange + translation, minRange) - currentMinRange;
+    }
+  }
+
+  return translation;
+}
+
+/**
+ * Returns true iff the scale.range[1] < scale.range[0].
+ */
+function isRangeReversed(scale: TransformableScale<any, number>): boolean {
+  const range = scale.range();
+  return range[1] < range[0];
+}
+
