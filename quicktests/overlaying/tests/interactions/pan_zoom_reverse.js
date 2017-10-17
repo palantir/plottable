@@ -29,6 +29,14 @@ function run(svg, data, Plottable) {
       .setMinMaxDomainValuesTo(xScale)
       .setMinMaxDomainValuesTo(yScale);
 
+    new Plottable.Interactions.PanZoom(xScale, null)
+        .attachTo(xAxis)
+        .setMinMaxDomainValuesTo(xScale);
+
+    new Plottable.Interactions.PanZoom(null, yScale)
+        .attachTo(yAxis)
+        .setMinMaxDomainValuesTo(yScale);
+
     return table;
   }
 

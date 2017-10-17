@@ -4,14 +4,13 @@
  */
 
 import * as d3 from "d3";
-
-import * as Interactions from "../interactions";
 import * as Utils from "../utils";
 
-import { ITransformableScale } from "./";
 import * as Scales from "./";
-import { Scale } from "./scale";
+import {ITransformableScale} from "./";
+import {Scale} from "./scale";
 import * as TickGenerators from "./tickGenerators";
+import {zoomOut} from "../interactions/panZoomConstraints";
 
 export class QuantitativeScale<D> extends Scale<D, number> implements ITransformableScale {
   protected static _DEFAULT_NUM_TICKS = 10;
@@ -275,7 +274,7 @@ export class QuantitativeScale<D> extends Scale<D, number> implements ITransform
   }
 
   public zoom(magnifyAmount: number, centerValue: number) {
-    const magnifyTransform = (rangeValue: number) => this.invert(Interactions.zoomAt(rangeValue, magnifyAmount, centerValue));
+    const magnifyTransform = (rangeValue: number) => this.invert(zoomOut(rangeValue, magnifyAmount, centerValue));
     this.domain(this.range().map(magnifyTransform));
   }
 

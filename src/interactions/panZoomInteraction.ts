@@ -5,29 +5,22 @@
 
 import * as d3 from "d3";
 
-import { Component } from "../components/component";
-import { Point } from "../core/interfaces";
+import {Component} from "../components/component";
+import {Point} from "../core/interfaces";
 import * as Dispatchers from "../dispatchers";
 import * as Scales from "../scales";
-import { TransformableScale } from "../scales/scale";
+import {TransformableScale} from "../scales/scale";
 import * as Utils from "../utils";
 
 import * as Interactions from "./";
-import { Interaction } from "./interaction";
+import {Interaction} from "./interaction";
+import {_isRangeReversed, constrainedZoom} from "./panZoomConstraints";
 
 export type PanCallback = () => void;
 export type ZoomCallback = () => void;
 export type PanZoomUpdateCallback = () => void;
 
 export type WheelFilter = (wheelEvent: WheelEvent) => boolean;
-
-/**
- * Performs a zoom transformation of the `value` argument scaled by the
- * `zoom` argument about the point defined by the `center` argument.
- */
-export function zoomAt(value: number, zoom: number, center: number) {
-  return center - (center - value) * zoom;
-}
 
 export class PanZoom extends Interaction {
   /**
@@ -143,7 +136,7 @@ export class PanZoom extends Interaction {
     this.xScales().forEach((xScale) => {
       const range = xScale.range();
       const xCenter = centerValue === undefined
-        ? (range[1] - range[0]) / 2
+        ? (range[1] + range[0]) / 2
         : centerValue.x;
 
       xScale.zoom(zoomAmount, xCenter);
@@ -152,7 +145,7 @@ export class PanZoom extends Interaction {
     this.yScales().forEach((yScale) => {
       const range = yScale.range();
       const yCenter = centerValue === undefined
-        ? (range[1] - range[0]) / 2
+        ? (range[1] + range[0]) / 2
         : centerValue.y;
 
       yScale.zoom(zoomAmount, yCenter);
@@ -324,112 +317,16 @@ export class PanZoom extends Interaction {
     }
   }
 
-  /**
-   * When scale ranges are reversed (i.e. range[1] < range[0]), we must alter the
-   * the calculations we do in screen space to constrain pan and zoom. This method
-   * returns `true` if the scale is reversed.
-   */
-  private _isRangeReversed(scale: TransformableScale<any, number>): boolean {
-    const range = scale.range();
-    return range[1] < range[0];
-  }
-
   private _constrainedZoom(scale: TransformableScale<any, number>, zoomAmount: number, centerPoint: number) {
-    zoomAmount = this._constrainZoomExtents(scale, zoomAmount);
-    return this._constrainZoomValues(scale, zoomAmount, centerPoint);
-  }
-
-  private _constrainZoomExtents(scale: TransformableScale<any, number>, zoomAmount: number) {
-    const extentIncreasing = zoomAmount > 1;
-
-    const boundingDomainExtent = extentIncreasing ? this.maxDomainExtent(scale) : this.minDomainExtent(scale);
-    if (boundingDomainExtent == null) {
-      return zoomAmount;
-    }
-
-    const [ scaleDomainMin, scaleDomainMax ] = scale.getTransformationDomain();
-    const domainExtent = Math.abs(scaleDomainMax - scaleDomainMin);
-    const compareF = extentIncreasing ? Math.min : Math.max;
-    return compareF(zoomAmount, boundingDomainExtent / domainExtent);
-  }
-
-  private _constrainZoomValues(scale: TransformableScale<any, number>, zoomAmount: number, centerPoint: number) {
-    // when zooming in, we don't have to worry about overflowing domain
-    if (zoomAmount <= 1) {
-      return { centerPoint, zoomAmount };
-    }
-
-    const reversed = this._isRangeReversed(scale);
-    const minDomain = this.minDomainValue(scale);
-    const maxDomain = this.maxDomainValue(scale);
-
-    // if no constraints set, we're done
-    if (minDomain == null && maxDomain == null) {
-      return { centerPoint, zoomAmount };
-    }
-
-    const [ scaleDomainMin, scaleDomainMax ] = scale.getTransformationDomain();
-
-    if (maxDomain != null) {
-      // compute max range point if zoom applied
-      const maxRange = scale.scaleTransformation(maxDomain);
-      const currentMaxRange = scale.scaleTransformation(scaleDomainMax);
-      const testMaxRange = zoomAt(currentMaxRange, zoomAmount, centerPoint);
-
-      // move the center point to prevent max overflow, if necessary
-      if (testMaxRange > maxRange != reversed) {
-        centerPoint = this._getZoomCenterForTarget(currentMaxRange, zoomAmount, maxRange);
-      }
-    }
-
-    if (minDomain != null) {
-      // compute min range point if zoom applied
-      const minRange = scale.scaleTransformation(minDomain);
-      const currentMinRange = scale.scaleTransformation(scaleDomainMin);
-      const testMinRange = zoomAt(currentMinRange, zoomAmount, centerPoint);
-
-      // move the center point to prevent min overflow, if necessary
-      if (testMinRange < minRange != reversed) {
-        centerPoint = this._getZoomCenterForTarget(currentMinRange, zoomAmount, minRange);
-      }
-    }
-
-    // add fallback to prevent overflowing both min and max
-    if (minDomain != null && maxDomain != null) {
-      const maxRange = scale.scaleTransformation(maxDomain);
-      const currentMaxRange = scale.scaleTransformation(scaleDomainMax);
-      const testMaxRange = zoomAt(currentMaxRange, zoomAmount, centerPoint);
-
-      const minRange = scale.scaleTransformation(minDomain);
-      const currentMinRange = scale.scaleTransformation(scaleDomainMin);
-      const testMinRange = zoomAt(currentMinRange, zoomAmount, centerPoint);
-
-      // If we overflow both, use some algebra to solve for centerPoint and
-      // zoomAmount that will make the domain match the min/max exactly.
-      // Algebra brought to you by Wolfram Alpha.
-      if (testMaxRange > maxRange != reversed && testMinRange < minRange != reversed) {
-        const denominator = (currentMaxRange - currentMinRange + minRange - maxRange);
-        if (denominator === 0) {
-          // In this case the domains already match, so just return no-op values.
-          centerPoint = (currentMaxRange + currentMinRange) / 2;
-          zoomAmount = 1;
-        } else {
-          centerPoint = (currentMaxRange * minRange - currentMinRange * maxRange) / denominator;
-          zoomAmount = (maxRange - minRange) / (currentMaxRange - currentMinRange);
-        }
-      }
-    }
-
-    return { centerPoint, zoomAmount };
-  }
-
-  /**
-   * Returns the `center` value to be used with `zoomAt` that will produce the
-   * `target` value given the same `value` and `zoom` arguments. Algebra
-   * brought to you by Wolfram Alpha.
-   */
-  private _getZoomCenterForTarget(value: number, zoom: number, target: number) {
-    return (value * zoom - target) / (zoom - 1);
+    return constrainedZoom(
+      scale,
+      zoomAmount,
+      centerPoint,
+      this.minDomainExtent(scale),
+      this.maxDomainExtent(scale),
+      this.minDomainValue(scale),
+      this.maxDomainValue(scale),
+    );
   }
 
   private _setupDragInteraction() {
@@ -460,7 +357,7 @@ export class PanZoom extends Interaction {
    */
   private _constrainedTranslation(scale: TransformableScale<any, number>, translation: number) {
     const [ scaleDomainMin, scaleDomainMax ] = scale.getTransformationDomain();
-    const reversed = this._isRangeReversed(scale);
+    const reversed = _isRangeReversed(scale);
 
     if (translation > 0 !== reversed) {
       const bound = this.maxDomainValue(scale);

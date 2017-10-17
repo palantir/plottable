@@ -4,12 +4,11 @@
  */
 
 import * as d3 from "d3";
-
-import * as Interactions from "../interactions";
 import * as Utils from "../utils";
 
-import { ITransformableScale } from "./";
-import { Scale } from "./scale";
+import {ITransformableScale} from "./";
+import {Scale} from "./scale";
+import {zoomOut} from "../interactions/panZoomConstraints";
 
 const TRANSFORMATION_SPACE = [0, 1] as [number, number];
 
@@ -212,7 +211,7 @@ export class Category extends Scale<string, number> implements ITransformableSca
 
   public zoom(magnifyAmount: number, centerValue: number) {
     const magnifyTransform = (rangeValue: number) => {
-      return this._d3TransformationScale.invert(Interactions.zoomAt(rangeValue, magnifyAmount, centerValue));
+      return this._d3TransformationScale.invert(zoomOut(rangeValue, magnifyAmount, centerValue));
     };
     this._d3TransformationScale.domain(this._d3TransformationScale.range().map(magnifyTransform));
     this._dispatchUpdate();
