@@ -296,6 +296,10 @@ export class Component {
     return this;
   }
 
+  public renderLowPriority() {
+    return this.render();
+  }
+
   private _scheduleComputeLayout() {
     if (this._isAnchored && this._isSetup) {
       RenderController.registerToComputeLayoutAndRender(this);
