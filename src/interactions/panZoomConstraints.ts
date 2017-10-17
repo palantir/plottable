@@ -62,20 +62,8 @@ function constrainZoomExtents(
 }
 
 /**
- * We want to avoid scale.zoom(zoomAmount, centerPoint) returning a domain that's
- * "out of bounds", defined as:
- *
- * 1. Math.min(domain[0], domain[1]) < minDomainValue, or
- * 2. Math.max(domain[0], domain[1]) > maxDomainValue
- *
- * There's four cases to cover and what to do in each case:
- *
- * 1. Not out of bounds. Don't change zoomAmount or centerPoint.
- * 2. Out of bounds only on lower end. Don't change zoomAmount, just shift the centerPoint such that the domain min
- *    lines up with the min bounds. Be careful - you might hit case 4 after this.
- * 3. Out of bounds only on upper end. Do some as step 2.
- * 4. Out of bounds on both ends. Set the centerPoint to the center of the bounds, and zoomAmount such that the
- *    domain will perfectly line up at the bounds.
+ * Modify zoomAmount and centerPoint such that a panzoom will stay inside
+ * the bounds defined by minDomainValue and maxDomainValue.
  */
 function constrainZoomValues(
   scale: TransformableScale<any, number>,
@@ -111,7 +99,7 @@ function constrainZoomValues(
   const newRangeLength = Math.abs(newMaxRange - newMinRange);
 
   if (newRangeLength > minMaxLength) {
-    // set the new zoom amount
+    // The new zoom simply won't fit. Instead just set the zoom amount to a full zoom out.
     const wantedZoomAmount = (maxRange - minRange) / (currentMaxRange - currentMinRange);
     if (wantedZoomAmount !== 1) {
       // only solve for centerPoint if wantedZoomAmount isn't 1 to prevent NaN.
@@ -121,12 +109,14 @@ function constrainZoomValues(
         zoomAmount: wantedZoomAmount,
       };
     } else {
+      // the centerPoint doesn't matter at all here but we must include it
       return {
         centerPoint,
         zoomAmount: wantedZoomAmount,
       };
     }
   } else {
+    // the zoom does fit, but one end is outside. In this case just nudge the edge in
     if (newMaxRange > maxRange != reversed) {
       // prevent out of bounds on max edge.
       return {
