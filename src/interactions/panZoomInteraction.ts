@@ -14,7 +14,7 @@ import * as Utils from "../utils";
 
 import * as Interactions from "./";
 import {Interaction} from "./interaction";
-import {_isRangeReversed, constrainedZoom} from "./panZoomConstraints";
+import { isRangeReversed, constrainedZoom } from "./panZoomConstraints";
 
 export type PanCallback = () => void;
 export type ZoomCallback = () => void;
@@ -357,7 +357,7 @@ export class PanZoom extends Interaction {
    */
   private _constrainedTranslation(scale: TransformableScale<any, number>, translation: number) {
     const [ scaleDomainMin, scaleDomainMax ] = scale.getTransformationDomain();
-    const reversed = _isRangeReversed(scale);
+    const reversed = isRangeReversed(scale);
 
     if (translation > 0 !== reversed) {
       const bound = this.maxDomainValue(scale);

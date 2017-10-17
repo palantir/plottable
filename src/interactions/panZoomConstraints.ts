@@ -8,17 +8,29 @@ import {TransformableScale} from "../scales/scale";
 /**
  * Returns true iff the scale.range[1] < scale.range[0].
  */
-export function _isRangeReversed(scale: TransformableScale<any, number>): boolean {
+export function isRangeReversed(scale: TransformableScale<any, number>): boolean {
   const range = scale.range();
   return range[1] < range[0];
 }
 
 /**
- * Performs a zoom transformation of the `value` argument scaled by the
- * `zoom` argument about the point defined by the `center` argument.
+ * Return `value` if its distance to `center` was scaled by `zoom`.
+ *
+ * e.g. zoomOut(100, 2, 50) -> 150
+ * e.g. zoomOut(0, 2, 50) -> -50
+ * e.g. zoomOut(100, 0.5, 50) -> 75
+ * e.g. zoomOut(0, 0.5, 50) -> 25
  */
 export function zoomOut(value: number, zoom: number, center: number) {
   return center - (center - value) * zoom;
+}
+
+/**
+ * This is the zoomOut method algebra-ed to solve for the `center` value
+ * given the other three. The "target" is the return value of zoomOut.
+ */
+function getZoomOutCenter(value: number, zoom: number, target: number) {
+  return (value * zoom - target) / (zoom - 1);
 }
 
 /**
@@ -57,6 +69,22 @@ function constrainZoomExtents(
   return compareF(zoomAmount, boundingDomainExtent / domainExtent);
 }
 
+/**
+ * We want to avoid scale.zoom(zoomAmount, centerPoint) returning a domain that's
+ * "out of bounds", defined as:
+ *
+ * 1. Math.min(domain[0], domain[1]) < minDomainValue, or
+ * 2. Math.max(domain[0], domain[1]) > maxDomainValue
+ *
+ * There's four cases to cover and what to do in each case:
+ *
+ * 1. Not out of bounds. Don't change zoomAmount or centerPoint.
+ * 2. Out of bounds only on lower end. Don't change zoomAmount, just shift the centerPoint such that the domain min
+ *    lines up with the min bounds. Be careful - you might hit case 4 after this.
+ * 3. Out of bounds only on upper end. Do some as step 2.
+ * 4. Out of bounds on both ends. Set the centerPoint to the center of the bounds, and zoomAmount such that the
+ *    domain will perfectly line up at the bounds.
+ */
 export function constrainZoomValues(
   scale: TransformableScale<any, number>,
   zoomAmount: number,
@@ -69,7 +97,7 @@ export function constrainZoomValues(
     return { centerPoint, zoomAmount };
   }
 
-  const reversed = _isRangeReversed(scale);
+  const reversed = isRangeReversed(scale);
   // if no constraints set, we're done
   if (minDomainValue == null && maxDomainValue == null) {
     return { centerPoint, zoomAmount };
@@ -85,7 +113,7 @@ export function constrainZoomValues(
 
     // move the center point to prevent max overflow, if necessary
     if (testMaxRange > maxRange != reversed) {
-      centerPoint = _getZoomCenterForTarget(currentMaxRange, zoomAmount, maxRange);
+      centerPoint = getZoomOutCenter(currentMaxRange, zoomAmount, maxRange);
     }
   }
 
@@ -97,7 +125,7 @@ export function constrainZoomValues(
 
     // move the center point to prevent min overflow, if necessary
     if (testMinRange < minRange != reversed) {
-      centerPoint = _getZoomCenterForTarget(currentMinRange, zoomAmount, minRange);
+      centerPoint = getZoomOutCenter(currentMinRange, zoomAmount, minRange);
     }
   }
 
@@ -128,13 +156,4 @@ export function constrainZoomValues(
   }
 
   return { centerPoint, zoomAmount };
-}
-
-/**
- * Returns the `center` value to be used with `zoomAt` that will produce the
- * `target` value given the same `value` and `zoom` arguments. Algebra
- * brought to you by Wolfram Alpha.
- */
-function _getZoomCenterForTarget(value: number, zoom: number, target: number) {
-  return (value * zoom - target) / (zoom - 1);
 }
