@@ -49,19 +49,14 @@ export class XYPlot<X, Y> extends Plot {
       }
     };
 
-    const _applyTransform = (tx: number, ty: number, sx: number, sy: number) => {
-      if (!this._isAnchored) {
-        return;
-      }
-      if (this._renderArea != null) {
-        this._renderArea.attr("transform", `translate(${tx}, ${ty}) scale(${sx}, ${sy})`);
-      }
-      if (this._canvas != null) {
-        this._canvas.style("transform", `translate(${tx}px, ${ty}px) scale(${sx}, ${sy})`);
-      }
-    };
+    this._deferredRenderer = new DeferredRenderer<X, Y>(() => this.render(), this._applyDeferredRenderingTransform);
+  }
 
-    this._deferredRenderer = new DeferredRenderer<X, Y>(() => this.render(), _applyTransform);
+  public render() {
+    if (this.deferredRendering()) {
+      this._deferredRenderer.resetTransforms();
+    }
+    return super.render();
   }
 
   /**
@@ -199,6 +194,18 @@ export class XYPlot<X, Y> extends Plot {
       }
     }
     return null;
+  }
+
+  private _applyDeferredRenderingTransform = (tx: number, ty: number, sx: number, sy: number) => {
+    if (!this._isAnchored) {
+      return;
+    }
+    if (this._renderArea != null) {
+      this._renderArea.attr("transform", `translate(${tx}, ${ty}) scale(${sx}, ${sy})`);
+    }
+    if (this._canvas != null) {
+      this._canvas.style("transform", `translate(${tx}px, ${ty}px) scale(${sx}, ${sy})`);
+    }
   }
 
   protected _uninstallScaleForKey(scale: Scale<any, any>, key: string) {

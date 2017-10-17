@@ -418,6 +418,7 @@ export class Plot extends Component {
 
   public renderLowPriority() {
     this._renderCallback();
+    return this;
   }
 
   /**
