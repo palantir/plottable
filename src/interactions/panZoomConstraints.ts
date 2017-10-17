@@ -184,4 +184,3 @@ function isRangeReversed(scale: TransformableScale<any, number>): boolean {
   const range = scale.range();
   return range[1] < range[0];
 }
-
