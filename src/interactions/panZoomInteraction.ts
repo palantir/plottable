@@ -133,25 +133,44 @@ export class PanZoom extends Interaction {
    * By default, `centerValue` is the center of the x and y range of each scale.
    */
   public zoom(zoomAmount: number, centerValue?: Point) {
+    let centerX: number;
+    let centerY: number;
+    if (centerValue != null) {
+      centerX = centerValue.x;
+      centerY = centerValue.y;
+      this.xScales().forEach((xScale) => {
+        const constrained = this._constrainedZoom(xScale, zoomAmount, centerX);
+        centerX = constrained.centerPoint;
+        zoomAmount = constrained.zoomAmount;
+      });
+
+      this.yScales().forEach((yScale) => {
+        const constrained = this._constrainedZoom(yScale, zoomAmount, centerY);
+        centerY = constrained.centerPoint;
+        zoomAmount = constrained.zoomAmount;
+      });
+    }
+
     this.xScales().forEach((xScale) => {
       const range = xScale.range();
-      const xCenter = centerValue === undefined
+      const xCenter = centerX == null
         ? (range[1] + range[0]) / 2
-        : centerValue.x;
+        : centerX;
 
       xScale.zoom(zoomAmount, xCenter);
     });
 
     this.yScales().forEach((yScale) => {
       const range = yScale.range();
-      const yCenter = centerValue === undefined
+      const yCenter = centerY == null
         ? (range[1] + range[0]) / 2
-        : centerValue.y;
+        : centerY;
 
       yScale.zoom(zoomAmount, yCenter);
     });
 
     this._panZoomUpdateCallbacks.callCallbacks();
+    return { zoomAmount, centerValue: { centerX, centerY } };
   }
 
   protected _anchor(component: Component) {
@@ -219,32 +238,24 @@ export class PanZoom extends Interaction {
       return;
     }
 
-    let magnifyAmount = oldCornerDistance / newCornerDistance;
+    const initMagnifyAmount = oldCornerDistance / newCornerDistance;
 
     const normalizedPointDiffs = points.map((point, i) => {
-      return { x: (point.x - oldPoints[i].x) / magnifyAmount, y: (point.y - oldPoints[i].y) / magnifyAmount };
+      return {
+        x: (point.x - oldPoints[i].x) / initMagnifyAmount,
+        y: (point.y - oldPoints[i].y) / initMagnifyAmount,
+      };
     });
 
     const oldCenterPoint = PanZoom.centerPoint(oldPoints[0], oldPoints[1]);
-    let centerX = oldCenterPoint.x;
-    let centerY = oldCenterPoint.y;
 
-    this.xScales().forEach((xScale) => {
-      const constrained = this._constrainedZoom(xScale, magnifyAmount, centerX);
-      centerX = constrained.centerPoint;
-      magnifyAmount = constrained.zoomAmount;
-    });
-
-    this.yScales().forEach((yScale) => {
-      const constrained = this._constrainedZoom(yScale, magnifyAmount, centerY);
-      centerY = constrained.centerPoint;
-      magnifyAmount = constrained.zoomAmount;
-    });
+    const { centerValue, zoomAmount } = this.zoom(initMagnifyAmount, oldCenterPoint);
+    const { centerX, centerY } = centerValue;
 
     const constrainedPoints = oldPoints.map((oldPoint, i) => {
       return {
-        x: normalizedPointDiffs[i].x * magnifyAmount + oldPoint.x,
-        y: normalizedPointDiffs[i].y * magnifyAmount + oldPoint.y,
+        x: normalizedPointDiffs[i].x * zoomAmount + oldPoint.x,
+        y: normalizedPointDiffs[i].y * zoomAmount + oldPoint.y,
       };
     });
 
@@ -253,7 +264,6 @@ export class PanZoom extends Interaction {
       y: centerY - ((constrainedPoints[0].y + constrainedPoints[1].y) / 2),
     };
 
-    this.zoom(magnifyAmount, { x: centerX, y: centerY });
     this.pan(translateAmount);
   }
 
@@ -296,23 +306,9 @@ export class PanZoom extends Interaction {
       // in cases where only horizontal scroll is present, use that in lieu of nothing.
       const deltaAmount = e.deltaY !== 0 ? e.deltaY : e.deltaX;
       const deltaPixelAmount = deltaAmount * (e.deltaMode ? PanZoom._PIXELS_PER_LINE : 1);
-      let zoomAmount = Math.pow(2, deltaPixelAmount * .002);
-      let centerX = translatedP.x;
-      let centerY = translatedP.y;
+      const zoomAmount = Math.pow(2, deltaPixelAmount * .002);
 
-      this.xScales().forEach((xScale) => {
-        const constrained = this._constrainedZoom(xScale, zoomAmount, centerX);
-        centerX = constrained.centerPoint;
-        zoomAmount = constrained.zoomAmount;
-      });
-
-      this.yScales().forEach((yScale) => {
-        const constrained = this._constrainedZoom(yScale, zoomAmount, centerY);
-        centerY = constrained.centerPoint;
-        zoomAmount = constrained.zoomAmount;
-      });
-
-      this.zoom(zoomAmount, { x: centerX, y: centerY });
+      this.zoom(zoomAmount, translatedP);
       this._zoomEndCallbacks.callCallbacks();
     }
   }

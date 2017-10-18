@@ -42,7 +42,7 @@ export function constrainedZoom(
   return constrainZoomValues(scale, zoomAmount, centerPoint, minDomainValue, maxDomainValue);
 }
 
-function constrainZoomExtents(
+export function constrainZoomExtents(
   scale: TransformableScale<any, number>,
   zoomAmount: number,
   minDomainExtent: number,
@@ -65,7 +65,7 @@ function constrainZoomExtents(
  * Modify zoomAmount and centerPoint such that a panzoom will stay inside
  * the bounds defined by minDomainValue and maxDomainValue.
  */
-function constrainZoomValues(
+export function constrainZoomValues(
   scale: TransformableScale<any, number>,
   zoomAmount: number,
   centerPoint: number,
