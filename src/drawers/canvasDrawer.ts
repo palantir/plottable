@@ -132,14 +132,14 @@ export function renderPathWithStyle(context: CanvasRenderingContext2D, style: Re
   if (style["stroke"]) {
     context.lineWidth = getStrokeWidth(style);
     const strokeColor = d3.color(style["stroke"]);
-    strokeColor.opacity = getStrokeOpacity(style);
+    strokeColor.opacity *= getStrokeOpacity(style);
     context.strokeStyle = strokeColor.toString();
     context.stroke();
   }
 
   if (style["fill"]) {
     const fillColor = d3.color(style["fill"]);
-    fillColor.opacity = getFillOpacity(style);
+    fillColor.opacity *= getFillOpacity(style);
     context.fillStyle = fillColor.toString();
     context.fill();
   }
