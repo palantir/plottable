@@ -126,29 +126,33 @@ export class PanZoom extends Interaction {
   /**
    * Zooms the chart by a specified amount around a specific point
    *
-   * @param {number} [maginfyAmount] The percentage by which to zoom the x and y scale.
+   * @param {number} [zoomAmount] The percentage by which to zoom the x and y scale.
    * A value of 0.9 zooms in by 10%. A value of 1.1 zooms out by 10%. A value of 1 has
    * no effect.
    * @param {Plottable.Point} [centerValue] The center in pixels around which to zoom.
    * By default, `centerValue` is the center of the x and y range of each scale.
+   * @param {boolean} [constrained] Whether to respect the zoom extents and min/max
+   * values. Default true.
    */
-  public zoom(zoomAmount: number, centerValue?: Point) {
+  public zoom(zoomAmount: number, centerValue?: Point, constrained = true) {
     let centerX: number;
     let centerY: number;
     if (centerValue != null) {
       centerX = centerValue.x;
       centerY = centerValue.y;
-      this.xScales().forEach((xScale) => {
-        const constrained = this._constrainedZoom(xScale, zoomAmount, centerX);
-        centerX = constrained.centerPoint;
-        zoomAmount = constrained.zoomAmount;
-      });
+      if (constrained) {
+        this.xScales().forEach((xScale) => {
+          const constrained = this._constrainedZoom(xScale, zoomAmount, centerX);
+          centerX = constrained.centerPoint;
+          zoomAmount = constrained.zoomAmount;
+        });
 
-      this.yScales().forEach((yScale) => {
-        const constrained = this._constrainedZoom(yScale, zoomAmount, centerY);
-        centerY = constrained.centerPoint;
-        zoomAmount = constrained.zoomAmount;
-      });
+        this.yScales().forEach((yScale) => {
+          const constrained = this._constrainedZoom(yScale, zoomAmount, centerY);
+          centerY = constrained.centerPoint;
+          zoomAmount = constrained.zoomAmount;
+        });
+      }
     }
 
     this.xScales().forEach((xScale) => {
