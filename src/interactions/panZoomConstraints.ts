@@ -77,14 +77,19 @@ export function constrainZoomValues(
     return { centerPoint, zoomAmount };
   }
 
-  const reversed = isRangeReversed(scale);
   // if no constraints set, we're done
   if (minDomainValue == null && maxDomainValue == null) {
     return { centerPoint, zoomAmount };
   }
 
-  minDomainValue = minDomainValue == null ? -Infinity : minDomainValue;
-  maxDomainValue = maxDomainValue == null ? Infinity : maxDomainValue;
+  const rangeReversed = isRangeReversed(scale);
+  const domainReversed = isDomainReversed(scale);
+
+  const defaultDomainMin = domainReversed ? Infinity : -Infinity;
+  const defaultDomainMax = domainReversed ? -Infinity : Infinity;
+
+  minDomainValue = minDomainValue == null ? defaultDomainMin : minDomainValue;
+  maxDomainValue = maxDomainValue == null ? defaultDomainMax : maxDomainValue;
   const [ scaleDomainMin, scaleDomainMax ] = scale.getTransformationDomain();
 
   const maxRange = scale.scaleTransformation(maxDomainValue);
@@ -117,13 +122,13 @@ export function constrainZoomValues(
     }
   } else {
     // the zoom does fit, but one end is outside. In this case just nudge the edge in
-    if (newMaxRange > maxRange != reversed) {
+    if (newMaxRange > maxRange != rangeReversed) {
       // prevent out of bounds on max edge.
       return {
         centerPoint: getZoomOutCenter(currentMaxRange, zoomAmount, maxRange),
         zoomAmount,
       };
-    } else if (newMinRange < minRange != reversed) {
+    } else if (newMinRange < minRange != rangeReversed) {
       // prevent out of bounds on min edge.
       return {
         centerPoint: getZoomOutCenter(currentMinRange, zoomAmount, minRange),
@@ -173,4 +178,9 @@ export function constrainedTranslation(
 function isRangeReversed(scale: TransformableScale<any, number>): boolean {
   const range = scale.range();
   return range[1] < range[0];
+}
+
+function isDomainReversed(scale: TransformableScale<any, number>) {
+  const domain = scale.getTransformationDomain();
+  return domain[1] < domain[0];
 }
