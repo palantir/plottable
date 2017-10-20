@@ -8,3 +8,4 @@ export * from "./dragInteraction";
 export * from "./keyInteraction";
 export * from "./panZoomInteraction";
 export * from "./pointerInteraction";
+export {zoomOut} from "./panZoomConstraints";

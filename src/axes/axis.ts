@@ -10,7 +10,7 @@ import { Component } from "../components/component";
 import * as Formatters from "../core/formatters";
 import { Formatter } from "../core/formatters";
 import { Point, SimpleSelection, SpaceRequest } from "../core/interfaces";
-import { IScaleCallback, Scale } from "../scales/scale";
+import {IScaleCallback, Scale} from "../scales/scale";
 import * as Utils from "../utils";
 import { makeEnum } from "../utils/makeEnum";
 
