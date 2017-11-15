@@ -1,3 +1,9 @@
+import { DatumFormatter } from './../core/formatters';
+import { SimpleSelection } from './../core/interfaces';
+import * as Typesettable from "typesettable";
+import * as Formatters from "../core/formatters";
+
+
 /**
  * Copyright 2014-present Palantir Technologies
  * @license MIT
@@ -15,6 +21,7 @@ import * as Animators from "../animators";
 import * as Drawers from "../drawers";
 import * as Scales from "../scales";
 import * as Utils from "../utils";
+import { makeEnum } from "../utils/makeEnum";
 import * as Plots from "./";
 import { IAccessorScaleBinding, ILightweightPlotEntity, IPlotEntity, ITransformableAccessorScaleBinding } from "./";
 import { Plot } from "./plot";
@@ -23,11 +30,27 @@ import { XYPlot } from "./xyPlot";
 export interface ILightweightScatterPlotEntity extends ILightweightPlotEntity {
   // size of the entity in pixel space
   diameter: number;
+  label?: string;
 }
+
+type LabelConfig = {
+  labelArea: SimpleSelection<void>;
+  measurer: Typesettable.CacheMeasurer;
+  writer: Typesettable.Writer;
+};
+export const LabelsPosition = makeEnum(["start", "middle", "end", "outside"]);
+
 
 export class Scatter<X, Y> extends XYPlot<X, Y> {
   private static _SIZE_KEY = "size";
   private static _SYMBOL_KEY = "symbol";
+  
+  // label stuff
+  protected static _LABEL_AREA_CLASS = "bar-label-text-area";
+  private _labelConfig: Utils.Map<Dataset, LabelConfig>;
+  private _labelFormatter: DatumFormatter = Formatters.identity();
+  private _labelsEnabled = true;
+  private _labelsPosition = LabelsPosition.end;
 
   /**
    * A Scatter Plot draws a symbol at each data point.
@@ -47,6 +70,7 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
     this.size(6);
     const circleSymbolFactory = SymbolFactories.circle();
     this.symbol(() => circleSymbolFactory);
+    this._labelConfig = new Utils.Map<Dataset, LabelConfig>();
   }
 
   protected _buildLightweightPlotEntities(datasets: Dataset[]) {
@@ -59,6 +83,9 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
         lightweightPlotEntity.dataset);
 
       lightweightPlotEntity.diameter = diameter;
+
+      lightweightPlotEntity.label = "NO_LABEL";
+
       return lightweightPlotEntity;
     });
   }
@@ -205,4 +232,96 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
       return x - size / 2 <= p.x && p.x <= x + size / 2 && y - size / 2 <= p.y && p.y <= y + size / 2;
     });
   }
+
+  // labels
+
+  protected _createNodesForDataset(dataset: Dataset): ProxyDrawer {
+    const drawer = super._createNodesForDataset(dataset);
+    const labelArea = this._renderArea.append("g").classed(Scatter._LABEL_AREA_CLASS, true);
+    const context = new Typesettable.SvgContext(labelArea.node() as SVGElement);
+    const measurer = new Typesettable.CacheMeasurer(context);
+    const writer = new Typesettable.Writer(measurer, context);
+    this._labelConfig.set(dataset, { labelArea: labelArea, measurer: measurer, writer: writer });
+    return drawer;
+  }
+
+  protected _removeDatasetNodes(dataset: Dataset) {
+    super._removeDatasetNodes(dataset);
+    const labelConfig = this._labelConfig.get(dataset);
+    if (labelConfig != null) {
+      labelConfig.labelArea.remove();
+      this._labelConfig.delete(dataset);
+    }
+  }
+
+  protected _additionalPaint(time: number) {
+    console.log("SCATTER ADDITIONAL PAINT CALLED!");
+    this.datasets().forEach((dataset) => this._labelConfig.get(dataset).labelArea.selectAll("g").remove());
+    if (this._labelsEnabled) {
+      Utils.Window.setTimeout(() => this._drawLabels(), time);
+    }
+  }
+
+  protected _drawLabels() {
+    const dataToDraw = this._getDataToDraw();
+    const attrToProjector = this._getAttrToProjector();
+    this.datasets().forEach((dataset) => {
+      dataToDraw.get(dataset).forEach((datum, index) => {
+        if (datum == null) {
+          return;
+        }
+        this._drawLabel(datum, index, dataset, attrToProjector);
+      });
+    });
+  }
+
+  private _drawLabel(datum: any, index: number, dataset: Dataset, attrToProjector: AttributeToProjector) {
+    const { labelArea, measurer, writer } = this._labelConfig.get(dataset);
+
+    const scatterCoordinates = { x: attrToProjector["x"](datum, index, dataset), y: attrToProjector["y"](datum, index, dataset) };
+    const text = this._labelFormatter("TEST", datum, index, dataset);
+    const measurement = measurer.measure(text);
+
+    const { containerDimensions, labelContainerOrigin, labelOrigin, alignment } = this._calculateLabelProperties(scatterCoordinates, measurement);
+
+    const labelContainer = this._createLabelContainer(labelArea, labelContainerOrigin, labelOrigin, measurement);
+
+    const writeOptions = { xAlign: alignment.x as Typesettable.IXAlign, yAlign: alignment.y as Typesettable.IYAlign };
+    writer.write(text, containerDimensions.width, containerDimensions.height, writeOptions, labelContainer.node());
+  }
+
+  // Todo: do something smart with the text size vs. symbol diameter
+  private _calculateLabelProperties(
+    pointCoordinates: Point, measurement: Typesettable.IDimensions) {
+
+    return {
+      containerDimensions: {
+        width: measurement.width,
+        height: measurement.height
+      },
+      labelContainerOrigin: {
+        x: pointCoordinates.x - measurement.width / 2,
+        y: pointCoordinates.y - measurement.height / 2,
+      },
+      labelOrigin: {
+        x: pointCoordinates.x,
+        y: pointCoordinates.y,
+      },
+      alignment: {
+        x: "center",
+        y: "center",
+      },
+    };
+  }
+
+  private _createLabelContainer(
+    labelArea: SimpleSelection<void>, labelContainerOrigin: Point, labelOrigin: Point, measurement: Typesettable.IDimensions) {
+
+    const labelContainer = labelArea.append("g").attr("transform", `translate(${labelContainerOrigin.x}, ${labelContainerOrigin.y})`);
+    labelContainer.classed("on-bar-label", true);
+    labelContainer.classed("dark-label");
+
+    return labelContainer;
+  }
+
 }
