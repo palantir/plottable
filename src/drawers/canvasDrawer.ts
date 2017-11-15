@@ -85,7 +85,7 @@ export interface IStrokeStyle {
   "stroke-width"?: number;
   opacity?: number;
   stroke?: string;
-  "stroke-dasharray"?: number[];
+  "stroke-dasharray"?: string;
 }
 
 export interface IFillStyle {
@@ -113,7 +113,7 @@ export function getStrokeWidth(style: Record<string, any>) {
 export function getStrokeDashArray(style: Record<string, any>): number[] {
   if (style["stroke-dasharray"] != null) {
     // need to consider space delimited
-    return style["stroke-dasharray"].split(",");
+    return style["stroke-dasharray"].split(",").map((x: string) => parseInt(x, 10));
   }
   return [];
 }
@@ -142,7 +142,7 @@ export function renderPathWithStyle(context: CanvasRenderingContext2D, style: Re
   if (style["stroke"]) {
     context.lineWidth = getStrokeWidth(style);
     const strokeColor = d3.color(style["stroke"]);
-    const strokeDashArray = getStrokeDashArray(style["stroke-dasharray"]);
+    const strokeDashArray = getStrokeDashArray(style);
     context.setLineDash(strokeDashArray);
     strokeColor.opacity *= getStrokeOpacity(style);
     context.strokeStyle = strokeColor.toString();

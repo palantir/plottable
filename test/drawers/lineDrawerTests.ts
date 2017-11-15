@@ -1,11 +1,11 @@
 import { assert } from "chai";
 import * as d3 from "d3";
+import * as sinon from "sinon";
 
 import * as Plottable from "../../src";
 
 import { makeLineCanvasDrawStep } from "../../src/drawers/lineDrawer";
 import * as TestMethods from "../testMethods";
-
 describe("SVGDrawers", () => {
   describe("Line Drawer", () => {
     const data = [["A", "B", "C"]]; // line normally takes single array of data
@@ -56,5 +56,17 @@ describe("LineCanvasDrawStep", () => {
     const lineDrawStep = makeLineCanvasDrawStep(() => line);
     lineDrawStep(context, data, {});
     assert.strictEqual(line.context(), context, "line's context is set");
+  });
+
+  it("applies stroke-dasharray", () => {
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+    context.setLineDash = sinon.spy();
+    const line = d3.line();
+    const lineDrawStep = makeLineCanvasDrawStep(() => line);
+    lineDrawStep(context, data, { stroke: () => "red", "stroke-dasharray": () => "5,5" });
+    assert.isTrue((context.setLineDash as sinon.SinonSpy).called, "setLineDash is called");
+    const arg = (context.setLineDash as sinon.SinonSpy).getCall(0).args[0];
+    assert.deepEqual(arg, [5,5], "setLineDash called with proper args");
   });
 });
