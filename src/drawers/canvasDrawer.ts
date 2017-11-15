@@ -113,7 +113,6 @@ export function getStrokeWidth(style: Record<string, any>) {
 export function getStrokeDashArray(style: Record<string, any>): number[] {
   const rawValue: string = style["stroke-dasharray"];
   if (rawValue != null) {
-    // need to consider space delimited
     try {
       const cleaned = rawValue.replace(/, /g, ",").replace(/ /g, ",");
       return cleaned.split(",").map((x: string) => parseInt(x, 10));
