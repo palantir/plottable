@@ -66,7 +66,15 @@ describe("LineCanvasDrawStep", () => {
     const lineDrawStep = makeLineCanvasDrawStep(() => line);
     lineDrawStep(context, data, { stroke: () => "red", "stroke-dasharray": () => "5,5" });
     assert.isTrue((context.setLineDash as sinon.SinonSpy).called, "setLineDash is called");
-    const arg = (context.setLineDash as sinon.SinonSpy).getCall(0).args[0];
+    let arg = (context.setLineDash as sinon.SinonSpy).getCall(0).args[0];
+    assert.deepEqual(arg, [5,5], "setLineDash called with proper args");
+
+    lineDrawStep(context, data, { stroke: () => "red", "stroke-dasharray": () => "5 5" });
+    arg = (context.setLineDash as sinon.SinonSpy).getCall(1).args[0];
+    assert.deepEqual(arg, [5,5], "setLineDash called with proper args");
+
+    lineDrawStep(context, data, { stroke: () => "red", "stroke-dasharray": () => "5, 5" });
+    arg = (context.setLineDash as sinon.SinonSpy).getCall(2).args[0];
     assert.deepEqual(arg, [5,5], "setLineDash called with proper args");
   });
 });

@@ -111,9 +111,16 @@ export function getStrokeWidth(style: Record<string, any>) {
 }
 
 export function getStrokeDashArray(style: Record<string, any>): number[] {
-  if (style["stroke-dasharray"] != null) {
+  const rawValue: string = style["stroke-dasharray"];
+  if (rawValue != null) {
     // need to consider space delimited
-    return style["stroke-dasharray"].split(",").map((x: string) => parseInt(x, 10));
+    try {
+      const cleaned = rawValue.replace(/, /g, ",").replace(/ /g, ",");
+      return cleaned.split(",").map((x: string) => parseInt(x, 10));
+    } catch (e) {
+      console.warn("getStrokeDashArray failed with: " + e);
+      return [];
+    }
   }
   return [];
 }
