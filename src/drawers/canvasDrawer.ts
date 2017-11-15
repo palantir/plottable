@@ -114,8 +114,7 @@ export function getStrokeDashArray(style: Record<string, any>): number[] {
   const rawValue: string = style["stroke-dasharray"];
   if (rawValue != null) {
     try {
-      const cleaned = rawValue.replace(/, /g, ",").replace(/ /g, ",");
-      return cleaned.split(",").map((x: string) => parseInt(x, 10));
+      return rawValue.split(/[ ,]+/).map((x: string) => parseInt(x, 10));
     } catch (e) {
       console.error("getStrokeDashArray failed with: " + e);
       return [];
