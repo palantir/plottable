@@ -117,7 +117,7 @@ export function getStrokeDashArray(style: Record<string, any>): number[] {
       const cleaned = rawValue.replace(/, /g, ",").replace(/ /g, ",");
       return cleaned.split(",").map((x: string) => parseInt(x, 10));
     } catch (e) {
-      console.warn("getStrokeDashArray failed with: " + e);
+      console.error("getStrokeDashArray failed with: " + e);
       return [];
     }
   }
