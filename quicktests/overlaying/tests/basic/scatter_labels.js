@@ -57,14 +57,6 @@ function run(div, data, Plottable) {
     var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
     var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
-    // using the same symbol factories instead of new instances from each
-    // projector allows us to compare the instances and save a lot of re-rendering
-    var symbols = [
-        new Plottable.SymbolFactories.cross(),
-        new Plottable.SymbolFactories.square(),
-        new Plottable.SymbolFactories.star(),
-    ];
-
     var plot = new Plottable.Plots.Scatter()
         .renderer("svg")
         .deferredRendering(true)

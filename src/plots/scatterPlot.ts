@@ -3,17 +3,16 @@
  * @license MIT
  */
 
+import * as Typesettable from "typesettable";
+
 import { Dataset } from "../core/dataset";
-import { AttributeToProjector, Bounds, IAccessor, Point } from "../core/interfaces";
+import * as Formatters from "../core/formatters";
+import { AttributeToProjector, Bounds, IAccessor, Point, SimpleSelection } from "../core/interfaces";
 import * as SymbolFactories from "../core/symbolFactories";
 import { SymbolFactory } from "../core/symbolFactories";
 import { ProxyDrawer } from "../drawers/drawer";
 import { makeSymbolCanvasDrawStep, SymbolSVGDrawer } from "../drawers/symbolDrawer";
 import { Scale } from "../scales/scale";
-import { DatumFormatter } from './../core/formatters';
-import { SimpleSelection } from './../core/interfaces';
-import * as Typesettable from "typesettable";
-import * as Formatters from "../core/formatters";
 
 import * as Animators from "../animators";
 import * as Drawers from "../drawers";
@@ -42,7 +41,7 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
   // label stuff
   protected static _LABEL_AREA_CLASS = "bar-label-text-area";
   private _labelConfig: Utils.Map<Dataset, LabelConfig>;
-  private _labelFormatter: DatumFormatter = Formatters.identity();
+  private _labelFormatter: Formatters.DatumFormatter = Formatters.identity();
 
   protected static _LABEL_MARGIN_FROM_BUBBLE = 15;
   private _labelsEnabled = true;
@@ -290,14 +289,14 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
   private _calculateLabelProperties(
     pointCoordinates: Point, diameter: number, measurement: Typesettable.IDimensions) {
 
-    // If diameter is smaller than font size, put label above 
+    // If diameter is smaller than font size, put label above
 
     const labelShift = diameter < measurement.height ? diameter / 2 + Scatter._LABEL_MARGIN_FROM_BUBBLE : 0;
 
     return {
       containerDimensions: {
         width: measurement.width,
-        height: measurement.height
+        height: measurement.height,
       },
       labelContainerOrigin: {
         x: pointCoordinates.x - measurement.width / 2,
