@@ -44,14 +44,14 @@ export const LabelsPosition = makeEnum(["start", "middle", "end", "outside"]);
 export class Scatter<X, Y> extends XYPlot<X, Y> {
   private static _SIZE_KEY = "size";
   private static _SYMBOL_KEY = "symbol";
-  
+
   // label stuff
   protected static _LABEL_AREA_CLASS = "bar-label-text-area";
   private _labelConfig: Utils.Map<Dataset, LabelConfig>;
   private _labelFormatter: DatumFormatter = Formatters.identity();
-  private _labelsEnabled = true;
-  private _labelsPosition = LabelsPosition.end;
 
+  protected static _LABEL_MARGIN_FROM_BUBBLE = 15;
+  private _labelsEnabled = true;
   /**
    * A Scatter Plot draws a symbol at each data point.
    *
@@ -81,10 +81,7 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
         lightweightPlotEntity.datum,
         lightweightPlotEntity.index,
         lightweightPlotEntity.dataset);
-
       lightweightPlotEntity.diameter = diameter;
-
-      lightweightPlotEntity.label = "NO_LABEL";
 
       return lightweightPlotEntity;
     });
@@ -255,7 +252,6 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
   }
 
   protected _additionalPaint(time: number) {
-    console.log("SCATTER ADDITIONAL PAINT CALLED!");
     this.datasets().forEach((dataset) => this._labelConfig.get(dataset).labelArea.selectAll("g").remove());
     if (this._labelsEnabled) {
       Utils.Window.setTimeout(() => this._drawLabels(), time);
@@ -276,23 +272,34 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
   }
 
   private _drawLabel(datum: any, index: number, dataset: Dataset, attrToProjector: AttributeToProjector) {
+    if (datum.label == null) {
+      return;
+    }
     const { labelArea, measurer, writer } = this._labelConfig.get(dataset);
 
     const scatterCoordinates = { x: attrToProjector["x"](datum, index, dataset), y: attrToProjector["y"](datum, index, dataset) };
-    const text = this._labelFormatter("TEST", datum, index, dataset);
-    const measurement = measurer.measure(text);
 
-    const { containerDimensions, labelContainerOrigin, labelOrigin, alignment } = this._calculateLabelProperties(scatterCoordinates, measurement);
+    const sizeProjector = Plot._scaledAccessor(this.size());
+    const diameter = sizeProjector(datum, index, dataset);
+
+    const label = this._labelFormatter(datum.label, datum, index, dataset);
+    const measurement = measurer.measure(label);
+
+    const { containerDimensions, labelContainerOrigin, labelOrigin, alignment } = this._calculateLabelProperties(scatterCoordinates, diameter, measurement);
 
     const labelContainer = this._createLabelContainer(labelArea, labelContainerOrigin, labelOrigin, measurement);
 
     const writeOptions = { xAlign: alignment.x as Typesettable.IXAlign, yAlign: alignment.y as Typesettable.IYAlign };
-    writer.write(text, containerDimensions.width, containerDimensions.height, writeOptions, labelContainer.node());
+    writer.write(label, containerDimensions.width, containerDimensions.height, writeOptions, labelContainer.node());
   }
 
   // Todo: do something smart with the text size vs. symbol diameter
   private _calculateLabelProperties(
-    pointCoordinates: Point, measurement: Typesettable.IDimensions) {
+    pointCoordinates: Point, diameter: number, measurement: Typesettable.IDimensions) {
+
+    // if diameter is smaller than font size, put label above 
+
+    const labelShift = diameter < measurement.height ? diameter / 2 + Scatter._LABEL_MARGIN_FROM_BUBBLE : 0;
 
     return {
       containerDimensions: {
@@ -301,7 +308,7 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
       },
       labelContainerOrigin: {
         x: pointCoordinates.x - measurement.width / 2,
-        y: pointCoordinates.y - measurement.height / 2,
+        y: pointCoordinates.y - measurement.height / 2 + labelShift,
       },
       labelOrigin: {
         x: pointCoordinates.x,
