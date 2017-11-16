@@ -1,9 +1,3 @@
-import { DatumFormatter } from './../core/formatters';
-import { SimpleSelection } from './../core/interfaces';
-import * as Typesettable from "typesettable";
-import * as Formatters from "../core/formatters";
-
-
 /**
  * Copyright 2014-present Palantir Technologies
  * @license MIT
@@ -16,12 +10,15 @@ import { SymbolFactory } from "../core/symbolFactories";
 import { ProxyDrawer } from "../drawers/drawer";
 import { makeSymbolCanvasDrawStep, SymbolSVGDrawer } from "../drawers/symbolDrawer";
 import { Scale } from "../scales/scale";
+import { DatumFormatter } from './../core/formatters';
+import { SimpleSelection } from './../core/interfaces';
+import * as Typesettable from "typesettable";
+import * as Formatters from "../core/formatters";
 
 import * as Animators from "../animators";
 import * as Drawers from "../drawers";
 import * as Scales from "../scales";
 import * as Utils from "../utils";
-import { makeEnum } from "../utils/makeEnum";
 import * as Plots from "./";
 import { IAccessorScaleBinding, ILightweightPlotEntity, IPlotEntity, ITransformableAccessorScaleBinding } from "./";
 import { Plot } from "./plot";
@@ -30,7 +27,6 @@ import { XYPlot } from "./xyPlot";
 export interface ILightweightScatterPlotEntity extends ILightweightPlotEntity {
   // size of the entity in pixel space
   diameter: number;
-  label?: string;
 }
 
 type LabelConfig = {
@@ -38,8 +34,6 @@ type LabelConfig = {
   measurer: Typesettable.CacheMeasurer;
   writer: Typesettable.Writer;
 };
-export const LabelsPosition = makeEnum(["start", "middle", "end", "outside"]);
-
 
 export class Scatter<X, Y> extends XYPlot<X, Y> {
   private static _SIZE_KEY = "size";
@@ -293,11 +287,10 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
     writer.write(label, containerDimensions.width, containerDimensions.height, writeOptions, labelContainer.node());
   }
 
-  // Todo: do something smart with the text size vs. symbol diameter
   private _calculateLabelProperties(
     pointCoordinates: Point, diameter: number, measurement: Typesettable.IDimensions) {
 
-    // if diameter is smaller than font size, put label above 
+    // If diameter is smaller than font size, put label above 
 
     const labelShift = diameter < measurement.height ? diameter / 2 + Scatter._LABEL_MARGIN_FROM_BUBBLE : 0;
 
