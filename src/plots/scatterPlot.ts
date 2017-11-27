@@ -312,7 +312,6 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
     pointCoordinates: Point, diameter: number, measurement: Typesettable.IDimensions) {
 
     // If diameter is smaller than font size, put label above
-
     const labelShift = diameter < measurement.height ? diameter / 2 + Scatter._LABEL_MARGIN_FROM_BUBBLE : 0;
 
     return {
@@ -336,11 +335,14 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
   }
 
   private _createLabelContainer(
-    labelArea: SimpleSelection<void>, labelContainerOrigin: Point, labelOrigin: Point, measurement: Typesettable.IDimensions) {
+    labelArea: SimpleSelection<void>,
+    labelContainerOrigin: Point,
+    labelOrigin: Point,
+    measurement: Typesettable.IDimensions) {
 
-    const labelContainer = labelArea.append("g").attr("transform", `translate(${labelContainerOrigin.x}, ${labelContainerOrigin.y})`);
+    const labelContainer = labelArea.append("g")
+                                    .attr("transform", `translate(${labelContainerOrigin.x}, ${labelContainerOrigin.y})`);
     labelContainer.classed("on-bar-label", true);
-    labelContainer.classed("dark-label");
 
     return labelContainer;
   }
