@@ -27,6 +27,7 @@ const LINE_ATTRIBUTES =  [
   "stroke-opacity",
   "stroke-width",
   "stroke",
+  "stroke-dasharray",
 ];
 
 /**
