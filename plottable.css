@@ -113,7 +113,8 @@
   fill: #32313F;
 }
 
-.plottable .bar-label-text-area text {
+.plottable .bar-label-text-area text,
+.plottable .scatter-label-text-area text {
   font-family: "Helvetica Neue", sans-serif;
   font-size: 12px;
 }
