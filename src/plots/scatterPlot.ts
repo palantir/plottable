@@ -44,7 +44,7 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
   private _labelFormatter: Formatters.DatumFormatter = Formatters.identity();
 
   protected static _LABEL_MARGIN_FROM_BUBBLE = 15;
-  private _labelsEnabled = true;
+  private _labelsEnabled = false;
   /**
    * A Scatter Plot draws a symbol at each data point.
    *
@@ -223,7 +223,29 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
     });
   }
 
-  // labels
+ /**
+   * Get whether bar labels are enabled.
+   *
+   * @returns {boolean} Whether bars should display labels or not.
+   */
+  public labelsEnabled(): boolean;
+  /**
+   * Sets whether labels are enabled.
+   *
+   * @param {boolean} labelsEnabled
+   * @returns {Scatter} The calling SCATTER Plot.
+   */
+  public labelsEnabled(enabled: boolean): this;
+  public labelsEnabled(enabled?: boolean): any {
+    if (enabled == null) {
+      return this._labelsEnabled;
+    } else {
+      this._labelsEnabled = enabled;
+      this._clearAttrToProjectorCache();
+      this.render();
+      return this;
+    }
+  }
 
   protected _createNodesForDataset(dataset: Dataset): ProxyDrawer {
     const drawer = super._createNodesForDataset(dataset);

@@ -61,6 +61,7 @@ function run(div, data, Plottable) {
         .renderer("svg")
         .deferredRendering(true)
         .addDataset(new Plottable.Dataset(data))
+        .labelsEnabled(true)
         .x((d) => d.x, xScale)
         .y((d) => d.y, yScale)
         .size((d) => d.size);
