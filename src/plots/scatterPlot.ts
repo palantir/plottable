@@ -39,7 +39,7 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
   private static _SYMBOL_KEY = "symbol";
 
   // label stuff
-  protected static _LABEL_AREA_CLASS = "bar-label-text-area";
+  protected static _LABEL_AREA_CLASS = "scatter-label-text-area";
   private _labelConfig: Utils.Map<Dataset, LabelConfig>;
   private _labelFormatter: Formatters.DatumFormatter = Formatters.identity();
 
