@@ -65,6 +65,6 @@
     "d3-ease": "^1.0.0",
     "d3-shape": "^1.0.0",
     "is-plain-object": "^2.0.4",
-    "typesettable": "^3.0.2"
+    "typesettable": "4.0.0"
   }
 }

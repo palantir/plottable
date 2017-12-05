@@ -5216,9 +5216,9 @@ typescript@2.1.5:
   version "2.1.5"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.1.5.tgz#6fe9479e00e01855247cea216e7561bafcdbcd4a"
 
-typesettable@^3.0.2:
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/typesettable/-/typesettable-3.0.2.tgz#0c6d687f0b93a214348e70916795fb8bcac53499"
+typesettable@4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/typesettable/-/typesettable-4.0.0.tgz#6b087b47cde39d2459906ad03dde6da0eb1bccf8"
 
 uglify-js@^2.6, uglify-js@^2.7.5:
   version "2.8.18"
