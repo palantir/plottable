@@ -2,6 +2,7 @@
     "compilerOptions": {
       "declaration": true,
       "forceConsistentCasingInFileNames": true,
+      "importHelpers": true,
       "module": "commonjs",
       "noFallthroughCasesInSwitch": true,
       "noImplicitReturns": true,
