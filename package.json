@@ -11,6 +11,7 @@
   "main": "build/src/index.js",
   "typings": "build/src/index.d.ts",
   "scripts": {
+    "prepare": "npm run dist",
     "build": "npm-run-all -p lint:tslint build:tsc -s build:webpack",
     "build:tsc": "tsc -p .",
     "build:webpack": "webpack",
