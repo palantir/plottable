@@ -234,7 +234,7 @@ export function multiTime() {
       ? acceptableFormats[0].specifier
       : "%Y";
 
-    return d3.utcFormat(specifier)(d);
+    return d3.timeFormat(specifier)(d);
   };
 }
 
@@ -247,8 +247,11 @@ export function multiTime() {
  *
  * @returns {Formatter} A formatter for time/date values.
  */
-export function time(specifier: string): Formatter {
-  return d3.utcFormat(specifier);
+export function time(specifier: string, useUTC?: boolean): Formatter {
+  if (useUTC) {
+    return d3.utcFormat(specifier);
+  }
+  return d3.timeFormat(specifier);
 }
 
 function verifyPrecision(precision: number) {

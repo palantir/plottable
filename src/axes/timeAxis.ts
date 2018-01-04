@@ -80,115 +80,118 @@ export class Time extends Axis<Date> {
     [TimeInterval.year]: 6,
   };
 
-  private static _DEFAULT_TIME_AXIS_CONFIGURATIONS: TimeAxisConfiguration[] = [
-    [
-      { interval: TimeInterval.second, step: 1, formatter: Formatters.time("%I:%M:%S %p") },
-      { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
-    ],
-    [
-      { interval: TimeInterval.second, step: 5, formatter: Formatters.time("%I:%M:%S %p") },
-      { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
-    ],
-    [
-      { interval: TimeInterval.second, step: 10, formatter: Formatters.time("%I:%M:%S %p") },
-      { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
-    ],
-    [
-      { interval: TimeInterval.second, step: 15, formatter: Formatters.time("%I:%M:%S %p") },
-      { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
-    ],
-    [
-      { interval: TimeInterval.second, step: 30, formatter: Formatters.time("%I:%M:%S %p") },
-      { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
-    ],
-    [
-      { interval: TimeInterval.minute, step: 1, formatter: Formatters.time("%I:%M %p") },
-      { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
-    ],
-    [
-      { interval: TimeInterval.minute, step: 5, formatter: Formatters.time("%I:%M %p") },
-      { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
-    ],
-    [
-      { interval: TimeInterval.minute, step: 10, formatter: Formatters.time("%I:%M %p") },
-      { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
-    ],
-    [
-      { interval: TimeInterval.minute, step: 15, formatter: Formatters.time("%I:%M %p") },
-      { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
-    ],
-    [
-      { interval: TimeInterval.minute, step: 30, formatter: Formatters.time("%I:%M %p") },
-      { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
-    ],
-    [
-      { interval: TimeInterval.hour, step: 1, formatter: Formatters.time("%I %p") },
-      { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
-    ],
-    [
-      { interval: TimeInterval.hour, step: 3, formatter: Formatters.time("%I %p") },
-      { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
-    ],
-    [
-      { interval: TimeInterval.hour, step: 6, formatter: Formatters.time("%I %p") },
-      { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
-    ],
-    [
-      { interval: TimeInterval.hour, step: 12, formatter: Formatters.time("%I %p") },
-      { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y") },
-    ],
-    [
-      { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%a %e") },
-      { interval: TimeInterval.month, step: 1, formatter: Formatters.time("%B %Y") },
-    ],
-    [
-      { interval: TimeInterval.day, step: 1, formatter: Formatters.time("%e") },
-      { interval: TimeInterval.month, step: 1, formatter: Formatters.time("%B %Y") },
-    ],
-    [
-      { interval: TimeInterval.month, step: 1, formatter: Formatters.time("%B") },
-      { interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y") },
-    ],
-    [
-      { interval: TimeInterval.month, step: 1, formatter: Formatters.time("%b") },
-      { interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y") },
-    ],
-    [
-      { interval: TimeInterval.month, step: 3, formatter: Formatters.time("%b") },
-      { interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y") },
-    ],
-    [
-      { interval: TimeInterval.month, step: 6, formatter: Formatters.time("%b") },
-      { interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y") },
-    ],
-    [
-      { interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y") },
-    ],
-    [
-      { interval: TimeInterval.year, step: 1, formatter: Formatters.time("%y") },
-    ],
-    [
-      { interval: TimeInterval.year, step: 5, formatter: Formatters.time("%Y") },
-    ],
-    [
-      { interval: TimeInterval.year, step: 25, formatter: Formatters.time("%Y") },
-    ],
-    [
-      { interval: TimeInterval.year, step: 50, formatter: Formatters.time("%Y") },
-    ],
-    [
-      { interval: TimeInterval.year, step: 100, formatter: Formatters.time("%Y") },
-    ],
-    [
-      { interval: TimeInterval.year, step: 200, formatter: Formatters.time("%Y") },
-    ],
-    [
-      { interval: TimeInterval.year, step: 500, formatter: Formatters.time("%Y") },
-    ],
-    [
-      { interval: TimeInterval.year, step: 1000, formatter: Formatters.time("%Y") },
-    ],
-  ];
+  private static _DEFAULT_TIME_AXIS_CONFIGURATIONS = (useUTC: boolean) => {
+    const formatter = (specifier: string) => Formatters.time(specifier, useUTC);
+    return [
+      [
+        { interval: TimeInterval.second, step: 1, formatter: formatter("%I:%M:%S %p") },
+        { interval: TimeInterval.day, step: 1, formatter: formatter("%B %e, %Y") },
+      ],
+      [
+        { interval: TimeInterval.second, step: 5, formatter: formatter("%I:%M:%S %p") },
+        { interval: TimeInterval.day, step: 1, formatter: formatter("%B %e, %Y") },
+      ],
+      [
+        { interval: TimeInterval.second, step: 10, formatter: formatter("%I:%M:%S %p") },
+        { interval: TimeInterval.day, step: 1, formatter: formatter("%B %e, %Y") },
+      ],
+      [
+        { interval: TimeInterval.second, step: 15, formatter: formatter("%I:%M:%S %p") },
+        { interval: TimeInterval.day, step: 1, formatter: formatter("%B %e, %Y") },
+      ],
+      [
+        { interval: TimeInterval.second, step: 30, formatter: formatter("%I:%M:%S %p") },
+        { interval: TimeInterval.day, step: 1, formatter: formatter("%B %e, %Y") },
+      ],
+      [
+        { interval: TimeInterval.minute, step: 1, formatter: formatter("%I:%M %p") },
+        { interval: TimeInterval.day, step: 1, formatter: formatter("%B %e, %Y") },
+      ],
+      [
+        { interval: TimeInterval.minute, step: 5, formatter: formatter("%I:%M %p") },
+        { interval: TimeInterval.day, step: 1, formatter: formatter("%B %e, %Y") },
+      ],
+      [
+        { interval: TimeInterval.minute, step: 10, formatter: formatter("%I:%M %p") },
+        { interval: TimeInterval.day, step: 1, formatter: formatter("%B %e, %Y") },
+      ],
+      [
+        { interval: TimeInterval.minute, step: 15, formatter: formatter("%I:%M %p") },
+        { interval: TimeInterval.day, step: 1, formatter: formatter("%B %e, %Y") },
+      ],
+      [
+        { interval: TimeInterval.minute, step: 30, formatter: formatter("%I:%M %p") },
+        { interval: TimeInterval.day, step: 1, formatter: formatter("%B %e, %Y") },
+      ],
+      [
+        { interval: TimeInterval.hour, step: 1, formatter: formatter("%I %p") },
+        { interval: TimeInterval.day, step: 1, formatter: formatter("%B %e, %Y") },
+      ],
+      [
+        { interval: TimeInterval.hour, step: 3, formatter: formatter("%I %p") },
+        { interval: TimeInterval.day, step: 1, formatter: formatter("%B %e, %Y") },
+      ],
+      [
+        { interval: TimeInterval.hour, step: 6, formatter: formatter("%I %p") },
+        { interval: TimeInterval.day, step: 1, formatter: formatter("%B %e, %Y") },
+      ],
+      [
+        { interval: TimeInterval.hour, step: 12, formatter: formatter("%I %p") },
+        { interval: TimeInterval.day, step: 1, formatter: formatter("%B %e, %Y") },
+      ],
+      [
+        { interval: TimeInterval.day, step: 1, formatter: formatter("%a %e") },
+        { interval: TimeInterval.month, step: 1, formatter: formatter("%B %Y") },
+      ],
+      [
+        { interval: TimeInterval.day, step: 1, formatter: formatter("%e") },
+        { interval: TimeInterval.month, step: 1, formatter: formatter("%B %Y") },
+      ],
+      [
+        { interval: TimeInterval.month, step: 1, formatter: formatter("%B") },
+        { interval: TimeInterval.year, step: 1, formatter: formatter("%Y") },
+      ],
+      [
+        { interval: TimeInterval.month, step: 1, formatter: formatter("%b") },
+        { interval: TimeInterval.year, step: 1, formatter: formatter("%Y") },
+      ],
+      [
+        { interval: TimeInterval.month, step: 3, formatter: formatter("%b") },
+        { interval: TimeInterval.year, step: 1, formatter: formatter("%Y") },
+      ],
+      [
+        { interval: TimeInterval.month, step: 6, formatter: formatter("%b") },
+        { interval: TimeInterval.year, step: 1, formatter: formatter("%Y") },
+      ],
+      [
+        { interval: TimeInterval.year, step: 1, formatter: formatter("%Y") },
+      ],
+      [
+        { interval: TimeInterval.year, step: 1, formatter: formatter("%y") },
+      ],
+      [
+        { interval: TimeInterval.year, step: 5, formatter: formatter("%Y") },
+      ],
+      [
+        { interval: TimeInterval.year, step: 25, formatter: formatter("%Y") },
+      ],
+      [
+        { interval: TimeInterval.year, step: 50, formatter: formatter("%Y") },
+      ],
+      [
+        { interval: TimeInterval.year, step: 100, formatter: formatter("%Y") },
+      ],
+      [
+        { interval: TimeInterval.year, step: 200, formatter: formatter("%Y") },
+      ],
+      [
+        { interval: TimeInterval.year, step: 500, formatter: formatter("%Y") },
+      ],
+      [
+        { interval: TimeInterval.year, step: 1000, formatter: formatter("%Y") },
+      ],
+    ];
+  }
 
   private _tierLabelContainers: SimpleSelection<void>[];
   private _tierMarkContainers: SimpleSelection<void>[];
@@ -213,14 +216,15 @@ export class Time extends Axis<Date> {
    * @constructor
    * @param {Scales.Time} scale
    * @param {AxisOrientation} orientation Orientation of this Time Axis. Time Axes can only have "top" or "bottom"
+   * @param {boolean} useUTC Displays date object in UTC if true, local time if false. Defaults to false.
    * orientations.
    */
-  constructor(scale: Scales.Time, orientation: TimeAxisOrientation) {
+  constructor(scale: Scales.Time, orientation: TimeAxisOrientation, useUTC?: boolean) {
     super(scale, orientation);
     this.addClass("time-axis");
     this.tickLabelPadding(5);
-    this.axisConfigurations(Time._DEFAULT_TIME_AXIS_CONFIGURATIONS);
-    this.annotationFormatter(Formatters.time("%a %b %d, %Y"));
+    this.axisConfigurations(Time._DEFAULT_TIME_AXIS_CONFIGURATIONS(useUTC));
+    this.annotationFormatter(Formatters.time("%a %b %d, %Y", false));
   }
 
   /**
