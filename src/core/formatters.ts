@@ -244,6 +244,7 @@ export function multiTime() {
  * List of directives can be found on: https://github.com/mbostock/d3/wiki/Time-Formatting#format
  *
  * @param {string} [specifier] The specifier for the formatter.
+ * @param {boolean} [useUTC] Displays time in UTC if true, local time if false.
  *
  * @returns {Formatter} A formatter for time/date values.
  */
