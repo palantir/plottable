@@ -6,6 +6,9 @@
 import * as d3 from "d3";
 import { Dataset } from "./dataset";
 
+// Do not use utc by default
+const DEFAULT_USE_UTC = false;
+
 /**
  * A basic formatter function that will be passed a value to format (e.g. the tick value for axes).
  * A Formatter should return the formatted string representation of the input value.
@@ -244,11 +247,11 @@ export function multiTime() {
  * List of directives can be found on: https://github.com/mbostock/d3/wiki/Time-Formatting#format
  *
  * @param {string} [specifier] The specifier for the formatter.
- * @param {boolean} [useUTC] Displays time in UTC if true, local time if false.
+ * @param {boolean} [useUTC] Displays time in UTC if true, local time if false. Defaults to false.
  *
  * @returns {Formatter} A formatter for time/date values.
  */
-export function time(specifier: string, useUTC?: boolean): Formatter {
+export function time(specifier: string, useUTC: boolean = DEFAULT_USE_UTC): Formatter {
   if (useUTC) {
     return d3.utcFormat(specifier);
   }
