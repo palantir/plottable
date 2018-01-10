@@ -193,6 +193,8 @@ export class Time extends Axis<Date> {
     ];
   }
 
+  private _useUTC: boolean = false;
+
   private _tierLabelContainers: SimpleSelection<void>[];
   private _tierMarkContainers: SimpleSelection<void>[];
   private _tierBaselines: SimpleSelection<void>[];
@@ -221,10 +223,11 @@ export class Time extends Axis<Date> {
    */
   constructor(scale: Scales.Time, orientation: TimeAxisOrientation, useUTC?: boolean) {
     super(scale, orientation);
+    this._useUTC = useUTC;
     this.addClass("time-axis");
     this.tickLabelPadding(5);
-    this.axisConfigurations(Time._DEFAULT_TIME_AXIS_CONFIGURATIONS(useUTC));
-    this.annotationFormatter(Formatters.time("%a %b %d, %Y", useUTC));
+    this.axisConfigurations(Time._DEFAULT_TIME_AXIS_CONFIGURATIONS(this._useUTC));
+    this.annotationFormatter(Formatters.time("%a %b %d, %Y", this._useUTC));
   }
 
   /**
@@ -439,7 +442,7 @@ export class Time extends Axis<Date> {
   }
 
   private _getTickIntervalValues(config: TimeAxisTierConfiguration): any[] {
-    return (<Scales.Time> this._scale).tickInterval(config.interval, config.step);
+    return (<Scales.Time> this._scale).tickInterval(config.interval, config.step, this._useUTC);
   }
 
   protected _getTickValues() {
@@ -458,7 +461,7 @@ export class Time extends Axis<Date> {
   }
 
   private _getTickValuesForConfiguration(config: TimeAxisTierConfiguration) {
-    const tickPos = (<Scales.Time> this._scale).tickInterval(config.interval, config.step);
+    const tickPos = (<Scales.Time> this._scale).tickInterval(config.interval, config.step, this._useUTC);
     const domain = this._scale.domain();
     const tickPosValues = tickPos.map((d: Date) => d.valueOf()); // can't indexOf with objects
     if (tickPosValues.indexOf(domain[0].valueOf()) === -1) {
