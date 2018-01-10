@@ -368,7 +368,7 @@ export class Time extends Axis<Date> {
 
   private _getIntervalLength(config: TimeAxisTierConfiguration) {
     const startDate = this._scale.domain()[0];
-    const d3Interval = Scales.Time.timeIntervalToD3Time(config.interval);
+    const d3Interval = Scales.Time.timeIntervalToD3Time(config.interval, this._useUTC);
     const endDate = d3Interval.offset(startDate, config.step);
     if (endDate > this._scale.domain()[1]) {
       // this offset is too large, so just return available width
