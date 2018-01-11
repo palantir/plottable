@@ -601,14 +601,14 @@ describe("Plots", () => {
           };
         }
 
-        function expectedEntityForIndex(index: number) {
-          const datum = data[index];
+        function expectedEntityForIndex(sourceDataIndex: number, visibleElementIndex: number) {
+          const datum = data[sourceDataIndex];
           const basePosition = baseScale.scale(datum.base);
           const valuePosition = valueScale.scale(datum.value);
-          const element = barPlot.content().selectAll<Element, any>("rect").nodes()[index];
+          const element = barPlot.content().selectAll<Element, any>("rect").nodes()[visibleElementIndex];
           return {
             datum: datum,
-            index: index,
+            index: sourceDataIndex,
             dataset: dataset,
             datasetIndex: 0,
             position: getPointFromBaseAndValuePositions(basePosition, valuePosition),
@@ -621,7 +621,7 @@ describe("Plots", () => {
         describe("retrieving the nearest Entity", () => {
           function testEntityNearest() {
             data.forEach((datum, index) => {
-              const expectedEntity = expectedEntityForIndex(index);
+              const expectedEntity = expectedEntityForIndex(index, index);
 
               const barBasePosition = baseScale.scale(datum.base);
 
@@ -655,7 +655,7 @@ describe("Plots", () => {
             const baselineValuePosition = valueScale.scale(barPlot.baselineValue());
 
             const nearestEntity = barPlot.entityNearest(getPointFromBaseAndValuePositions(bar0BasePosition, baselineValuePosition));
-            const expectedEntity = expectedEntityForIndex(1); // nearest visible bar
+            const expectedEntity = expectedEntityForIndex(1, 0); // nearest visible bar
             TestMethods.assertPlotEntitiesEqual(nearestEntity, expectedEntity, "returned Entity for nearest in-view bar");
           });
 
@@ -686,7 +686,7 @@ describe("Plots", () => {
               if (datum.value === barPlot.baselineValue()) {
                 return; // bar has no height
               }
-              const expectedEntity = expectedEntityForIndex(index);
+              const expectedEntity = expectedEntityForIndex(index, index);
 
               const barBasePosition = baseScale.scale(datum.base);
 
@@ -721,7 +721,7 @@ describe("Plots", () => {
             const entitiesInRange = isVertical ? barPlot.entitiesIn(baseRange, fullSizeValueRange)
                                                : barPlot.entitiesIn(fullSizeValueRange, baseRange);
             assert.lengthOf(entitiesInRange, 1, "retrieved two Entities when range intersects one bar");
-            TestMethods.assertPlotEntitiesEqual(entitiesInRange[0], expectedEntityForIndex(0), "Entity corresponds to bar 0");
+            TestMethods.assertPlotEntitiesEqual(entitiesInRange[0], expectedEntityForIndex(0, 0), "Entity corresponds to bar 0");
           });
 
           it("returns the Entity if the range includes any part of the bar", () => {
@@ -738,7 +738,7 @@ describe("Plots", () => {
             const entitiesInRange = isVertical ? barPlot.entitiesIn(fullSizeBaseRange, valueRange)
                                                : barPlot.entitiesIn(valueRange, fullSizeBaseRange);
             assert.lengthOf(entitiesInRange, 1, "retrieved one entity when range intersects one bar");
-            TestMethods.assertPlotEntitiesEqual(entitiesInRange[0], expectedEntityForIndex(0), "Entity corresponds to bar 0");
+            TestMethods.assertPlotEntitiesEqual(entitiesInRange[0], expectedEntityForIndex(0, 0), "Entity corresponds to bar 0");
           });
         });
       });
