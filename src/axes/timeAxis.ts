@@ -193,7 +193,7 @@ export class Time extends Axis<Date> {
     ];
   }
 
-  private _useUTC: boolean = false;
+  private _useUTC: boolean;
 
   private _tierLabelContainers: SimpleSelection<void>[];
   private _tierMarkContainers: SimpleSelection<void>[];
