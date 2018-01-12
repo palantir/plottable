@@ -10,6 +10,7 @@ describe("SymbolFactory", () => {
   describe("Generates correct path", () => {
     let svg: d3.Selection<SVGSVGElement, any, any, any>;
     const symbolSize = 5;
+    const epsilon = 0.1;
 
     beforeEach(() => {
       svg = TestMethods.generateSVG();
@@ -23,10 +24,10 @@ describe("SymbolFactory", () => {
       assert.strictEqual(d, expectedD, "a circle of set size is generated");
       const path = svg.append("path").attr("d", d);
       const bbox = Plottable.Utils.DOM.elementBBox(path);
-      assert.strictEqual(bbox.height, symbolSize, "height is as set");
-      assert.strictEqual(bbox.width, symbolSize, "width is as set");
-      assert.strictEqual(bbox.x, -bbox.width / 2, "x is centered in the middle");
-      assert.strictEqual(bbox.y, -bbox.height / 2, "y is centered in the middle");
+      assert.closeTo(bbox.height, symbolSize, epsilon, "height is as set");
+      assert.closeTo(bbox.width, symbolSize, epsilon, "width is as set");
+      assert.closeTo(bbox.x, -bbox.width / 2, epsilon, "x is centered in the middle");
+      assert.closeTo(bbox.y, -bbox.height / 2, epsilon,"y is centered in the middle");
       svg.remove();
     });
 
