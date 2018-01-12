@@ -181,6 +181,18 @@ describe("Formatters", () => {
     });
   });
 
+  describe("time()", () => {
+    it("defaults to local time", () => {
+      const formatter = Plottable.Formatters.time("%I %p");
+      assert.strictEqual(formatter(new Date(2000, 0, 1, 0, 0, 0, 0)), "12 AM");
+    });
+
+    it("formats to UTC accordingly", () => {
+      const formatter = Plottable.Formatters.time("%I %p", true);
+      assert.strictEqual(formatter(new Date(Date.UTC(2000, 0, 1, 0, 0, 0, 0))), "12 AM");
+    });
+  });
+
   describe("percentage()", () => {
     it("formats number to percetage with correct precision", () => {
       const percentFormatter = Plottable.Formatters.percentage();
