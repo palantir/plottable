@@ -10,13 +10,13 @@ import { SimpleSelection, SpaceRequest } from "../core/interfaces";
 import { Component } from "./component";
 
 export class Label extends Component {
-  private _textContainer: SimpleSelection<void>;
-  private _text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
-  private _angle: number;
-  private _measurer: Typesettable.CacheMeasurer;
-  private _wrapper: Typesettable.Wrapper;
-  private _writer: Typesettable.Writer;
-  private _padding: number;
+  protected _textContainer: SimpleSelection<void>;
+  protected _text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
+  protected _angle: number;
+  protected _measurer: Typesettable.CacheMeasurer;
+  protected _wrapper: Typesettable.Wrapper;
+  protected _writer: Typesettable.Writer;
+  protected _padding: number;
 
   /**
    * A Label is a Component that displays a single line of text.
@@ -38,7 +38,6 @@ export class Label extends Component {
     const desiredWH = this._measurer.measure(this._text);
     const desiredWidth = (this.angle() === 0 ? desiredWH.width : desiredWH.height) + 2 * this.padding();
     const desiredHeight = (this.angle() === 0 ? desiredWH.height : desiredWH.width) + 2 * this.padding();
-
     return {
       minWidth: desiredWidth,
       minHeight: desiredHeight,
