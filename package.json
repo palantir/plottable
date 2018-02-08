@@ -46,14 +46,14 @@
     "grunt-exec": "1.0.1",
     "grunt-jscs": "2.6.0",
     "grunt-saucelabs": "8.6.2",
-    "jquery": "2.1.0",
+    "jquery": "3.0.0",
     "load-grunt-tasks": "3.4.0",
     "mocha": "2.2.5",
     "npm-run-all": "4.0.1",
     "requirejs": "2.1.18",
     "sinon": "^2.1.0",
     "tslint": "4.5.1",
-    "typescript": "2.1.5",
+    "typescript": "2.3.4",
     "webpack": "2.2.1",
     "webpack-dev-server": "2.3.0",
     "webpack-merge": "^4.1.0"
@@ -66,6 +66,6 @@
     "d3-shape": "^1.0.0",
     "is-plain-object": "^2.0.4",
     "tslib": "~1.8.0",
-    "typesettable": "4.0.0"
+    "typesettable": "4.1.0"
   }
 }
