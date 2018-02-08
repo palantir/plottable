@@ -252,7 +252,7 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
    * @param {Point} point The point to query.
    * @returns {PlotEntity[]} The PlotEntities at the particular point
    */
-  public entitiesAt(point: Point) {
+  public entitiesAt(point: Point): IPlotEntity[] {
     const attrToProjector = this._getAttrToProjector();
     return this.entities().filter((entity) => {
       const datum = entity.datum;
