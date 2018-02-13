@@ -70,7 +70,7 @@ export class Time extends Axis<Date> {
    */
   public static TIME_AXIS_TIER_CLASS = "time-axis-tier";
 
-  private static _SORTED_TIME_INTERVAL_INDEX = {
+  private static _SORTED_TIME_INTERVAL_INDEX: Record<TimeInterval, number> = {
     [TimeInterval.second]: 0,
     [TimeInterval.minute]: 1,
     [TimeInterval.hour]: 2,
@@ -393,7 +393,7 @@ export class Time extends Axis<Date> {
     // setting (if set).
     if (this._maxTimeIntervalPrecision != null) {
       const precisionLimit = Time._SORTED_TIME_INTERVAL_INDEX[this._maxTimeIntervalPrecision];
-      const configPrecision = Time._SORTED_TIME_INTERVAL_INDEX[config.interval];
+      const configPrecision = Time._SORTED_TIME_INTERVAL_INDEX[config.interval as TimeInterval];
       if (precisionLimit != null && configPrecision != null && configPrecision < precisionLimit) {
         return false;
       }

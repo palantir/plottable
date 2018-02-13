@@ -5216,13 +5216,13 @@ typedarray@^0.0.6, typedarray@~0.0.5:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
 
-typescript@2.1.5:
-  version "2.1.5"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.1.5.tgz#6fe9479e00e01855247cea216e7561bafcdbcd4a"
+typescript@^2.7:
+  version "2.7.1"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.7.1.tgz#bb3682c2c791ac90e7c6210b26478a8da085c359"
 
-typesettable@4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/typesettable/-/typesettable-4.0.0.tgz#6b087b47cde39d2459906ad03dde6da0eb1bccf8"
+typesettable@4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/typesettable/-/typesettable-4.1.0.tgz#9dc4f539fabad7db4de2c3b08e286ff72a60f038"
 
 uglify-js@^2.6, uglify-js@^2.7.5:
   version "2.8.18"
