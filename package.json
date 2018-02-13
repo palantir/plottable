@@ -34,6 +34,7 @@
     "@types/d3-selection-multi": "1.0.4",
     "@types/mocha": "^2.2.27",
     "@types/sinon": "^1.16.36",
+    "awesome-typescript-loader": "^3.4.1",
     "chai": "2.0.0",
     "circle-github-bot": "0.3.0",
     "grunt": "~0.4.5",

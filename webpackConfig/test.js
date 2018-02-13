@@ -17,9 +17,23 @@ module.exports = {
     port: 9999,
     inline: false
   },
-  entry: "./build/test/index.js",
+  entry: "./test/index.ts",
   output: {
     filename: "test/tests.js"
+  },
+  resolve: {
+      extensions: [ ".js", ".jsx", ".ts", ".tsx", ".scss" ],
+  },
+  module: {
+      rules: [
+          {
+              test: /\.tsx?$/,
+              loader: require.resolve("awesome-typescript-loader"),
+              options: {
+                  configFileName: "./tsconfig.json",
+              },
+          }
+      ],
   },
   externals: {
     "d3": "d3",
