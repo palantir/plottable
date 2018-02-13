@@ -16,7 +16,6 @@ import * as Scales from "../scales";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
 import * as Plots from "./";
-import { IPlotEntity } from "./";
 import { Plot } from "./plot";
 import { XYPlot } from "./xyPlot";
 
