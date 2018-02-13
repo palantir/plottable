@@ -46,7 +46,7 @@
     "grunt-exec": "1.0.1",
     "grunt-jscs": "2.6.0",
     "grunt-saucelabs": "8.6.2",
-    "jquery": "2.1.0",
+    "jquery": "^3.3.1",
     "load-grunt-tasks": "3.4.0",
     "mocha": "2.2.5",
     "npm-run-all": "4.0.1",
