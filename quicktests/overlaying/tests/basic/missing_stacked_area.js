@@ -17,6 +17,7 @@ function run(svg, data, Plottable) {
   var xAxis = new Plottable.Axes.Category(xScale, "bottom");
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
   var stackedAreaPlot = new Plottable.Plots.StackedArea()
+                                         .renderer("canvas")
                                          .x(function(d) { return d.name; }, xScale)
                                          .y(function(d) { return d.y; }, yScale)
                                          .attr("fill", function(d) { return d.type; }, colorScale)
