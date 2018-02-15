@@ -23,7 +23,7 @@ export class AreaSVGDrawer extends SVGDrawer {
   }
 }
 
-const AREA_FILL_ATTRS = [ "fill", "opacity", "fill-opacity" ];
+const AREA_FILL_ATTRS = [ "fill", "opacity", "fill-opacity", "stroke", "stroke-width" ];
 
 export function makeAreaCanvasDrawStep(d3AreaFactory: () => d3.Area<any>): CanvasDrawStep {
   return (context: CanvasRenderingContext2D, data: any[][], projector: AttributeToAppliedProjector) => {

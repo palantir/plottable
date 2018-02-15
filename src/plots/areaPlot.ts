@@ -157,9 +157,7 @@ export class Area<X> extends Line<X> {
       (ctx) => {
         return new Drawers.CanvasDrawer(ctx, makeAreaCanvasDrawStep(
           () => {
-            const xProjector = Plot._scaledAccessor(this.x());
-            const yProjector = Plot._scaledAccessor(this.y());
-            const y0Projector = Plot._scaledAccessor(this.y0());
+            const [ xProjector, yProjector, y0Projector ] = this._coordinateProjectors();
             const definedProjector = this._createDefinedProjector(xProjector, yProjector);
             return this._createAreaGenerator(xProjector, yProjector, y0Projector, definedProjector, dataset);
           },
@@ -215,13 +213,18 @@ export class Area<X> extends Line<X> {
     return Plot._scaledAccessor(this.y0());
   }
 
-  protected _propertyProjectors(): AttributeToProjector {
-    const propertyToProjectors = super._propertyProjectors();
-    propertyToProjectors["d"] = this._constructAreaProjector(
+  protected _coordinateProjectors(): [Projector, Projector, Projector] {
+    return [
       Plot._scaledAccessor(this.x()),
       Plot._scaledAccessor(this.y()),
       Plot._scaledAccessor(this.y0()),
-    );
+    ];
+  }
+
+  protected _propertyProjectors(): AttributeToProjector {
+    const propertyToProjectors = super._propertyProjectors();
+    const [ xProject, yProjector, y0Projector ] = this._coordinateProjectors();
+    propertyToProjectors["d"] = this._constructAreaProjector(xProject, yProjector, y0Projector);
     return propertyToProjectors;
   }
 
