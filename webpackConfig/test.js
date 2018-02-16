@@ -17,9 +17,23 @@ module.exports = {
     port: 9999,
     inline: false
   },
-  entry: "./build/test/index.js",
+  entry: "./test/index.ts",
   output: {
     filename: "test/tests.js"
+  },
+  resolve: {
+      extensions: [ ".js", ".jsx", ".ts", ".tsx", ".scss" ],
+  },
+  module: {
+      rules: [
+          {
+              test: /\.tsx?$/,
+              loader: require.resolve("awesome-typescript-loader"),
+              options: {
+                  configFileName: "./tsconfig.json",
+              },
+          }
+      ],
   },
   externals: {
     "d3": "d3",
@@ -31,7 +45,7 @@ module.exports = {
     // for files matching the /Tests.js$/ regex. we use .js files because webpack runs on compiled
     // .js files.
     // see https://github.com/webpack/webpack/issues/2783 for info on how this works
-    new webpack.ContextReplacementPlugin(/TestSelector/, ".", true, /Tests.js$/),
+    new webpack.ContextReplacementPlugin(/TestSelector/, ".", true, /Tests.ts$/),
     new webpack.DefinePlugin({
       "__VERSION__": JSON.stringify(packageJson.version)
     })

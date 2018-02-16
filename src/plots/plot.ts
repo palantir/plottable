@@ -390,7 +390,7 @@ export class Plot extends Component {
       this._cachedAttrToProjector = this._generateAttrToProjector();
     }
     // return shallow clone of cached projector
-    return Utils.Object.assign({}, this._cachedAttrToProjector);
+    return Utils.assign({}, this._cachedAttrToProjector);
   }
 
   protected _generateAttrToProjector(): AttributeToProjector {
