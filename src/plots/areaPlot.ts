@@ -161,6 +161,11 @@ export class Area<X> extends Line<X> {
             const definedProjector = this._createDefinedProjector(xProjector, yProjector);
             return this._createAreaGenerator(xProjector, yProjector, y0Projector, definedProjector, dataset);
           },
+          () => {
+            const [ xProjector, yProjector ] = this._coordinateProjectors();
+            const definedProjector = this._createDefinedProjector(xProjector, yProjector);
+            return this._createTopLineGenerator(xProjector, yProjector, definedProjector, dataset);
+          },
         ));
       },
     );
@@ -273,6 +278,21 @@ export class Area<X> extends Line<X> {
         .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
         .y1((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
         .y0((innerDatum, innerIndex) => y0Projector(innerDatum, innerIndex, dataset))
+        .curve(curveFactory)
+        .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset));
+      return areaGenerator;
+  }
+
+  private _createTopLineGenerator(
+    xProjector: Projector,
+    yProjector: Projector,
+    definedProjector: Projector,
+    dataset: Dataset,
+  ) {
+      const curveFactory = this._getCurveFactory() as d3.CurveFactory;
+      const areaGenerator = d3.line()
+        .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
+        .y((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
         .curve(curveFactory)
         .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset));
       return areaGenerator;
