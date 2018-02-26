@@ -18,7 +18,8 @@ machine:
 
 dependencies:
   override:
-    - yarn install --pure-lockfile
+    - yarn install --no-progress
+    - echo "Checking if yarn.lock changed..." && git diff --exit-code
   cache_directories:
     - ~/.cache/yarn
 
