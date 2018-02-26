@@ -11,14 +11,15 @@ general:
     - node_modules/requirejs
 
 machine:
-  node:
-    version: 6.1.0
   environment:
     PATH: "${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin"
+  node:
+    version: 8.8.1
 
 dependencies:
   override:
-    - yarn
+    - yarn install --no-progress
+    - echo "Checking if yarn.lock changed..." && git diff --exit-code
   cache_directories:
     - ~/.cache/yarn
 
