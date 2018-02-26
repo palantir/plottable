@@ -390,7 +390,7 @@ export class Plot extends Component {
       this._cachedAttrToProjector = this._generateAttrToProjector();
     }
     // return shallow clone of cached projector
-    return Utils.Object.assign({}, this._cachedAttrToProjector);
+    return Utils.assign({}, this._cachedAttrToProjector);
   }
 
   protected _generateAttrToProjector(): AttributeToProjector {
@@ -841,7 +841,7 @@ export class Plot extends Component {
       datum: entity.datum,
       index: entity.index,
       position: entity.position,
-      selection: d3.select(entity.drawer.getVisualPrimitives()[entity.validDatumIndex]),
+      selection: d3.select(entity.drawer.getVisualPrimitiveAtIndex(entity.validDatumIndex)),
     };
     return plotEntity;
   }

@@ -486,7 +486,23 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
    * @returns {PlotEntity[]}
    */
   public entitiesAt(p: Point) {
-    return this._entitiesIntersecting(p.x, p.y);
+    const worker = () => this._entitiesIntersecting(p.x, p.y);
+    return this._fixedBarPixelThickness ? this._computeBarPixelThickness.doLocked(worker) : worker();
+  }
+
+  public entitiesInBounds(queryBounds: IEntityBounds): Plots.IPlotEntity[] {
+    const worker = () => super.entitiesInBounds(queryBounds);
+    return this._fixedBarPixelThickness ? this._computeBarPixelThickness.doLocked(worker) : worker();
+  }
+
+  public entitiesInXBounds(queryBounds: IEntityBounds): Plots.IPlotEntity[] {
+    const worker = () => super.entitiesInXBounds(queryBounds);
+    return this._fixedBarPixelThickness ? this._computeBarPixelThickness.doLocked(worker) : worker();
+  }
+
+  public entitiesInYBounds(queryBounds: IEntityBounds): Plots.IPlotEntity[] {
+    const worker = () => super.entitiesInYBounds(queryBounds);
+    return this._fixedBarPixelThickness ? this._computeBarPixelThickness.doLocked(worker) : worker();
   }
 
   private _entitiesIntersecting(xValOrRange: number | Range, yValOrRange: number | Range): IPlotEntity[] {

@@ -8,7 +8,7 @@ import * as d3 from "d3";
 import * as Animators from "../animators";
 import { IAnimator } from "../animators/animator";
 import { Dataset } from "../core/dataset";
-import { AttributeToProjector, IAccessor, Point, SimpleSelection } from "../core/interfaces";
+import { AttributeToProjector, IAccessor, Point, Projector, SimpleSelection } from "../core/interfaces";
 import { memThunk, Thunk } from "../memoize/index";
 import { QuantitativeScale } from "../scales/quantitativeScale";
 import { Scale } from "../scales/scale";
@@ -49,7 +49,6 @@ export class StackedArea<X> extends Area<X> {
     super();
     this._stackingOrder = "bottomup";
     this.addClass("stacked-area-plot");
-    this.attr("fill-opacity", 1);
     this._baselineValueProvider = () => [this._baselineValue];
     this.croppedRenderingEnabled(false);
   }
@@ -235,20 +234,36 @@ export class StackedArea<X> extends Area<X> {
     return domainKeys.values();
   }
 
-  protected _propertyProjectors(): AttributeToProjector {
-    const propertyToProjectors = super._propertyProjectors();
+  protected _coordinateProjectors(): [Projector, Projector, Projector] {
+    const xProjector = Plot._scaledAccessor(this.x());
+
     const yAccessor = this.y().accessor;
     const xAccessor = this.x().accessor;
     const normalizedXAccessor = (datum: any, index: number, dataset: Dataset) => {
       return Utils.Stacking.normalizeKey(xAccessor(datum, index, dataset));
     };
     const stackingResult = this._stackingResult();
-    const stackYProjector = (d: any, i: number, dataset: Dataset) =>
-      this.y().scale.scale(+yAccessor(d, i, dataset) + stackingResult.get(dataset).get(normalizedXAccessor(d, i, dataset)).offset);
-    const stackY0Projector = (d: any, i: number, dataset: Dataset) =>
-      this.y().scale.scale(stackingResult.get(dataset).get(normalizedXAccessor(d, i, dataset)).offset);
+    const stackYProjector = (d: any, i: number, dataset: Dataset) => {
+      const y = +yAccessor(d, i, dataset);
+      const { offset } = stackingResult.get(dataset).get(normalizedXAccessor(d, i, dataset));
+      return this.y().scale.scale(y + offset);
+    };
+    const stackY0Projector = (d: any, i: number, dataset: Dataset) => {
+      const { offset } = stackingResult.get(dataset).get(normalizedXAccessor(d, i, dataset));
+      return this.y().scale.scale(offset);
+    };
 
-    propertyToProjectors["d"] = this._constructAreaProjector(Plot._scaledAccessor(this.x()), stackYProjector, stackY0Projector);
+    return [
+      xProjector,
+      stackYProjector,
+      stackY0Projector,
+    ];
+  }
+
+  protected _propertyProjectors(): AttributeToProjector {
+    const propertyToProjectors = super._propertyProjectors();
+    const [ xProjector, stackYProjector, stackY0Projector ] = this._coordinateProjectors();
+    propertyToProjectors["d"] = this._constructAreaProjector(xProjector, stackYProjector, stackY0Projector);
     return propertyToProjectors;
   }
 

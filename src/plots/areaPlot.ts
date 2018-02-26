@@ -157,11 +157,14 @@ export class Area<X> extends Line<X> {
       (ctx) => {
         return new Drawers.CanvasDrawer(ctx, makeAreaCanvasDrawStep(
           () => {
-            const xProjector = Plot._scaledAccessor(this.x());
-            const yProjector = Plot._scaledAccessor(this.y());
-            const y0Projector = Plot._scaledAccessor(this.y0());
+            const [ xProjector, yProjector, y0Projector ] = this._coordinateProjectors();
             const definedProjector = this._createDefinedProjector(xProjector, yProjector);
             return this._createAreaGenerator(xProjector, yProjector, y0Projector, definedProjector, dataset);
+          },
+          () => {
+            const [ xProjector, yProjector ] = this._coordinateProjectors();
+            const definedProjector = this._createDefinedProjector(xProjector, yProjector);
+            return this._createTopLineGenerator(xProjector, yProjector, definedProjector, dataset);
           },
         ));
       },
@@ -215,13 +218,18 @@ export class Area<X> extends Line<X> {
     return Plot._scaledAccessor(this.y0());
   }
 
-  protected _propertyProjectors(): AttributeToProjector {
-    const propertyToProjectors = super._propertyProjectors();
-    propertyToProjectors["d"] = this._constructAreaProjector(
+  protected _coordinateProjectors(): [Projector, Projector, Projector] {
+    return [
       Plot._scaledAccessor(this.x()),
       Plot._scaledAccessor(this.y()),
       Plot._scaledAccessor(this.y0()),
-    );
+    ];
+  }
+
+  protected _propertyProjectors(): AttributeToProjector {
+    const propertyToProjectors = super._propertyProjectors();
+    const [ xProject, yProjector, y0Projector ] = this._coordinateProjectors();
+    propertyToProjectors["d"] = this._constructAreaProjector(xProject, yProjector, y0Projector);
     return propertyToProjectors;
   }
 
@@ -270,6 +278,21 @@ export class Area<X> extends Line<X> {
         .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
         .y1((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
         .y0((innerDatum, innerIndex) => y0Projector(innerDatum, innerIndex, dataset))
+        .curve(curveFactory)
+        .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset));
+      return areaGenerator;
+  }
+
+  private _createTopLineGenerator(
+    xProjector: Projector,
+    yProjector: Projector,
+    definedProjector: Projector,
+    dataset: Dataset,
+  ) {
+      const curveFactory = this._getCurveFactory() as d3.CurveFactory;
+      const areaGenerator = d3.line()
+        .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
+        .y((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
         .curve(curveFactory)
         .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset));
       return areaGenerator;

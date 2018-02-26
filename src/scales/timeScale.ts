@@ -30,10 +30,10 @@ export class Time extends QuantitativeScale<Date> {
    * @param {number?} [step] The number of multiples of the interval between consecutive ticks.
    * @return {Date[]}
    */
-  public tickInterval(interval: string, step: number = 1): Date[] {
+  public tickInterval(interval: string, step: number = 1, useUTC: boolean = false): Date[] {
     // temporarily creats a time scale from our linear scale into a time scale so we can get access to its api
     const tempScale = d3.scaleTime();
-    const d3Interval = Time.timeIntervalToD3Time(interval).every(step);
+    const d3Interval = Time.timeIntervalToD3Time(interval, useUTC).every(step);
     tempScale.domain(this.domain());
     tempScale.range(this.range());
     return tempScale.ticks(d3Interval);
@@ -128,22 +128,22 @@ export class Time extends QuantitativeScale<Date> {
    * Transforms the Plottable TimeInterval string into a d3 time interval equivalent.
    * If the provided TimeInterval is incorrect, the default is d3.timeYear
    */
-  public static timeIntervalToD3Time(timeInterval: string): d3.CountableTimeInterval {
+  public static timeIntervalToD3Time(timeInterval: string, useUTC: boolean): d3.CountableTimeInterval {
     switch (timeInterval) {
       case TimeInterval.second:
-        return d3.timeSecond;
+        return useUTC ? d3.utcSecond : d3.timeSecond;
       case TimeInterval.minute:
-        return d3.timeMinute;
+        return useUTC ? d3.utcMinute : d3.timeMinute;
       case TimeInterval.hour:
-        return d3.timeHour;
+        return useUTC ? d3.utcHour : d3.timeHour;
       case TimeInterval.day:
-        return d3.timeDay;
+        return useUTC ? d3.utcDay : d3.timeDay;
       case TimeInterval.week:
-        return d3.timeWeek;
+        return useUTC ? d3.utcWeek : d3.timeWeek;
       case TimeInterval.month:
-        return d3.timeMonth;
+        return useUTC ? d3.utcMonth : d3.timeMonth;
       case TimeInterval.year:
-        return d3.timeYear;
+        return useUTC ? d3.utcYear : d3.timeYear;
       default:
         throw Error("TimeInterval specified does not exist: " + timeInterval);
     }

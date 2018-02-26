@@ -14,5 +14,6 @@ export * from "./legend";
 export * from "./plotGroup";
 export * from "./selectionBoxLayer";
 export * from "./table";
+export * from "./wrappedLabel";
 export * from "./xDragBoxLayer";
 export * from "./yDragBoxLayer";

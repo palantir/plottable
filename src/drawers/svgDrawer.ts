@@ -36,6 +36,7 @@ export class SVGDrawer implements IDrawer {
    * Cache of the _selection.nodes().
    */
   private _cachedVisualPrimitivesNodes: Element[];
+  private _cachedVisualPrimitivesNodeMap: Utils.Map<number, Element>;
 
   /**
    * @param svgElementName an HTML/SVG tag name to be created, one per datum.
@@ -71,7 +72,10 @@ export class SVGDrawer implements IDrawer {
   }
 
   public getVisualPrimitiveAtIndex(index: number) {
-    return this.getVisualPrimitives()[index];
+    if (this._cachedVisualPrimitivesNodeMap == null) {
+      return null;
+    }
+    return this._cachedVisualPrimitivesNodeMap.get(index);
   }
 
   public remove() {
@@ -99,20 +103,35 @@ export class SVGDrawer implements IDrawer {
   }
 
   private _createAndDestroyDOMElements(data: any[]) {
+    // first store source data index before any filtering takes place
+    const mappedData = data.map((d, i) => d != null ? { d, i } : null);
+
     // Whereas canvas renders can cope with null data values, svg renderer
     // attribute accessors assume non-null data values, so we must filter them
     // out. Unfortunately, this means the index passed to each accessor will
     // not necessarily match the index of the datum in the dataset.
-    const filteredData = data.filter((d) => d != null);
+    const filteredData = mappedData.filter((d) => d != null);
     const dataElementsUpdate = this._root.selectAll<Element, any>(this.selector()).data(filteredData);
 
-    this._selection =
-      dataElementsUpdate
+    this._selection = dataElementsUpdate
         .enter()
         .append<Element>(this._svgElementName)
         .merge(dataElementsUpdate);
     dataElementsUpdate.exit().remove();
+
+    // build map of source data index to Element
+    const newMap = new Utils.Map<number, Element>();
+    this._selection.each(function (dataAndIndex) {
+      // TODO optionally attach data attributes to Element
+      // this.setAttribute("data-source-data", dataAndIndex.d);
+      // this.setAttribute("data-source-index", dataAndIndex.i);
+      newMap.set(dataAndIndex.i, this);
+    });
+    this._cachedVisualPrimitivesNodeMap = newMap;
     this._cachedVisualPrimitivesNodes = null;
+
+    // unwrap data now that elements match their original data index
+    this._selection.data(this._selection.data().map(({ d }) => d));
 
     if (this._className != null) {
       this._selection.classed(this._className, true);

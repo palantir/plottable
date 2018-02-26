@@ -47,7 +47,8 @@ Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)`;
  */
 module.exports = {
   devtool: "source-map",
-  entry: "./build/src/index.js",
+  entry: "./src/index.ts",
+
   output: {
     filename: "plottable.js",
     // adds the UMD header to allow export to AMD, commonJS, or global
@@ -55,10 +56,28 @@ module.exports = {
     // the name of the AMD/commonJS/global
     library: "Plottable"
   },
+
   externals: {
     // don't bundle d3 but instead it request it externally
     "d3": "d3"
   },
+
+  module: {
+    rules: [
+        {
+            test: /\.tsx?$/,
+            loader: require.resolve("awesome-typescript-loader"),
+            options: {
+                configFileName: "./tsconfig.json",
+            },
+        },
+    ],
+  },
+
+  resolve: {
+    extensions: [ ".js", ".jsx", ".ts", ".tsx", ".scss" ],
+  },
+
   plugins: [
     new webpack.BannerPlugin({
       banner: LICENSE_HEADER,
