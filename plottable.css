@@ -109,19 +109,16 @@
 }
 
 .plottable .label text {
-  font-family: "Helvetica Neue", sans-serif;
   fill: #32313F;
 }
 
 .plottable .bar-label-text-area text,
 .plottable .scatter-label-text-area text {
-  font-family: "Helvetica Neue", sans-serif;
   font-size: 12px;
 }
 
 .plottable .label-area text {
   fill: #32313F;
-  font-family: "Helvetica Neue", sans-serif;
   font-size: 14px;
 }
 
@@ -172,7 +169,6 @@
 
 .plottable .axis text {
   fill: #32313F;
-  font-family: "Helvetica Neue", sans-serif;
   font-size: 12px;
   font-weight: 200;
   line-height: normal;
@@ -260,7 +256,6 @@
 
 .plottable .legend text {
   fill: #32313F;
-  font-family: "Helvetica Neue", sans-serif;
   font-size: 12px;
   font-weight: bold;
   line-height: normal;
