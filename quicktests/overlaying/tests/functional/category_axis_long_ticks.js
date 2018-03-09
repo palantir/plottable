@@ -185,6 +185,7 @@ function run(svg, data, Plottable) {
 
     var yAxis = new Plottable.Axes.Numeric(yScale, "left");
     var xAxis = new Plottable.Axes.Category(xScale, "bottom");
+    xAxis.tickLabelBreakWords(false);
 
     var dataset = new Plottable.Dataset(data);
 
