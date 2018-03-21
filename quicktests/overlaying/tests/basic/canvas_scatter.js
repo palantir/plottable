@@ -1,3 +1,7 @@
+
+const POINT_COUNT = 100*1000;
+const BUFFER_INVALIDATE_PERIOD = 100;
+
 function makeData() {
   "use strict";
 
@@ -10,7 +14,7 @@ function makeData() {
   };
 
   var data = [];
-  for (var i = 0; i < 100*1000; i++) {
+  for (var i = 0; i < POINT_COUNT; i++) {
     data.push(boxMuller({
       x: Math.random(),
       y: Math.random(),
@@ -24,6 +28,7 @@ function run(div, data, Plottable) {
 
   var xScale = new Plottable.Scales.Linear();
   var yScale = new Plottable.Scales.Linear();
+  var colorScale = new Plottable.Scales.Color();
   var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
@@ -39,10 +44,11 @@ function run(div, data, Plottable) {
     .renderer("canvas")
     .deferredRendering(true)
     .addDataset(new Plottable.Dataset(data))
+    .attr("fill", (d, i) => colorScale.scale(Math.floor(i / BUFFER_INVALIDATE_PERIOD) % 50))
     .x((d) => d.x, xScale)
     .y((d) => d.y, yScale)
-    .size((d, i) => 6 + (Math.floor(i / 100) % 6) * 4)
-    .symbol((d, i) => symbols[Math.floor(i / 100) % 3]);
+    .size((d, i) => 6 + (Math.floor(i / BUFFER_INVALIDATE_PERIOD) % 6) * 4)
+    .symbol((d, i) => symbols[Math.floor(i / BUFFER_INVALIDATE_PERIOD) % 3]);
 
   var table = new Plottable.Components.Table([
     [yAxis, plot],
