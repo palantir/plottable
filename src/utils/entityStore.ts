@@ -3,7 +3,6 @@
  * @license MIT
  */
 
-import * as d3 from "d3";
 import { Bounds, IEntityBounds, Point } from "../core/interfaces";
 import { RTree, RTreeBounds } from "./rTree";
 
@@ -42,6 +41,24 @@ export interface IEntityStore<T extends IPositionedEntity> {
    * @returns {T} Will return the nearest entity or undefined if none are found
    */
   entityNearest(point: Point): T;
+
+  /**
+   * Returns the entity closest to a given {Point} in the x-dimension. Ties are
+   * broken with a sort in the y-dimension.
+   *
+   * @param {Point} [point] Point around which to search for a closest entity
+   * @returns {T} Will return the nearest entity or undefined if none are found
+   */
+  entityNearestX(point: Point): T;
+
+  /**
+   * Returns the entity closest to a given {Point} in the y-dimension. Ties are
+   * broken with a sort in the x-dimension.
+   *
+   * @param {Point} [point] Point around which to search for a closest entity
+   * @returns {T} Will return the nearest entity or undefined if none are found
+   */
+  entityNearestY(point: Point): T;
 
   /**
    * Returns the entites whose bounding boxes overlap the parameter.
@@ -84,17 +101,11 @@ export interface IEntityStore<T extends IPositionedEntity> {
  */
 export class EntityStore<T extends IPositionedEntity> implements IEntityStore<T> {
   private _entities: T[];
-  private _tree: d3.Quadtree<T>;
   private _rtree: RTree<T>;
 
   constructor() {
     this._entities = [];
     this._rtree = new RTree<T>();
-    this._tree = d3.quadtree<T>()
-      // Flooring for faster computation. losing sub-pixel precision here is
-      // of no concern.
-      .x((d) => Math.floor(d.position.x))
-      .y((d) => Math.floor(d.position.y));
   }
 
   public addAll(entities: T[], entityBoundsFactory: (entity: T) => IEntityBounds, bounds?: Bounds) {
@@ -107,12 +118,10 @@ export class EntityStore<T extends IPositionedEntity> implements IEntityStore<T>
         const entity = entities[i];
         const entityBounds = RTreeBounds.entityBounds(entityBoundsFactory(entity));
         if (RTreeBounds.isBoundsOverlapBounds(filterBounds, entityBounds)) {
-          this._tree.add(entity);
           this._rtree.insert(entityBounds, entity);
         }
       }
     } else {
-      this._tree.addAll(entities);
       for (let i = 0; i < entities.length; i++) {
         const entity = entities[i];
         const entityBounds = RTreeBounds.entityBounds(entityBoundsFactory(entity));
@@ -122,7 +131,15 @@ export class EntityStore<T extends IPositionedEntity> implements IEntityStore<T>
   }
 
   public entityNearest(queryPoint: Point) {
-    return this._tree.find(queryPoint.x, queryPoint.y);
+    return this._rtree.locateNearest(queryPoint).pop();
+  }
+
+  public entityNearestX(queryPoint: Point) {
+    return this._rtree.locateNearestX(queryPoint).pop();
+  }
+
+  public entityNearestY(queryPoint: Point) {
+    return this._rtree.locateNearestY(queryPoint).pop();
   }
 
   public entitiesInBounds(bounds: IEntityBounds) {

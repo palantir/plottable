@@ -24,6 +24,73 @@ const DEFAULT_MAX_NODE_CHILDREN = 5;
 const DEFAULT_SPLIT_STRATEGY: IRTreeSplitStrategy = new SplitStrategyLinear();
 
 /**
+ * The return result of predicates used with `RTree.queryNodes`.
+ *
+ * The `PASS_AND_OVERWRITE` value will overwrite previous results
+ * when the predicate finds a more optimal result.
+ */
+export enum QueryPredicateResult {
+    PASS,
+    FAIL,
+    PASS_AND_OVERWRITE,
+}
+
+/**
+ * Returns the absolute distance to the nearest point on the edge of bounds or 0
+ * if the point is in bounds.
+ */
+export type IDistanceFunction = (bounds: RTreeBounds, p: Point) => number;
+
+/**
+ * Creates a node predicate for use with `RTree.queryNodes`
+ *
+ * @param point - the query point
+ * @param nearFn - an `IDistanceFunction` from the query point to the nearest
+ * point on the node bounds
+ * @param farFn - an `IDistanceFunction` from the query point to the farthest
+ * point on the node bounds
+ */
+export function createMinimizingNodePredicate<T>(point: Point, nearFn: IDistanceFunction, farFn: IDistanceFunction) {
+    let nearestLeafDistance = Infinity;
+    let nearestBranchDistance = Infinity;
+    let farthestBranchDistance = Infinity;
+    return (node: RTreeNode<T>) => {
+        const near = nearFn(node.bounds, point);
+        const far = farFn(node.bounds, point);
+        // assumption: node.value indicates that parent is a leaf
+        if (node.value != null) {
+            if (near < nearestLeafDistance) {
+                nearestLeafDistance = near;
+                nearestBranchDistance = near;
+                farthestBranchDistance = far;
+                return QueryPredicateResult.PASS_AND_OVERWRITE;
+            } else if (near === nearestLeafDistance) {
+                return QueryPredicateResult.PASS;
+            } else {
+                return QueryPredicateResult.FAIL;
+            }
+        } else {
+            if (near > farthestBranchDistance) {
+                return QueryPredicateResult.FAIL;
+            } else {
+                nearestBranchDistance = Math.min(near, nearestBranchDistance);
+                farthestBranchDistance = Math.max(far, farthestBranchDistance);
+                return QueryPredicateResult.PASS;
+            }
+        }
+    };
+}
+
+/**
+ * Create a `Array.sort` function from a query point and a distance function.
+ */
+export function createNodeSort<T>(point: Point, distanceFn: IDistanceFunction) {
+    return (a: RTreeNode<T>, b: RTreeNode<T>) => {
+        return distanceFn(b.bounds, point) - distanceFn(a.bounds, point);
+    };
+}
+
+/**
  * R-Tree is a multidimensional spatial region tree. It stores entries that have
  * arbitrarily overlapping bounding boxes and supports efficient point and
  * bounding box overlap queries.
@@ -84,6 +151,63 @@ export class RTree<T> {
         return this.query((b) => b.contains(xy));
     }
 
+    /**
+     * Returns an array of `T` values that are the "nearest" to the query point.
+     *
+     * Nearness is measured as the absolute distance from the query point to the
+     * nearest edge of the node bounds. If the node bounds contains the query
+     * point, the distance is 0.
+     */
+    public locateNearest(xy: Point) {
+        const predicate = createMinimizingNodePredicate(
+            xy,
+            RTreeBounds.distanceSquaredToNearEdge,
+            RTreeBounds.distanceSquaredToFarEdge,
+        );
+        const nodes = this.queryNodes(predicate);
+        return nodes.map((node) => node.value);
+    }
+
+    /**
+     * Returns an array of `T` values that are the "nearest" to the query point.
+     *
+     * Nearness is measured as the 1-dimensional absolute distance from the
+     * query's x point to the nearest edge of the node bounds. If the node
+     * bounds contains the query point, the distance is 0.
+     *
+     * The results are sorted by y-coordinate nearness.
+     */
+    public locateNearestX(xy: Point) {
+        const predicate = createMinimizingNodePredicate(
+            xy,
+            RTreeBounds.absoluteDistanceToNearEdgeX,
+            RTreeBounds.absoluteDistanceToFarEdgeX,
+        );
+        const nodes = this.queryNodes(predicate);
+        nodes.sort(createNodeSort(xy, RTreeBounds.absoluteDistanceToNearEdgeY));
+        return nodes.map((node) => node.value);
+    }
+
+    /**
+     * Returns an array of `T` values that are the "nearest" to the query point.
+     *
+     * Nearness is measured as the 1-dimensional absolute distance from the
+     * query's y point to the nearest edge of the node bounds. If the node
+     * bounds contains the query point, the distance is 0.
+     *
+     * The results are sorted by x-coordinate nearness.
+     */
+    public locateNearestY(xy: Point) {
+        const predicate = createMinimizingNodePredicate(
+            xy,
+            RTreeBounds.absoluteDistanceToNearEdgeY,
+            RTreeBounds.absoluteDistanceToFarEdgeY,
+        );
+        const nodes = this.queryNodes(predicate);
+        nodes.sort(createNodeSort(xy, RTreeBounds.absoluteDistanceToNearEdgeX));
+        return nodes.map((node) => node.value);
+    }
+
     public intersect(bounds: RTreeBounds) {
         return this.query((b) => RTreeBounds.isBoundsOverlapBounds(b, bounds));
     }
@@ -110,6 +234,33 @@ export class RTree<T> {
                 if (predicate(entry.bounds)) {
                     if (candidate.leaf) {
                         results.push(entry.value);
+                    } else {
+                        candidates.push(entry);
+                    }
+                }
+            }
+        }
+        return results;
+    }
+
+    public queryNodes(predicate: (b: RTreeNode<T>) => QueryPredicateResult) {
+        let results: RTreeNode<T>[] = [];
+        if (this.root.bounds != null && predicate(this.root) === QueryPredicateResult.FAIL) {
+            return results;
+        }
+
+        const candidates = [this.root];
+        while (candidates.length > 0) {
+            const candidate = candidates.shift();
+            for (let i = 0; i < candidate.entries.length; i++) {
+                const entry = candidate.entries[i];
+                const p = predicate(entry);
+                if (p === QueryPredicateResult.PASS_AND_OVERWRITE) {
+                    results = [];
+                }
+                if (p === QueryPredicateResult.PASS || p === QueryPredicateResult.PASS_AND_OVERWRITE) {
+                    if (candidate.leaf) {
+                        results.push(entry);
                     } else {
                         candidates.push(entry);
                     }
@@ -233,6 +384,8 @@ export class RTreeNode<T> {
         const parent = this.parent != null ? this.parent : new RTreeNode<T>(false);
         parent.insert(children[0]);
         parent.insert(children[1]);
+        // Always make the parent a non-leaf after split
+        parent.leaf = false;
         return parent;
     }
 
@@ -339,6 +492,70 @@ export class RTreeBounds {
      */
     public static isBoundsOverlapY(a: RTreeBounds, b: RTreeBounds) {
         return !(a.yh < b.yl) && !(a.yl > b.yh);
+    }
+
+    /**
+     * Returns the orthogonal absolute distance in the x-dimension from point
+     * `p` to the nearest edge of `bounds`.
+     *
+     * If `p.x` is inside the bounds returns `0`.
+     */
+    public static absoluteDistanceToNearEdgeX(bounds: RTreeBounds, p: Point) {
+        const half = bounds.width / 2;
+        const mid = bounds.xl + half;
+        return Math.max(Math.abs(p.x - mid) - half, 0);
+    }
+
+    /**
+     * Returns the orthogonal absolute distance in the y-dimension from point
+     * `p` to the nearest edge of `bounds`.
+     *
+     * If `p.y` is inside the bounds returns `0`.
+     */
+    public static absoluteDistanceToNearEdgeY(bounds: RTreeBounds, p: Point) {
+        const half = bounds.height / 2;
+        const mid = bounds.yl + half;
+        return Math.max(Math.abs(p.y - mid) - half, 0);
+    }
+
+    /**
+     * Returns the orthogonal absolute distance in the x-dimension from point
+     * `p` to the farthest edge of `bounds`.
+     *
+     * If `p.x` is inside the bounds returns `0`.
+     */
+    public static absoluteDistanceToFarEdgeX(bounds: RTreeBounds, p: Point) {
+        const near = RTreeBounds.absoluteDistanceToNearEdgeX(bounds, p);
+        return near === 0 ? 0 : near + bounds.width;
+    }
+
+    /**
+     * Returns the orthogonal absolute distance in the y-dimension from point
+     * `p` to the farthest edge of `bounds`.
+     *
+     * If `p.y` is inside the bounds returns `0`.
+     */
+    public static absoluteDistanceToFarEdgeY(bounds: RTreeBounds, p: Point) {
+        const near = RTreeBounds.absoluteDistanceToNearEdgeY(bounds, p);
+        return near === 0 ? 0 : near + bounds.height;
+    }
+
+    /**
+     * Returns the distance squared from `p` to the nearest edge of `bounds`. If
+     * the point touches or is inside the bounds, returns `0`;
+     *
+     * https://gamedev.stackexchange.com/questions/44483/how-do-i-calculate-distance-between-a-point-and-an-axis-aligned-rectangle
+     */
+    public static distanceSquaredToNearEdge(bounds: RTreeBounds, p: Point) {
+        const dx = RTreeBounds.absoluteDistanceToNearEdgeX(bounds, p);
+        const dy = RTreeBounds.absoluteDistanceToNearEdgeY(bounds, p);
+        return dx * dx + dy * dy;
+    }
+
+    public static distanceSquaredToFarEdge(bounds: RTreeBounds, p: Point) {
+        const dx = RTreeBounds.absoluteDistanceToFarEdgeX(bounds, p);
+        const dy = RTreeBounds.absoluteDistanceToFarEdgeY(bounds, p);
+        return dx * dx + dy * dy;
     }
 
     public width: number;
