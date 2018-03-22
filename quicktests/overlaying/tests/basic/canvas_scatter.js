@@ -50,14 +50,14 @@ function run(div, data, Plottable) {
     .renderer("canvas")
     .deferredRendering(false)
     .addDataset(hoverData)
-    .attr("fill", (d) => null)
-    .attr("stroke", (d) => "lime")
+    .attr("fill", () => null)
+    .attr("stroke", () => "lime")
     .attr("stroke-width", () => 5)
-    .attr("opacity", (d) => 1)
+    .attr("opacity", () => 1)
     .x((d) => xScale.scale(d.x)) // don't use second argument so that scale doesn't recompute from other data on every render
     .y((d) => yScale.scale(d.y))
-    .size((d) => 30)
-    .symbol((d) => hoverDot);
+    .size(() => 30)
+    .symbol(() => hoverDot);
 
   var table = new Plottable.Components.Table([
     [yAxis, new Plottable.Components.Group([plot, hoverIndicator])],
