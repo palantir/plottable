@@ -51,6 +51,7 @@ export type BarAlignment = keyof typeof BarAlignment;
 
 export class Bar<X, Y> extends XYPlot<X, Y> {
   public static _BAR_THICKNESS_RATIO = 0.95;
+  public static _BAR_GAPLESS_THRESHOLD_PX = 3;
   public static _SINGLE_BAR_DIMENSION_RATIO = 0.4;
   private static _BAR_AREA_CLASS = "bar-area";
   private static _BAR_END_KEY = "barEnd";
@@ -751,7 +752,11 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     const thicknessF = attrToProjector[Bar._BAR_THICKNESS_KEY];
     const gapF = attrToProjector["gap"];
     const thicknessMinusGap = gapF == null ? thicknessF : (d: any, i: number, dataset: Dataset) => {
-      return thicknessF(d, i, dataset) - gapF(d, i, dataset);
+      const thick = thicknessF(d, i, dataset);
+      // only subtract gap if bars are at least 2 pixels wide, otherwise canvas
+      // interpolation can cause bars to become invisible due to subpixel
+      // sampling
+      return thick < Bar._BAR_GAPLESS_THRESHOLD_PX ? thick : thick - gapF(d, i, dataset);
     };
 
     // re-interpret "width" attr from representing "thickness" to actually meaning
