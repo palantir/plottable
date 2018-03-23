@@ -9,6 +9,40 @@ import * as Utils from "../utils";
 
 import { Scale } from "./scale";
 
+/**
+ * Workaround for bad d3 behavior.
+ *
+ * d3's color scales, which are oridinal scales, have side-effects when invoked.
+ * When you call the `scale(value)` as a function, it will implicitly add new
+ * values to the domain.
+ *
+ * These side-effects cause us to rely on looking up the current scale state
+ * with the `.domain()` and `.range()` methods. However, these methods have poor
+ * performance implications since they will always slice their internal values
+ * before returning. Inside the inner render loop of color scatter plot points,
+ * these slices add up.
+ */
+class ImplicitSeriesTracker {
+  public count = 0;
+  private tracker: Record<string, number> = {};
+
+  public getIndex(value: string) {
+    if (this.tracker[value] != null) {
+      return this.tracker[value];
+    } else{
+      const idx = this.count;
+      this.tracker[value] = idx;
+      this.count += 1;
+      return idx;
+    }
+  }
+
+  public clear() {
+    this.count = 0;
+    this.tracker = {};
+  }
+}
+
 export class Color extends Scale<string, string> {
 
   private static _LOOP_LIGHTEN_FACTOR = 1.6;
@@ -18,6 +52,9 @@ export class Color extends Scale<string, string> {
   private static _plottableColorCache: string[];
 
   private _d3Scale: d3.ScaleOrdinal<string, string>;
+  // Cache the number of range value to avoid calling `scale.range().length`
+  private _rangeLength = 1;
+  private _tracker = new ImplicitSeriesTracker();
 
   /**
    * A Color Scale maps string values to color hex values expressed as a string.
@@ -62,6 +99,7 @@ export class Color extends Scale<string, string> {
         throw new Error("Unsupported ColorScale type");
     }
     this._d3Scale = scale;
+    this._rangeLength = this._d3Scale.range().length;
   }
 
   public extentOfValues(values: string[]) {
@@ -99,15 +137,20 @@ export class Color extends Scale<string, string> {
 
   /**
    * Returns the color-string corresponding to a given string.
-   * If there are not enough colors in the range(), a lightened version of an existing color will be used.
+   *
+   * If there are not enough colors in the range(), a lightened version of an
+   * existing color will be used.
    *
    * @param {string} value
    * @returns {string}
    */
   public scale(value: string): string {
     const color = this._d3Scale(value);
-    const index = this.domain().indexOf(value);
-    const numLooped = Math.floor(index / this.range().length);
+    const index = this._tracker.getIndex(value);
+    const numLooped = Math.floor(index / this._rangeLength);
+    if (numLooped === 0) {
+      return color;
+    }
     const modifyFactor = Math.log(numLooped * Color._LOOP_LIGHTEN_FACTOR + 1);
     return Utils.Color.lightenColor(color, modifyFactor);
   }
@@ -123,6 +166,7 @@ export class Color extends Scale<string, string> {
       return this._d3Scale.domain();
     } else {
       this._d3Scale.domain(values);
+      this._tracker.clear();
       return this;
     }
   }
@@ -133,5 +177,6 @@ export class Color extends Scale<string, string> {
 
   protected _setRange(values: string[]) {
     this._d3Scale.range(values);
+    this._rangeLength = values.length;
   }
 }
