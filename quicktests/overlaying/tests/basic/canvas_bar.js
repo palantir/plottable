@@ -1,13 +1,12 @@
 function makeData() {
   "use strict";
 
-  // makes 10 datasets of 10000 points
   return Array.apply(null, Array(1)).map((_, datasetIndex) => {
-    return Array.apply(null, Array(5*10000)).map((_, i) => {
+    return Array.apply(null, Array(1000)).map((_, i) => {
       return {
         // one data point per day, offset by one hour per dataset
         x: new Date(i * 1000 * 3600 * 24 + datasetIndex * 1000 * 3600),
-        y: datasetIndex + Math.random()
+        y: datasetIndex + 10 + Math.random()
       };
     });
   });
@@ -30,8 +29,9 @@ function run(div, data, Plottable) {
     .renderer("canvas")
     .deferredRendering(true)
     .x((d) => d.x, xScale)
+    .barEnd((d) => new Date(1000 * 3600 * 24 + d.x.valueOf()))
     .y((d) => d.y, yScale)
-    .attr("gap", () => 0)
+    .attr("gap", () => 1)
     .attr("fill", (d,i,ds) => ds.metadata(), colorScale);
 
   var table = new Plottable.Components.Table([
