@@ -29,7 +29,6 @@ import * as Utils from "../utils";
 import { makeEnum } from "../utils/makeEnum";
 import * as Plots from "./";
 import { IPlotEntity } from "./";
-import { ILightweightPlotEntity } from "./commons";
 import { Plot } from "./plot";
 import { XYPlot } from "./xyPlot";
 
@@ -410,73 +409,13 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
    * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
    */
   public entityNearest(queryPoint: Point): IPlotEntity {
-    return this._computeBarPixelThickness.doLocked(() => {
-      const queryPtPrimary = this._isVertical ? queryPoint.x : queryPoint.y;
-      const queryPtSecondary = this._isVertical ? queryPoint.y : queryPoint.x;
-
-      // SVGRects are positioned with sub-pixel accuracy (the default unit
-      // for the x, y, height & width attributes), but user selections (e.g. via
-      // mouse events) usually have pixel accuracy. We add a tolerance of 0.5 pixels.
-      const tolerance = 0.5;
-
-      // PERF: precompute all these values to prevent recomputing for each entity
-      const chartBounds = this.bounds();
-      const chartWidth = chartBounds.bottomRight.x - chartBounds.topLeft.x;
-      const chartHeight = chartBounds.bottomRight.y - chartBounds.topLeft.y;
-      const xRange = { min: 0, max: chartWidth };
-      const yRange = { min: 0, max: chartHeight };
-      const originalPositionProjector = Plot._scaledAccessor(this.length());
-      const scaledBaseline = this.length().scale.scale(this.baselineValue());
-      const plotPointFactory = (datum: any, index: number, dataset: Dataset, rect: IEntityBounds) => {
-        return this._pixelPointBar(originalPositionProjector(datum, index, dataset), scaledBaseline, rect);
-      };
-
-      let minPrimaryDist = Infinity;
-      let minSecondaryDist = Infinity;
-      let closest: ILightweightPlotEntity;
-      this._getEntityStore().entities().forEach((entity: ILightweightPlotEntity) => {
-        const barBBox = this._entityBounds(entity);
-        if (!Utils.DOM.intersectsBBox(xRange, yRange, barBBox)) {
-          return;
-        }
-
-        let primaryDist = 0;
-        let secondaryDist = 0;
-
-        // if we're inside a bar, distance in both directions should stay 0
-        if (!Utils.DOM.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
-          const plotPt = plotPointFactory(entity.datum, entity.index, entity.dataset, barBBox);
-          const plotPtPrimary = this._isVertical ? plotPt.x : plotPt.y;
-          primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
-
-          // compute this bar's min and max along the secondary axis
-          const barMinSecondary = this._isVertical ? barBBox.y : barBBox.x;
-          const barMaxSecondary = barMinSecondary + (this._isVertical ? barBBox.height : barBBox.width);
-
-          if (queryPtSecondary >= barMinSecondary - tolerance && queryPtSecondary <= barMaxSecondary + tolerance) {
-            // if we're within a bar's secondary axis span, it is closest in that direction
-            secondaryDist = 0;
-          } else {
-            const plotPtSecondary = this._isVertical ? plotPt.y : plotPt.x;
-            secondaryDist = Math.abs(queryPtSecondary - plotPtSecondary);
-          }
-        }
-
-        // if we find a closer bar, record its distance and start new closest lists
-        if (primaryDist < minPrimaryDist
-          || primaryDist === minPrimaryDist && secondaryDist < minSecondaryDist) {
-          closest = entity;
-          minPrimaryDist = primaryDist;
-          minSecondaryDist = secondaryDist;
-        }
-      });
-
-      if (closest !== undefined) {
-        return this._lightweightPlotEntityToPlotEntity(closest);
-      } else {
-        return undefined;
-      }
-    });
+    const worker = () => {
+      const nearest = this._isVertical ?
+        this._getEntityStore().entityNearestX(queryPoint) :
+        this._getEntityStore().entityNearestY(queryPoint);
+      return nearest === undefined ? undefined : this._lightweightPlotEntityToPlotEntity(nearest);
+    };
+    return this._fixedBarPixelThickness ? this._computeBarPixelThickness.doLocked(worker) : worker();
   }
 
   /**

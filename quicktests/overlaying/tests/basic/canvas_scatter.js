@@ -50,10 +50,49 @@ function run(div, data, Plottable) {
     .size((d, i) => 6 + (Math.floor(i / BUFFER_INVALIDATE_PERIOD) % 6) * 4)
     .symbol((d, i) => symbols[Math.floor(i / BUFFER_INVALIDATE_PERIOD) % 3]);
 
+  var hoverDot = new Plottable.SymbolFactories.circle();
+  var hoverData = new Plottable.Dataset([{x: 0, y: 0}]);
+  var hoverIndicator = new Plottable.Plots.Scatter()
+    .renderer("canvas")
+    .deferredRendering(false)
+    .addDataset(hoverData)
+    .attr("fill", () => null)
+    .attr("stroke", () => "lime")
+    .attr("stroke-width", () => 5)
+    .attr("opacity", () => 1)
+    .x((d) => xScale.scale(d.x)) // don't use second argument so that scale doesn't recompute from other data on every render
+    .y((d) => yScale.scale(d.y))
+    .size(() => 30)
+    .symbol(() => hoverDot);
+
   var table = new Plottable.Components.Table([
-    [yAxis, plot],
+    [yAxis, new Plottable.Components.Group([plot, hoverIndicator])],
     [null, xAxis]
   ]);
+
+  const defaultEntityLabel = "Hover for nearest entity";
+  const nearestEntityLabel = div.append("div").style("text-align", "center").text(defaultEntityLabel);
+  new Plottable.Interactions.Pointer()
+    .onPointerMove((p) => {
+      const nearestEntity = plot.entityNearest(p);
+      let text = defaultEntityLabel;
+      if (nearestEntity != null) {
+        const datum = nearestEntity.datum;
+        if (datum != null) {
+          text = `Nearest Entity: ${datum.x.toFixed(4)} ${datum.y.toFixed(4)}`;
+        }
+        hoverData.data([datum]);
+        nearestEntityLabel.text(text);
+      } else {
+        hoverData.data([]);
+        nearestEntityLabel.text(defaultEntityLabel);
+      }
+
+    })
+    .onPointerExit(() => {
+      nearestEntityLabel.text(defaultEntityLabel);
+    })
+    .attachTo(plot);
 
   var panZoom = new Plottable.Interactions.PanZoom(xScale, yScale).attachTo(plot);
 
