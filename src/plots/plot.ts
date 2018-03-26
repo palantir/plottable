@@ -795,11 +795,11 @@ export class Plot extends Component {
    * before upconverting them to full plot entities
    * @return {Plots.PlotEntity[]}
    */
-  public filterEntities(where: (entity: Plots.ILightweightPlotEntity) => boolean): Plots.IPlotEntity[] {
-      return this._getEntityStore()
-        .entities()
-        .filter(where)
-        .map((entity) => this._lightweightPlotEntityToPlotEntity(entity));
+  public filterEntities(where: (entity: Plots.ILightweightPlotEntity, index: number) => boolean): Plots.IPlotEntity[] {
+    return this._getEntityStore()
+      .entities()
+      .filter(where)
+      .map((entity) => this._lightweightPlotEntityToPlotEntity(entity));
   }
 
   /**
