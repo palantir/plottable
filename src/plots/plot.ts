@@ -786,6 +786,23 @@ export class Plot extends Component {
   }
 
   /**
+   * Gets the `Plots.PlotEntity`s in the plot, whereby the
+   * `Plots.ILightweightPlotEntity`s are filtered by the provided predicate.
+   * Since `_lightweightPlotEntityToPlotEntity` can be expensive, this method
+   * can be useful for performance optimization.
+   *
+   * @param where A filter predicate that is applied to lightweight entities
+   * before upconverting them to full plot entities
+   * @return {Plots.PlotEntity[]}
+   */
+  public filterEntities(where: (entity: Plots.ILightweightPlotEntity, index: number) => boolean): Plots.IPlotEntity[] {
+    return this._getEntityStore()
+      .entities()
+      .filter(where)
+      .map((entity) => this._lightweightPlotEntityToPlotEntity(entity));
+  }
+
+  /**
    * _getEntityStore returns the store of all Entities associated with the specified dataset
    *
    * @param {Dataset[]} [datasets] - The datasets with which to construct the store. If no datasets
