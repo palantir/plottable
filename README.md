@@ -14,7 +14,7 @@ Plottable is used and developed at [Palantir Technologies](http://palantir.com/)
 - Get Plottable:
   - npm: `npm install --save plottable`
   - yarn: `yarn add plottable`
-  - [unpkg](https://unpkg.com/plottable/plottable.min.js)
+  - [jsdelivr](https://cdn.jsdelivr.net/npm/plottable@3/plottable.min.js)
 - [Check out examples](http://plottablejs.org/examples/)
 - [Read the tutorials](http://plottablejs.org/tutorials/)
 - [Visit the website, plottablejs.org](http://plottablejs.org/)
