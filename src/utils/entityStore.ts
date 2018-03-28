@@ -109,7 +109,7 @@ export class EntityStore<T extends IPositionedEntity> implements IEntityStore<T>
   }
 
   public addAll(entities: T[], entityBoundsFactory: (entity: T) => IEntityBounds, bounds?: Bounds) {
-    this._entities.push(...entities);
+    this._entities = this._entities.concat(entities);
 
     // filter out of bounds entities if bounds is defined
     if (bounds !== undefined) {
