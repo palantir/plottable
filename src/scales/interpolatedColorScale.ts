@@ -128,7 +128,7 @@ export class InterpolatedColor extends Scale<number, string> {
 
   private _resetScale(): any {
     this._d3Scale = this._d3InterpolatedScale();
-    this._autoDomainIfAutomaticMode();
+    this.autoDomainIfAutomaticMode();
     this._dispatchUpdate();
   }
 

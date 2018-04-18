@@ -66,7 +66,7 @@ export class QuantitativeScale<D> extends Scale<D, number> implements ITransform
       return;
     }
 
-    super._autoDomainIfAutomaticMode();
+    super.autoDomainIfAutomaticMode();
   }
 
   protected _getUnboundedExtent(ignoreAttachState = false): D[] {
