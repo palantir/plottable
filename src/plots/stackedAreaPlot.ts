@@ -205,7 +205,7 @@ export class StackedArea<X> extends Area<X> {
     const keyAccessor = this.x().accessor;
 
     const keySets = datasets.map((dataset) => {
-      return d3.set(dataset.data().map((datum, i) => keyAccessor(datum, i, dataset).toString())).values();
+      return d3.set(dataset.data().map((datum, i) => Utils.Stacking.normalizeKey(keyAccessor(datum, i, dataset)))).values();
     });
     const domainKeys = StackedArea._domainKeys(datasets, keyAccessor);
 
