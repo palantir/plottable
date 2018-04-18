@@ -40,7 +40,7 @@ export class QuantitativeScale<D> extends Scale<D, number> implements ITransform
     return this;
   }
 
-  protected _autoDomainIfAutomaticMode() {
+  public autoDomainIfAutomaticMode() {
     if (this._domainMin != null && this._domainMax != null) {
       this._setDomain([this._domainMin, this._domainMax]);
       return;
@@ -66,7 +66,7 @@ export class QuantitativeScale<D> extends Scale<D, number> implements ITransform
       return;
     }
 
-    super._autoDomainIfAutomaticMode();
+    super.autoDomainIfAutomaticMode();
   }
 
   protected _getUnboundedExtent(ignoreAttachState = false): D[] {
@@ -103,7 +103,7 @@ export class QuantitativeScale<D> extends Scale<D, number> implements ITransform
    */
   public addPaddingExceptionsProvider(provider: Scales.IPaddingExceptionsProvider<D>) {
     this._paddingExceptionsProviders.add(provider);
-    this._autoDomainIfAutomaticMode();
+    this.autoDomainIfAutomaticMode();
     return this;
   }
 
@@ -115,7 +115,7 @@ export class QuantitativeScale<D> extends Scale<D, number> implements ITransform
    */
   public removePaddingExceptionsProvider(provider: Scales.IPaddingExceptionsProvider<D>) {
     this._paddingExceptionsProviders.delete(provider);
-    this._autoDomainIfAutomaticMode();
+    this.autoDomainIfAutomaticMode();
     return this;
   }
 
@@ -140,7 +140,7 @@ export class QuantitativeScale<D> extends Scale<D, number> implements ITransform
       throw new Error("padProportion must be non-negative");
     }
     this._padProportion = padProportion;
-    this._autoDomainIfAutomaticMode();
+    this.autoDomainIfAutomaticMode();
     return this;
   }
 
@@ -194,7 +194,7 @@ export class QuantitativeScale<D> extends Scale<D, number> implements ITransform
     }
 
     this._snappingDomainEnabled = snappingDomainEnabled;
-    this._autoDomainIfAutomaticMode();
+    this.autoDomainIfAutomaticMode();
     return this;
   }
 
@@ -239,7 +239,7 @@ export class QuantitativeScale<D> extends Scale<D, number> implements ITransform
       return this.domain()[0];
     }
     this._domainMin = domainMin;
-    this._autoDomainIfAutomaticMode();
+    this.autoDomainIfAutomaticMode();
     return this;
   }
 
@@ -260,7 +260,7 @@ export class QuantitativeScale<D> extends Scale<D, number> implements ITransform
       return this.domain()[1];
     }
     this._domainMax = domainMax;
-    this._autoDomainIfAutomaticMode();
+    this.autoDomainIfAutomaticMode();
     return this;
   }
 

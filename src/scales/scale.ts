@@ -90,7 +90,10 @@ export class Scale<D, R> {
     return this;
   }
 
-  protected _autoDomainIfAutomaticMode() {
+  /**
+   * Triggers `.autoDomain()` if the domain is not explicitly set.
+   */
+  public autoDomainIfAutomaticMode() {
     if (this._autoDomainAutomatically) {
       this.autoDomain();
     }
@@ -195,7 +198,7 @@ export class Scale<D, R> {
    */
   public addIncludedValuesProvider(provider: Scales.IIncludedValuesProvider<D>) {
     this._includedValuesProviders.add(provider);
-    this._autoDomainIfAutomaticMode();
+    this.autoDomainIfAutomaticMode();
     return this;
   }
 
@@ -207,7 +210,7 @@ export class Scale<D, R> {
    */
   public removeIncludedValuesProvider(provider: Scales.IIncludedValuesProvider<D>) {
     this._includedValuesProviders.delete(provider);
-    this._autoDomainIfAutomaticMode();
+    this.autoDomainIfAutomaticMode();
     return this;
   }
 
