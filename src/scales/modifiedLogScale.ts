@@ -50,6 +50,7 @@ export class ModifiedLog extends QuantitativeScale<number> {
     this._base = base;
     this._pivot = this._base;
     this._setDomain(this._defaultExtent());
+    this.tickGenerator(this._logTickGenerator);
     if (base <= 1) {
       throw new Error("ModifiedLogScale: The base must be > 1");
     }
@@ -140,7 +141,7 @@ export class ModifiedLog extends QuantitativeScale<number> {
     }
   }
 
-  public ticks(): number[] {
+  private _logTickGenerator = (scale: QuantitativeScale<number>) => {
     // Say your domain is [-100, 100] and your pivot is 10.
     // then we're going to draw negative log ticks from -100 to -10,
     // linear ticks from -10 to 10, and positive log ticks from 10 to 100.
