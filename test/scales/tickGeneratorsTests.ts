@@ -2,6 +2,11 @@ import { assert } from "chai";
 
 import * as Plottable from "../../src";
 
+function normalizeNegativeZeros(nums: number[]) {
+  // -0 + +0 -> +0
+  return nums.map((n) => n + 0);
+}
+
 describe("Scales", () => {
   describe("Tick generators", () => {
     describe("intervalTickGenerator() generates ticks with a given interval", () => {
@@ -106,12 +111,12 @@ describe("Scales", () => {
 
       it("works across negative numbers", () => {
         scale.domain([-2, 1]);
-        assert.deepEqual(integerTickGenerator(scale), [-2, -1, 0, 1], "only the integers are returned");
+        assert.deepEqual(normalizeNegativeZeros(integerTickGenerator(scale)), [-2, -1, 0, 1], "only the integers are returned");
       });
 
       it("includes end ticks", () => {
         scale.domain([-2.7, 1.5]);
-        assert.deepEqual(integerTickGenerator(scale), [-2.5, -2, -1, 0, 1, 1.5], "end ticks are included");
+        assert.deepEqual(normalizeNegativeZeros(integerTickGenerator(scale)), [-2.5, -2, -1, 0, 1, 1.5], "end ticks are included");
       });
 
       it("does not include integer ticks when there are none in the domain", () => {
