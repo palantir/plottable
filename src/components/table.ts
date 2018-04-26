@@ -175,7 +175,7 @@ export class Table extends ComponentContainer {
      *
      */
     const rows = this._rows;
-    const cols = d3.transpose(this._rows);
+    const cols = d3.transpose<Component>(this._rows);
     const availableWidthAfterPadding = availableWidth - this._columnPadding * (this._nCols - 1);
     const availableHeightAfterPadding = availableHeight - this._rowPadding * (this._nRows - 1);
 
@@ -456,7 +456,7 @@ export class Table extends ComponentContainer {
   }
 
   public fixedWidth(): boolean {
-    const cols = d3.transpose(this._rows);
+    const cols = d3.transpose<Component>(this._rows);
     return Table._fixedSpace(cols, (c: Component) => (c == null) || c.fixedWidth());
   }
 
