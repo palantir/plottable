@@ -285,7 +285,7 @@ export class Line<X> extends XYPlot<X, number> {
       includedValues = edgeIntersectionPoints.top.concat(edgeIntersectionPoints.bottom).map((point) => point.x);
     }
 
-    return extents.map((extent: [number, number]) => d3.extent(d3.merge([extent, includedValues])));
+    return extents.map((extent: [number, number]) => d3.extent(d3.merge<number>([extent, includedValues])));
   }
 
   private _getEdgeIntersectionPoints(): EdgeIntersections {
