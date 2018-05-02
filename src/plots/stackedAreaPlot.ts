@@ -129,7 +129,7 @@ export class StackedArea<X> extends Area<X> {
     if (datasetStackingResult == null) {
       return undefined;
     }
-    const result = datasetStackingResult.get(`${x}`);
+    const result = datasetStackingResult.get(String(x));
     if (result == null) {
       return undefined;
     }
