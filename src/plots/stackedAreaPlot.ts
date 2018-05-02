@@ -115,6 +115,28 @@ export class StackedArea<X> extends Area<X> {
   }
 
   /**
+   * Gets the offset of the y value corresponding to an x value of a given dataset. This allows other plots to plot
+   * points corresponding to their stacked value in the graph.
+   * @param dataset The dataset from which to retrieve the y value offset
+   * @param x The x value corresponding to the y-value of interest.
+   */
+  public yOffset(dataset: Dataset, x: any): number {
+    const stackingResult = this._stackingResult();
+    if (stackingResult == null) {
+      return undefined;
+    }
+    const datasetStackingResult = stackingResult.get(dataset);
+    if (datasetStackingResult == null) {
+      return undefined;
+    }
+    const result = datasetStackingResult.get(String(x));
+    if (result == null) {
+      return undefined;
+    }
+    return result.offset;
+  }
+
+  /**
    * Gets the stacking order of the plot.
    */
   public stackingOrder(): Utils.Stacking.IStackingOrder;
