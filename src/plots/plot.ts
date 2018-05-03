@@ -230,7 +230,7 @@ export class Plot extends Component {
         if (btx) {
           const originalCanvas = this._canvas.node();
           if (originalCanvas.width > 0 && originalCanvas.height > 0 && btx.canvas.width > 0 && btx.canvas.height > 0) {
-            btx.drawImage(this._canvas.node(), 0, 0);
+            btx.drawImage(originalCanvas, 0, 0);
           }
         }
         this._bufferCanvasValid = true;
