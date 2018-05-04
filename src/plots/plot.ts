@@ -228,7 +228,14 @@ export class Plot extends Component {
         const btx = this._bufferCanvas.node().getContext("2d");
         // for headless test compat (jest)
         if (btx) {
-          btx.drawImage(this._canvas.node(), 0, 0);
+          const originalCanvas = this._canvas.node();
+          if (originalCanvas.width > 0 && originalCanvas.height > 0) {
+            if (btx.canvas.width > 0 && btx.canvas.height > 0) {
+              btx.drawImage(originalCanvas, 0, 0);
+            }
+          } else {
+            console.warn("Failed to fill buffer canvas with with 0x0 canvas");
+          }
         }
         this._bufferCanvasValid = true;
       }
@@ -249,8 +256,15 @@ export class Plot extends Component {
         ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
 
         if (this._bufferCanvas) {
-          // draw buffer to current canvas at new size
-          ctx.drawImage(this._bufferCanvas.node(), 0, 0, width, height);
+          const bufferCanvas = this._bufferCanvas.node();
+          if (bufferCanvas.width > 0 && bufferCanvas.height > 0) {
+            if (ctx.canvas.width > 0 && ctx.canvas.height > 0) {
+              // draw buffer to current canvas at new size
+              ctx.drawImage(bufferCanvas, 0, 0, width, height);
+            }
+          } else {
+            console.warn("Failed to fill canvas with 0x0 buffer canvas");
+          }
         }
       }
     }
