@@ -417,7 +417,7 @@ export class Line<X> extends XYPlot<X, number> {
       }
       const projector = attrToProjector[attribute];
       attrToProjector[attribute] = (data: any[], i: number, dataset: Dataset) =>
-        data.length > 0 ? projector(data[0], i, dataset) : null;
+        data.length > 0 ? projector(data[i], i, dataset) : null;
     });
 
     return attrToProjector;

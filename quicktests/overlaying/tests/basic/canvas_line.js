@@ -7,7 +7,8 @@ function makeData() {
       return {
         // one data point per day, offset by one hour per dataset
         x: new Date(i * 1000 * 3600 * 24 + datasetIndex * 1000 * 3600),
-        y: datasetIndex + Math.random()
+        y: datasetIndex + Math.random(),
+        index: i,
       };
     });
   });
@@ -30,6 +31,9 @@ function run(div, data, Plottable) {
     .collapseDenseLinesEnabled(true)
     .x((d) => d.x, xScale)
     .y((d) => d.y, yScale)
+    .attr("opacity", (d, i) => {
+      return d.index / 10000;
+    })
     .attr("stroke", (d,i,ds) => ds.metadata(), colorScale);
 
   var table = new Plottable.Components.Table([
