@@ -31,7 +31,7 @@ function run(div, data, Plottable) {
     .collapseDenseLinesEnabled(true)
     .x((d) => d.x, xScale)
     .y((d) => d.y, yScale)
-    .attr("opacity", (d, i) => {
+    .attr("opacity", (d) => {
       return d.index / 10000;
     })
     .attr("stroke", (d,i,ds) => ds.metadata(), colorScale);
