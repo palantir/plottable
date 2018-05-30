@@ -444,9 +444,12 @@ export class Line<X> extends XYPlot<X, number> {
     let closest: IPlotEntity;
 
     const chartBounds = this.bounds();
-    this.entities().forEach((entity) => {
+    const entities = this.entities();
+    const entityLen = entities.length;
+    for (let i = 0; i < entityLen; i++) {
+      const entity = entities[i];
       if (!Utils.Math.within(entity.position, chartBounds)) {
-        return;
+        continue;
       }
       const xDist = Math.abs(queryPoint.x - entity.position.x);
       const yDist = Math.abs(queryPoint.y - entity.position.y);
@@ -456,7 +459,7 @@ export class Line<X> extends XYPlot<X, number> {
         minXDist = xDist;
         minYDist = yDist;
       }
-    });
+    }
 
     return closest;
   }
@@ -530,7 +533,12 @@ export class Line<X> extends XYPlot<X, number> {
         return;
       }
 
-      let filteredDataIndices = data.map((d, i) => i);
+      let filteredDataIndices = [];
+      const dataLen = data.length;
+      for (let i = 0; i < dataLen; i++) {
+        filteredDataIndices[i] = i;
+      }
+
       if (this._croppedRenderingEnabled) {
         filteredDataIndices = this._filterCroppedRendering(dataset, filteredDataIndices);
       }
@@ -540,7 +548,14 @@ export class Line<X> extends XYPlot<X, number> {
       if (this._collapseDenseVerticalLinesEnabled) {
         filteredDataIndices = this._filterDenseLines(dataset, filteredDataIndices);
       }
-      dataToDraw.set(dataset, [filteredDataIndices.map((d, i) => data[d])]);
+
+      const filteredData = [];
+      const filteredIndicesLen = filteredDataIndices.length;
+      for (let i = 0; i < filteredIndicesLen; i++) {
+        filteredData[i] = data[i];
+      }
+
+      dataToDraw.set(dataset, [filteredData]);
     });
 
     return dataToDraw;
@@ -690,7 +705,8 @@ export class Line<X> extends XYPlot<X, number> {
     const data = dataset.data();
     let bucket: Utils.Bucket = null;
 
-    for (let ii = 0; ii <= indices.length; ++ii) {
+    const indicesLength = indices.length;
+    for (let ii = 0; ii <= indicesLength; ++ii) {
       const i = indices[ii];
       if (data[i] == null) {
         continue;

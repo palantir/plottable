@@ -447,11 +447,14 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
 
   private _entitiesIntersecting(xValOrRange: number | Range, yValOrRange: number | Range): IPlotEntity[] {
     const intersected: IPlotEntity[] = [];
-    this._getEntityStore().entities().forEach((entity) => {
+    const entities = this._getEntityStore().entities();
+    const entitiesLen = entities.length;
+    for (let i = 0; i < entitiesLen; i++) {
+      const entity = entities[i];
       if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, this._entityBounds(entity))) {
         intersected.push(this._lightweightPlotEntityToPlotEntity(entity));
       }
-    });
+    }
     return intersected;
   }
 

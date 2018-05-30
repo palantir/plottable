@@ -703,7 +703,10 @@ export class Plot extends Component {
       const drawer = this._datasetToDrawer.get(dataset);
       let validDatumIndex = 0;
 
-      dataset.data().forEach((datum: any, datumIndex: number) => {
+      const data = dataset.data();
+      const dataLen = data.length;
+      for (let datumIndex = 0; datumIndex < dataLen; datumIndex++) {
+        const datum = data[datumIndex];
         const position = this._pixelPoint(datum, datumIndex, dataset);
         if (Utils.Math.isNaN(position.x) || Utils.Math.isNaN(position.y)) {
           return;
@@ -724,7 +727,7 @@ export class Plot extends Component {
           validDatumIndex,
         });
         validDatumIndex++;
-      });
+      }
     });
 
     return lightweightPlotEntities;

@@ -224,11 +224,14 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
   private _entitiesIntersecting(xRange: Range, yRange: Range): IPlotEntity[] {
     const intersected: IPlotEntity[] = [];
     const attrToProjector = this._getAttrToProjector();
-    this.entities().forEach((entity) => {
+    const entities = this.entities();
+    const entitiesLen = entities.length;
+    for (let i = 0; i < entitiesLen; i++) {
+      const entity = entities[i];
       if (this._lineIntersectsBox(entity, xRange, yRange, attrToProjector)) {
         intersected.push(entity);
       }
-    });
+    }
     return intersected;
   }
 

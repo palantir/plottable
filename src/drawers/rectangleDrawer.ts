@@ -26,7 +26,9 @@ export const RectangleCanvasDrawStep: CanvasDrawStep = (
     data: any[],
     projector: AttributeToAppliedProjector) => {
   context.save();
-  data.forEach((datum, index) => {
+  const dataLen = data.length;
+  for (let index = 0; index < dataLen; index++ ) {
+    const datum = data[index];
     if (datum == null) {
       return;
     }
@@ -34,7 +36,7 @@ export const RectangleCanvasDrawStep: CanvasDrawStep = (
     context.beginPath();
     context.rect(attrs["x"], attrs["y"], attrs["width"], attrs["height"]);
     renderPathWithStyle(context, attrs);
-  });
+  }
   context.restore();
 };
 

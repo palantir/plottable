@@ -598,7 +598,10 @@ export class Pie extends Plot {
     const writer = new Typesettable.Writer(measurer, context);
     const dataset = this.datasets()[0];
     const data = this._getDataToDraw().get(dataset);
-    data.forEach((datum, datumIndex) => {
+    const dataLen = data.length;
+    for (let datumIndex = 0; datumIndex < dataLen; datumIndex++) {
+      const datum = data[datumIndex];
+
       let value = this.sectorValue().accessor(datum, datumIndex, dataset);
       if (!Utils.Math.isValidNumber(value)) {
         return;
@@ -647,6 +650,6 @@ export class Pie extends Plot {
         xAlign: "center",
         yAlign: "center",
       }, g.node());
-    });
+    }
   }
 }
