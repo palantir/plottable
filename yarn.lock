@@ -3804,7 +3804,7 @@ lodash.keysin@^3.0.0:
 
 lodash.memoize@^4.1.2:
   version "4.1.2"
-  resolved "https://artifactory.palantir.build:443/artifactory/api/npm/all-npm/lodash.memoize/-/lodash.memoize-4.1.2.tgz?dl=https://registry.yarnpkg.com/lodash.memoize/-/lodash.memoize-4.1.2.tgz#bcc6c49a42a2840ed997f323eada5ecd182e0bfe"
+  resolved "https://registry.yarnpkg.com/lodash.memoize/-/lodash.memoize-4.1.2.tgz#bcc6c49a42a2840ed997f323eada5ecd182e0bfe"
 
 lodash.merge@^3.3.2:
   version "3.3.2"
