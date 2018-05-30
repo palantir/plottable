@@ -7,8 +7,9 @@ import { AttributeToAppliedProjector } from "../core/interfaces";
 import {
   CanvasDrawer,
   CanvasDrawStep,
+  ContextStyleAttrs,
   renderPathWithStyle,
-  resolveAttributesSubsetWithStyles,
+  resolveAttributes,
 } from "./canvasDrawer";
 import { SVGDrawer } from "./svgDrawer";
 
@@ -19,18 +20,19 @@ export class RectangleSVGDrawer extends SVGDrawer {
   }
 }
 
-const RECT_ATTRS = ["x", "y", "width", "height"];
+const RECT_ATTRS = ContextStyleAttrs.concat(["x", "y", "width", "height"]);
 
 export const RectangleCanvasDrawStep: CanvasDrawStep = (
     context: CanvasRenderingContext2D,
     data: any[],
     projector: AttributeToAppliedProjector) => {
   context.save();
+
   data.forEach((datum, index) => {
     if (datum == null) {
       return;
     }
-    const attrs = resolveAttributesSubsetWithStyles(projector, RECT_ATTRS, datum, index);
+    const attrs = resolveAttributes(projector, RECT_ATTRS, datum, index);
     context.beginPath();
     context.rect(attrs["x"], attrs["y"], attrs["width"], attrs["height"]);
     renderPathWithStyle(context, attrs);

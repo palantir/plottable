@@ -25,7 +25,7 @@ import { CanvasDrawer } from "../drawers/canvasDrawer";
 import { ProxyDrawer } from "../drawers/drawer";
 import { AppliedDrawStep, DrawStep } from "../drawers/index";
 import { SVGDrawer } from "../drawers/svgDrawer";
-import { memThunk, Thunk } from "../memoize";
+import { memoizeProjectors, memThunk, Thunk } from "../memoize";
 import * as Scales from "../scales";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
@@ -401,7 +401,7 @@ export class Plot extends Component {
 
   protected _getAttrToProjector(): AttributeToProjector {
     if (this._cachedAttrToProjector == null) {
-      this._cachedAttrToProjector = this._generateAttrToProjector();
+      this._cachedAttrToProjector = memoizeProjectors(this._generateAttrToProjector());
     }
     // return shallow clone of cached projector
     return Utils.assign({}, this._cachedAttrToProjector);
@@ -409,15 +409,18 @@ export class Plot extends Component {
 
   protected _generateAttrToProjector(): AttributeToProjector {
     const h: AttributeToProjector = {};
+
     this._attrBindings.each((binding, attr) => {
       h[attr] = Plot._scaledAccessor(binding);
     });
+
     const propertyProjectors = this._propertyProjectors();
     Object.keys(propertyProjectors).forEach((key) => {
       if (h[key] == null) {
         h[key] = propertyProjectors[key];
       }
     });
+
     return h;
   }
 

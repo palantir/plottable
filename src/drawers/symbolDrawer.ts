@@ -3,16 +3,18 @@
  * @license MIT
  */
 
-import { Dataset } from "../core/dataset";
 import { AttributeToAppliedProjector, IAccessor } from "../core/interfaces";
+import {
+    CanvasDrawStep,
+    ContextStyleAttrs,
+    getStrokeWidth,
+    renderPathWithStyle,
+    resolveAttributes,
+} from "./canvasDrawer";
+
+import { Dataset } from "../core/dataset";
 import { SymbolFactory } from "../core/symbolFactories";
 import { CanvasBuffer } from "./canvasBuffer";
-import {
-  CanvasDrawStep,
-  ContextStyleAttrs, getStrokeWidth,
-  renderPathWithStyle,
-  resolveAttributesSubsetWithStyles,
-} from "./canvasDrawer";
 import { SVGDrawer } from "./svgDrawer";
 
 export class SymbolSVGDrawer extends SVGDrawer {
@@ -20,6 +22,8 @@ export class SymbolSVGDrawer extends SVGDrawer {
         super("path", "symbol");
     }
 }
+
+const SYMBOL_ATTRS = ContextStyleAttrs.concat(["x", "y"]);
 
 export function makeSymbolCanvasDrawStep(
         dataset: Dataset,
@@ -44,7 +48,7 @@ export function makeSymbolCanvasDrawStep(
             }
 
             // check symbol is in viewport
-            const attrs = resolveAttributesSubsetWithStyles(attrToAppliedProjector, ["x", "y"], datum, index);
+            const attrs = resolveAttributes(attrToAppliedProjector, SYMBOL_ATTRS, datum, index);
             const symbolSize = sizeAccessor(datum, index, dataset);
             if (!squareOverlapsBounds(clientWidth, clientHeight, attrs["x"], attrs["y"], symbolSize)) {
                 continue;

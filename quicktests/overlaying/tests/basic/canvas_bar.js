@@ -2,7 +2,7 @@ function makeData() {
   "use strict";
 
   return Array.apply(null, Array(1)).map((_, datasetIndex) => {
-    return Array.apply(null, Array(1000)).map((_, i) => {
+    return Array.apply(null, Array(100 * 1000)).map((_, i) => {
       return {
         // one data point per day, offset by one hour per dataset
         x: new Date(i * 1000 * 3600 * 24 + datasetIndex * 1000 * 3600),
