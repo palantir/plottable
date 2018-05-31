@@ -8,7 +8,7 @@ import * as d3 from "d3";
 import { Dataset } from "../core/dataset";
 import { IAccessor } from "../core/interfaces";
 
-import { memoize } from "lodash";
+import { memoize, MemoizedFunction } from "lodash";
 import * as Utils from "./";
 import { makeEnum } from "./makeEnum";
 
@@ -184,4 +184,4 @@ export function stackedExtent(stackingResult: StackingResult, keyAccessor: IAcce
  */
 export const normalizeKey = memoize((key: any) => {
   return String(key);
-});
+}) as ((key: any) => string) & MemoizedFunction;
