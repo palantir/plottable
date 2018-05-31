@@ -413,7 +413,7 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
       const datum = data[datumIndex];
 
       if (datum == null) {
-        return;
+        continue;
       }
 
       const label = "" + this.label()(datum, datumIndex, dataset);
@@ -433,10 +433,10 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
         const xLabelRange = { min: x, max: x + measurement.width };
         const yLabelRange = { min: y, max: y + measurement.height };
         if (xLabelRange.min < xMin || xLabelRange.max > xMax || yLabelRange.min < yMin || yLabelRange.max > yMax) {
-          return;
+          continue;
         }
         if (this._overlayLabel(xLabelRange, yLabelRange, datumIndex, datasetIndex, dataToDraw)) {
-          return;
+          continue;
         }
 
         const color = attrToProjector["fill"](datum, datumIndex, dataset);

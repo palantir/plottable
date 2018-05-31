@@ -709,7 +709,7 @@ export class Plot extends Component {
         const datum = data[datumIndex];
         const position = this._pixelPoint(datum, datumIndex, dataset);
         if (Utils.Math.isNaN(position.x) || Utils.Math.isNaN(position.y)) {
-          return;
+          continue;
         }
 
         const plot = this;

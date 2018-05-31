@@ -197,6 +197,10 @@
   version "0.0.2"
   resolved "https://registry.npmjs.org/@types/is-plain-object/-/is-plain-object-0.0.2.tgz#25bca7b656ba23fb03799a060dba201a7952103d"
 
+"@types/lodash@^4.14.109":
+  version "4.14.109"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.109.tgz#b1c4442239730bf35cabaf493c772b18c045886d"
+
 "@types/mocha@^2.2.27":
   version "2.2.40"
   resolved "https://registry.yarnpkg.com/@types/mocha/-/mocha-2.2.40.tgz#9811dd800ece544cd84b5b859917bf584a150c4c"
@@ -3802,10 +3806,6 @@ lodash.keysin@^3.0.0:
     lodash.isarguments "^3.0.0"
     lodash.isarray "^3.0.0"
 
-lodash.memoize@^4.1.2:
-  version "4.1.2"
-  resolved "https://registry.yarnpkg.com/lodash.memoize/-/lodash.memoize-4.1.2.tgz#bcc6c49a42a2840ed997f323eada5ecd182e0bfe"
-
 lodash.merge@^3.3.2:
   version "3.3.2"
   resolved "https://registry.yarnpkg.com/lodash.merge/-/lodash.merge-3.3.2.tgz#0d90d93ed637b1878437bb3e21601260d7afe994"
@@ -3857,6 +3857,10 @@ lodash@^3.10.0, lodash@^3.3.1, lodash@^3.5.0, lodash@^3.7.0, lodash@^3.9.0, loda
 lodash@^4.14.0, lodash@^4.17.2, lodash@^4.17.4:
   version "4.17.4"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.4.tgz#78203a4d1c328ae1d86dca6460e369b57f4055ae"
+
+lodash@^4.17.10:
+  version "4.17.10"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.10.tgz#1b7793cf7259ea38fb3661d4d38b3260af8ae4e7"
 
 lodash@~0.9.2:
   version "0.9.2"

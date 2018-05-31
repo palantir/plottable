@@ -282,7 +282,7 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
       for (let index = 0; index < dataLen; index++) {
         const datum = data[index];
         if (datum == null) {
-          return;
+          continue;
         }
         this._drawLabel(datum, index, dataset, attrToProjector);
       }

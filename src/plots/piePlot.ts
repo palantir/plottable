@@ -604,7 +604,7 @@ export class Pie extends Plot {
 
       let value = this.sectorValue().accessor(datum, datumIndex, dataset);
       if (!Utils.Math.isValidNumber(value)) {
-        return;
+        continue;
       }
       value = this._labelFormatter(value, datum, datumIndex, dataset);
       const measurement = measurer.measure(value);

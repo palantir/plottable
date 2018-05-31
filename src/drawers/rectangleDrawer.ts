@@ -30,7 +30,7 @@ export const RectangleCanvasDrawStep: CanvasDrawStep = (
   for (let index = 0; index < dataLen; index++ ) {
     const datum = data[index];
     if (datum == null) {
-      return;
+      continue;
     }
     const attrs = resolveAttributesSubsetWithStyles(projector, RECT_ATTRS, datum, index);
     context.beginPath();

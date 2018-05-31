@@ -8,10 +8,9 @@ import * as d3 from "d3";
 import { Dataset } from "../core/dataset";
 import { IAccessor } from "../core/interfaces";
 
+import { memoize } from "lodash";
 import * as Utils from "./";
 import { makeEnum } from "./makeEnum";
-
-const lMemoize = require("lodash.memoize");
 
 export type GenericStackedDatum<D> = {
   value: number;
@@ -165,7 +164,7 @@ export function stackedExtent(stackingResult: StackingResult, keyAccessor: IAcce
     for (let index = 0; index < dataLen; index++) {
       const datum = data[index];
       if (filter != null && !filter(datum, index, dataset)) {
-        return;
+        continue;
       }
       const stackedDatum = stackedDatumMap.get(normalizeKey(keyAccessor(datum, index, dataset)));
       extents.push(stackedDatum.value + stackedDatum.offset);
@@ -183,6 +182,6 @@ export function stackedExtent(stackingResult: StackingResult, keyAccessor: IAcce
  * @param {any} key The key to be normalized
  * @return {string} The stringified key
  */
-export const normalizeKey = lMemoize((key: any) => {
+export const normalizeKey = memoize((key: any) => {
   return String(key);
 });
