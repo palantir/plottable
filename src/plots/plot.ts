@@ -4,10 +4,12 @@
  */
 
 import * as d3 from "d3";
-
 import * as Animators from "../animators";
-import { IAnimator } from "../animators/animator";
-import { Component } from "../components/component";
+import * as Drawers from "../drawers";
+import * as Scales from "../scales";
+import * as Utils from "../utils";
+import * as Plots from "./commons";
+
 import { Dataset, DatasetCallback } from "../core/dataset";
 import {
   AttributeToAppliedProjector,
@@ -20,24 +22,25 @@ import {
   Range,
   SimpleSelection,
 } from "../core/interfaces";
-import * as Drawers from "../drawers";
+import { AppliedDrawStep, DrawStep } from "../drawers/index";
+import { memoizeProjectors, memThunk, Thunk } from "../memoize";
+
+import { IAnimator } from "../animators/animator";
+import { Component } from "../components/component";
 import { CanvasDrawer } from "../drawers/canvasDrawer";
 import { ProxyDrawer } from "../drawers/drawer";
-import { AppliedDrawStep, DrawStep } from "../drawers/index";
 import { SVGDrawer } from "../drawers/svgDrawer";
-import { memThunk, Thunk } from "../memoize";
-import * as Scales from "../scales";
 import { Scale } from "../scales/scale";
-import * as Utils from "../utils";
 import { coerceExternalD3 } from "../utils/coerceD3";
 import { makeEnum } from "../utils/makeEnum";
-import * as Plots from "./commons";
 import { DeferredRenderer } from "./deferredRenderer";
 
 export const Renderer = makeEnum(["svg", "canvas"]);
 export type Renderer = keyof typeof Renderer;
 
 export class Plot extends Component {
+  public static OPTIMIZE_MEMOIZE_PROJECTORS: boolean = false;
+
   public static getTotalDrawTime(data: any[], drawSteps: Drawers.DrawStep[]) {
     return drawSteps.reduce((time, drawStep) => time + drawStep.animator.totalTime(data.length), 0);
   }
@@ -401,7 +404,11 @@ export class Plot extends Component {
 
   protected _getAttrToProjector(): AttributeToProjector {
     if (this._cachedAttrToProjector == null) {
-      this._cachedAttrToProjector = this._generateAttrToProjector();
+      let projectors = this._generateAttrToProjector();
+      if (Plot.OPTIMIZE_MEMOIZE_PROJECTORS) {
+        projectors = memoizeProjectors(projectors);
+      }
+      this._cachedAttrToProjector = projectors;
     }
     // return shallow clone of cached projector
     return Utils.assign({}, this._cachedAttrToProjector);
@@ -409,15 +416,18 @@ export class Plot extends Component {
 
   protected _generateAttrToProjector(): AttributeToProjector {
     const h: AttributeToProjector = {};
+
     this._attrBindings.each((binding, attr) => {
       h[attr] = Plot._scaledAccessor(binding);
     });
+
     const propertyProjectors = this._propertyProjectors();
     Object.keys(propertyProjectors).forEach((key) => {
       if (h[key] == null) {
         h[key] = propertyProjectors[key];
       }
     });
+
     return h;
   }
 

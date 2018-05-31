@@ -4,5 +4,6 @@
  */
 
 export * from "./memoize";
+export * from "./memoizeProjectors";
 export * from "./memThunk";
 export { sign } from "./signature";

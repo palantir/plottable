@@ -65,6 +65,10 @@ export const ContextStyleAttrs = [
   "stroke-dasharray",
 ];
 
+/**
+ * DEPRECATED. Precompute the concatted array and use `resolveAttributes`
+ * instead of using this in the inner loop.
+ */
 export function resolveAttributesSubsetWithStyles(projector: AttributeToAppliedProjector, extraKeys: string[], datum: any, index: number) {
   const attrKeys = ContextStyleAttrs.concat(extraKeys);
   return resolveAttributes(projector, attrKeys, datum, index);

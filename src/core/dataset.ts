@@ -5,13 +5,21 @@
 
 import * as Utils from "../utils";
 
+let UPDATE_MONOTONIC = 0;
+
 export type DatasetCallback = (dataset: Dataset) => void;
 
 export class Dataset {
   private _data: any[];
   private _metadata: any;
   private _callbacks: Utils.CallbackSet<DatasetCallback>;
-  private _updateId = 0;
+
+  /**
+   * Store an update id for fast detection of changes to the dataset. Also, this
+   * uses a global monotonically increasing value so that it may be used as a
+   * combination update-aware memoize key.
+   */
+  private _updateId: number;
 
   /**
    * A Dataset contains an array of data and some metadata.
@@ -22,6 +30,7 @@ export class Dataset {
    * @param {any} [metadata={}] An object containing additional information.
    */
   constructor(data: any[] = [], metadata: any = {}) {
+    this._updateId = UPDATE_MONOTONIC++;
     this._data = data;
     this._metadata = metadata;
     this._callbacks = new Utils.CallbackSet<DatasetCallback>();
@@ -100,7 +109,7 @@ export class Dataset {
   }
 
   private _dispatchUpdate() {
-    this._updateId++;
+    this._updateId = UPDATE_MONOTONIC++;
     this._callbacks.callCallbacks(this);
   }
 }
