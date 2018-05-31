@@ -552,7 +552,8 @@ export class Line<X> extends XYPlot<X, number> {
       const filteredData = [];
       const filteredIndicesLen = filteredDataIndices.length;
       for (let i = 0; i < filteredIndicesLen; i++) {
-        filteredData[i] = data[i];
+        const index = filteredDataIndices[i];
+        filteredData[i] = data[index];
       }
 
       dataToDraw.set(dataset, [filteredData]);
