@@ -170,7 +170,10 @@ export class Waterfall<X, Y> extends Bar<X, number> {
     let max = Number.MIN_VALUE;
     let total = 0;
     let hasStarted = false;
-    dataset.data().forEach((datum, index) => {
+    const data = dataset.data();
+    const dataLen = data.length;
+    for (let index = 0; index < dataLen; index ++) {
+      const datum = data[index];
       const currentValue = this.y().accessor(datum, index, dataset);
       const isTotal = this.total().accessor(datum, index, dataset);
       if (!isTotal || index === 0) {
@@ -201,7 +204,7 @@ export class Waterfall<X, Y> extends Bar<X, number> {
         min += startTotal;
         max += startTotal;
       }
-    });
+    }
     this._extent = [min, max];
   }
 

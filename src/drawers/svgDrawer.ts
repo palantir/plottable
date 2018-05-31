@@ -58,10 +58,12 @@ export class SVGDrawer implements IDrawer {
     this._createAndDestroyDOMElements(data);
 
     let delay = 0;
-    appliedDrawSteps.forEach((drawStep, i) => {
+    const drawLength = appliedDrawSteps.length;
+    for (let i = 0; i < drawLength; i++) {
+      const drawStep = appliedDrawSteps[i];
       Utils.Window.setTimeout(() => this._drawStep(drawStep), delay);
       delay += drawStep.animator.totalTime(data.length);
-    });
+    }
   }
 
   public getVisualPrimitives() {
