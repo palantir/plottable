@@ -3,7 +3,6 @@
  * @license MIT
  */
 
-import { AttributeToAppliedProjector } from "../core/interfaces";
 import {
   CanvasDrawer,
   CanvasDrawStep,
@@ -11,6 +10,8 @@ import {
   renderPathWithStyle,
   resolveAttributes,
 } from "./canvasDrawer";
+
+import { AttributeToAppliedProjector } from "../core/interfaces";
 import { SVGDrawer } from "./svgDrawer";
 
 export class RectangleSVGDrawer extends SVGDrawer {
@@ -27,16 +28,17 @@ export const RectangleCanvasDrawStep: CanvasDrawStep = (
     data: any[],
     projector: AttributeToAppliedProjector) => {
   context.save();
-
-  data.forEach((datum, index) => {
+  const dataLen = data.length;
+  for (let index = 0; index < dataLen; index++ ) {
+    const datum = data[index];
     if (datum == null) {
-      return;
+      continue;
     }
     const attrs = resolveAttributes(projector, RECT_ATTRS, datum, index);
     context.beginPath();
     context.rect(attrs["x"], attrs["y"], attrs["width"], attrs["height"]);
     renderPathWithStyle(context, attrs);
-  });
+  }
   context.restore();
 };
 

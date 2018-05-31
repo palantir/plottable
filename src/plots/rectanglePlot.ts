@@ -408,9 +408,12 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
     const yMin = Math.min.apply(null, yRange);
     const yMax = Math.max.apply(null, yRange);
     const data = dataToDraw.get(dataset);
-    data.forEach((datum, datumIndex) => {
+    const dataLength = data.length;
+    for (let datumIndex = 0; datumIndex < dataLength; datumIndex++) {
+      const datum = data[datumIndex];
+
       if (datum == null) {
-        return;
+        continue;
       }
 
       const label = "" + this.label()(datum, datumIndex, dataset);
@@ -430,10 +433,10 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
         const xLabelRange = { min: x, max: x + measurement.width };
         const yLabelRange = { min: y, max: y + measurement.height };
         if (xLabelRange.min < xMin || xLabelRange.max > xMax || yLabelRange.min < yMin || yLabelRange.max > yMax) {
-          return;
+          continue;
         }
         if (this._overlayLabel(xLabelRange, yLabelRange, datumIndex, datasetIndex, dataToDraw)) {
-          return;
+          continue;
         }
 
         const color = attrToProjector["fill"](datum, datumIndex, dataset);
@@ -447,7 +450,7 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
           yAlign: "center",
         }, g.node());
       }
-    });
+    }
   }
 
   private _overlayLabel(labelXRange: Range, labelYRange: Range, datumIndex: number, datasetIndex: number,
@@ -457,7 +460,8 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
     for (let i = datasetIndex; i < datasets.length; i++) {
       const dataset = datasets[i];
       const data = dataToDraw.get(dataset);
-      for (let j = (i === datasetIndex ? datumIndex + 1 : 0); j < data.length; j++) {
+      const dataLen = data.length;
+      for (let j = (i === datasetIndex ? datumIndex + 1 : 0); j < dataLen; j++) {
         if (Utils.DOM.intersectsBBox(labelXRange, labelYRange, this._entityBBox(data[j], j, dataset, attrToProjector))) {
           return true;
         }

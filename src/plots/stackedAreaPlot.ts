@@ -248,9 +248,12 @@ export class StackedArea<X> extends Area<X> {
   private static _domainKeys(datasets: Dataset[], keyAccessor: IAccessor<any>) {
     const domainKeys = d3.set();
     datasets.forEach((dataset) => {
-      dataset.data().forEach((datum, index) => {
+      const data = dataset.data();
+      const dataLen = data.length;
+      for (let index = 0; index < dataLen; index++) {
+        const datum = data[index];
         domainKeys.add(keyAccessor(datum, index, dataset));
-      });
+      }
     });
 
     return domainKeys.values();

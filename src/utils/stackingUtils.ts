@@ -8,6 +8,7 @@ import * as d3 from "d3";
 import { Dataset } from "../core/dataset";
 import { IAccessor } from "../core/interfaces";
 
+import { memoize, MemoizedFunction } from "lodash";
 import * as Utils from "./";
 import { makeEnum } from "./makeEnum";
 
@@ -75,10 +76,14 @@ export function stack(
     datasets.reverse();
   }
 
-  datasets.forEach((dataset) => {
+  for (const dataset of datasets) {
     const keyToStackedDatum = new Utils.Map<string, StackedDatum>();
-    dataset.data().forEach((datum, index) => {
-      const key = normalizeKey(keyAccessor(datum, index, dataset));
+    const data = dataset.data();
+    const dataLen = data.length;
+    for (let index = 0; index < dataLen; index++) {
+      const datum = data[index];
+      const accessedKey = keyAccessor(datum, index, dataset);
+      const key = normalizeKey(accessedKey);
       const value = +valueAccessor(datum, index, dataset);
       let offset: number;
       const offsetMap = (value >= 0) ? positiveOffsets : negativeOffsets;
@@ -92,14 +97,14 @@ export function stack(
       keyToStackedDatum.set(key, {
         offset: offset,
         value: value,
-        axisValue: keyAccessor(datum, index, dataset),
+        axisValue: accessedKey,
         originalDatum: datum,
         originalDataset: dataset,
         originalIndex: index,
       });
-    });
+    }
     datasetToKeyToStackedDatum.set(dataset, keyToStackedDatum);
-  });
+  }
   return datasetToKeyToStackedDatum;
 }
 
@@ -120,8 +125,9 @@ export function stackedExtents<D>(stackingResult: GenericStackingResult<D>): {
   stackingResult.forEach((stack) => {
     stack.forEach((datum: GenericStackedDatum<D>, key) => {
       // correctly handle negative bar stacks
-      const maximalValue = Utils.Math.max([datum.offset + datum.value, datum.offset], datum.offset);
-      const minimalValue = Utils.Math.min([datum.offset + datum.value, datum.offset], datum.offset);
+      const offsetValue = datum.offset + datum.value;
+      const maximalValue = Utils.Math.max([offsetValue, datum.offset], datum.offset);
+      const minimalValue = Utils.Math.min([offsetValue, datum.offset], datum.offset);
 
       const { axisValue } = datum;
 
@@ -153,13 +159,16 @@ export function stackedExtents<D>(stackingResult: GenericStackingResult<D>): {
 export function stackedExtent(stackingResult: StackingResult, keyAccessor: IAccessor<any>, filter: IAccessor<boolean>) {
   const extents: number[] = [];
   stackingResult.forEach((stackedDatumMap: Utils.Map<string, StackedDatum>, dataset: Dataset) => {
-    dataset.data().forEach((datum, index) => {
+    const data = dataset.data();
+    const dataLen = data.length;
+    for (let index = 0; index < dataLen; index++) {
+      const datum = data[index];
       if (filter != null && !filter(datum, index, dataset)) {
-        return;
+        continue;
       }
       const stackedDatum = stackedDatumMap.get(normalizeKey(keyAccessor(datum, index, dataset)));
       extents.push(stackedDatum.value + stackedDatum.offset);
-    });
+    }
   });
   const maxStackExtent = Utils.Math.max(extents, 0);
   const minStackExtent = Utils.Math.min(extents, 0);
@@ -173,6 +182,6 @@ export function stackedExtent(stackingResult: StackingResult, keyAccessor: IAcce
  * @param {any} key The key to be normalized
  * @return {string} The stringified key
  */
-export function normalizeKey(key: any) {
+export const normalizeKey = memoize((key: any) => {
   return String(key);
-}
+}) as ((key: any) => string) & MemoizedFunction;
