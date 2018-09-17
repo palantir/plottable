@@ -13,6 +13,7 @@ export * from "./categoryScale";
 export * from "./colorScale";
 export * from "./interpolatedColorScale";
 export * from "./linearScale";
+export * from "./logScale";
 export * from "./modifiedLogScale";
 export * from "./timeScale";
 
