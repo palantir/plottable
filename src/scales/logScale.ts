@@ -44,11 +44,11 @@ export class Log extends QuantitativeScale<number> {
     }
   }
 
-  private _log(x: number): number {
+  protected _log(x: number): number {
     return Math.log(x) / Math.log(this._base);
   }
 
-  private _invertedLog(x: number): number {
+  protected _invertedLog(x: number): number {
     return Math.pow(this._base, x);
   }
 
@@ -80,6 +80,10 @@ export class Log extends QuantitativeScale<number> {
     this.domain(domain);
   }
 
+  public _getBase() {
+    return this._base;
+  }
+
   protected _getDomain() {
     return this._untransformedDomain;
   }
@@ -101,7 +105,7 @@ export class Log extends QuantitativeScale<number> {
     }
   }
 
-  private _logTickGenerator = (scale: QuantitativeScale<number>) => {
+  protected _logTickGenerator = (scale: QuantitativeScale<number>) => {
     const min = Utils.Math.min(this._untransformedDomain, 0);
     const max = Utils.Math.max(this._untransformedDomain, 0);
 
@@ -127,7 +131,7 @@ export class Log extends QuantitativeScale<number> {
    * This function will generate clusters as large as it can while not
    * drastically exceeding its number of ticks.
    */
-  private _logTicks(lower: number, upper: number): number[] {
+  protected _logTicks(lower: number, upper: number): number[] {
     const nTicks = this._howManyTicks(lower, upper);
     if (nTicks === 0) {
       return [];
@@ -151,7 +155,7 @@ export class Log extends QuantitativeScale<number> {
    * I would get 1/2 of the ticks. The range 10, 100 takes up 1/2 of the
    * distance when plotted.
    */
-  private _howManyTicks(lower: number, upper: number): number {
+  protected _howManyTicks(lower: number, upper: number): number {
     const logMin = this._log(Utils.Math.min(this._untransformedDomain, 0));
     const logMax = this._log(Utils.Math.max(this._untransformedDomain, 0));
     const logLower = this._log(lower);
