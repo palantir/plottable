@@ -5,8 +5,8 @@ function makeData() {
     var data = [];
 
     for (var i = 0; i < 10; i++) {
-        var x = (3**i)/100;
-        data.push({x: x, y: x**exponent});
+        var x = Math.pow(3, i)/100;
+        data.push({x: x, y: Math.pow(x, exponent)});
     }
 
     return data;
