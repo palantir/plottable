@@ -5,9 +5,6 @@
 
 import * as d3 from "d3";
 
-import * as Utils from "../utils";
-
-import * as Scales from "./";
 import { QuantitativeScale } from "./quantitativeScale";
 
 export class Log extends QuantitativeScale<number> {
@@ -23,12 +20,13 @@ export class Log extends QuantitativeScale<number> {
   }
 
   protected _defaultExtent(): number[] {
-    return [this._d3Scale.base()/10, this._d3Scale.base()*10];
+    return [1, this._d3Scale.base()];
   }
 
   protected _expandSingleValueDomain(singleValueDomain: number[]) {
     if (singleValueDomain[0] === singleValueDomain[1]) {
-      return [singleValueDomain[0] - 1, singleValueDomain[1] + 1];
+      return [singleValueDomain[0]/this._d3Scale.base(),
+              singleValueDomain[1]*this._d3Scale.base()];
     }
     return singleValueDomain;
   }
