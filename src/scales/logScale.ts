@@ -19,10 +19,11 @@ export class Log extends QuantitativeScale<number> {
   constructor(base = 10) {
     super();
     this._d3Scale = d3.scaleLog().base(base);
+    this._setDomain(this._defaultExtent());
   }
 
   protected _defaultExtent(): number[] {
-    return [0, 1];
+    return [this._d3Scale.base()/10, this._d3Scale.base()*10];
   }
 
   protected _expandSingleValueDomain(singleValueDomain: number[]) {
