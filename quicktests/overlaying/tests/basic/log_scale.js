@@ -17,8 +17,10 @@ function run(div, data, Plottable) {
 
     var xScale = new Plottable.Scales.Log();
     var yScale = new Plottable.Scales.Log();
-    var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
-    var yAxis = new Plottable.Axes.Numeric(yScale, "left");
+    var xAxis = new Plottable.Axes.Numeric(xScale, "bottom")
+        .formatter(Plottable.Formatters.siSuffix());
+    var yAxis = new Plottable.Axes.Numeric(yScale, "left")
+        .formatter(Plottable.Formatters.siSuffix());
 
     var plot = new Plottable.Plots.Scatter()
         .renderer("svg")
