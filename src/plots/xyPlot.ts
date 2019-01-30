@@ -360,9 +360,13 @@ export class XYPlot<X, Y> extends Plot {
   protected _getDataToDraw(): Utils.Map<Dataset, any[]> {
     const dataToDraw: Utils.Map<Dataset, any[]> = super._getDataToDraw();
 
+    const definedAttr = this.attr("defined");
     const definedFunction = (d: any, i: number, dataset: Dataset) => {
       const positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
       const positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
+      if (definedAttr && definedAttr.accessor(d, i, dataset) === false) {
+        return false;
+      }
       return Utils.Math.isValidNumber(positionX) &&
         Utils.Math.isValidNumber(positionY);
     };
