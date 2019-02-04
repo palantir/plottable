@@ -1,7 +1,7 @@
 {
   "name": "plottable",
   "description": "A modular charting library built on D3",
-  "version": "3.8.3",
+  "version": "3.8.4",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -55,8 +55,8 @@
     "sinon": "^2.1.0",
     "tslint": "4.5.1",
     "typescript": "~2.7",
-    "webpack": "2.2.1",
-    "webpack-dev-server": "2.3.0",
+    "webpack": "2.6.1",
+    "webpack-dev-server": "2.11.1",
     "webpack-merge": "^4.1.0"
   },
   "dependencies": {
