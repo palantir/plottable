@@ -333,10 +333,10 @@ export class Plot extends Component {
    * Sets a particular attribute to a constant value or the result of an Accessor.
    *
    * @param {string} attr
-   * @param {number|string|Accessor<number>|Accessor<string>} attrValue
+   * @param {number|string|Accessor<number>|Accessor<string>|Accessor<boolean>} attrValue
    * @returns {Plot} The calling Plot.
    */
-  public attr(attr: string, attrValue: number | string | IAccessor<number> | IAccessor<string>): this;
+  public attr(attr: string, attrValue: number | string | IAccessor<number> | IAccessor<string> | IAccessor<boolean>): this;
   /**
    * Sets a particular attribute to a scaled constant value or scaled result of an Accessor.
    * The provided Scale will account for the attribute values when autoDomain()-ing.
