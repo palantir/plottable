@@ -10,12 +10,12 @@
 "@types/d3-array@*":
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/@types/d3-array/-/d3-array-1.2.1.tgz#e489605208d46a1c9d980d2e5772fa9c75d9ec65"
-  integrity sha1-5IlgUgjUahydmA0uV3L6nHXZ7GU=
+  integrity sha512-YBaAfimGdWE4nDuoGVKsH89/dkz2hWZ0i8qC+xxqmqi+XJ/aXiRF0jPtzXmN7VdkpVjy1xuDmM5/m1FNuB6VWA==
 
 "@types/d3-axis@*":
   version "1.0.10"
   resolved "https://registry.yarnpkg.com/@types/d3-axis/-/d3-axis-1.0.10.tgz#41d6b3ea9032f9531ec0d71d83bcf49294511210"
-  integrity sha1-Qdaz6pAy+VMewNcdg7z0kpRREhA=
+  integrity sha512-5YF0wfdQMPKw01VAAupLIlg/T4pn5M3/vL9u0KZjiemnVnnKBEWE24na4X1iW+TfZiYJ8j+BgK2KFYnAAT54Ug==
   dependencies:
     "@types/d3-selection" "*"
 
@@ -34,12 +34,12 @@
 "@types/d3-collection@*":
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/@types/d3-collection/-/d3-collection-1.0.6.tgz#0a5a87fe241fcbd253a637d024b4d8c55f84a369"
-  integrity sha1-ClqH/iQfy9JTpjfQJLTYxV+Eo2k=
+  integrity sha512-UHBvaU2wT5GlJN6rRVQm42211uAyZtp7m0jpQFuMuX7hTuivc0tcF0cjx5Ny5eQkhIolEyKwWgvJexw4e8g4+A==
 
 "@types/d3-color@*":
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/@types/d3-color/-/d3-color-1.0.6.tgz#6e955f739c3f92bf94e9e3a8cfa2806734244b60"
-  integrity sha1-bpVfc5w/kr+U6eOoz6KAZzQkS2A=
+  integrity sha512-AOlR0Gp7zV3c8C+gfxSboL3crNqsXCbAm32X934qXy0A1ymFC6T1TEIAEF/oH9yKQN2JHKpDkMhVEZeEVwKXEw==
 
 "@types/d3-dispatch@*":
   version "1.0.5"
@@ -49,14 +49,14 @@
 "@types/d3-drag@*":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@types/d3-drag/-/d3-drag-1.2.0.tgz#5ee6279432c894f85cb72fcda911a959bae11952"
-  integrity sha1-XuYnlDLIlPhcty/NqRGpWbrhGVI=
+  integrity sha512-AePmm0sXj0Tpl0uQWvwmbAf1QR3yCy9aRhjJ9mRDDSZlHBdY0SCpUtdZC9uG9Q+pyHT/dEt1R2FT/sj+5k/bVA==
   dependencies:
     "@types/d3-selection" "*"
 
 "@types/d3-dsv@*":
   version "1.0.31"
   resolved "https://registry.yarnpkg.com/@types/d3-dsv/-/d3-dsv-1.0.31.tgz#468302f18ac44db2a3944086388d862503ab9c6c"
-  integrity sha1-RoMC8YrETbKjlECGOI2GJQOrnGw=
+  integrity sha512-UCAVZdwd2NkrbkF1lZu9vzTlmUENRRrPCubyhDPlG8Ye1B8Xr2PNvk/Tp8tMm6sPoWZWagri6/P9H+t7WqkGDg==
 
 "@types/d3-ease@*":
   version "1.0.7"
@@ -66,17 +66,17 @@
 "@types/d3-force@*":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@types/d3-force/-/d3-force-1.1.0.tgz#40925ca3512b63bd424f7c9685e1781b5b0a1d7e"
-  integrity sha1-QJJco1ErY71CT3yWheF4G1sKHX4=
+  integrity sha512-a39Uu/ltLaMpj6K0elEB1oAqhx9rlTB5X/O75uTUqyTW2CfjhPXg6hFsX1lF8oeMc29kqGJZ4g9Pf6mET25bVw==
 
 "@types/d3-format@*":
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/@types/d3-format/-/d3-format-1.2.2.tgz#bc60b936bd3cc805225ab4423081eb218e6d1db0"
-  integrity sha1-vGC5Nr08yAUiWrRCMIHrIY5tHbA=
+  integrity sha512-XN4KV7RTNtN70pBJlC2vLTCFdCH27AyJK6/VQ/iKtrOd3Rf00zErr8espKqtBoEAdQeqjSP5ohuwJI1RHSGQAA==
 
 "@types/d3-geo@*":
   version "1.10.1"
   resolved "https://registry.yarnpkg.com/@types/d3-geo/-/d3-geo-1.10.1.tgz#a70732541adde9d2cfcf705ff58622cf4a6819e3"
-  integrity sha1-pwcyVBrd6dLPz3Bf9YYiz0poGeM=
+  integrity sha512-CXGq6jMGVdcRhC/oqDOKQzPmuzxa0sUErjE2BilS8HmLzY16pEKhYyJivHu+KfWUWMHCklwJGyzF0elSOb+eGA==
   dependencies:
     "@types/geojson" "*"
 
@@ -95,7 +95,7 @@
 "@types/d3-path@*":
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/@types/d3-path/-/d3-path-1.0.6.tgz#c1a7d2dc07b295fdd1c84dabe4404df991b48693"
-  integrity sha1-wafS3Aeylf3RyE2r5EBN+ZG0hpM=
+  integrity sha512-YHW4cs+wOU9gFUzudjJs9TkrB/8GOgKhq32ZyNaZ2rzZjOhkqG486sGr9XSh4C91CcgIg1FRGoDaN29Ropx9nw==
 
 "@types/d3-polygon@*":
   version "1.0.5"
@@ -127,7 +127,7 @@
 "@types/d3-scale@^1":
   version "1.0.12"
   resolved "https://registry.yarnpkg.com/@types/d3-scale/-/d3-scale-1.0.12.tgz#f6300e886ce38dc8834172a9ce4a2cbfad74d029"
-  integrity sha1-9jAOiGzjjciDQXKpzkosv6100Ck=
+  integrity sha512-2Z3YsHdWRBuUiqKHcnWVF1ffuALFn+k74QEECUCpzabD/5Olxvs/aJM4eG3QTe5n9yiWK432kOEpinGvO1wDfA==
   dependencies:
     "@types/d3-time" "*"
 
@@ -142,24 +142,24 @@
 "@types/d3-selection@*":
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/@types/d3-selection/-/d3-selection-1.3.0.tgz#acede3d22c18ec085cc401d4fdab9f040e1a73c7"
-  integrity sha1-rO3j0iwY7AhcxAHU/aufBA4ac8c=
+  integrity sha512-1SJhi3kTk/SHHIE6XkHuHU2REYkbSOjkQuo3HT71FOTs8/tjeGcvtXMsX4N3kU1UE1nVG+A5pg7TSjuJ4zUN3A==
 
 "@types/d3-shape@*":
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/@types/d3-shape/-/d3-shape-1.2.2.tgz#f8dcdff7772a7ae37858bf04abd43848a78e590e"
-  integrity sha1-+Nzf93cqeuN4WL8Eq9Q4SKeOWQ4=
+  integrity sha512-Ydksrces8J5WP/NXhZ/CcDx/XZZ8b7MDX+u6WGQXwEWfmimJn9eYHiD7QR4BLe3zBiAOQmmiGAwRBKUDp5zb1g==
   dependencies:
     "@types/d3-path" "*"
 
 "@types/d3-time-format@*":
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/@types/d3-time-format/-/d3-time-format-2.1.0.tgz#011e0fb7937be34a9a8f580ae1e2f2f1336a8a22"
-  integrity sha1-AR4Pt5N740qaj1gK4eLy8TNqiiI=
+  integrity sha512-/myT3I7EwlukNOX2xVdMzb8FRgNzRMpsZddwst9Ld/VFe6LyJyRp0s32l/V9XoUzk+Gqu56F/oGk6507+8BxrA==
 
 "@types/d3-time@*":
   version "1.0.7"
   resolved "https://registry.yarnpkg.com/@types/d3-time/-/d3-time-1.0.7.tgz#4266d7c9be15fa81256a88d1d052d61cd8dc572c"
-  integrity sha1-QmbXyb4V+oElaojR0FLWHNjcVyw=
+  integrity sha512-X5ZQYiJIM38XygNwld4gZ++Vtw2ftgo3KOfZOY4n/sCudUxclxf/3THBvuG8UqSV+EQ0ezYjT5eyvcrrmixOWA==
 
 "@types/d3-timer@*":
   version "1.0.6"
@@ -169,19 +169,19 @@
 "@types/d3-transition@*":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@types/d3-transition/-/d3-transition-1.1.1.tgz#c209fce6a966d6696356dd42b091a9c6cc79929f"
-  integrity sha1-wgn85qlm1mljVt1CsJGpxsx5kp8=
+  integrity sha512-GHTghl0YYB8gGgbyKxVLHyAp9Na0HqsX2U7M0u0lGw4IdfEaslooykweZ8fDHW13T+KZeZAuzhbmqBZVFO+6kg==
   dependencies:
     "@types/d3-selection" "*"
 
 "@types/d3-voronoi@*":
   version "1.1.7"
   resolved "https://registry.yarnpkg.com/@types/d3-voronoi/-/d3-voronoi-1.1.7.tgz#c0a145cf04395927e01706ff6c4ff835c97a8ece"
-  integrity sha1-wKFFzwQ5WSfgFwb/bE/4Ncl6js4=
+  integrity sha512-/dHFLK5jhXTb/W4XEQcFydVk8qlIAo85G3r7+N2fkBFw190l0R1GQ8C1VPeXBb2GfSU5GbT2hjlnE7i7UY5Gvg==
 
 "@types/d3-zoom@*":
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/@types/d3-zoom/-/d3-zoom-1.7.0.tgz#1221bbf6434820f044c80b551c5519b817008961"
-  integrity sha1-EiG79kNIIPBEyAtVHFUZuBcAiWE=
+  integrity sha512-eIivt2ehMUXqS0guuVzRSMr5RGhO958g9EKxIJv3Z23suPnX4VQI9k1TC/bLuwKq0IWp9a1bEEcIy+PNJv9BtA==
   dependencies:
     "@types/d3-interpolate" "*"
     "@types/d3-selection" "*"
@@ -189,7 +189,7 @@
 "@types/d3@^4.13.0":
   version "4.13.0"
   resolved "https://registry.yarnpkg.com/@types/d3/-/d3-4.13.0.tgz#aae092b368266409cfbf19c611203145ec0d5f65"
-  integrity sha1-quCSs2gmZAnPvxnGESAxRewNX2U=
+  integrity sha512-L7C+aOIl+z/e7pPBvRXxA9EZ8a5RIZSq4UnTgdjCnypYV3bPI1wpx81snC8pE1zB4SZQC/WK4noZUHzWAABfBA==
   dependencies:
     "@types/d3-array" "*"
     "@types/d3-axis" "*"
@@ -225,7 +225,7 @@
 "@types/geojson@*":
   version "7946.0.2"
   resolved "https://registry.yarnpkg.com/@types/geojson/-/geojson-7946.0.2.tgz#0bd0a01ef04e813c2b7580318da9e37c2eadea9c"
-  integrity sha1-C9CgHvBOgTwrdYAxjanjfC6t6pw=
+  integrity sha512-JuRe9eeID7XvL7viIcFqIAAXDLfyRcImIWE/XjBIhrUZjxX5z4fLcF3QXS9zYnvIn8mmtW/7OxDV3XC8QMb7OA==
 
 "@types/is-plain-object@^0.0.2":
   version "0.0.2"
@@ -235,7 +235,7 @@
 "@types/lodash@^4.14.109":
   version "4.14.109"
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.109.tgz#b1c4442239730bf35cabaf493c772b18c045886d"
-  integrity sha1-scREIjlzC/Ncq69JPHcrGMBFiG0=
+  integrity sha512-hop8SdPUEzbcJm6aTsmuwjIYQo1tqLseKCM+s2bBqTU2gErwI4fE+aqUVOlscPSQbKHKgtMMPoC+h4AIGOJYvw==
 
 "@types/mocha@^2.2.27":
   version "2.2.40"
@@ -267,7 +267,7 @@ accepts@~1.3.3:
 
 accepts@~1.3.5:
   version "1.3.5"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/accepts/-/accepts-1.3.5.tgz#eb777df6011723a3b14e8a72c0805c8e86746bd2"
+  resolved "https://registry.yarnpkg.com/accepts/-/accepts-1.3.5.tgz#eb777df6011723a3b14e8a72c0805c8e86746bd2"
   integrity sha1-63d99gEXI6OxTopywIBcjoZ0a9I=
   dependencies:
     mime-types "~2.1.18"
@@ -292,8 +292,8 @@ acorn@^4.0.3:
 
 acorn@^5.0.0:
   version "5.7.3"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/acorn/-/acorn-5.7.3.tgz#67aa231bf8812974b85235a96771eb6bd07ea279"
-  integrity sha1-Z6ojG/iBKXS4UjWpZ3Hra9B+onk=
+  resolved "https://registry.yarnpkg.com/acorn/-/acorn-5.7.3.tgz#67aa231bf8812974b85235a96771eb6bd07ea279"
+  integrity sha512-T/zvzYRfbVojPWahDsE5evJdHb3oJoQfFbsrKM7w5Zcs++Tr257tia3BmMP8XYVjp1S9RZXQMh7gao96BlqZOw==
 
 ajv-keywords@^1.1.1:
   version "1.5.1"
@@ -368,8 +368,8 @@ ansi-styles@~1.0.0:
 
 anymatch@^2.0.0:
   version "2.0.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/anymatch/-/anymatch-2.0.0.tgz#bcb24b4f37934d9aa7ac17b4adaf89e7c76ef2eb"
-  integrity sha1-vLJLTzeTTZqnrBe0ra+J58du8us=
+  resolved "https://registry.yarnpkg.com/anymatch/-/anymatch-2.0.0.tgz#bcb24b4f37934d9aa7ac17b4adaf89e7c76ef2eb"
+  integrity sha512-5teOsQWABXHHBFP9y3skS5P3d/WfWXpv3FUpy+LorMrNYaT9pI4oLMQX7jzQ2KklNpGpWHzdCXTDT2Y3XGlZBw==
   dependencies:
     micromatch "^3.1.4"
     normalize-path "^2.1.1"
@@ -422,7 +422,7 @@ arr-flatten@^1.0.1:
 arr-flatten@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/arr-flatten/-/arr-flatten-1.1.0.tgz#36048bbff4e7b47e136644316c99669ea5ae91f1"
-  integrity sha1-NgSLv/TntH4TZkQxbJlmnqWukfE=
+  integrity sha512-L3hKV5R/p5o81R7O02IGnwpDmkp6E982XhtbuwSe3O4qOtMMMtodicASA1Cny2U+aCXcNpml+m4dPsvsJ3jatg==
 
 arr-union@^3.1.0:
   version "3.1.0"
@@ -441,7 +441,7 @@ array-filter@~0.0.0:
 
 array-find-index@^1.0.1:
   version "1.0.2"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/array-find-index/-/array-find-index-1.0.2.tgz#df010aa1287e164bbda6f9723b0a96a1ec4187a1"
+  resolved "https://registry.yarnpkg.com/array-find-index/-/array-find-index-1.0.2.tgz#df010aa1287e164bbda6f9723b0a96a1ec4187a1"
   integrity sha1-3wEKoSh+Fku9pvlyOwqWoexBh6E=
 
 array-flatten@1.1.1:
@@ -451,12 +451,12 @@ array-flatten@1.1.1:
 
 array-flatten@^2.1.0:
   version "2.1.2"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/array-flatten/-/array-flatten-2.1.2.tgz#24ef80a28c1a893617e2149b0c6d0d788293b099"
-  integrity sha1-JO+AoowaiTYX4hSbDG0NeIKTsJk=
+  resolved "https://registry.yarnpkg.com/array-flatten/-/array-flatten-2.1.2.tgz#24ef80a28c1a893617e2149b0c6d0d788293b099"
+  integrity sha512-hNfzcOV8W4NdualtqBFPyVO+54DSJuZGY9qT4pRroB6S9e3iiido2ISIC5h9R2sPJ8H3FHCIiEnsv1lPXO3KtQ==
 
 array-includes@^3.0.3:
   version "3.0.3"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/array-includes/-/array-includes-3.0.3.tgz#184b48f62d92d7452bb31b323165c7f8bd02266d"
+  resolved "https://registry.yarnpkg.com/array-includes/-/array-includes-3.0.3.tgz#184b48f62d92d7452bb31b323165c7f8bd02266d"
   integrity sha1-GEtI9i2S10UrsxsyMWXH+L0CJm0=
   dependencies:
     define-properties "^1.1.2"
@@ -615,7 +615,7 @@ atob@^2.0.0:
 awesome-typescript-loader@^3.4.1:
   version "3.4.1"
   resolved "https://registry.yarnpkg.com/awesome-typescript-loader/-/awesome-typescript-loader-3.4.1.tgz#22fa49800f0619ec18ab15383aef93b95378dea9"
-  integrity sha1-IvpJgA8GGewYqxU4Ou+TuVN43qk=
+  integrity sha512-fYxBtN6s4Dm6vtsROWi8IQ4I+KcmwRWePAVvhI06mFcHbtHfZopOs4qGNu9LyCPEw403LDROKFA+NVV6ig5yNw==
   dependencies:
     colors "^1.1.2"
     enhanced-resolve "3.3.0"
@@ -806,7 +806,7 @@ balanced-match@^0.4.1:
 
 balanced-match@^1.0.0:
   version "1.0.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/balanced-match/-/balanced-match-1.0.0.tgz#89b4d199ab2bee49de164ea02b89ce462d71b767"
+  resolved "https://registry.yarnpkg.com/balanced-match/-/balanced-match-1.0.0.tgz#89b4d199ab2bee49de164ea02b89ce462d71b767"
   integrity sha1-ibTRmasr7kneFk6gK4nORi1xt2c=
 
 base64-js@^1.0.2:
@@ -817,7 +817,7 @@ base64-js@^1.0.2:
 base@^0.11.1:
   version "0.11.2"
   resolved "https://registry.yarnpkg.com/base/-/base-0.11.2.tgz#7bde5ced145b6d551a90db87f83c558b4eb48a8f"
-  integrity sha1-e95c7RRbbVUakNuH+DxVi060io8=
+  integrity sha512-5T6P4xPgpp0YDFvSWwEZ4NoE3aM4QBQXDzmVbraCkFj8zHM+mba8SyqB5DbZWyR7mYHo6Y7BdQo3MoA4m0TeQg==
   dependencies:
     cache-base "^1.0.1"
     class-utils "^0.3.5"
@@ -885,7 +885,7 @@ bn.js@^4.0.0, bn.js@^4.1.0, bn.js@^4.1.1, bn.js@^4.4.0:
 
 body-parser@1.18.3:
   version "1.18.3"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/body-parser/-/body-parser-1.18.3.tgz#5b292198ffdd553b3a0f20ded0592b956955c8b4"
+  resolved "https://registry.yarnpkg.com/body-parser/-/body-parser-1.18.3.tgz#5b292198ffdd553b3a0f20ded0592b956955c8b4"
   integrity sha1-WykhmP/dVTs6DyDe0FkrlWlVyLQ=
   dependencies:
     bytes "3.0.0"
@@ -901,7 +901,7 @@ body-parser@1.18.3:
 
 bonjour@^3.5.0:
   version "3.5.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/bonjour/-/bonjour-3.5.0.tgz#8e890a183d8ee9a2393b3844c691a42bcf7bc9f5"
+  resolved "https://registry.yarnpkg.com/bonjour/-/bonjour-3.5.0.tgz#8e890a183d8ee9a2393b3844c691a42bcf7bc9f5"
   integrity sha1-jokKGD2O6aI5OzhExpGkK897yfU=
   dependencies:
     array-flatten "^2.1.0"
@@ -948,8 +948,8 @@ brace-expansion@^1.0.0:
 
 brace-expansion@^1.1.7:
   version "1.1.11"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/brace-expansion/-/brace-expansion-1.1.11.tgz#3c7fcbf529d87226f3d2f52b966ff5271eb441dd"
-  integrity sha1-PH/L9SnYcibz0vUrlm/1Jx60Qd0=
+  resolved "https://registry.yarnpkg.com/brace-expansion/-/brace-expansion-1.1.11.tgz#3c7fcbf529d87226f3d2f52b966ff5271eb441dd"
+  integrity sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA==
   dependencies:
     balanced-match "^1.0.0"
     concat-map "0.0.1"
@@ -966,7 +966,7 @@ braces@^1.8.2:
 braces@^2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/braces/-/braces-2.3.0.tgz#a46941cb5fb492156b3d6a656e06c35364e3e66e"
-  integrity sha1-pGlBy1+0khVrPWplbgbDU2Tj5m4=
+  integrity sha512-P4O8UQRdGiMLWSizsApmXVQDBS6KCt7dSexgLKBmH5Hr1CZq7vsnscFh8oR1sP1ab1Zj0uCHCEzZeV6SfUf3rA==
   dependencies:
     arr-flatten "^1.1.0"
     array-unique "^0.3.2"
@@ -982,8 +982,8 @@ braces@^2.3.0:
 
 braces@^2.3.1:
   version "2.3.2"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/braces/-/braces-2.3.2.tgz#5979fd3f14cd531565e5fa2df1abfff1dfaee729"
-  integrity sha1-WXn9PxTNUxVl5fot8av/8d+u5yk=
+  resolved "https://registry.yarnpkg.com/braces/-/braces-2.3.2.tgz#5979fd3f14cd531565e5fa2df1abfff1dfaee729"
+  integrity sha512-aNdbnj9P8PjdXU4ybaWLK2IF3jc/EoDYbC7AazW6to3TRsfXxscC9UXOB5iDiEQrkyIbWp2SLQda4+QAa7nc3w==
   dependencies:
     arr-flatten "^1.1.0"
     array-unique "^0.3.2"
@@ -1065,8 +1065,8 @@ browserify-zlib@^0.1.4:
 
 buffer-indexof@^1.0.0:
   version "1.1.1"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/buffer-indexof/-/buffer-indexof-1.1.1.tgz#52fabcc6a606d1a00302802648ef68f639da268c"
-  integrity sha1-Uvq8xqYG0aADAoAmSO9o9jnaJow=
+  resolved "https://registry.yarnpkg.com/buffer-indexof/-/buffer-indexof-1.1.1.tgz#52fabcc6a606d1a00302802648ef68f639da268c"
+  integrity sha512-4/rOEg86jivtPTeOUUT61jJO1Ya1TrR/OkqCSZDyq84WJh3LuuiphBYJN+fm5xufIk4XAFcEwte/8WzC8If/1g==
 
 buffer-shims@^1.0.0:
   version "1.0.0"
@@ -1104,13 +1104,13 @@ bytes@2.3.0:
 
 bytes@3.0.0:
   version "3.0.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/bytes/-/bytes-3.0.0.tgz#d32815404d689699f85a4ea4fa8755dd13a96048"
+  resolved "https://registry.yarnpkg.com/bytes/-/bytes-3.0.0.tgz#d32815404d689699f85a4ea4fa8755dd13a96048"
   integrity sha1-0ygVQE1olpn4Wk6k+odV3ROpYEg=
 
 cache-base@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/cache-base/-/cache-base-1.0.1.tgz#0a7f46416831c8b662ee36fe4e7c59d76f666ab2"
-  integrity sha1-Cn9GQWgxyLZi7jb+TnxZ129marI=
+  integrity sha512-AKcdTnFSWATd5/GCPRxr2ChwIJ85CeyrEyjRHlKxQ56d4XJMGym0uAiKn0xbLOGOl3+yRpOTi484dVCEc5AUzQ==
   dependencies:
     collection-visit "^1.0.0"
     component-emitter "^1.2.1"
@@ -1124,7 +1124,7 @@ cache-base@^1.0.1:
 
 camelcase-keys@^2.0.0:
   version "2.1.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/camelcase-keys/-/camelcase-keys-2.1.0.tgz#308beeaffdf28119051efa1d932213c91b8f92e7"
+  resolved "https://registry.yarnpkg.com/camelcase-keys/-/camelcase-keys-2.1.0.tgz#308beeaffdf28119051efa1d932213c91b8f92e7"
   integrity sha1-MIvur/3ygRkFHvodkyITyRuPkuc=
   dependencies:
     camelcase "^2.0.0"
@@ -1137,7 +1137,7 @@ camelcase@^1.0.2, camelcase@^1.2.1:
 
 camelcase@^2.0.0:
   version "2.1.1"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/camelcase/-/camelcase-2.1.1.tgz#7c1d16d679a1bbe59ca02cacecfb011e201f5a1f"
+  resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-2.1.1.tgz#7c1d16d679a1bbe59ca02cacecfb011e201f5a1f"
   integrity sha1-fB0W1nmhu+WcoCys7PsBHiAfWh8=
 
 camelcase@^3.0.0:
@@ -1214,8 +1214,8 @@ chalk@~1.0.0:
 
 chokidar@^2.0.0, chokidar@^2.0.2:
   version "2.0.4"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/chokidar/-/chokidar-2.0.4.tgz#356ff4e2b0e8e43e322d18a372460bbcf3accd26"
-  integrity sha1-NW/04rDo5D4yLRijckYLvPOszSY=
+  resolved "https://registry.yarnpkg.com/chokidar/-/chokidar-2.0.4.tgz#356ff4e2b0e8e43e322d18a372460bbcf3accd26"
+  integrity sha512-z9n7yt9rOvIJrMhvDtDictKrkFHeihkNl6uWMmZlmL6tJtX9Cs+87oK+teBx+JIgzvbX3yZHT3eF8vpbDxHJXQ==
   dependencies:
     anymatch "^2.0.0"
     async-each "^1.0.0"
@@ -1234,8 +1234,8 @@ chokidar@^2.0.0, chokidar@^2.0.2:
 
 chownr@^1.1.1:
   version "1.1.1"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/chownr/-/chownr-1.1.1.tgz#54726b8b8fff4df053c42187e801fb4412df1494"
-  integrity sha1-VHJri4//TfBTxCGH6AH7RBLfFJQ=
+  resolved "https://registry.yarnpkg.com/chownr/-/chownr-1.1.1.tgz#54726b8b8fff4df053c42187e801fb4412df1494"
+  integrity sha512-j38EvO5+LHX84jlo6h4UzmOwi0UgW61WRyPtJz4qaadK5eY3BTS5TY/S1Stc3Uk2lIM6TPevAlULiEJwie860g==
 
 cipher-base@^1.0.0, cipher-base@^1.0.1:
   version "1.0.3"
@@ -1257,7 +1257,7 @@ circular-json@^0.3.1:
 class-utils@^0.3.5:
   version "0.3.6"
   resolved "https://registry.yarnpkg.com/class-utils/-/class-utils-0.3.6.tgz#f93369ae8b9a7ce02fd41faad0ca83033190c463"
-  integrity sha1-+TNprouafOAv1B+q0MqDAzGQxGM=
+  integrity sha512-qOhPa/Fj7s6TY8H8esGu5QNpMMQxz79h+urzrNYN6mn+9BnxlDGf5QZ+XeCDsxSjPqsSR56XOZOJmpeurnLMeg==
   dependencies:
     arr-union "^3.1.0"
     define-property "^0.2.5"
@@ -1500,8 +1500,8 @@ content-disposition@0.5.2:
 
 content-type@~1.0.4:
   version "1.0.4"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/content-type/-/content-type-1.0.4.tgz#e138cc75e040c727b1966fe5e5f8c9aee256fe3b"
-  integrity sha1-4TjMdeBAxyexlm/l5fjJruJW/js=
+  resolved "https://registry.yarnpkg.com/content-type/-/content-type-1.0.4.tgz#e138cc75e040c727b1966fe5e5f8c9aee256fe3b"
+  integrity sha512-hIP3EEPs8tB9AT1L+NUqtwOAps4mk2Zob89MWXMHjHWg9milF/j4osnnQLXBCBFBk/tvIG/tUc9mOUJiPBhPXA==
 
 convert-source-map@^1.1.0:
   version "1.4.0"
@@ -1635,7 +1635,7 @@ ctype@0.5.3:
 
 currently-unhandled@^0.4.1:
   version "0.4.1"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/currently-unhandled/-/currently-unhandled-0.4.1.tgz#988df33feab191ef799a61369dd76c17adf957ea"
+  resolved "https://registry.yarnpkg.com/currently-unhandled/-/currently-unhandled-0.4.1.tgz#988df33feab191ef799a61369dd76c17adf957ea"
   integrity sha1-mI3zP+qxke95mmE2nddsF635V+o=
   dependencies:
     array-find-index "^1.0.1"
@@ -1653,7 +1653,7 @@ d3-array@1:
 d3-array@1.2.1, d3-array@^1.2.0:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/d3-array/-/d3-array-1.2.1.tgz#d1ca33de2f6ac31efadb8e050a021d7e2396d5dc"
-  integrity sha1-0coz3i9qwx76244FCgIdfiOW1dw=
+  integrity sha512-CyINJQ0SOUHojDdFDH4JEM0552vCR1utGyLHegJHyYH0JyCpSeTPxi4OBqHMA2jJZq4NH782LtaJWBImqI/HBw==
 
 d3-axis@1.0.8:
   version "1.0.8"
@@ -1710,7 +1710,7 @@ d3-drag@1:
 d3-drag@1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/d3-drag/-/d3-drag-1.2.1.tgz#df8dd4c502fb490fc7462046a8ad98a5c479282d"
-  integrity sha1-343UxQL7SQ/HRiBGqK2YpcR5KC0=
+  integrity sha512-Cg8/K2rTtzxzrb0fmnYOUeZHvwa4PHzwXOLZZPwtEs2SKLLKLXeYwZKBB+DlOxUvFmarOnmt//cU4+3US2lyyQ==
   dependencies:
     d3-dispatch "1"
     d3-selection "1"
@@ -1727,7 +1727,7 @@ d3-dsv@1:
 d3-dsv@1.0.8:
   version "1.0.8"
   resolved "https://registry.yarnpkg.com/d3-dsv/-/d3-dsv-1.0.8.tgz#907e240d57b386618dc56468bacfe76bf19764ae"
-  integrity sha1-kH4kDVezhmGNxWRous/na/GXZK4=
+  integrity sha512-IVCJpQ+YGe3qu6odkPQI0KPqfxkhbP/oM1XhhE/DFiYmcXKfCRub4KXyiuehV1d4drjWVXHUWx4gHqhdZb6n/A==
   dependencies:
     commander "2"
     iconv-lite "0.4"
@@ -1741,7 +1741,7 @@ d3-ease@1, d3-ease@1.0.3, d3-ease@^1.0.0:
 d3-force@1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/d3-force/-/d3-force-1.1.0.tgz#cebf3c694f1078fcc3d4daf8e567b2fbd70d4ea3"
-  integrity sha1-zr88aU8QePzD1Nr45Wey+9cNTqM=
+  integrity sha512-2HVQz3/VCQs0QeRNZTYb7GxoUCeb6bOzMp/cGcLa87awY9ZsPvXOGeZm0iaGBjXic6I1ysKwMn+g+5jSAdzwcg==
   dependencies:
     d3-collection "1"
     d3-dispatch "1"
@@ -1756,12 +1756,12 @@ d3-format@1:
 d3-format@1.2.2:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/d3-format/-/d3-format-1.2.2.tgz#1a39c479c8a57fe5051b2e67a3bee27061a74e7a"
-  integrity sha1-GjnEecilf+UFGy5no77icGGnTno=
+  integrity sha512-zH9CfF/3C8zUI47nsiKfD0+AGDEuM8LwBIP7pBVpyR4l/sKkZqITmMtxRp04rwBrlshIZ17XeFAaovN3++wzkw==
 
 d3-geo@1.9.1:
   version "1.9.1"
   resolved "https://registry.yarnpkg.com/d3-geo/-/d3-geo-1.9.1.tgz#157e3b0f917379d0f73bebfff3be537f49fa7356"
-  integrity sha1-FX47D5FzedD3O+v/875Tf0n6c1Y=
+  integrity sha512-l9wL/cEQkyZQYXw3xbmLsH3eQ5ij+icNfo4r0GrLa5rOCZR/e/3am45IQ0FvQ5uMsv+77zBRunLc9ufTWSQYFA==
   dependencies:
     d3-array "1"
 
@@ -1780,7 +1780,7 @@ d3-interpolate@1:
 d3-interpolate@1.1.6:
   version "1.1.6"
   resolved "https://registry.yarnpkg.com/d3-interpolate/-/d3-interpolate-1.1.6.tgz#2cf395ae2381804df08aa1bf766b7f97b5f68fb6"
-  integrity sha1-LPOVriOBgE3wiqG/dmt/l7X2j7Y=
+  integrity sha512-mOnv5a+pZzkNIHtw/V6I+w9Lqm9L5bG3OTXPM5A+QO0yyVMQ4W1uZhR+VOJmazaOZXri2ppbiZ5BUNWT0pFM9A==
   dependencies:
     d3-color "1"
 
@@ -1812,7 +1812,7 @@ d3-random@1.1.0:
 d3-request@1.0.6:
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/d3-request/-/d3-request-1.0.6.tgz#a1044a9ef4ec28c824171c9379fae6d79474b19f"
-  integrity sha1-oQRKnvTsKMgkFxyTefrm15R0sZ8=
+  integrity sha512-FJj8ySY6GYuAJHZMaCQ83xEYE4KbkPkmxZ3Hu6zA1xxG2GD+z6P+Lyp+zjdsHf0xEbp2xcluDI50rCS855EQ6w==
   dependencies:
     d3-collection "1"
     d3-dispatch "1"
@@ -1822,7 +1822,7 @@ d3-request@1.0.6:
 d3-scale@1.0.7:
   version "1.0.7"
   resolved "https://registry.yarnpkg.com/d3-scale/-/d3-scale-1.0.7.tgz#fa90324b3ea8a776422bd0472afab0b252a0945d"
-  integrity sha1-+pAySz6op3ZCK9BHKvqwslKglF0=
+  integrity sha512-KvU92czp2/qse5tUfGms6Kjig0AhHOwkzXG0+PqIJB3ke0WUv088AHMZI0OssO9NCkXt4RP8yju9rpH8aGB7Lw==
   dependencies:
     d3-array "^1.2.0"
     d3-collection "1"
@@ -1840,7 +1840,7 @@ d3-selection@1:
 d3-selection@1.3.0, d3-selection@^1.1.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/d3-selection/-/d3-selection-1.3.0.tgz#d53772382d3dc4f7507bfb28bcd2d6aed2a0ad6d"
-  integrity sha1-1TdyOC09xPdQe/sovNLWrtKgrW0=
+  integrity sha512-qgpUOg9tl5CirdqESUAu0t9MU/t3O9klYfGfyKsXEmhyxyzLpzpeh08gaxBUTQw1uXIOkr/30Ut2YRjSSxlmHA==
 
 d3-shape@1.2.0:
   version "1.2.0"
@@ -1866,7 +1866,7 @@ d3-time-format@2:
 d3-time-format@2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/d3-time-format/-/d3-time-format-2.1.1.tgz#85b7cdfbc9ffca187f14d3c456ffda268081bb31"
-  integrity sha1-hbfN+8n/yhh/FNPEVv/aJoCBuzE=
+  integrity sha512-8kAkymq2WMfzW7e+s/IUNAtN/y3gZXGRrdGfo6R8NKPAA85UBTxZg5E61bR6nLwjPjj4d3zywSQe1CkYLPFyrw==
   dependencies:
     d3-time "1"
 
@@ -1878,7 +1878,7 @@ d3-time@1:
 d3-time@1.0.8:
   version "1.0.8"
   resolved "https://registry.yarnpkg.com/d3-time/-/d3-time-1.0.8.tgz#dbd2d6007bf416fe67a76d17947b784bffea1e84"
-  integrity sha1-29LWAHv0Fv5np20XlHt4S//qHoQ=
+  integrity sha512-YRZkNhphZh3KcnBfitvF3c6E0JOFGikHZ4YqD+Lzv83ZHn1/u6yGenRU1m+KAk9J1GnZMnKcrtfvSktlA1DXNQ==
 
 d3-timer@1:
   version "1.0.5"
@@ -1888,7 +1888,7 @@ d3-timer@1:
 d3-timer@1.0.7:
   version "1.0.7"
   resolved "https://registry.yarnpkg.com/d3-timer/-/d3-timer-1.0.7.tgz#df9650ca587f6c96607ff4e60cc38229e8dd8531"
-  integrity sha1-35ZQylh/bJZgf/TmDMOCKejdhTE=
+  integrity sha512-vMZXR88XujmG/L5oB96NNKH5lCWwiLM/S2HyyAQLcjWJCloK5shxta4CwOFYLZoY3AWX73v8Lgv4cCAdWtRmOA==
 
 d3-transition@1:
   version "1.0.4"
@@ -1905,7 +1905,7 @@ d3-transition@1:
 d3-transition@1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/d3-transition/-/d3-transition-1.1.1.tgz#d8ef89c3b848735b060e54a39b32aaebaa421039"
-  integrity sha1-2O+Jw7hIc1sGDlSjmzKq66pCEDk=
+  integrity sha512-xeg8oggyQ+y5eb4J13iDgKIjUcEfIOZs2BqV/eEmXm2twx80wTzJ4tB4vaZ5BKfz7XsI/DFmQL5me6O27/5ykQ==
   dependencies:
     d3-color "1"
     d3-dispatch "1"
@@ -1922,7 +1922,7 @@ d3-voronoi@1.1.2:
 d3-zoom@1.7.1:
   version "1.7.1"
   resolved "https://registry.yarnpkg.com/d3-zoom/-/d3-zoom-1.7.1.tgz#02f43b3c3e2db54f364582d7e4a236ccc5506b63"
-  integrity sha1-AvQ7PD4ttU82RYLX5KI2zMVQa2M=
+  integrity sha512-sZHQ55DGq5BZBFGnRshUT8tm2sfhPHFnOlmPbbwTkAoPeVdRTkB4Xsf9GCY0TSHrTD8PeJPZGmP/TpGicwJDJQ==
   dependencies:
     d3-dispatch "1"
     d3-drag "1"
@@ -1933,7 +1933,7 @@ d3-zoom@1.7.1:
 d3@^4.13.0:
   version "4.13.0"
   resolved "https://registry.yarnpkg.com/d3/-/d3-4.13.0.tgz#ab236ff8cf0cfc27a81e69bf2fb7518bc9b4f33d"
-  integrity sha1-qyNv+M8M/CeoHmm/L7dRi8m08z0=
+  integrity sha512-l8c4+0SldjVKLaE2WG++EQlqD7mh/dmQjvi2L2lKPadAVC+TbJC4ci7Uk9bRi+To0+ansgsS0iWfPjD7DBy+FQ==
   dependencies:
     d3-array "1.2.1"
     d3-axis "1.0.8"
@@ -2019,14 +2019,14 @@ debug@2.6.1, debug@^2.1.1, debug@^2.2.0:
 debug@2.6.9, debug@^2.1.2, debug@^2.3.3, debug@^2.6.6:
   version "2.6.9"
   resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.9.tgz#5d128515df134ff327e90a4c93f4e077a536341f"
-  integrity sha1-XRKFFd8TT/Mn6QpMk/Tgd6U2NB8=
+  integrity sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==
   dependencies:
     ms "2.0.0"
 
 debug@^3.1.0:
   version "3.2.6"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/debug/-/debug-3.2.6.tgz#e83d17de16d8a7efb7717edbe5fb10135eee629b"
-  integrity sha1-6D0X3hbYp++3cX7b5fsQE17uYps=
+  resolved "https://registry.yarnpkg.com/debug/-/debug-3.2.6.tgz#e83d17de16d8a7efb7717edbe5fb10135eee629b"
+  integrity sha512-mel+jf7nrtEl5Pn1Qx46zARXKDpBbvzezse7p7LqINmdoIk8PYP5SySaxEmYv6TZ0JyEKA1hsCId6DIhgITtWQ==
   dependencies:
     ms "^2.1.1"
 
@@ -2054,8 +2054,8 @@ deep-equal@*, deep-equal@^1.0.1:
 
 deep-extend@^0.6.0:
   version "0.6.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/deep-extend/-/deep-extend-0.6.0.tgz#c4fa7c95404a17a9c3e8ca7e1537312b736330ac"
-  integrity sha1-xPp8lUBKF6nD6Mp+FTcxK3NjMKw=
+  resolved "https://registry.yarnpkg.com/deep-extend/-/deep-extend-0.6.0.tgz#c4fa7c95404a17a9c3e8ca7e1537312b736330ac"
+  integrity sha512-LOHxIOaPYdHlJRtCQfDIVZtfw/ufM8+rVj649RIHzcm/vGwQRXFt6OPqIFWsm2XEMrNIEtWR64sY1LEKD2vAOA==
 
 deep-extend@~0.4.0:
   version "0.4.1"
@@ -2091,8 +2091,8 @@ define-property@^1.0.0:
 
 define-property@^2.0.2:
   version "2.0.2"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/define-property/-/define-property-2.0.2.tgz#d459689e8d654ba77e02a817f8710d702cb16e9d"
-  integrity sha1-1Flono1lS6d+AqgX+HENcCyxbp0=
+  resolved "https://registry.yarnpkg.com/define-property/-/define-property-2.0.2.tgz#d459689e8d654ba77e02a817f8710d702cb16e9d"
+  integrity sha512-jwK2UV4cnPpbcG7+VRARKTZPUWowwXA8bzH5NP6ud0oeAxyYPuGZUAC7hMugpCdz4BeSZl2Dl9k66CHJ/46ZYQ==
   dependencies:
     is-descriptor "^1.0.2"
     isobject "^3.0.1"
@@ -2133,7 +2133,7 @@ del@^2.0.2:
 
 del@^3.0.0:
   version "3.0.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/del/-/del-3.0.0.tgz#53ecf699ffcbcb39637691ab13baf160819766e5"
+  resolved "https://registry.yarnpkg.com/del/-/del-3.0.0.tgz#53ecf699ffcbcb39637691ab13baf160819766e5"
   integrity sha1-U+z2mf/LyzljdpGrE7rxYIGXZuU=
   dependencies:
     globby "^6.1.0"
@@ -2165,7 +2165,7 @@ depd@1.1.0, depd@~1.1.0:
 
 depd@~1.1.2:
   version "1.1.2"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/depd/-/depd-1.1.2.tgz#9bcd52e14c097763e749b274c4346ed2e560b5a9"
+  resolved "https://registry.yarnpkg.com/depd/-/depd-1.1.2.tgz#9bcd52e14c097763e749b274c4346ed2e560b5a9"
   integrity sha1-m81S4UwJd2PnSbJ0xDRu0uVgtak=
 
 des.js@^1.0.0:
@@ -2192,7 +2192,7 @@ detect-indent@^3.0.0:
 
 detect-libc@^1.0.2:
   version "1.0.3"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/detect-libc/-/detect-libc-1.0.3.tgz#fa137c4bd698edf55cd5cd02ac559f91a4c4ba9b"
+  resolved "https://registry.yarnpkg.com/detect-libc/-/detect-libc-1.0.3.tgz#fa137c4bd698edf55cd5cd02ac559f91a4c4ba9b"
   integrity sha1-+hN8S9aY7fVc1c0CrFWfkaTEups=
 
 detective@^4.3.1:
@@ -2224,20 +2224,20 @@ diffie-hellman@^5.0.0:
 
 dns-equal@^1.0.0:
   version "1.0.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/dns-equal/-/dns-equal-1.0.0.tgz#b39e7f1da6eb0a75ba9c17324b34753c47e0654d"
+  resolved "https://registry.yarnpkg.com/dns-equal/-/dns-equal-1.0.0.tgz#b39e7f1da6eb0a75ba9c17324b34753c47e0654d"
   integrity sha1-s55/HabrCnW6nBcySzR1PEfgZU0=
 
 dns-packet@^1.3.1:
   version "1.3.1"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/dns-packet/-/dns-packet-1.3.1.tgz#12aa426981075be500b910eedcd0b47dd7deda5a"
-  integrity sha1-EqpCaYEHW+UAuRDu3NC0fdfe2lo=
+  resolved "https://registry.yarnpkg.com/dns-packet/-/dns-packet-1.3.1.tgz#12aa426981075be500b910eedcd0b47dd7deda5a"
+  integrity sha512-0UxfQkMhYAUaZI+xrNZOz/as5KgDU0M/fQ9b6SpkyLbk3GEswDi6PADJVaYJradtRVsRIlF1zLyOodbcTCDzUg==
   dependencies:
     ip "^1.1.0"
     safe-buffer "^5.0.1"
 
 dns-txt@^2.0.2:
   version "2.0.2"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/dns-txt/-/dns-txt-2.0.2.tgz#b91d806f5d27188e4ab3e7d107d881a1cc4642b6"
+  resolved "https://registry.yarnpkg.com/dns-txt/-/dns-txt-2.0.2.tgz#b91d806f5d27188e4ab3e7d107d881a1cc4642b6"
   integrity sha1-uR2Ab10nGI5Ks+fRB9iBocxGQrY=
   dependencies:
     buffer-indexof "^1.0.0"
@@ -2342,13 +2342,13 @@ encodeurl@~1.0.1:
 
 encodeurl@~1.0.2:
   version "1.0.2"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/encodeurl/-/encodeurl-1.0.2.tgz#ad3ff4c86ec2d029322f5a02c3a9a606c95b3f59"
+  resolved "https://registry.yarnpkg.com/encodeurl/-/encodeurl-1.0.2.tgz#ad3ff4c86ec2d029322f5a02c3a9a606c95b3f59"
   integrity sha1-rT/0yG7C0CkyL1oCw6mmBslbP1k=
 
 enhanced-resolve@3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/enhanced-resolve/-/enhanced-resolve-3.3.0.tgz#950964ecc7f0332a42321b673b38dc8ff15535b3"
-  integrity sha1-lQlk7MfwMypCMhtnOzjcj/FVNbM=
+  integrity sha512-2qbxE7ek3YxPJ1ML6V+satHkzHpJQKWkRHmRx6mfAoW59yP8YH8BFplbegSP+u2hBd6B6KCOpvJQ3dZAP+hkpg==
   dependencies:
     graceful-fs "^4.1.2"
     memory-fs "^0.4.0"
@@ -2401,8 +2401,8 @@ es-abstract@^1.4.3:
 
 es-abstract@^1.7.0:
   version "1.13.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/es-abstract/-/es-abstract-1.13.0.tgz#ac86145fdd5099d8dd49558ccba2eaf9b88e24e9"
-  integrity sha1-rIYUX91QmdjdSVWMy6Lq+biOJOk=
+  resolved "https://registry.yarnpkg.com/es-abstract/-/es-abstract-1.13.0.tgz#ac86145fdd5099d8dd49558ccba2eaf9b88e24e9"
+  integrity sha512-vDZfg/ykNxQVwup/8E1BZhVzFfBxs9NqMzGcvIJrqg5k2/5Za2bWo40dK2J1pgLngZ7c+Shh8lwYtLGyrwPutg==
   dependencies:
     es-to-primitive "^1.2.0"
     function-bind "^1.1.1"
@@ -2422,8 +2422,8 @@ es-to-primitive@^1.1.1:
 
 es-to-primitive@^1.2.0:
   version "1.2.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/es-to-primitive/-/es-to-primitive-1.2.0.tgz#edf72478033456e8dda8ef09e00ad9650707f377"
-  integrity sha1-7fckeAM0VujdqO8J4ArZZQcH83c=
+  resolved "https://registry.yarnpkg.com/es-to-primitive/-/es-to-primitive-1.2.0.tgz#edf72478033456e8dda8ef09e00ad9650707f377"
+  integrity sha512-qZryBOJjV//LaxLTV6UC//WewneB3LcXOL9NP++ozKVXsIIIpm/2c13UDiD9Jp2eThsecw9m3jPqDwTyobcdbg==
   dependencies:
     is-callable "^1.1.4"
     is-date-object "^1.0.1"
@@ -2621,7 +2621,7 @@ etag@~1.8.0:
 
 etag@~1.8.1:
   version "1.8.1"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/etag/-/etag-1.8.1.tgz#41ae2eeb65efa62268aebfea83ac7d79299b0887"
+  resolved "https://registry.yarnpkg.com/etag/-/etag-1.8.1.tgz#41ae2eeb65efa62268aebfea83ac7d79299b0887"
   integrity sha1-Qa4u62XvpiJorr/qg6x9eSmbCIc=
 
 event-emitter@~0.3.4:
@@ -2662,7 +2662,7 @@ events@^1.0.0:
 
 eventsource@0.1.6:
   version "0.1.6"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/eventsource/-/eventsource-0.1.6.tgz#0acede849ed7dd1ccc32c811bb11b944d4f29232"
+  resolved "https://registry.yarnpkg.com/eventsource/-/eventsource-0.1.6.tgz#0acede849ed7dd1ccc32c811bb11b944d4f29232"
   integrity sha1-Cs7ehJ7X3RzMMsgRuxG5RNTykjI=
   dependencies:
     original ">=0.0.5"
@@ -2725,8 +2725,8 @@ expand-range@^1.8.1:
 
 express@^4.16.2:
   version "4.16.4"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/express/-/express-4.16.4.tgz#fddef61926109e24c515ea97fd2f1bdbf62df12e"
-  integrity sha1-/d72GSYQniTFFeqX/S8b2/Yt8S4=
+  resolved "https://registry.yarnpkg.com/express/-/express-4.16.4.tgz#fddef61926109e24c515ea97fd2f1bdbf62df12e"
+  integrity sha512-j12Uuyb4FMrd/qQAm6uCHAkPtO8FDTRJZBDd5D2KOL2eLaz1yUNdUB/NOIyq0iU4q4cFarsUCrnFDPBcnksuOg==
   dependencies:
     accepts "~1.3.5"
     array-flatten "1.1.1"
@@ -2789,7 +2789,7 @@ extglob@^0.3.1:
 extglob@^2.0.2, extglob@^2.0.4:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/extglob/-/extglob-2.0.4.tgz#ad00fe4dc612a9232e8718711dc5cb5ab0285543"
-  integrity sha1-rQD+TcYSqSMuhxhxHcXLWrAoVUM=
+  integrity sha512-Nmb6QXkELsuBr24CJSkilo6UHHgbekK5UiZgfE6UHD3Eb27YC6oD+bhcT+tJ6cl8dmsgdQxnWlcry8ksBIBLpw==
   dependencies:
     array-unique "^0.3.2"
     define-property "^1.0.0"
@@ -2926,8 +2926,8 @@ finalhandler@1.0.0:
 
 finalhandler@1.1.1:
   version "1.1.1"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/finalhandler/-/finalhandler-1.1.1.tgz#eebf4ed840079c83f4249038c9d703008301b105"
-  integrity sha1-7r9O2EAHnIP0JJA4ydcDAIMBsQU=
+  resolved "https://registry.yarnpkg.com/finalhandler/-/finalhandler-1.1.1.tgz#eebf4ed840079c83f4249038c9d703008301b105"
+  integrity sha512-Y1GUDo39ez4aHAw7MysnUD5JzYX+WaIj8I57kO3aEPT1fFRL4sr7mjei97FgnwhAyyzRYmQZaTHb2+9uZ1dPtg==
   dependencies:
     debug "2.6.9"
     encodeurl "~1.0.2"
@@ -2947,7 +2947,7 @@ find-up@^1.0.0:
 
 find-up@^2.1.0:
   version "2.1.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/find-up/-/find-up-2.1.0.tgz#45d1b7e506c717ddd482775a2b77920a3c0c57a7"
+  resolved "https://registry.yarnpkg.com/find-up/-/find-up-2.1.0.tgz#45d1b7e506c717ddd482775a2b77920a3c0c57a7"
   integrity sha1-RdG35QbHF93UgndaK3eSCjwMV6c=
   dependencies:
     locate-path "^2.0.0"
@@ -3040,7 +3040,7 @@ formatio@1.2.0:
 
 forwarded@~0.1.2:
   version "0.1.2"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/forwarded/-/forwarded-0.1.2.tgz#98c23dab1175657b8c0573e8ceccd91b0ff18c84"
+  resolved "https://registry.yarnpkg.com/forwarded/-/forwarded-0.1.2.tgz#98c23dab1175657b8c0573e8ceccd91b0ff18c84"
   integrity sha1-mMI9qxF1ZXuMBXPozszZGw/xjIQ=
 
 fragment-cache@^0.2.1:
@@ -3057,7 +3057,7 @@ fresh@0.5.0:
 
 fresh@0.5.2:
   version "0.5.2"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/fresh/-/fresh-0.5.2.tgz#3d8cadd90d976569fa835ab1f8e4b23a105605a7"
+  resolved "https://registry.yarnpkg.com/fresh/-/fresh-0.5.2.tgz#3d8cadd90d976569fa835ab1f8e4b23a105605a7"
   integrity sha1-PYyt2Q2XZWn6g1qx+OSyOhBWBac=
 
 from@~0:
@@ -3076,8 +3076,8 @@ fs-extra@~1.0.0:
 
 fs-minipass@^1.2.5:
   version "1.2.5"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/fs-minipass/-/fs-minipass-1.2.5.tgz#06c277218454ec288df77ada54a03b8702aacb9d"
-  integrity sha1-BsJ3IYRU7CiN93raVKA7hwKqy50=
+  resolved "https://registry.yarnpkg.com/fs-minipass/-/fs-minipass-1.2.5.tgz#06c277218454ec288df77ada54a03b8702aacb9d"
+  integrity sha512-JhBl0skXjUPCFH7x6x61gQxrKyXsxB5gcgePLZCwfyCGGsTISMoIeObbrvVeP6Xmyaudw4TT43qV2Gz+iyd2oQ==
   dependencies:
     minipass "^2.2.1"
 
@@ -3093,8 +3093,8 @@ fs.realpath@^1.0.0:
 
 fsevents@^1.2.2:
   version "1.2.7"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/fsevents/-/fsevents-1.2.7.tgz#4851b664a3783e52003b3c66eb0eee1074933aa4"
-  integrity sha1-SFG2ZKN4PlIAOzxm6w7uEHSTOqQ=
+  resolved "https://registry.yarnpkg.com/fsevents/-/fsevents-1.2.7.tgz#4851b664a3783e52003b3c66eb0eee1074933aa4"
+  integrity sha512-Pxm6sI2MeBD7RdD12RYsqaP0nMiwx8eZBXCa6z2L+mRHm2DYrOYwihmhjpkdjUHwQhslWQjRpEgNq4XvBmaAuw==
   dependencies:
     nan "^2.9.2"
     node-pre-gyp "^0.10.0"
@@ -3106,12 +3106,12 @@ function-bind@^1.0.2, function-bind@^1.1.0:
 
 function-bind@^1.1.1:
   version "1.1.1"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/function-bind/-/function-bind-1.1.1.tgz#a56899d3ea3c9bab874bb9773b7c5ede92f4895d"
-  integrity sha1-pWiZ0+o8m6uHS7l3O3xe3pL0iV0=
+  resolved "https://registry.yarnpkg.com/function-bind/-/function-bind-1.1.1.tgz#a56899d3ea3c9bab874bb9773b7c5ede92f4895d"
+  integrity sha512-yIovAzMX49sF8Yl58fSCWJ5svSLuaibPxXQJFLmBObTuCr0Mf1KiPopGM9NiFjiYBCbfaa2Fh6breQ6ANVTI0A==
 
 gauge@~2.7.3:
   version "2.7.4"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/gauge/-/gauge-2.7.4.tgz#2c03405c7538c39d7eb37b317022e325fb018bf7"
+  resolved "https://registry.yarnpkg.com/gauge/-/gauge-2.7.4.tgz#2c03405c7538c39d7eb37b317022e325fb018bf7"
   integrity sha1-LANAXHU4w51+s3sxcCLjJfsBi/c=
   dependencies:
     aproba "^1.0.3"
@@ -3191,7 +3191,7 @@ glob-parent@^2.0.0:
 
 glob-parent@^3.1.0:
   version "3.1.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/glob-parent/-/glob-parent-3.1.0.tgz#9e6af6299d8d3bd2bd40430832bd113df906c5ae"
+  resolved "https://registry.yarnpkg.com/glob-parent/-/glob-parent-3.1.0.tgz#9e6af6299d8d3bd2bd40430832bd113df906c5ae"
   integrity sha1-nmr2KZ2NO9K9QEMIMr0RPfkGxa4=
   dependencies:
     is-glob "^3.1.0"
@@ -3239,8 +3239,8 @@ glob@^7.0.3, glob@^7.0.5, glob@^7.1.1:
 
 glob@^7.1.3:
   version "7.1.3"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/glob/-/glob-7.1.3.tgz#3960832d3f1574108342dafd3a67b332c0969df1"
-  integrity sha1-OWCDLT8VdBCDQtr9OmezMsCWnfE=
+  resolved "https://registry.yarnpkg.com/glob/-/glob-7.1.3.tgz#3960832d3f1574108342dafd3a67b332c0969df1"
+  integrity sha512-vcfuiIxogLV4DlGBHIUOwI0IbrJ8HWPc4MU7HzviGeNho/UJDfi6B5p3sHeWIQ0KGIU0Jpxi5ZHxemQfLkkAwQ==
   dependencies:
     fs.realpath "^1.0.0"
     inflight "^1.0.4"
@@ -3282,7 +3282,7 @@ globby@^5.0.0:
 
 globby@^6.1.0:
   version "6.1.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/globby/-/globby-6.1.0.tgz#f5a6d70e8395e21c858fb0489d64df02424d506c"
+  resolved "https://registry.yarnpkg.com/globby/-/globby-6.1.0.tgz#f5a6d70e8395e21c858fb0489d64df02424d506c"
   integrity sha1-9abXDoOV4hyFj7BInWTfAkJNUGw=
   dependencies:
     array-union "^1.0.1"
@@ -3556,12 +3556,12 @@ has-flag@^1.0.0:
 
 has-flag@^3.0.0:
   version "3.0.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/has-flag/-/has-flag-3.0.0.tgz#b5d454dc2199ae225699f3467e5a07f3b955bafd"
+  resolved "https://registry.yarnpkg.com/has-flag/-/has-flag-3.0.0.tgz#b5d454dc2199ae225699f3467e5a07f3b955bafd"
   integrity sha1-tdRU3CGZriJWmfNGfloH87lVuv0=
 
 has-symbols@^1.0.0:
   version "1.0.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/has-symbols/-/has-symbols-1.0.0.tgz#ba1a8f1af2a0fc39650f5c850367704122063b44"
+  resolved "https://registry.yarnpkg.com/has-symbols/-/has-symbols-1.0.0.tgz#ba1a8f1af2a0fc39650f5c850367704122063b44"
   integrity sha1-uhqPGvKg/DllD1yFA2dwQSIGO0Q=
 
 has-unicode@^2.0.0:
@@ -3609,8 +3609,8 @@ has@^1.0.1:
 
 has@^1.0.3:
   version "1.0.3"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/has/-/has-1.0.3.tgz#722d7cbfc1f6aa8241f16dd814e011e1f41e8796"
-  integrity sha1-ci18v8H2qoJB8W3YFOAR4fQeh5Y=
+  resolved "https://registry.yarnpkg.com/has/-/has-1.0.3.tgz#722d7cbfc1f6aa8241f16dd814e011e1f41e8796"
+  integrity sha512-f2dvO0VU6Oej7RkWJGrehjbzMAjFp5/VKPp5tTpWIV4JHHZK1/BxbFRtf/siA2SWTe09caDmVtYYzWEIbBS4zw==
   dependencies:
     function-bind "^1.1.1"
 
@@ -3734,7 +3734,7 @@ http-deceiver@^1.2.4:
 
 http-errors@1.6.3, http-errors@~1.6.2, http-errors@~1.6.3:
   version "1.6.3"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/http-errors/-/http-errors-1.6.3.tgz#8b55680bb4be283a0b5bf4ea2e38580be1d9320d"
+  resolved "https://registry.yarnpkg.com/http-errors/-/http-errors-1.6.3.tgz#8b55680bb4be283a0b5bf4ea2e38580be1d9320d"
   integrity sha1-i1VoC7S+KDoLW/TqLjhYC+HZMg0=
   dependencies:
     depd "~1.1.2"
@@ -3763,7 +3763,7 @@ http-errors@~1.6.1:
 
 http-proxy-middleware@~0.17.4:
   version "0.17.4"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/http-proxy-middleware/-/http-proxy-middleware-0.17.4.tgz#642e8848851d66f09d4f124912846dbaeb41b833"
+  resolved "https://registry.yarnpkg.com/http-proxy-middleware/-/http-proxy-middleware-0.17.4.tgz#642e8848851d66f09d4f124912846dbaeb41b833"
   integrity sha1-ZC6ISIUdZvCdTxJJEoRtuutBuDM=
   dependencies:
     http-proxy "^1.16.2"
@@ -3823,15 +3823,15 @@ iconv-lite@0.4, iconv-lite@^0.4.5:
 
 iconv-lite@0.4.23:
   version "0.4.23"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/iconv-lite/-/iconv-lite-0.4.23.tgz#297871f63be507adcfbfca715d0cd0eed84e9a63"
-  integrity sha1-KXhx9jvlB63Pv8pxXQzQ7thOmmM=
+  resolved "https://registry.yarnpkg.com/iconv-lite/-/iconv-lite-0.4.23.tgz#297871f63be507adcfbfca715d0cd0eed84e9a63"
+  integrity sha512-neyTUVFtahjf0mB3dZT77u+8O0QB89jFdnBkd5P1JgYPbPaia3gXXOVL2fq8VyU2gMMD7SaN7QukTB/pmXYvDA==
   dependencies:
     safer-buffer ">= 2.1.2 < 3"
 
 iconv-lite@^0.4.4:
   version "0.4.24"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/iconv-lite/-/iconv-lite-0.4.24.tgz#2022b4b25fbddc21d2f524974a474aafe733908b"
-  integrity sha1-ICK0sl+93CHS9SSXSkdKr+czkIs=
+  resolved "https://registry.yarnpkg.com/iconv-lite/-/iconv-lite-0.4.24.tgz#2022b4b25fbddc21d2f524974a474aafe733908b"
+  integrity sha512-v3MXnZAcvnywkTUEZomIActle7RXXeedOR31wwl7VlyoXO4Qi9arvSenNQWne1TcRwhCL1HwLI21bEqdpj8/rA==
   dependencies:
     safer-buffer ">= 2.1.2 < 3"
 
@@ -3847,15 +3847,15 @@ ieee754@^1.1.4:
 
 ignore-walk@^3.0.1:
   version "3.0.1"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/ignore-walk/-/ignore-walk-3.0.1.tgz#a83e62e7d272ac0e3b551aaa82831a19b69f82f8"
-  integrity sha1-qD5i59JyrA47VRqqgoMaGbafgvg=
+  resolved "https://registry.yarnpkg.com/ignore-walk/-/ignore-walk-3.0.1.tgz#a83e62e7d272ac0e3b551aaa82831a19b69f82f8"
+  integrity sha512-DTVlMx3IYPe0/JJcYP7Gxg7ttZZu3IInhuEhbchuqneY9wWe5Ojy2mXLBaQFUQmo0AW2r3qG7m1mg86js+gnlQ==
   dependencies:
     minimatch "^3.0.4"
 
 import-local@^1.0.0:
   version "1.0.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/import-local/-/import-local-1.0.0.tgz#5e4ffdc03f4fe6c009c6729beb29631c2f8227bc"
-  integrity sha1-Xk/9wD9P5sAJxnKb6yljHC+CJ7w=
+  resolved "https://registry.yarnpkg.com/import-local/-/import-local-1.0.0.tgz#5e4ffdc03f4fe6c009c6729beb29631c2f8227bc"
+  integrity sha512-vAaZHieK9qjGo58agRBg+bhHX3hoTZU/Oa3GESWLz7t1U62fk63aHuDJJEteXoDeTCcPmUT+z38gkHPZkkmpmQ==
   dependencies:
     pkg-dir "^2.0.0"
     resolve-cwd "^2.0.0"
@@ -3867,7 +3867,7 @@ imurmurhash@^0.1.4:
 
 indent-string@^2.1.0:
   version "2.1.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/indent-string/-/indent-string-2.1.0.tgz#8e2d48348742121b4a8218b7a137e9a52049dc80"
+  resolved "https://registry.yarnpkg.com/indent-string/-/indent-string-2.1.0.tgz#8e2d48348742121b4a8218b7a137e9a52049dc80"
   integrity sha1-ji1INIdCEhtKghi3oTfppSBJ3IA=
   dependencies:
     repeating "^2.0.0"
@@ -3926,7 +3926,7 @@ inquirer@^0.11.0:
 
 internal-ip@1.2.0:
   version "1.2.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/internal-ip/-/internal-ip-1.2.0.tgz#ae9fbf93b984878785d50a8de1b356956058cf5c"
+  resolved "https://registry.yarnpkg.com/internal-ip/-/internal-ip-1.2.0.tgz#ae9fbf93b984878785d50a8de1b356956058cf5c"
   integrity sha1-rp+/k7mEh4eF1QqN4bNWlWBYz1w=
   dependencies:
     meow "^3.3.0"
@@ -3943,12 +3943,12 @@ invert-kv@^1.0.0:
 
 ip@^1.1.0, ip@^1.1.5:
   version "1.1.5"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/ip/-/ip-1.1.5.tgz#bdded70114290828c0a039e72ef25f5aaec4354a"
+  resolved "https://registry.yarnpkg.com/ip/-/ip-1.1.5.tgz#bdded70114290828c0a039e72ef25f5aaec4354a"
   integrity sha1-vd7XARQpCCjAoDnnLvJfWq7ENUo=
 
 ipaddr.js@1.8.0:
   version "1.8.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/ipaddr.js/-/ipaddr.js-1.8.0.tgz#eaa33d6ddd7ace8f7f6fe0c9ca0440e706738b1e"
+  resolved "https://registry.yarnpkg.com/ipaddr.js/-/ipaddr.js-1.8.0.tgz#eaa33d6ddd7ace8f7f6fe0c9ca0440e706738b1e"
   integrity sha1-6qM9bd16zo9/b+DJygRA5wZzix4=
 
 is-accessor-descriptor@^0.1.6:
@@ -3961,7 +3961,7 @@ is-accessor-descriptor@^0.1.6:
 is-accessor-descriptor@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/is-accessor-descriptor/-/is-accessor-descriptor-1.0.0.tgz#169c2f6d3df1f992618072365c9b0ea1f6878656"
-  integrity sha1-FpwvbT3x+ZJhgHI2XJsOofaHhlY=
+  integrity sha512-m5hnHTkcVsPfqx3AKlyttIPb7J+XykHvJP2B9bZDjlhLIoEq4XoK64Vg7boZlVWYK6LUY94dYPEE7Lh0ZkZKcQ==
   dependencies:
     kind-of "^6.0.0"
 
@@ -3985,7 +3985,7 @@ is-buffer@^1.0.2:
 is-buffer@^1.1.5:
   version "1.1.6"
   resolved "https://registry.yarnpkg.com/is-buffer/-/is-buffer-1.1.6.tgz#efaa2ea9daa0d7ab2ea13a97b2b8ad51fefbe8be"
-  integrity sha1-76ouqdqg16suoTqXsritUf776L4=
+  integrity sha512-NcdALwpXkTm5Zvvbk7owOUSvVvBKDgKP5/ewfXEznmQFfs4ZRmanOeKBTjRVjka3QFoN6XJ+9F3USqfHqTaU5w==
 
 is-builtin-module@^1.0.0:
   version "1.0.0"
@@ -4001,8 +4001,8 @@ is-callable@^1.1.1, is-callable@^1.1.3:
 
 is-callable@^1.1.4:
   version "1.1.4"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/is-callable/-/is-callable-1.1.4.tgz#1e1adf219e1eeb684d691f9d6a05ff0d30a24d75"
-  integrity sha1-HhrfIZ4e62hNaR+dagX/DTCiTXU=
+  resolved "https://registry.yarnpkg.com/is-callable/-/is-callable-1.1.4.tgz#1e1adf219e1eeb684d691f9d6a05ff0d30a24d75"
+  integrity sha512-r5p9sxJjYnArLjObpjA4xu5EKI3CuKHkJXMhT7kwbpUyIFD1n5PMAsoPvWnvtZiNz7LjkYDRZhd7FlI0eMijEA==
 
 is-data-descriptor@^0.1.4:
   version "0.1.4"
@@ -4014,7 +4014,7 @@ is-data-descriptor@^0.1.4:
 is-data-descriptor@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/is-data-descriptor/-/is-data-descriptor-1.0.0.tgz#d84876321d0e7add03990406abbbbd36ba9268c7"
-  integrity sha1-2Eh2Mh0Oet0DmQQGq7u9NrqSaMc=
+  integrity sha512-jbRXy1FmtAoCjQkVmIVYwuuqDFUbaOeDjmed1tOGPrsMhtJA4rD9tkgA0F1qJ3gRFRXcHYVkdeaP50Q5rE/jLQ==
   dependencies:
     kind-of "^6.0.0"
 
@@ -4026,7 +4026,7 @@ is-date-object@^1.0.1:
 is-descriptor@^0.1.0:
   version "0.1.6"
   resolved "https://registry.yarnpkg.com/is-descriptor/-/is-descriptor-0.1.6.tgz#366d8240dde487ca51823b1ab9f07a10a78251ca"
-  integrity sha1-Nm2CQN3kh8pRgjsaufB6EKeCUco=
+  integrity sha512-avDYr0SB3DwO9zsMov0gKCESFYqCnE4hq/4z3TdUlukEy5t9C0YRq7HLrsN52NAcqXKaepeCD0n+B0arnVG3Hg==
   dependencies:
     is-accessor-descriptor "^0.1.6"
     is-data-descriptor "^0.1.4"
@@ -4035,7 +4035,7 @@ is-descriptor@^0.1.0:
 is-descriptor@^1.0.0, is-descriptor@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/is-descriptor/-/is-descriptor-1.0.2.tgz#3b159746a66604b04f8c81524ba365c5f14d86ec"
-  integrity sha1-OxWXRqZmBLBPjIFSS6NlxfFNhuw=
+  integrity sha512-2eis5WqQGV7peooDyLmNEPUrps9+SXX5c9pL3xEB+4e9HnGuDa7mB7kHxHw4CbqS9k1T2hOH3miL8n8WtiYVtg==
   dependencies:
     is-accessor-descriptor "^1.0.0"
     is-data-descriptor "^1.0.0"
@@ -4061,7 +4061,7 @@ is-extendable@^0.1.0, is-extendable@^0.1.1:
 is-extendable@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/is-extendable/-/is-extendable-1.0.1.tgz#a7470f9e426733d81bd81e1155264e3a3507cab4"
-  integrity sha1-p0cPnkJnM9gb2B4RVSZOOjUHyrQ=
+  integrity sha512-arnXMxT1hhoKo9k1LZdmlNyJdDDfy2v0fXjFlmok4+i8ul/6WlbVge9bhM74OpNPQPMGUToDtz+KXa1PneJxOA==
   dependencies:
     is-plain-object "^2.0.4"
 
@@ -4072,7 +4072,7 @@ is-extglob@^1.0.0:
 
 is-extglob@^2.1.0, is-extglob@^2.1.1:
   version "2.1.1"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/is-extglob/-/is-extglob-2.1.1.tgz#a88c02535791f02ed37c76a1b9ea9773c833f8c2"
+  resolved "https://registry.yarnpkg.com/is-extglob/-/is-extglob-2.1.1.tgz#a88c02535791f02ed37c76a1b9ea9773c833f8c2"
   integrity sha1-qIwCU1eR8C7TfHahueqXc8gz+MI=
 
 is-finite@^1.0.0:
@@ -4110,7 +4110,7 @@ is-glob@^3.1.0:
 
 is-glob@^4.0.0:
   version "4.0.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/is-glob/-/is-glob-4.0.0.tgz#9521c76845cc2610a85203ddf080a958c2ffabc0"
+  resolved "https://registry.yarnpkg.com/is-glob/-/is-glob-4.0.0.tgz#9521c76845cc2610a85203ddf080a958c2ffabc0"
   integrity sha1-lSHHaEXMJhCoUgPd8ICpWML/q8A=
   dependencies:
     is-extglob "^2.1.1"
@@ -4185,7 +4185,7 @@ is-path-inside@^1.0.0:
 is-plain-object@^2.0.1, is-plain-object@^2.0.3, is-plain-object@^2.0.4:
   version "2.0.4"
   resolved "https://registry.npmjs.org/is-plain-object/-/is-plain-object-2.0.4.tgz#2c163b3fafb1b606d9d17928f05c2a1c38e07677"
-  integrity sha1-LBY7P6+xtgbZ0Xko8FwqHDjgdnc=
+  integrity sha512-h5PpgXkWitc38BBMYawTYMWJHFZJVnBquFE57xFpjB8pJFiF6gZ+bU+WyI/yqXiFR5mdLsgYNaPe8uao6Uv9Og==
   dependencies:
     isobject "^3.0.1"
 
@@ -4240,8 +4240,8 @@ is-symbol@^1.0.1:
 
 is-symbol@^1.0.2:
   version "1.0.2"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/is-symbol/-/is-symbol-1.0.2.tgz#a055f6ae57192caee329e7a860118b497a950f38"
-  integrity sha1-oFX2rlcZLK7jKeeoYBGLSXqVDzg=
+  resolved "https://registry.yarnpkg.com/is-symbol/-/is-symbol-1.0.2.tgz#a055f6ae57192caee329e7a860118b497a950f38"
+  integrity sha512-HS8bZ9ox60yCJLH9snBpIwv9pYUAkcuLhSA1oero1UB5y9aiQpRA8y2ex945AOtCZL1lJDeIk3G5LthswI46Lw==
   dependencies:
     has-symbols "^1.0.0"
 
@@ -4257,12 +4257,12 @@ is-utf8@^0.2.0:
 
 is-windows@^1.0.2:
   version "1.0.2"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/is-windows/-/is-windows-1.0.2.tgz#d1850eb9791ecd18e6182ce12a30f396634bb19d"
-  integrity sha1-0YUOuXkezRjmGCzhKjDzlmNLsZ0=
+  resolved "https://registry.yarnpkg.com/is-windows/-/is-windows-1.0.2.tgz#d1850eb9791ecd18e6182ce12a30f396634bb19d"
+  integrity sha512-eXK1UInq2bPmjyX6e3VHIzMLobc4J94i4AWn+Hpq3OU5KkrRC96OAcR3PRJ/pGu6m8TRnBHP9dkXQVsT/COVIA==
 
 is-wsl@^1.1.0:
   version "1.1.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/is-wsl/-/is-wsl-1.1.0.tgz#1f16e4aa22b04d1336b66188a66af3c600c3a66d"
+  resolved "https://registry.yarnpkg.com/is-wsl/-/is-wsl-1.1.0.tgz#1f16e4aa22b04d1336b66188a66af3c600c3a66d"
   integrity sha1-HxbkqiKwTRM2tmGIpmrzxgDDpm0=
 
 isarray@0.0.1:
@@ -4315,7 +4315,7 @@ jodid25519@^1.0.0:
 jquery@^3.3.1:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.3.1.tgz#958ce29e81c9790f31be7792df5d4d95fc57fbca"
-  integrity sha1-lYzinoHJeQ8xvneS311NlfxX+8o=
+  integrity sha512-Ubldcmxp5np52/ENotGxlLe6aGMvmF4R8S6tZjsP6Knsaxd/xp3Zrh50cG93lR6nPXyUFwzN3ZSOQI0wRJNdGg==
 
 js-tokens@1.0.1:
   version "1.0.1"
@@ -4490,8 +4490,8 @@ kew@~0.7.0:
 
 killable@^1.0.0:
   version "1.0.1"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/killable/-/killable-1.0.1.tgz#4c8ce441187a061c7474fb87ca08e2a638194892"
-  integrity sha1-TIzkQRh6Bhx0dPuHygjipjgZSJI=
+  resolved "https://registry.yarnpkg.com/killable/-/killable-1.0.1.tgz#4c8ce441187a061c7474fb87ca08e2a638194892"
+  integrity sha512-LzqtLKlUwirEUyl/nicirVmNiPvYs7l5n8wOPP7fyJVpUPkvCnW/vuiXGpylGUlnPDnB7311rARzAt3Mhswpjg==
 
 kind-of@^3.0.2:
   version "3.1.0"
@@ -4517,12 +4517,12 @@ kind-of@^4.0.0:
 kind-of@^5.0.0, kind-of@^5.0.2:
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-5.1.0.tgz#729c91e2d857b7a419a1f9aa65685c4c33f5845d"
-  integrity sha1-cpyR4thXt6QZofmqZWhcTDP1hF0=
+  integrity sha512-NGEErnH6F2vUuXDh+OlbcKW7/wOcfdRHaZ7VWtqCztfHri/++YKmP51OdWeGPuqCOba6kk2OTe5d02VmTB80Pw==
 
 kind-of@^6.0.0, kind-of@^6.0.2:
   version "6.0.2"
   resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-6.0.2.tgz#01146b36a6218e64e58f3a8d66de5d7fc6f6d051"
-  integrity sha1-ARRrNqYhjmTljzqNZt5df8b20FE=
+  integrity sha512-s5kLOcnH0XqDO+FvuaLX8DDjZ18CGFk7VygH40QoKPUQhW4e2rvM0rwUq0t8IQDOwYSeLK01U90OjzBTme2QqA==
 
 klaw@^1.0.0:
   version "1.3.1"
@@ -4632,7 +4632,7 @@ loader-utils@^1.1.0:
 
 locate-path@^2.0.0:
   version "2.0.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/locate-path/-/locate-path-2.0.0.tgz#2b568b265eec944c6d9c0de9c3dbbbca0354cd8e"
+  resolved "https://registry.yarnpkg.com/locate-path/-/locate-path-2.0.0.tgz#2b568b265eec944c6d9c0de9c3dbbbca0354cd8e"
   integrity sha1-K1aLJl7slExtnA3pw9u7ygNUzY4=
   dependencies:
     p-locate "^2.0.0"
@@ -4773,7 +4773,7 @@ lodash.clonedeep@^3.0.1:
 
 lodash.debounce@^4.0.8:
   version "4.0.8"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/lodash.debounce/-/lodash.debounce-4.0.8.tgz#82d79bff30a67c4005ffd5e2515300ad9ca4d7af"
+  resolved "https://registry.yarnpkg.com/lodash.debounce/-/lodash.debounce-4.0.8.tgz#82d79bff30a67c4005ffd5e2515300ad9ca4d7af"
   integrity sha1-gteb/zCmfEAF/9XiUVMArZyk168=
 
 lodash.isarguments@^3.0.0:
@@ -4879,7 +4879,7 @@ lodash@^4.14.0, lodash@^4.17.2, lodash@^4.17.4:
 lodash@^4.17.10:
   version "4.17.10"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.10.tgz#1b7793cf7259ea38fb3661d4d38b3260af8ae4e7"
-  integrity sha1-G3eTz3JZ6jj7NmHU04syYK+K5Oc=
+  integrity sha512-UejweD1pDoXu+AD825lWwp4ZGtSwgnpZxb3JDViD7StjQz+Nb/6l093lx4OQ0foGWNRoc19mWy7BzL+UAK2iVg==
 
 lodash@~0.9.2:
   version "0.9.2"
@@ -4898,7 +4898,7 @@ lodash@~3.7.0:
 
 loglevel@^1.4.1:
   version "1.6.1"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/loglevel/-/loglevel-1.6.1.tgz#e0fc95133b6ef276cdc8887cdaf24aa6f156f8fa"
+  resolved "https://registry.yarnpkg.com/loglevel/-/loglevel-1.6.1.tgz#e0fc95133b6ef276cdc8887cdaf24aa6f156f8fa"
   integrity sha1-4PyVEztu8nbNyIh82vJKpvFW+Po=
 
 lolex@^1.6.0:
@@ -4913,7 +4913,7 @@ longest@^1.0.1:
 
 loud-rejection@^1.0.0:
   version "1.6.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/loud-rejection/-/loud-rejection-1.6.0.tgz#5b46f80147edee578870f086d04821cf998e551f"
+  resolved "https://registry.yarnpkg.com/loud-rejection/-/loud-rejection-1.6.0.tgz#5b46f80147edee578870f086d04821cf998e551f"
   integrity sha1-W0b4AUft7leIcPCG0Eghz5mOVR8=
   dependencies:
     currently-unhandled "^0.4.1"
@@ -4944,7 +4944,7 @@ map-cache@^0.2.2:
 
 map-obj@^1.0.0, map-obj@^1.0.1:
   version "1.0.1"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/map-obj/-/map-obj-1.0.1.tgz#d933ceb9205d82bdcf4886f6742bdc2b4dea146d"
+  resolved "https://registry.yarnpkg.com/map-obj/-/map-obj-1.0.1.tgz#d933ceb9205d82bdcf4886f6742bdc2b4dea146d"
   integrity sha1-2TPOuSBdgr3PSIb2dCvcK03qFG0=
 
 map-stream@~0.1.0:
@@ -4974,7 +4974,7 @@ memory-fs@^0.4.0, memory-fs@~0.4.1:
 
 meow@^3.3.0:
   version "3.7.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/meow/-/meow-3.7.0.tgz#72cb668b425228290abbfa856892587308a801fb"
+  resolved "https://registry.yarnpkg.com/meow/-/meow-3.7.0.tgz#72cb668b425228290abbfa856892587308a801fb"
   integrity sha1-cstmi0JSKCkKu/qFaJJYcwioAfs=
   dependencies:
     camelcase-keys "^2.0.0"
@@ -5020,7 +5020,7 @@ micromatch@^2.3.11:
 micromatch@^3.0.3:
   version "3.1.5"
   resolved "https://registry.yarnpkg.com/micromatch/-/micromatch-3.1.5.tgz#d05e168c206472dfbca985bfef4f57797b4cd4ba"
-  integrity sha1-0F4WjCBkct+8qYW/709XeXtM1Lo=
+  integrity sha512-ykttrLPQrz1PUJcXjwsTUjGoPJ64StIGNE2lGVD1c9CuguJ+L7/navsE8IcDNndOoCMvYV0qc/exfVbMHkUhvA==
   dependencies:
     arr-diff "^4.0.0"
     array-unique "^0.3.2"
@@ -5038,8 +5038,8 @@ micromatch@^3.0.3:
 
 micromatch@^3.1.4:
   version "3.1.10"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/micromatch/-/micromatch-3.1.10.tgz#70859bc95c9840952f359a068a3fc49f9ecfac23"
-  integrity sha1-cIWbyVyYQJUvNZoGij/En57PrCM=
+  resolved "https://registry.yarnpkg.com/micromatch/-/micromatch-3.1.10.tgz#70859bc95c9840952f359a068a3fc49f9ecfac23"
+  integrity sha512-MWikgl9n9M3w+bpsY3He8L+w9eF9338xRl8IAO5viDizwSzziFEyUzo2xrrloB64ADbTf8uA8vRqqttDTOmccg==
   dependencies:
     arr-diff "^4.0.0"
     array-unique "^0.3.2"
@@ -5075,8 +5075,8 @@ mime-db@~1.12.0:
 
 mime-db@~1.37.0:
   version "1.37.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/mime-db/-/mime-db-1.37.0.tgz#0b6a0ce6fdbe9576e25f1f2d2fde8830dc0ad0d8"
-  integrity sha1-C2oM5v2+lXbiXx8tL96IMNwK0Ng=
+  resolved "https://registry.yarnpkg.com/mime-db/-/mime-db-1.37.0.tgz#0b6a0ce6fdbe9576e25f1f2d2fde8830dc0ad0d8"
+  integrity sha512-R3C4db6bgQhlIhPU48fUtdVmKnflq+hRdad7IyKhtFj06VPNVdk2RhiYL3UjQIlso8L+YxAtFkobT0VK+S/ybg==
 
 mime-types@^2.1.12, mime-types@~2.1.11, mime-types@~2.1.7:
   version "2.1.14"
@@ -5099,8 +5099,8 @@ mime-types@~2.0.3:
 
 mime-types@~2.1.18:
   version "2.1.21"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/mime-types/-/mime-types-2.1.21.tgz#28995aa1ecb770742fe6ae7e58f9181c744b3f96"
-  integrity sha1-KJlaoey3cHQv5q5+WPkYHHRLP5Y=
+  resolved "https://registry.yarnpkg.com/mime-types/-/mime-types-2.1.21.tgz#28995aa1ecb770742fe6ae7e58f9181c744b3f96"
+  integrity sha512-3iL6DbwpyLzjR3xHSFNFeb9Nz/M8WDkX33t1GFQnFOllWk8pOrh/LSrB5OXlnlW5P9LH73X6loW/eogc+F5lJg==
   dependencies:
     mime-db "~1.37.0"
 
@@ -5111,13 +5111,13 @@ mime@1.3.4:
 
 mime@1.4.1:
   version "1.4.1"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/mime/-/mime-1.4.1.tgz#121f9ebc49e3766f311a76e1fa1c8003c4b03aa6"
-  integrity sha1-Eh+evEnjdm8xGnbh+hyAA8SwOqY=
+  resolved "https://registry.yarnpkg.com/mime/-/mime-1.4.1.tgz#121f9ebc49e3766f311a76e1fa1c8003c4b03aa6"
+  integrity sha512-KI1+qOZu5DcW6wayYHSzR/tXKCDC5Om4s1z2QJjDULzLcmf3DvzS7oluY4HCTrc+9FiKmWUgeNLg7W3uIQvxtQ==
 
 mime@^1.5.0:
   version "1.6.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/mime/-/mime-1.6.0.tgz#32cd9e5c64553bd58d19a568af452acff04981b1"
-  integrity sha1-Ms2eXGRVO9WNGaVor0Uqz/BJgbE=
+  resolved "https://registry.yarnpkg.com/mime/-/mime-1.6.0.tgz#32cd9e5c64553bd58d19a568af452acff04981b1"
+  integrity sha512-x0Vn8spI+wuJ1O6S7gnbaQg8Pxh4NNHb7KSINmEWKiPE4RKOplvijn+NkmYmmRgP68mc70j2EbeTFRsrswaQeg==
 
 mime@~1.2.2, mime@~1.2.9:
   version "1.2.11"
@@ -5158,8 +5158,8 @@ minimatch@^2.0.3:
 
 minimatch@^3.0.4:
   version "3.0.4"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/minimatch/-/minimatch-3.0.4.tgz#5166e286457f03306064be5497e8dbb0c3d32083"
-  integrity sha1-UWbihkV/AzBgZL5Ul+jbsMPTIIM=
+  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-3.0.4.tgz#5166e286457f03306064be5497e8dbb0c3d32083"
+  integrity sha512-yJHVQEhyqPLUTgt9B83PXu6W3rx4MvvHvSUvToogpwoGDOUQ+yDrR0HRot+yOCdCO7u4hX3pWft6kWBBcqh0UA==
   dependencies:
     brace-expansion "^1.1.7"
 
@@ -5183,23 +5183,23 @@ minimist@^1.1.0, minimist@^1.1.3, minimist@^1.2.0:
 
 minipass@^2.2.1, minipass@^2.3.4:
   version "2.3.5"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/minipass/-/minipass-2.3.5.tgz#cacebe492022497f656b0f0f51e2682a9ed2d848"
-  integrity sha1-ys6+SSAiSX9law8PUeJoKp7S2Eg=
+  resolved "https://registry.yarnpkg.com/minipass/-/minipass-2.3.5.tgz#cacebe492022497f656b0f0f51e2682a9ed2d848"
+  integrity sha512-Gi1W4k059gyRbyVUZQ4mEqLm0YIUiGYfvxhF6SIlk3ui1WVxMTGfGdQ2SInh3PDrRTVvPKgULkpJtT4RH10+VA==
   dependencies:
     safe-buffer "^5.1.2"
     yallist "^3.0.0"
 
 minizlib@^1.1.1:
   version "1.2.1"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/minizlib/-/minizlib-1.2.1.tgz#dd27ea6136243c7c880684e8672bb3a45fd9b614"
-  integrity sha1-3SfqYTYkPHyIBoToZyuzpF/ZthQ=
+  resolved "https://registry.yarnpkg.com/minizlib/-/minizlib-1.2.1.tgz#dd27ea6136243c7c880684e8672bb3a45fd9b614"
+  integrity sha512-7+4oTUOWKg7AuL3vloEWekXY2/D20cevzsrNT2kGWm+39J9hGTCBv8VI5Pm5lXZ/o3/mdR4f8rflAPhnQb8mPA==
   dependencies:
     minipass "^2.2.1"
 
 mixin-deep@^1.2.0:
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/mixin-deep/-/mixin-deep-1.3.1.tgz#a49e7268dce1a0d9698e45326c5626df3543d0fe"
-  integrity sha1-pJ5yaNzhoNlpjkUybFYm3zVD0P4=
+  integrity sha512-8ZItLHeEgaqEvd5lYBXfm4EZSFCX29Jb9K+lAHhDKzReKBQKj3R+7NOF6tjqYi9t4oI8VUfaWITJQm86wnXGNQ==
   dependencies:
     for-in "^1.0.2"
     is-extendable "^1.0.1"
@@ -5287,18 +5287,18 @@ ms@2.0.0:
 
 ms@^2.1.1:
   version "2.1.1"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/ms/-/ms-2.1.1.tgz#30a5864eb3ebb0a66f2ebe6d727af06a09d86e0a"
-  integrity sha1-MKWGTrPrsKZvLr5tcnrwagnYbgo=
+  resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.1.tgz#30a5864eb3ebb0a66f2ebe6d727af06a09d86e0a"
+  integrity sha512-tgp+dl5cGk28utYktBsrFqA7HKgrhgPsg6Z/EfhWI4gl1Hwq8B/GmY/0oXZ6nF8hDVesS/FpnYaD/kOWhYQvyg==
 
 multicast-dns-service-types@^1.1.0:
   version "1.1.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/multicast-dns-service-types/-/multicast-dns-service-types-1.1.0.tgz#899f11d9686e5e05cb91b35d5f0e63b773cfc901"
+  resolved "https://registry.yarnpkg.com/multicast-dns-service-types/-/multicast-dns-service-types-1.1.0.tgz#899f11d9686e5e05cb91b35d5f0e63b773cfc901"
   integrity sha1-iZ8R2WhuXgXLkbNdXw5jt3PPyQE=
 
 multicast-dns@^6.0.1:
   version "6.2.3"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/multicast-dns/-/multicast-dns-6.2.3.tgz#a0ec7bd9055c4282f790c3c82f4e28db3b31b229"
-  integrity sha1-oOx72QVcQoL3kMPIL04o2zsxsik=
+  resolved "https://registry.yarnpkg.com/multicast-dns/-/multicast-dns-6.2.3.tgz#a0ec7bd9055c4282f790c3c82f4e28db3b31b229"
+  integrity sha512-ji6J5enbMyGRHIAkAOu3WdV8nggqviKCEKtXcOqfphZZtQrmHKycfynJ2V7eVPUA4NhJ6V7Wf4TmGbTwKE9B6g==
   dependencies:
     dns-packet "^1.3.1"
     thunky "^1.0.2"
@@ -5320,13 +5320,13 @@ mute-stream@0.0.5, mute-stream@~0.0.4:
 
 nan@^2.9.2:
   version "2.12.1"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/nan/-/nan-2.12.1.tgz#7b1aa193e9aa86057e3c7bbd0ac448e770925552"
-  integrity sha1-exqhk+mqhgV+PHu9CsRI53CSVVI=
+  resolved "https://registry.yarnpkg.com/nan/-/nan-2.12.1.tgz#7b1aa193e9aa86057e3c7bbd0ac448e770925552"
+  integrity sha512-JY7V6lRkStKcKTvHO5NVSQRv+RV+FIL5pvDoLiAtSL9pKlC5x9PKQcZDsq7m4FO4d57mkhC6Z+QhAh3Jdk5JFw==
 
 nanomatch@^1.2.5:
   version "1.2.7"
   resolved "https://registry.yarnpkg.com/nanomatch/-/nanomatch-1.2.7.tgz#53cd4aa109ff68b7f869591fdc9d10daeeea3e79"
-  integrity sha1-U81KoQn/aLf4aVkf3J0Q2u7qPnk=
+  integrity sha512-/5ldsnyurvEw7wNpxLFgjVvBLMta43niEYOy0CJ4ntcYSbx6bugRUTQeFb4BR/WanEL1o3aQgHuVLHQaB6tOqg==
   dependencies:
     arr-diff "^4.0.0"
     array-unique "^0.3.2"
@@ -5342,8 +5342,8 @@ nanomatch@^1.2.5:
 
 nanomatch@^1.2.9:
   version "1.2.13"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/nanomatch/-/nanomatch-1.2.13.tgz#b87a8aa4fc0de8fe6be88895b38983ff265bd119"
-  integrity sha1-uHqKpPwN6P5r6IiVs4mD/yZb0Rk=
+  resolved "https://registry.yarnpkg.com/nanomatch/-/nanomatch-1.2.13.tgz#b87a8aa4fc0de8fe6be88895b38983ff265bd119"
+  integrity sha512-fpoe2T0RbHwBTBUOftAfBPaDEi06ufaUai0mE6Yn1kacc3SnTErfb/h+X94VXzI64rKFHYImXSvdwGGCmwOqCA==
   dependencies:
     arr-diff "^4.0.0"
     array-unique "^0.3.2"
@@ -5374,8 +5374,8 @@ ncp@0.4.x:
 
 needle@^2.2.1:
   version "2.2.4"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/needle/-/needle-2.2.4.tgz#51931bff82533b1928b7d1d69e01f1b00ffd2a4e"
-  integrity sha1-UZMb/4JTOxkot9HWngHxsA/9Kk4=
+  resolved "https://registry.yarnpkg.com/needle/-/needle-2.2.4.tgz#51931bff82533b1928b7d1d69e01f1b00ffd2a4e"
+  integrity sha512-HyoqEb4wr/rsoaIDfTH2aVL9nWtQqba2/HvMv+++m8u0dz808MaagKILxtfeSN7QU7nvbQ79zk3vYOJp9zsNEA==
   dependencies:
     debug "^2.1.2"
     iconv-lite "^0.4.4"
@@ -5388,13 +5388,13 @@ negotiator@0.6.1:
 
 neo-async@^2.5.0:
   version "2.6.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/neo-async/-/neo-async-2.6.0.tgz#b9d15e4d71c6762908654b5183ed38b753340835"
-  integrity sha1-udFeTXHGdikIZUtRg+04t1M0CDU=
+  resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.0.tgz#b9d15e4d71c6762908654b5183ed38b753340835"
+  integrity sha512-MFh0d/Wa7vkKO3Y3LlacqAEeHK0mckVqzDieUKTT+KGxi+zIpeVsFxymkIiRpbpDziHc290Xr9A1O4Om7otoRA==
 
 node-forge@0.7.5:
   version "0.7.5"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/node-forge/-/node-forge-0.7.5.tgz#6c152c345ce11c52f465c2abd957e8639cd674df"
-  integrity sha1-bBUsNFzhHFL0ZcKr2VfoY5zWdN8=
+  resolved "https://registry.yarnpkg.com/node-forge/-/node-forge-0.7.5.tgz#6c152c345ce11c52f465c2abd957e8639cd674df"
+  integrity sha512-MmbQJ2MTESTjt3Gi/3yG1wGpIMhUfcIypUCGtTizFR9IiccFwxSpfp0vtIZlkFclEqERemxfnSdZEMR9VqqEFQ==
 
 node-libs-browser@^2.0.0:
   version "2.0.0"
@@ -5427,8 +5427,8 @@ node-libs-browser@^2.0.0:
 
 node-pre-gyp@^0.10.0:
   version "0.10.3"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/node-pre-gyp/-/node-pre-gyp-0.10.3.tgz#3070040716afdc778747b61b6887bf78880b80fc"
-  integrity sha1-MHAEBxav3HeHR7YbaIe/eIgLgPw=
+  resolved "https://registry.yarnpkg.com/node-pre-gyp/-/node-pre-gyp-0.10.3.tgz#3070040716afdc778747b61b6887bf78880b80fc"
+  integrity sha512-d1xFs+C/IPS8Id0qPTZ4bUT8wWryfR/OzzAFxweG+uLN85oPzyo2Iw6bVlLQ/JOdgNonXLCoRyqDzDWq4iw72A==
   dependencies:
     detect-libc "^1.0.2"
     mkdirp "^0.5.1"
@@ -5456,7 +5456,7 @@ node-uuid@~1.4.0:
 
 nopt@^4.0.1:
   version "4.0.1"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/nopt/-/nopt-4.0.1.tgz#d0d4685afd5415193c8c7505602d0d17cd64474d"
+  resolved "https://registry.yarnpkg.com/nopt/-/nopt-4.0.1.tgz#d0d4685afd5415193c8c7505602d0d17cd64474d"
   integrity sha1-0NRoWv1UFRk8jHUFYC0NF81kR00=
   dependencies:
     abbrev "1"
@@ -5495,8 +5495,8 @@ normalize-package-data@^2.3.2:
 
 normalize-package-data@^2.3.4:
   version "2.4.2"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/normalize-package-data/-/normalize-package-data-2.4.2.tgz#6b2abd85774e51f7936f1395e45acb905dc849b2"
-  integrity sha1-ayq9hXdOUfeTbxOV5FrLkF3ISbI=
+  resolved "https://registry.yarnpkg.com/normalize-package-data/-/normalize-package-data-2.4.2.tgz#6b2abd85774e51f7936f1395e45acb905dc849b2"
+  integrity sha512-YcMnjqeoUckXTPKZSAsPjUPLxH85XotbpqK3w4RyCwdFQSU5FxxBys8buehkSfg0j9fKvV1hn7O0+8reEgkAiw==
   dependencies:
     hosted-git-info "^2.1.4"
     is-builtin-module "^1.0.0"
@@ -5510,20 +5510,20 @@ normalize-path@^2.0.1:
 
 normalize-path@^2.1.1:
   version "2.1.1"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/normalize-path/-/normalize-path-2.1.1.tgz#1ab28b556e198363a8c1a6f7e6fa20137fe6aed9"
+  resolved "https://registry.yarnpkg.com/normalize-path/-/normalize-path-2.1.1.tgz#1ab28b556e198363a8c1a6f7e6fa20137fe6aed9"
   integrity sha1-GrKLVW4Zg2Oowab35vogE3/mrtk=
   dependencies:
     remove-trailing-separator "^1.0.1"
 
 npm-bundled@^1.0.1:
   version "1.0.5"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/npm-bundled/-/npm-bundled-1.0.5.tgz#3c1732b7ba936b3a10325aef616467c0ccbcc979"
-  integrity sha1-PBcyt7qTazoQMlrvYWRnwMy8yXk=
+  resolved "https://registry.yarnpkg.com/npm-bundled/-/npm-bundled-1.0.5.tgz#3c1732b7ba936b3a10325aef616467c0ccbcc979"
+  integrity sha512-m/e6jgWu8/v5niCUKQi9qQl8QdeEduFA96xHDDzFGqly0OOjI7c+60KM/2sppfnUU9JJagf+zs+yGhqSOFj71g==
 
 npm-packlist@^1.1.6:
   version "1.2.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/npm-packlist/-/npm-packlist-1.2.0.tgz#55a60e793e272f00862c7089274439a4cc31fc7f"
-  integrity sha1-VaYOeT4nLwCGLHCJJ0Q5pMwx/H8=
+  resolved "https://registry.yarnpkg.com/npm-packlist/-/npm-packlist-1.2.0.tgz#55a60e793e272f00862c7089274439a4cc31fc7f"
+  integrity sha512-7Mni4Z8Xkx0/oegoqlcao/JpPCPEMtUvsmB0q7mgvlMinykJLSRTYuFqoQLYgGY8biuxIeiHO+QNJKbCfljewQ==
   dependencies:
     ignore-walk "^3.0.1"
     npm-bundled "^1.0.1"
@@ -5550,8 +5550,8 @@ npm-run-path@^1.0.0:
 
 npmlog@^4.0.2:
   version "4.1.2"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/npmlog/-/npmlog-4.1.2.tgz#08a7f2a8bf734604779a9efa4ad5cc717abb954b"
-  integrity sha1-CKfyqL9zRgR3mp76StXMcXq7lUs=
+  resolved "https://registry.yarnpkg.com/npmlog/-/npmlog-4.1.2.tgz#08a7f2a8bf734604779a9efa4ad5cc717abb954b"
+  integrity sha512-2uUqazuKlTaSI/dC8AzicUck7+IrEaOnN/e0jd3Xtt1KcGpwx30v50mL7oPyr/h9bL3E4aZccVwpwP+5W9Vjkg==
   dependencies:
     are-we-there-yet "~1.1.2"
     console-control-strings "~1.1.0"
@@ -5594,8 +5594,8 @@ object-copy@^0.1.0:
 
 object-keys@^1.0.12:
   version "1.0.12"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/object-keys/-/object-keys-1.0.12.tgz#09c53855377575310cca62f55bb334abff7b3ed2"
-  integrity sha1-CcU4VTd1dTEMymL1W7M0q/97PtI=
+  resolved "https://registry.yarnpkg.com/object-keys/-/object-keys-1.0.12.tgz#09c53855377575310cca62f55bb334abff7b3ed2"
+  integrity sha512-FTMyFUm2wBcGHnH2eXmz7tC6IwlqQZ6mVZ+6dm6vZ4IQIHjs6FdNsQBuKGPuUUUY6NfJw2PshC08Tn6LzLDOag==
 
 object-keys@^1.0.6, object-keys@^1.0.8:
   version "1.0.11"
@@ -5660,8 +5660,8 @@ opn@^1.0.0:
 
 opn@^5.1.0:
   version "5.4.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/opn/-/opn-5.4.0.tgz#cb545e7aab78562beb11aa3bfabc7042e1761035"
-  integrity sha1-y1Reeqt4VivrEao7+rxwQuF2EDU=
+  resolved "https://registry.yarnpkg.com/opn/-/opn-5.4.0.tgz#cb545e7aab78562beb11aa3bfabc7042e1761035"
+  integrity sha512-YF9MNdVy/0qvJvDtunAOzFw9iasOQHpVthTCvGzxt61Il64AYSGdK+rYwld7NAfk9qJ7dt+hymBNSc9LNYS+Sw==
   dependencies:
     is-wsl "^1.1.0"
 
@@ -5716,8 +5716,8 @@ os-tmpdir@^1.0.0, os-tmpdir@^1.0.1:
 
 osenv@^0.1.4:
   version "0.1.5"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/osenv/-/osenv-0.1.5.tgz#85cdfafaeb28e8677f416e287592b5f3f49ea410"
-  integrity sha1-hc36+uso6Gd/QW4odZK18/SepBA=
+  resolved "https://registry.yarnpkg.com/osenv/-/osenv-0.1.5.tgz#85cdfafaeb28e8677f416e287592b5f3f49ea410"
+  integrity sha512-0CWcCECdMVc2Rw3U5w9ZjqX6ga6ubk1xDVKxtBQPK7wis/0F2r9T6k4ydGYhecl7YUBxBVxhL5oisPsNxAPe2g==
   dependencies:
     os-homedir "^1.0.0"
     os-tmpdir "^1.0.0"
@@ -5733,26 +5733,26 @@ output-file-sync@^1.1.0:
 
 p-limit@^1.1.0:
   version "1.3.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/p-limit/-/p-limit-1.3.0.tgz#b86bd5f0c25690911c7590fcbfc2010d54b3ccb8"
-  integrity sha1-uGvV8MJWkJEcdZD8v8IBDVSzzLg=
+  resolved "https://registry.yarnpkg.com/p-limit/-/p-limit-1.3.0.tgz#b86bd5f0c25690911c7590fcbfc2010d54b3ccb8"
+  integrity sha512-vvcXsLAJ9Dr5rQOPk7toZQZJApBl2K4J6dANSsEuh6QI41JYcsS/qhTGa9ErIUUgK3WNQoJYvylxvjqmiqEA9Q==
   dependencies:
     p-try "^1.0.0"
 
 p-locate@^2.0.0:
   version "2.0.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/p-locate/-/p-locate-2.0.0.tgz#20a0103b222a70c8fd39cc2e580680f3dde5ec43"
+  resolved "https://registry.yarnpkg.com/p-locate/-/p-locate-2.0.0.tgz#20a0103b222a70c8fd39cc2e580680f3dde5ec43"
   integrity sha1-IKAQOyIqcMj9OcwuWAaA893l7EM=
   dependencies:
     p-limit "^1.1.0"
 
 p-map@^1.1.1:
   version "1.2.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/p-map/-/p-map-1.2.0.tgz#e4e94f311eabbc8633a1e79908165fca26241b6b"
-  integrity sha1-5OlPMR6rvIYzoeeZCBZfyiYkG2s=
+  resolved "https://registry.yarnpkg.com/p-map/-/p-map-1.2.0.tgz#e4e94f311eabbc8633a1e79908165fca26241b6b"
+  integrity sha512-r6zKACMNhjPJMTl8KcFH4li//gkrXWfbD6feV8l6doRHlzljFWGJ2AP6iKaCJXyZmAUMOPtvbW7EXkbWO/pLEA==
 
 p-try@^1.0.0:
   version "1.0.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/p-try/-/p-try-1.0.0.tgz#cbc79cdbaf8fd4228e13f621f2b1a237c1b207b3"
+  resolved "https://registry.yarnpkg.com/p-try/-/p-try-1.0.0.tgz#cbc79cdbaf8fd4228e13f621f2b1a237c1b207b3"
   integrity sha1-y8ec26+P1CKOE/Yh8rGiN8GyB7M=
 
 package-json@^3.0.0:
@@ -5810,7 +5810,7 @@ parseurl@~1.3.1:
 
 parseurl@~1.3.2:
   version "1.3.2"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/parseurl/-/parseurl-1.3.2.tgz#fc289d4ed8993119460c156253262cdc8de65bf3"
+  resolved "https://registry.yarnpkg.com/parseurl/-/parseurl-1.3.2.tgz#fc289d4ed8993119460c156253262cdc8de65bf3"
   integrity sha1-/CidTtiZMRlGDBViUyYs3I3mW/M=
 
 pascalcase@^0.1.1:
@@ -5825,7 +5825,7 @@ path-browserify@0.0.0:
 
 path-dirname@^1.0.0:
   version "1.0.2"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/path-dirname/-/path-dirname-1.0.2.tgz#cc33d24d525e099a5388c0336c6e32b9160609e0"
+  resolved "https://registry.yarnpkg.com/path-dirname/-/path-dirname-1.0.2.tgz#cc33d24d525e099a5388c0336c6e32b9160609e0"
   integrity sha1-zDPSTVJeCZpTiMAzbG4yuRYGCeA=
 
 path-exists@^1.0.0:
@@ -5842,7 +5842,7 @@ path-exists@^2.0.0:
 
 path-exists@^3.0.0:
   version "3.0.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/path-exists/-/path-exists-3.0.0.tgz#ce0ebeaa5f78cb18925ea7d810d7b59b010fd515"
+  resolved "https://registry.yarnpkg.com/path-exists/-/path-exists-3.0.0.tgz#ce0ebeaa5f78cb18925ea7d810d7b59b010fd515"
   integrity sha1-zg6+ql94yxiSXqfYENe1mwEP1RU=
 
 path-is-absolute@^1.0.0:
@@ -5939,7 +5939,7 @@ pify@^2.0.0:
 
 pify@^3.0.0:
   version "3.0.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/pify/-/pify-3.0.0.tgz#e5a4acd2c101fdf3d9a4d07f0dbc4db49dd28176"
+  resolved "https://registry.yarnpkg.com/pify/-/pify-3.0.0.tgz#e5a4acd2c101fdf3d9a4d07f0dbc4db49dd28176"
   integrity sha1-5aSs0sEB/fPZpNB/DbxNtJ3SgXY=
 
 pinkie-promise@^2.0.0:
@@ -5956,7 +5956,7 @@ pinkie@^2.0.0:
 
 pkg-dir@^2.0.0:
   version "2.0.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/pkg-dir/-/pkg-dir-2.0.0.tgz#f6d5d1109e19d63edf428e0bd57e12777615334b"
+  resolved "https://registry.yarnpkg.com/pkg-dir/-/pkg-dir-2.0.0.tgz#f6d5d1109e19d63edf428e0bd57e12777615334b"
   integrity sha1-9tXREJ4Z1j7fQo4L1X4Sd3YVM0s=
   dependencies:
     find-up "^2.1.0"
@@ -6047,8 +6047,8 @@ prompt@~0.2.14:
 
 proxy-addr@~2.0.4:
   version "2.0.4"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/proxy-addr/-/proxy-addr-2.0.4.tgz#ecfc733bf22ff8c6f407fa275327b9ab67e48b93"
-  integrity sha1-7PxzO/Iv+Mb0B/onUye5q2fki5M=
+  resolved "https://registry.yarnpkg.com/proxy-addr/-/proxy-addr-2.0.4.tgz#ecfc733bf22ff8c6f407fa275327b9ab67e48b93"
+  integrity sha512-5erio2h9jp5CHGwcybmxmVqHmnCBZeewlfJ0pex+UW7Qny7OOZXTtH56TGNyBizkgiOwhJtMKrVzDTeKcySZwA==
   dependencies:
     forwarded "~0.1.2"
     ipaddr.js "1.8.0"
@@ -6098,8 +6098,8 @@ q@^1.1.2, q@~1.3.0:
 
 qs@6.5.2:
   version "6.5.2"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/qs/-/qs-6.5.2.tgz#cb3ae806e8740444584ef154ce8ee98d403f3e36"
-  integrity sha1-yzroBuh0BERYTvFUzo7pjUA/PjY=
+  resolved "https://registry.yarnpkg.com/qs/-/qs-6.5.2.tgz#cb3ae806e8740444584ef154ce8ee98d403f3e36"
+  integrity sha512-N5ZAX4/LxJmF+7wN74pUD6qAh9/wnvdQcjq9TZjevvXzSUo7bfmw91saqMjzGS2xq91/odN2dW/WOl7qQHNDGA==
 
 qs@~0.5.2:
   version "0.5.6"
@@ -6138,8 +6138,8 @@ querystringify@0.0.x:
 
 querystringify@^2.0.0:
   version "2.1.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/querystringify/-/querystringify-2.1.0.tgz#7ded8dfbf7879dcc60d0a644ac6754b283ad17ef"
-  integrity sha1-fe2N+/eHncxg0KZErGdUsoOtF+8=
+  resolved "https://registry.yarnpkg.com/querystringify/-/querystringify-2.1.0.tgz#7ded8dfbf7879dcc60d0a644ac6754b283ad17ef"
+  integrity sha512-sluvZZ1YiTLD5jsqZcDmFyV2EwToyXZBfpoVOmktMmW+VEnhgakFHnasVph65fOjGPTWN0Nw3+XQaSeMayr0kg==
 
 randomatic@^1.1.3:
   version "1.1.6"
@@ -6161,8 +6161,8 @@ range-parser@^1.0.3, range-parser@~1.2.0:
 
 raw-body@2.3.3:
   version "2.3.3"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/raw-body/-/raw-body-2.3.3.tgz#1b324ece6b5706e153855bc1148c65bb7f6ea0c3"
-  integrity sha1-GzJOzmtXBuFThVvBFIxlu39uoMM=
+  resolved "https://registry.yarnpkg.com/raw-body/-/raw-body-2.3.3.tgz#1b324ece6b5706e153855bc1148c65bb7f6ea0c3"
+  integrity sha512-9esiElv1BrZoI3rCDuOuKCBRbuApGGaDPQfjSflGxdy4oyzqghxu6klEkkVIvBje+FF0BX9coEv8KqW6X/7njw==
   dependencies:
     bytes "3.0.0"
     http-errors "1.6.3"
@@ -6181,8 +6181,8 @@ rc@^1.0.1, rc@^1.1.6:
 
 rc@^1.2.7:
   version "1.2.8"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/rc/-/rc-1.2.8.tgz#cd924bf5200a075b83c188cd6b9e211b7fc0d3ed"
-  integrity sha1-zZJL9SAKB1uDwYjNa54hG3/A0+0=
+  resolved "https://registry.yarnpkg.com/rc/-/rc-1.2.8.tgz#cd924bf5200a075b83c188cd6b9e211b7fc0d3ed"
+  integrity sha512-y3bGgqKj3QBdxLbLkomlohkvsA8gdAiUQlSBJnBhfn+BPxg4bc62d8TcBW15wavDfgexCgccckhcZvywyQYPOw==
   dependencies:
     deep-extend "^0.6.0"
     ini "~1.3.0"
@@ -6308,7 +6308,7 @@ recast@^0.11.17:
 
 redent@^1.0.0:
   version "1.0.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/redent/-/redent-1.0.0.tgz#cf916ab1fd5f1f16dfb20822dd6ec7f730c2afde"
+  resolved "https://registry.yarnpkg.com/redent/-/redent-1.0.0.tgz#cf916ab1fd5f1f16dfb20822dd6ec7f730c2afde"
   integrity sha1-z5Fqsf1fHxbfsggi3W7H9zDCr94=
   dependencies:
     indent-string "^2.1.0"
@@ -6348,8 +6348,8 @@ regex-not@^1.0.0:
 
 regex-not@^1.0.2:
   version "1.0.2"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/regex-not/-/regex-not-1.0.2.tgz#1f4ece27e00b0b65e0247a6810e6a85d83a5752c"
-  integrity sha1-H07OJ+ALC2XgJHpoEOaoXYOldSw=
+  resolved "https://registry.yarnpkg.com/regex-not/-/regex-not-1.0.2.tgz#1f4ece27e00b0b65e0247a6810e6a85d83a5752c"
+  integrity sha512-J6SDjUgDxQj5NusnOtdFxDwN/+HWykR8GELwctJ7mdqhcyy1xEc4SRFHUXvxTp661YaVKAjfRLZ9cCqS6tn32A==
   dependencies:
     extend-shallow "^3.0.2"
     safe-regex "^1.1.0"
@@ -6393,7 +6393,7 @@ regjsparser@^0.1.4:
 
 remove-trailing-separator@^1.0.1:
   version "1.1.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/remove-trailing-separator/-/remove-trailing-separator-1.1.0.tgz#c24bce2a283adad5bc3f58e0d48249b92379d8ef"
+  resolved "https://registry.yarnpkg.com/remove-trailing-separator/-/remove-trailing-separator-1.1.0.tgz#c24bce2a283adad5bc3f58e0d48249b92379d8ef"
   integrity sha1-wkvOKig62tW8P1jg1IJJuSN52O8=
 
 repeat-element@^1.1.2:
@@ -6415,7 +6415,7 @@ repeating@^1.1.0, repeating@^1.1.2:
 
 repeating@^2.0.0:
   version "2.0.1"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/repeating/-/repeating-2.0.1.tgz#5214c53a926d3552707527fbab415dbc08d06dda"
+  resolved "https://registry.yarnpkg.com/repeating/-/repeating-2.0.1.tgz#5214c53a926d3552707527fbab415dbc08d06dda"
   integrity sha1-UhTFOpJtNVJwdSf7q0FdvAjQbdo=
   dependencies:
     is-finite "^1.0.0"
@@ -6528,7 +6528,7 @@ reserved-words@^0.1.1:
 
 resolve-cwd@^2.0.0:
   version "2.0.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/resolve-cwd/-/resolve-cwd-2.0.0.tgz#00a9f7387556e27038eae232caa372a6a59b665a"
+  resolved "https://registry.yarnpkg.com/resolve-cwd/-/resolve-cwd-2.0.0.tgz#00a9f7387556e27038eae232caa372a6a59b665a"
   integrity sha1-AKn3OHVW4nA46uIyyqNypqWbZlo=
   dependencies:
     resolve-from "^3.0.0"
@@ -6540,7 +6540,7 @@ resolve-from@^2.0.0:
 
 resolve-from@^3.0.0:
   version "3.0.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/resolve-from/-/resolve-from-3.0.0.tgz#b22c7af7d9d6881bc8b6e653335eebcb0a188748"
+  resolved "https://registry.yarnpkg.com/resolve-from/-/resolve-from-3.0.0.tgz#b22c7af7d9d6881bc8b6e653335eebcb0a188748"
   integrity sha1-six699nWiBvItuZTM17rywoYh0g=
 
 resolve-pkg@^0.1.0:
@@ -6577,8 +6577,8 @@ restore-cursor@^1.0.1:
 
 ret@~0.1.10:
   version "0.1.15"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/ret/-/ret-0.1.15.tgz#b8a4825d5bdb1fc3f6f53c2bc33f81388681c7bc"
-  integrity sha1-uKSCXVvbH8P29Twrwz+BOIaBx7w=
+  resolved "https://registry.yarnpkg.com/ret/-/ret-0.1.15.tgz#b8a4825d5bdb1fc3f6f53c2bc33f81388681c7bc"
+  integrity sha512-TTlYpa+OL+vMMNG24xSlQGEJ3B/RzEfUlLct7b5G/ytav+wPrplCpVMFuwzXbkecJrb6IYo1iFb0S9v37754mg==
 
 revalidator@0.1.x:
   version "0.1.8"
@@ -6601,8 +6601,8 @@ rimraf@2.x.x, rimraf@^2.2.8, rimraf@^2.5.2:
 
 rimraf@^2.6.1:
   version "2.6.3"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/rimraf/-/rimraf-2.6.3.tgz#b2d104fe0d8fb27cf9e0a1cda8262dd3833c6cab"
-  integrity sha1-stEE/g2Psnz54KHNqCYt04M8bKs=
+  resolved "https://registry.yarnpkg.com/rimraf/-/rimraf-2.6.3.tgz#b2d104fe0d8fb27cf9e0a1cda8262dd3833c6cab"
+  integrity sha512-mwqeW5XsA2qAejG46gYdENaxXjx9onRNCfn7L0duuP4hCuTIi/QO7PDK07KJfp1d+izWPrzEJDcSqBa0OZQriA==
   dependencies:
     glob "^7.1.3"
 
@@ -6635,8 +6635,8 @@ rx-lite@^3.1.2:
 
 safe-buffer@5.1.2, safe-buffer@^5.1.2:
   version "5.1.2"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/safe-buffer/-/safe-buffer-5.1.2.tgz#991ec69d296e0313747d59bdfd2b745c35f8828d"
-  integrity sha1-mR7GnSluAxN0fVm9/St0XDX4go0=
+  resolved "https://registry.yarnpkg.com/safe-buffer/-/safe-buffer-5.1.2.tgz#991ec69d296e0313747d59bdfd2b745c35f8828d"
+  integrity sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g==
 
 safe-buffer@^5.0.1:
   version "5.0.1"
@@ -6645,15 +6645,15 @@ safe-buffer@^5.0.1:
 
 safe-regex@^1.1.0:
   version "1.1.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/safe-regex/-/safe-regex-1.1.0.tgz#40a3669f3b077d1e943d44629e157dd48023bf2e"
+  resolved "https://registry.yarnpkg.com/safe-regex/-/safe-regex-1.1.0.tgz#40a3669f3b077d1e943d44629e157dd48023bf2e"
   integrity sha1-QKNmnzsHfR6UPURinhV91IAjvy4=
   dependencies:
     ret "~0.1.10"
 
 "safer-buffer@>= 2.1.2 < 3":
   version "2.1.2"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/safer-buffer/-/safer-buffer-2.1.2.tgz#44fa161b0187b9549dd84bb91802f9bd8385cd6a"
-  integrity sha1-RPoWGwGHuVSd2Eu5GAL5vYOFzWo=
+  resolved "https://registry.yarnpkg.com/safer-buffer/-/safer-buffer-2.1.2.tgz#44fa161b0187b9549dd84bb91802f9bd8385cd6a"
+  integrity sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==
 
 samsam@1.x, samsam@^1.1.3:
   version "1.2.1"
@@ -6676,8 +6676,8 @@ saucelabs@~0.1.1:
 
 sax@^1.2.4:
   version "1.2.4"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
-  integrity sha1-KBYjTiN4vdxOU1T6tcqold9xANk=
+  resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
+  integrity sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw==
 
 select-hose@^2.0.0:
   version "2.0.0"
@@ -6686,8 +6686,8 @@ select-hose@^2.0.0:
 
 selfsigned@^1.9.1:
   version "1.10.4"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/selfsigned/-/selfsigned-1.10.4.tgz#cdd7eccfca4ed7635d47a08bf2d5d3074092e2cd"
-  integrity sha1-zdfsz8pO12NdR6CL8tXTB0CS4s0=
+  resolved "https://registry.yarnpkg.com/selfsigned/-/selfsigned-1.10.4.tgz#cdd7eccfca4ed7635d47a08bf2d5d3074092e2cd"
+  integrity sha512-9AukTiDmHXGXWtWjembZ5NDmVvP2695EtpgbCsxCa68w3c88B+alqbmZ4O3hZ4VWGXeGWzEVdvqgAJD8DQPCDw==
   dependencies:
     node-forge "0.7.5"
 
@@ -6710,8 +6710,8 @@ semver@^4.3.3:
 
 semver@^5.3.0:
   version "5.6.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/semver/-/semver-5.6.0.tgz#7e74256fbaa49c75aa7c7a205cc22799cac80004"
-  integrity sha1-fnQlb7qknHWqfHogXMInmcrIAAQ=
+  resolved "https://registry.yarnpkg.com/semver/-/semver-5.6.0.tgz#7e74256fbaa49c75aa7c7a205cc22799cac80004"
+  integrity sha512-RS9R6R35NYgQn++fkDWaOmqGoj4Ek9gGs+DPxNUZKuwE183xjJroKvyo1IzVFeXvUrvmALy6FWD5xrdJT25gMg==
 
 send@0.15.1:
   version "0.15.1"
@@ -6734,8 +6734,8 @@ send@0.15.1:
 
 send@0.16.2:
   version "0.16.2"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/send/-/send-0.16.2.tgz#6ecca1e0f8c156d141597559848df64730a6bbc1"
-  integrity sha1-bsyh4PjBVtFBWXVZhI32RzCmu8E=
+  resolved "https://registry.yarnpkg.com/send/-/send-0.16.2.tgz#6ecca1e0f8c156d141597559848df64730a6bbc1"
+  integrity sha512-E64YFPUssFHEFBvpbbjr44NCLtI1AohxQ8ZSiJjQLskAdKuriYEP6VyGEsRDH8ScozGpkaX1BGvhanqCwkcEZw==
   dependencies:
     debug "2.6.9"
     depd "~1.1.2"
@@ -6766,8 +6766,8 @@ serve-index@^1.7.1, serve-index@^1.7.2:
 
 serve-static@1.13.2:
   version "1.13.2"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/serve-static/-/serve-static-1.13.2.tgz#095e8472fd5b46237db50ce486a43f4b86c6cec1"
-  integrity sha1-CV6Ecv1bRiN9tQzkhqQ/S4bGzsE=
+  resolved "https://registry.yarnpkg.com/serve-static/-/serve-static-1.13.2.tgz#095e8472fd5b46237db50ce486a43f4b86c6cec1"
+  integrity sha512-p/tdJrO4U387R9oMjb1oj7qSMaMfmOyd4j9hOFoxZe2baQszgHcSWjuya/CiT5kgZZKRudHNOA0pYXOl8rQ5nw==
   dependencies:
     encodeurl "~1.0.2"
     escape-html "~1.0.3"
@@ -6814,7 +6814,7 @@ set-value@^0.4.3:
 set-value@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/set-value/-/set-value-2.0.0.tgz#71ae4a88f0feefbbf52d1ea604f3fb315ebb6274"
-  integrity sha1-ca5KiPD+77v1LR6mBPP7MV67YnQ=
+  integrity sha512-hw0yxk9GT/Hr5yJEYnHNKYXkIA8mVJgd9ditYZCe16ZczcaELYYcfvaXesNACk2O8O0nTiPQcQhGUQj8JLzeeg==
   dependencies:
     extend-shallow "^2.0.1"
     is-extendable "^0.1.1"
@@ -6838,8 +6838,8 @@ setprototypeof@1.0.3:
 
 setprototypeof@1.1.0:
   version "1.1.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/setprototypeof/-/setprototypeof-1.1.0.tgz#d0bd85536887b6fe7c0d818cb962d9d91c54e656"
-  integrity sha1-0L2FU2iHtv58DYGMuWLZ2RxU5lY=
+  resolved "https://registry.yarnpkg.com/setprototypeof/-/setprototypeof-1.1.0.tgz#d0bd85536887b6fe7c0d818cb962d9d91c54e656"
+  integrity sha512-BvE/TwpZX4FXExxOxZyRGQQv651MSwmWKZGqvmPcRIjDqWub67kTKuIMx43cZZrS/cBBzwBcNDWoFxt2XEFIpQ==
 
 sha.js@^2.3.6:
   version "2.4.8"
@@ -6922,7 +6922,7 @@ slide@^1.1.5:
 snapdragon-node@^2.0.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/snapdragon-node/-/snapdragon-node-2.1.1.tgz#6c175f86ff14bdb0724563e8f3c1b021a286853b"
-  integrity sha1-bBdfhv8UvbByRWPo88GwIaKGhTs=
+  integrity sha512-O27l4xaMYt/RSQ5TR3vpWCAB5Kb/czIcqUFOM/C4fYcLnbZUc1PkjTAMjof2pBWaSTwOUd6qUHcFGVGj7aIwnw==
   dependencies:
     define-property "^1.0.0"
     isobject "^3.0.0"
@@ -6931,7 +6931,7 @@ snapdragon-node@^2.0.1:
 snapdragon-util@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/snapdragon-util/-/snapdragon-util-3.0.1.tgz#f956479486f2acd79700693f6f7b805e45ab56e2"
-  integrity sha1-+VZHlIbyrNeXAGk/b3uAXkWrVuI=
+  integrity sha512-mbKkMdQKsjX4BAL4bRYTj21edOf8cN7XHdYUJEe+Zn99hVEYcMvKPct1IqNe7+AZPirn8BCDOQBHQZknqmKlZQ==
   dependencies:
     kind-of "^3.2.0"
 
@@ -6965,7 +6965,7 @@ sntp@1.x.x:
 
 sockjs-client@1.1.4:
   version "1.1.4"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/sockjs-client/-/sockjs-client-1.1.4.tgz#5babe386b775e4cf14e7520911452654016c8b12"
+  resolved "https://registry.yarnpkg.com/sockjs-client/-/sockjs-client-1.1.4.tgz#5babe386b775e4cf14e7520911452654016c8b12"
   integrity sha1-W6vjhrd15M8U51IJEUUmVAFsixI=
   dependencies:
     debug "^2.6.6"
@@ -6977,21 +6977,21 @@ sockjs-client@1.1.4:
 
 sockjs@0.3.19:
   version "0.3.19"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/sockjs/-/sockjs-0.3.19.tgz#d976bbe800af7bd20ae08598d582393508993c0d"
-  integrity sha1-2Xa76ACve9IK4IWY1YI5NQiZPA0=
+  resolved "https://registry.yarnpkg.com/sockjs/-/sockjs-0.3.19.tgz#d976bbe800af7bd20ae08598d582393508993c0d"
+  integrity sha512-V48klKZl8T6MzatbLlzzRNhMepEys9Y4oGFpypBFFn1gLI/QQ9HtLLyWJNbPlwGLelOVOEijUbTTJeLLI59jLw==
   dependencies:
     faye-websocket "^0.10.0"
     uuid "^3.0.1"
 
 source-list-map@^1.1.1:
   version "1.1.2"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/source-list-map/-/source-list-map-1.1.2.tgz#9889019d1024cce55cdc069498337ef6186a11a1"
+  resolved "https://registry.yarnpkg.com/source-list-map/-/source-list-map-1.1.2.tgz#9889019d1024cce55cdc069498337ef6186a11a1"
   integrity sha1-mIkBnRAkzOVc3AaUmDN+9hhqEaE=
 
 source-map-resolve@^0.5.0:
   version "0.5.1"
   resolved "https://registry.yarnpkg.com/source-map-resolve/-/source-map-resolve-0.5.1.tgz#7ad0f593f2281598e854df80f19aae4b92d7a11a"
-  integrity sha1-etD1k/IoFZjoVN+A8ZquS5LXoRo=
+  integrity sha512-0KW2wvzfxm8NCTb30z0LMNyPqWCdDGE2viwzUaucqJdkTRXtZiSY3I+2A6nVAjmdOy0I4gU8DwnVVGsk9jvP2A==
   dependencies:
     atob "^2.0.0"
     decode-uri-component "^0.2.0"
@@ -7009,7 +7009,7 @@ source-map-support@^0.2.10:
 source-map-support@^0.4.15:
   version "0.4.18"
   resolved "https://registry.yarnpkg.com/source-map-support/-/source-map-support-0.4.18.tgz#0286a6de8be42641338594e97ccea75f0a2c585f"
-  integrity sha1-Aoam3ovkJkEzhZTpfM6nXwosWF8=
+  integrity sha512-try0/JqxPLF9nOjvSta7tVondkP5dwgyLDjVoyMDlmjugT2lRZ1OfsrYTkCd2hkDnJTKRbO/Rl3orm8vlsUzbA==
   dependencies:
     source-map "^0.5.6"
 
@@ -7084,7 +7084,7 @@ spdy@^3.4.1:
 split-string@^3.0.1, split-string@^3.0.2:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/split-string/-/split-string-3.1.0.tgz#7cb09dda3a86585705c64b39a6466038682e8fe2"
-  integrity sha1-fLCd2jqGWFcFxks5pkZgOGguj+I=
+  integrity sha512-NzNVhJDYpwceVVii8/Hu6DKfD2G+NrQHlS/V/qgv763EYudVwEcMQNxd2lh+0VrUByXN/oJkl5grOhYWvQUYiw==
   dependencies:
     extend-shallow "^3.0.0"
 
@@ -7141,13 +7141,13 @@ static-extend@^0.1.1:
 
 "statuses@>= 1.4.0 < 2":
   version "1.5.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/statuses/-/statuses-1.5.0.tgz#161c7dac177659fd9811f43771fa99381478628c"
+  resolved "https://registry.yarnpkg.com/statuses/-/statuses-1.5.0.tgz#161c7dac177659fd9811f43771fa99381478628c"
   integrity sha1-Fhx9rBd2Wf2YEfQ3cfqZOBR4Yow=
 
 statuses@~1.4.0:
   version "1.4.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/statuses/-/statuses-1.4.0.tgz#bb73d446da2796106efcc1b601a253d6c46bd087"
-  integrity sha1-u3PURtonlhBu/MG2AaJT1sRr0Ic=
+  resolved "https://registry.yarnpkg.com/statuses/-/statuses-1.4.0.tgz#bb73d446da2796106efcc1b601a253d6c46bd087"
+  integrity sha512-zhSCtt8v2NDrRlPQpCNtw/heZLtfUDqxBM1udqikb/Hbk52LK4nQSwr10u77iopCW5LsyHpuXS0GnEc48mLeew==
 
 stream-browserify@^2.0.1:
   version "2.0.1"
@@ -7259,7 +7259,7 @@ strip-eof@^1.0.0:
 
 strip-indent@^1.0.1:
   version "1.0.1"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/strip-indent/-/strip-indent-1.0.1.tgz#0c7962a6adefa7bbd4ac366460a638552ae1a0a2"
+  resolved "https://registry.yarnpkg.com/strip-indent/-/strip-indent-1.0.1.tgz#0c7962a6adefa7bbd4ac366460a638552ae1a0a2"
   integrity sha1-DHlipq3vp7vUrDZkYKY4VSrhoKI=
   dependencies:
     get-stdin "^4.0.1"
@@ -7298,8 +7298,8 @@ supports-color@^3.1.0:
 
 supports-color@^5.1.0:
   version "5.5.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/supports-color/-/supports-color-5.5.0.tgz#e2e69a44ac8772f78a1ec0b35b689df6530efc8f"
-  integrity sha1-4uaaRKyHcveKHsCzW2id9lMO/I8=
+  resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-5.5.0.tgz#e2e69a44ac8772f78a1ec0b35b689df6530efc8f"
+  integrity sha512-QjVjwdXIt408MIiAqCX4oUKsgU2EqAGzs2Ppkm4aQYbjm+ZEWEcW4SfFNTr4uMNZma0ey4f5lgLrkB0aX0QMow==
   dependencies:
     has-flag "^3.0.0"
 
@@ -7315,8 +7315,8 @@ tapable@^0.2.5, tapable@~0.2.5:
 
 tar@^4:
   version "4.4.8"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/tar/-/tar-4.4.8.tgz#b19eec3fde2a96e64666df9fdb40c5ca1bc3747d"
-  integrity sha1-sZ7sP94qluZGZt+f20DFyhvDdH0=
+  resolved "https://registry.yarnpkg.com/tar/-/tar-4.4.8.tgz#b19eec3fde2a96e64666df9fdb40c5ca1bc3747d"
+  integrity sha512-LzHF64s5chPQQS0IYBn9IN5h3i98c12bo4NCO7e0sGM2llXQ3p2FGC5sdENN4cTW48O915Sh+x+EXx7XW96xYQ==
   dependencies:
     chownr "^1.1.1"
     fs-minipass "^1.2.5"
@@ -7362,13 +7362,13 @@ through@2, through@^2.3.6, through@~2.3, through@~2.3.1, through@~2.3.8:
 
 thunky@^1.0.2:
   version "1.0.3"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/thunky/-/thunky-1.0.3.tgz#f5df732453407b09191dae73e2a8cc73f381a826"
-  integrity sha1-9d9zJFNAewkZHa5z4qjMc/OBqCY=
+  resolved "https://registry.yarnpkg.com/thunky/-/thunky-1.0.3.tgz#f5df732453407b09191dae73e2a8cc73f381a826"
+  integrity sha512-YwT8pjmNcAXBZqrubu22P4FYsh2D4dxRmnWBOL8Jk8bUcRUtc5326kx32tuTmFDAZtLOGEVNl8POAR8j896Iow==
 
 time-stamp@^2.0.0:
   version "2.2.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/time-stamp/-/time-stamp-2.2.0.tgz#917e0a66905688790ec7bbbde04046259af83f57"
-  integrity sha1-kX4KZpBWiHkOx7u94EBGJZr4P1c=
+  resolved "https://registry.yarnpkg.com/time-stamp/-/time-stamp-2.2.0.tgz#917e0a66905688790ec7bbbde04046259af83f57"
+  integrity sha512-zxke8goJQpBeEgD82CXABeMh0LSJcj7CXEd0OHOg45HgcofF7pxNwZm9+RknpxpDhwN4gFpySkApKfFYfRQnUA==
 
 timed-out@^4.0.0:
   version "4.0.1"
@@ -7438,8 +7438,8 @@ to-regex@^3.0.1:
 
 to-regex@^3.0.2:
   version "3.0.2"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/to-regex/-/to-regex-3.0.2.tgz#13cfdd9b336552f30b51f33a8ae1b42a7a7599ce"
-  integrity sha1-E8/dmzNlUvMLUfM6iuG0Knp1mc4=
+  resolved "https://registry.yarnpkg.com/to-regex/-/to-regex-3.0.2.tgz#13cfdd9b336552f30b51f33a8ae1b42a7a7599ce"
+  integrity sha512-FWtleNAtZ/Ki2qtqej2CXTOayOH9bHDQF+Q48VpWyDXjbYxA4Yz8iDB31zXOBUlOHHKidDbqGVrTUvQMPmBGBw==
   dependencies:
     define-property "^2.0.2"
     extend-shallow "^3.0.2"
@@ -7460,7 +7460,7 @@ tough-cookie@>=0.12.0, tough-cookie@~2.3.0:
 
 trim-newlines@^1.0.0:
   version "1.0.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/trim-newlines/-/trim-newlines-1.0.0.tgz#5887966bb582a4503a41eb524f7d35011815a613"
+  resolved "https://registry.yarnpkg.com/trim-newlines/-/trim-newlines-1.0.0.tgz#5887966bb582a4503a41eb524f7d35011815a613"
   integrity sha1-WIeWa7WCpFA6QetST301ARgVphM=
 
 trim-right@^1.0.0:
@@ -7486,7 +7486,7 @@ tryor@~0.1.2:
 tslib@~1.8.0:
   version "1.8.0"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.8.0.tgz#dc604ebad64bcbf696d613da6c954aa0e7ea1eb6"
-  integrity sha1-3GBOutZLy/aW1hPabJVKoOfqHrY=
+  integrity sha512-ymKWWZJST0/CkgduC2qkzjMOWr4bouhuURNXCn/inEX0L57BnRG6FhX76o7FOnsjHazCjfU2LKeSrlS2sIKQJg==
 
 tslint@4.5.1:
   version "4.5.1"
@@ -7547,8 +7547,8 @@ type-detect@^4.0.0:
 
 type-is@~1.6.16:
   version "1.6.16"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/type-is/-/type-is-1.6.16.tgz#f89ce341541c672b25ee7ae3c73dee3b2be50194"
-  integrity sha1-+JzjQVQcZysl7nrjxz3uOyvlAZQ=
+  resolved "https://registry.yarnpkg.com/type-is/-/type-is-1.6.16.tgz#f89ce341541c672b25ee7ae3c73dee3b2be50194"
+  integrity sha512-HRkVv/5qY2G6I8iab9cI7v1bOIdhm94dVjQCPFElW9W+3GeDOSHmy2EBYe4VTApuzolPcmgFTN3ftVJRKR2J9Q==
   dependencies:
     media-typer "0.3.0"
     mime-types "~2.1.18"
@@ -7561,12 +7561,12 @@ typedarray@^0.0.6, typedarray@~0.0.5:
 typescript@~2.7:
   version "2.7.2"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.7.2.tgz#2d615a1ef4aee4f574425cdff7026edf81919836"
-  integrity sha1-LWFaHvSu5PV0Qlzf9wJu34GRmDY=
+  integrity sha512-p5TCYZDAO0m4G344hD+wx/LATebLWZNkkh2asWUFqSsD2OrDNhbAHuSjobrmsUmdzjJjEeZVU9g1h3O6vpstnw==
 
 typesettable@4.1.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/typesettable/-/typesettable-4.1.0.tgz#9dc4f539fabad7db4de2c3b08e286ff72a60f038"
-  integrity sha1-ncT1Ofq619tN4sOwjihv9ypg8Dg=
+  integrity sha512-8JYVOPZiEP/YPNUyhDi+nzA9ZqtaKfanISeP56/7zOBnf9Ci7WYUWojjp456xXUNc20jJgvJXgaIewti45bRxA==
 
 uglify-js@^2.6:
   version "2.8.18"
@@ -7580,7 +7580,7 @@ uglify-js@^2.6:
 
 uglify-js@^2.8.27:
   version "2.8.29"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/uglify-js/-/uglify-js-2.8.29.tgz#29c5733148057bb4e1f75df35b7a9cb72e6a59dd"
+  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-2.8.29.tgz#29c5733148057bb4e1f75df35b7a9cb72e6a59dd"
   integrity sha1-KcVzMUgFe7Th913zW3qcty5qWd0=
   dependencies:
     source-map "~0.5.1"
@@ -7655,8 +7655,8 @@ unzip-response@^2.0.1:
 
 upath@^1.0.5:
   version "1.1.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/upath/-/upath-1.1.0.tgz#35256597e46a581db4793d0ce47fa9aebfc9fabd"
-  integrity sha1-NSVll+RqWB20eT0M5H+prr/J+r0=
+  resolved "https://registry.yarnpkg.com/upath/-/upath-1.1.0.tgz#35256597e46a581db4793d0ce47fa9aebfc9fabd"
+  integrity sha512-bzpH/oBhoS/QI/YtbkqCg6VEiPYjSZtrHQM6/QnJS6OL9pKUFLqb3aFh4Scvwm45+7iAgiMkLhSbaZxUqmrprw==
 
 update-notifier@^2.0.0:
   version "2.1.0"
@@ -7694,8 +7694,8 @@ url-parse@1.0.x:
 
 url-parse@^1.1.8:
   version "1.4.4"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/url-parse/-/url-parse-1.4.4.tgz#cac1556e95faa0303691fec5cf9d5a1bc34648f8"
-  integrity sha1-ysFVbpX6oDA2kf7Fz51aG8NGSPg=
+  resolved "https://registry.yarnpkg.com/url-parse/-/url-parse-1.4.4.tgz#cac1556e95faa0303691fec5cf9d5a1bc34648f8"
+  integrity sha512-/92DTTorg4JjktLNLe6GPS2/RvAd/RGr6LuktmWSMLEOa6rjnlrFXNgSbSmkNvCoL2T028A0a1JaJLzRMlFoHg==
   dependencies:
     querystringify "^2.0.0"
     requires-port "^1.0.0"
@@ -7760,7 +7760,7 @@ utils-merge@1.0.0:
 
 utils-merge@1.0.1:
   version "1.0.1"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/utils-merge/-/utils-merge-1.0.1.tgz#9f95710f50a267947b2ccc124741c1028427e713"
+  resolved "https://registry.yarnpkg.com/utils-merge/-/utils-merge-1.0.1.tgz#9f95710f50a267947b2ccc124741c1028427e713"
   integrity sha1-n5VxD1CiZ5R7LMwSR0HBAoQn5xM=
 
 uuid@^2.0.2:
@@ -7775,8 +7775,8 @@ uuid@^3.0.0:
 
 uuid@^3.0.1:
   version "3.3.2"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/uuid/-/uuid-3.3.2.tgz#1b4af4955eb3077c501c23872fc6513811587131"
-  integrity sha1-G0r0lV6zB3xQHCOHL8ZROBFYcTE=
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.3.2.tgz#1b4af4955eb3077c501c23872fc6513811587131"
+  integrity sha512-yXJmeNaw3DnnKAOKJE51sL/ZaYfWJRl1pK9dr19YFCu0ObS231AB1/LbqTKRAQ5kw8A90rA6fr4riOUpTZvQZA==
 
 validate-npm-package-license@^3.0.1:
   version "3.0.1"
@@ -7793,7 +7793,7 @@ vary@~1.1.0:
 
 vary@~1.1.2:
   version "1.1.2"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
+  resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
   integrity sha1-IpnwLG3tMNSllhsLn3RSShj2NPw=
 
 verror@1.3.6:
@@ -7834,8 +7834,8 @@ vow@^0.4.7, vow@~0.4.0, vow@~0.4.1, vow@~0.4.8:
 
 watchpack@^1.3.1:
   version "1.6.0"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/watchpack/-/watchpack-1.6.0.tgz#4bc12c2ebe8aa277a71f1d3f14d685c7b446cd00"
-  integrity sha1-S8EsLr6KonenHx0/FNaFx7RGzQA=
+  resolved "https://registry.yarnpkg.com/watchpack/-/watchpack-1.6.0.tgz#4bc12c2ebe8aa277a71f1d3f14d685c7b446cd00"
+  integrity sha512-i6dHe3EyLjMmDlU1/bGQpEw25XSjkJULPuAVKCbNRefQVq48yXKUpwg538F7AZTf9kyr57zj++pQFltUa5H7yA==
   dependencies:
     chokidar "^2.0.2"
     graceful-fs "^4.1.2"
@@ -7850,8 +7850,8 @@ wbuf@^1.1.0, wbuf@^1.4.0:
 
 webpack-dev-middleware@1.12.2:
   version "1.12.2"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/webpack-dev-middleware/-/webpack-dev-middleware-1.12.2.tgz#f8fc1120ce3b4fc5680ceecb43d777966b21105e"
-  integrity sha1-+PwRIM47T8VoDO7LQ9d3lmshEF4=
+  resolved "https://registry.yarnpkg.com/webpack-dev-middleware/-/webpack-dev-middleware-1.12.2.tgz#f8fc1120ce3b4fc5680ceecb43d777966b21105e"
+  integrity sha512-FCrqPy1yy/sN6U/SaEZcHKRXGlqU0DUaEBL45jkUYoB8foVb6wCnbIJ1HKIx+qUFTW+3JpVcCJCxZ8VATL4e+A==
   dependencies:
     memory-fs "~0.4.1"
     mime "^1.5.0"
@@ -7861,8 +7861,8 @@ webpack-dev-middleware@1.12.2:
 
 webpack-dev-server@2.11.1:
   version "2.11.1"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/webpack-dev-server/-/webpack-dev-server-2.11.1.tgz#6f9358a002db8403f016e336816f4485384e5ec0"
-  integrity sha1-b5NYoALbhAPwFuM2gW9EhThOXsA=
+  resolved "https://registry.yarnpkg.com/webpack-dev-server/-/webpack-dev-server-2.11.1.tgz#6f9358a002db8403f016e336816f4485384e5ec0"
+  integrity sha512-ombhu5KsO/85sVshIDTyQ5HF3xjZR3N0sf5Ao6h3vFwpNyzInEzA1GV3QPVjTMLTNckp8PjfG1PFGznzBwS5lg==
   dependencies:
     ansi-html "0.0.7"
     array-includes "^3.0.3"
@@ -7901,7 +7901,7 @@ webpack-merge@^4.1.0:
 
 webpack-sources@^0.2.3:
   version "0.2.3"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/webpack-sources/-/webpack-sources-0.2.3.tgz#17c62bfaf13c707f9d02c479e0dcdde8380697fb"
+  resolved "https://registry.yarnpkg.com/webpack-sources/-/webpack-sources-0.2.3.tgz#17c62bfaf13c707f9d02c479e0dcdde8380697fb"
   integrity sha1-F8Yr+vE8cH+dAsR54Nzd6DgGl/s=
   dependencies:
     source-list-map "^1.1.1"
@@ -7909,7 +7909,7 @@ webpack-sources@^0.2.3:
 
 webpack@2.6.1:
   version "2.6.1"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/webpack/-/webpack-2.6.1.tgz#2e0457f0abb1ac5df3ab106c69c672f236785f07"
+  resolved "https://registry.yarnpkg.com/webpack/-/webpack-2.6.1.tgz#2e0457f0abb1ac5df3ab106c69c672f236785f07"
   integrity sha1-LgRX8KuxrF3zqxBsacZy8jZ4Xwc=
   dependencies:
     acorn "^5.0.0"
@@ -8078,8 +8078,8 @@ yallist@^2.0.0:
 
 yallist@^3.0.0, yallist@^3.0.2:
   version "3.0.3"
-  resolved "https://artifactory.palantir.build/artifactory/api/npm/all-npm/yallist/-/yallist-3.0.3.tgz#b4b049e314be545e3ce802236d6cd22cd91c3de9"
-  integrity sha1-tLBJ4xS+VF486AIjbWzSLNkcPek=
+  resolved "https://registry.yarnpkg.com/yallist/-/yallist-3.0.3.tgz#b4b049e314be545e3ce802236d6cd22cd91c3de9"
+  integrity sha512-S+Zk8DEWE6oKpV+vI3qWkaK+jSbIK86pCwe2IF/xwIpQ8jEuxpw9NyaGjmp9+BoJv5FV2piqCDcoCtStppiq2A==
 
 yargs-parser@^4.2.0:
   version "4.2.1"
