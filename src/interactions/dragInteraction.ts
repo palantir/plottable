@@ -20,6 +20,7 @@ export class Drag extends Interaction {
   private _dragging = false;
   private _constrainedToComponent = true;
   private _mouseDispatcher: Dispatchers.Mouse;
+  private _mouseButton: number;
   /**
    * Only emit events when the mouseFilter is true for the source mouse
    * events. Use this to define custom filters (e.g. only right click,
@@ -97,13 +98,18 @@ export class Drag extends Interaction {
   }
 
   private _endDrag(point: Point, event: UIEvent) {
-    if (event instanceof MouseEvent && (<MouseEvent> event).button !== 0) {
+    if (event instanceof MouseEvent && (<MouseEvent> event).button !== this._mouseButton) {
       return;
     }
     if (this._dragging) {
       this._dragging = false;
       this._dragEndCallbacks.callCallbacks(this._dragOrigin, this._translateAndConstrain(point));
     }
+  }
+
+  public constructor(mouseButton?: number) {
+    super();
+    this._mouseButton = mouseButton !== undefined ? mouseButton : 0;
   }
 
   /**
