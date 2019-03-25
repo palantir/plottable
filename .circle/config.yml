@@ -1,0 +1,83 @@
+version: 2
+
+references:
+  setup_env: &setup_env
+    docker:
+      - image: circleci/node:8.10.0
+  setup_env_browser: &setup_env_browser
+    docker:
+      - image: circleci/node:8.10.0-browsers
+        environment:
+            CHROME_BIN: "/usr/bin/google-chrome"
+  save_cache: &save_cache
+    key: v1-dependency-cache-{{ checksum "yarn.lock" }}
+    paths:
+      - node_modules
+  restore_cache: &restore_cache
+    keys:
+      - v1-dependency-cache-{{ checksum "yarn.lock" }}
+      - v1-dependency-cache-
+  persist_to_workspace: &persist_to_workspace
+    root: '.'
+    paths:
+      - build
+      - dist
+      - plottable.*
+
+jobs:
+  install:
+    <<: *setup_env
+    steps:
+      - checkout
+      - attach_workspace:
+          at: '.'
+      - restore_cache: *restore_cache
+      - run: yarn --frozen-lockfile
+      - save_cache: *save_cache
+      - persist_to_workspace:
+          root: '.'
+          paths:
+            - yarn.lock
+
+  test:
+    <<: *setup_env_browser
+    steps:
+      - checkout
+      - attach_workspace:
+          at: '.'
+      - restore_cache: *restore_cache
+      - run: yarn test:ci
+      - persist_to_workspace: *persist_to_workspace
+
+  demo:
+    <<: *setup_env
+    steps:
+      - checkout
+      - attach_workspace:
+          at: '.'
+      - restore_cache: *restore_cache
+      - run: ./demo.js || true
+      - persist_to_workspace: *persist_to_workspace
+
+  dist:
+    <<: *setup_env
+    steps:
+      - checkout
+      - attach_workspace:
+          at: '.'
+      - restore_cache: *restore_cache
+      - run: yarn dist
+      - persist_to_workspace: *persist_to_workspace
+
+
+workflows:
+  version: 2
+  plottable:
+    jobs:
+      - install
+      - test:
+          requires: [install]
+      - demo:
+          requires: [test]
+      - dist:
+          requires: [test]
