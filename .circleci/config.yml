@@ -58,13 +58,17 @@ jobs:
       - restore_cache: *restore_cache
       - run: ./demo.js || true
       - store_artifacts:
-          root: '.'
-          paths:
-            - quicktests
-            - plottable.*
-            - node_modules/d3
-            - node_modules/jquery
-            - node_modules/requirejs
+        path: quicktests
+      - store_artifacts:
+        path: plottable.css
+      - store_artifacts:
+        path: plottable.js
+      - store_artifacts:
+        path: node_modules/d3
+      - store_artifacts:
+        path: node_modules/jquery
+      - store_artifacts:
+        path: node_modules/requirejs
       - persist_to_workspace: *persist_to_workspace
 
   dist:
