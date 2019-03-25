@@ -57,6 +57,8 @@ jobs:
           at: '.'
       - restore_cache: *restore_cache
       - run: ./demo.js || true
+      - store_artifacts:
+          path: quicktests
       - persist_to_workspace: *persist_to_workspace
 
   dist:
