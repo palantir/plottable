@@ -89,11 +89,10 @@ jobs:
       - attach_workspace:
           at: '.'
       - restore_cache: *restore_cache
-      - run:
-        - git diff HEAD..origin/develop --quiet || (echo "dist not built"; exit 1)
-        - npm run -s check_version || (echo "package.json version not updated"; exit 1)
-        - echo -e "$NPM_USER\n$NPM_PASS\n$NPM_EMAIL" | npm login
-        - npm publish
+      - run: git diff HEAD..origin/develop --quiet || (echo "dist not built"; exit 1)
+      - run: npm run -s check_version || (echo "package.json version not updated"; exit 1)
+      - run: echo -e "$NPM_USER\n$NPM_PASS\n$NPM_EMAIL" | npm login
+      - run: npm publish
       - persist_to_workspace: *persist_to_workspace
 
   publish-snapshot:
@@ -103,9 +102,8 @@ jobs:
       - attach_workspace:
           at: '.'
       - restore_cache: *restore_cache
-      - run:
-        - echo -e "$NPM_USER\n$NPM_PASS\n$NPM_EMAIL" | npm login
-        - ./publishSnapshot.sh
+      - run: echo -e "$NPM_USER\n$NPM_PASS\n$NPM_EMAIL" | npm login
+      - run: ./publishSnapshot.sh
       - persist_to_workspace: *persist_to_workspace
 
 workflows:
