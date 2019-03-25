@@ -58,7 +58,9 @@ jobs:
       - restore_cache: *restore_cache
       - run: ./demo.js || true
       - store_artifacts:
-          path: quicktests
+          paths:
+            - quicktests
+            - plottable.*
       - persist_to_workspace: *persist_to_workspace
 
   dist:
@@ -71,6 +73,31 @@ jobs:
       - run: yarn dist
       - persist_to_workspace: *persist_to_workspace
 
+  publish:
+    <<: *setup_env
+    steps:
+      - checkout
+      - attach_workspace:
+          at: '.'
+      - restore_cache: *restore_cache
+      - run:
+        - git diff HEAD..origin/develop --quiet || (echo "dist not built"; exit 1)
+        - npm run -s check_version || (echo "package.json version not updated"; exit 1)
+        - echo -e "$NPM_USER\n$NPM_PASS\n$NPM_EMAIL" | npm login
+        - npm publish
+      - persist_to_workspace: *persist_to_workspace
+
+  publish-snapshot:
+    <<: *setup_env
+    steps:
+      - checkout
+      - attach_workspace:
+          at: '.'
+      - restore_cache: *restore_cache
+      - run:
+        - echo -e "$NPM_USER\n$NPM_PASS\n$NPM_EMAIL" | npm login
+        - ./publishSnapshot.sh
+      - persist_to_workspace: *persist_to_workspace
 
 workflows:
   version: 2
@@ -83,3 +110,16 @@ workflows:
           requires: [test]
       - dist:
           requires: [test]
+      - publish:
+          requires: [test, dist]
+          filters:
+            tags:
+              only: /^v[0-9.]+.*/
+            branches:
+              ignore: /.*/
+      - publish-snapshot:
+          requires: [test, dist]
+          filters:
+            branches:
+              only: develop
+
