@@ -56,7 +56,9 @@ jobs:
       - attach_workspace:
           at: '.'
       - restore_cache: *restore_cache
-      - run: ./demo.js || true
+      - run:
+        - yarn start:update-quicktests
+        - ./demo.js || true
       - store_artifacts:
           path: quicktests
       - store_artifacts:
