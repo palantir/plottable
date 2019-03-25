@@ -56,15 +56,14 @@ jobs:
       - attach_workspace:
           at: '.'
       - restore_cache: *restore_cache
-      - run:
-        - yarn start:update-quicktests
-        - ./demo.js || true
-      - store_artifacts:
-          path: quicktests
+      - run: yarn start:update-quicktests
+      - run: ./demo.js || true
       - store_artifacts:
           path: plottable.css
       - store_artifacts:
           path: plottable.js
+      - store_artifacts:
+          path: quicktests
       - store_artifacts:
           path: node_modules/d3
       - store_artifacts:
