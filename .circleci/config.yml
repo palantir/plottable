@@ -1,0 +1,134 @@
+version: 2
+
+references:
+  setup_env: &setup_env
+    docker:
+      - image: circleci/node:8.10.0
+  setup_env_browser: &setup_env_browser
+    docker:
+      - image: circleci/node:8.10.0-browsers
+        environment:
+            CHROME_BIN: "/usr/bin/google-chrome"
+  save_cache: &save_cache
+    key: v1-dependency-cache-{{ checksum "yarn.lock" }}
+    paths:
+      - node_modules
+  restore_cache: &restore_cache
+    keys:
+      - v1-dependency-cache-{{ checksum "yarn.lock" }}
+      - v1-dependency-cache-
+  persist_to_workspace: &persist_to_workspace
+    root: '.'
+    paths:
+      - build
+      - dist
+      - plottable.*
+
+jobs:
+  install:
+    <<: *setup_env
+    steps:
+      - checkout
+      - attach_workspace:
+          at: '.'
+      - restore_cache: *restore_cache
+      - run: yarn --frozen-lockfile
+      - save_cache: *save_cache
+      - persist_to_workspace:
+          root: '.'
+          paths:
+            - yarn.lock
+
+  test:
+    <<: *setup_env_browser
+    steps:
+      - checkout
+      - attach_workspace:
+          at: '.'
+      - restore_cache: *restore_cache
+      - run: yarn test:ci
+      - persist_to_workspace: *persist_to_workspace
+
+  demo:
+    <<: *setup_env
+    steps:
+      - checkout
+      - attach_workspace:
+          at: '.'
+      - restore_cache: *restore_cache
+      - run: yarn start:update-quicktests
+      - run: ./demo.js || true
+      - store_artifacts:
+          path: plottable.css
+      - store_artifacts:
+          path: plottable.js
+      - store_artifacts:
+          path: quicktests
+      - store_artifacts:
+          path: node_modules/d3
+      - store_artifacts:
+          path: node_modules/jquery
+      - store_artifacts:
+          path: node_modules/requirejs
+      - persist_to_workspace: *persist_to_workspace
+
+  dist:
+    <<: *setup_env
+    steps:
+      - checkout
+      - attach_workspace:
+          at: '.'
+      - restore_cache: *restore_cache
+      - run: yarn dist
+      - persist_to_workspace: *persist_to_workspace
+
+  publish:
+    <<: *setup_env
+    steps:
+      - checkout
+      - attach_workspace:
+          at: '.'
+      - restore_cache: *restore_cache
+      - run:
+        - git diff HEAD..origin/develop --quiet || (echo "dist not built"; exit 1)
+        - npm run -s check_version || (echo "package.json version not updated"; exit 1)
+        - echo -e "$NPM_USER\n$NPM_PASS\n$NPM_EMAIL" | npm login
+        - npm publish
+      - persist_to_workspace: *persist_to_workspace
+
+  publish-snapshot:
+    <<: *setup_env
+    steps:
+      - checkout
+      - attach_workspace:
+          at: '.'
+      - restore_cache: *restore_cache
+      - run:
+        - echo -e "$NPM_USER\n$NPM_PASS\n$NPM_EMAIL" | npm login
+        - ./publishSnapshot.sh
+      - persist_to_workspace: *persist_to_workspace
+
+workflows:
+  version: 2
+  plottable:
+    jobs:
+      - install
+      - test:
+          requires: [install]
+      - demo:
+          requires: [test]
+      - dist:
+          requires: [test]
+      - publish:
+          requires: [test, dist]
+          filters:
+            tags:
+              only: /^v[0-9.]+.*/
+            branches:
+              ignore: /.*/
+      - publish-snapshot:
+          requires: [test, dist]
+          filters:
+            branches:
+              only: develop
+
