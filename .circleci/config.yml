@@ -23,6 +23,9 @@ references:
       - build
       - dist
       - plottable.*
+  release_tag_filter: &release_tag_filter
+    tags:
+      only: /^v[0-9.]+.*/
 
 jobs:
   install:
@@ -110,18 +113,21 @@ workflows:
   version: 2
   plottable:
     jobs:
-      - install
+      - install:
+          filters: *release_tag_filter
       - test:
           requires: [install]
+          filters: *release_tag_filter
       - demo:
           requires: [test]
+          filters: *release_tag_filter
       - dist:
           requires: [test]
+          filters: *release_tag_filter
       - publish:
           requires: [test, dist]
           filters:
-            tags:
-              only: /^v[0-9.]+.*/
+            <<: *release_tag_filter
             branches:
               ignore: /.*/
       - publish-snapshot:
@@ -129,4 +135,3 @@ workflows:
           filters:
             branches:
               only: develop
-
