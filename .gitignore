@@ -4,6 +4,7 @@ test/tests.js
 test/tests.js.map
 plottable.js
 plottable.js.map
+plottable.d.ts
 plottable.min.js
 
 # Typescript

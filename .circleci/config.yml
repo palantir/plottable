@@ -57,7 +57,7 @@ jobs:
           at: '.'
       - restore_cache: *restore_cache
       - run: yarn start:update-quicktests
-      - run: ./demo.js || true
+      - run: ./scripts/demo.js || true
       - store_artifacts:
           path: plottable.css
       - store_artifacts:
@@ -91,7 +91,7 @@ jobs:
       - restore_cache: *restore_cache
       - run: git diff HEAD..origin/develop --quiet || (echo "dist not built"; exit 1)
       - run: npm run -s check_version || (echo "package.json version not updated"; exit 1)
-      - run: echo -e "$NPM_USER\n$NPM_PASS\n$NPM_EMAIL" | npm login
+      - run: ./scripts/authenticateNpm.sh
       - run: npm publish
       - persist_to_workspace: *persist_to_workspace
 
@@ -102,8 +102,8 @@ jobs:
       - attach_workspace:
           at: '.'
       - restore_cache: *restore_cache
-      - run: echo -e "$NPM_USER\n$NPM_PASS\n$NPM_EMAIL" | npm login
-      - run: ./publishSnapshot.sh
+      - run: ./scripts/authenticateNpm.sh
+      - run: ./scripts/publishSnapshot.sh
       - persist_to_workspace: *persist_to_workspace
 
 workflows:
