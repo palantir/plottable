@@ -3,6 +3,8 @@
 !LICENSE
 !package.json
 !plottable.js
+!plottable.js.map
+!plottable.d.ts
 !plottable.css
 !plottable.min.js
 !build/src/**/*
