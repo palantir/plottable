@@ -43,7 +43,8 @@ export class Dispatcher {
     Object.keys(this._eventToProcessingFunction).forEach((event: string) => {
       const processingFunction = this._eventToProcessingFunction[event];
       // Add `{ passive: false }` option because Chrome 73 broke this.
-      this._eventTarget.addEventListener(event, processingFunction, { passive: false });
+      const options = event === "wheel" ?  { passive: false } : undefined;
+      this._eventTarget.addEventListener(event, processingFunction, options);
     });
     this._connected = true;
   }
