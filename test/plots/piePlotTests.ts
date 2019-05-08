@@ -73,6 +73,23 @@ describe("Plots", () => {
         div.remove();
       });
 
+      it("draws stroke paths on top of fill paths when data changes", () => {
+        let arcFillParent = piePlot.content().selectAll<Element, any>(".arc.fill").node().parentNode;
+        let arcOutlineParent = piePlot.content().selectAll<Element, any>(".arc.outline").node().parentNode;
+        assert.equal(arcOutlineParent.previousSibling, arcFillParent,
+                     "arcFill's parent node should be the previous silbing of arcOutline's parent node.");
+
+        const newDataset = new Plottable.Dataset([{ value: 3 }, { value: 4 }]);
+        piePlot.datasets([newDataset]);
+        piePlot.renderTo(div);
+
+        arcFillParent = piePlot.content().selectAll<Element, any>(".arc.fill").node().parentNode;
+        arcOutlineParent = piePlot.content().selectAll<Element, any>(".arc.outline").node().parentNode;
+        assert.equal(arcOutlineParent.previousSibling, arcFillParent,
+                     "arcFill's parent node should be the previous silbing of arcOutline's parent node.");
+        div.remove();
+      });
+
       it("uses Plottable colors for sectors by default", () => {
         const arcPaths = piePlot.content().selectAll<Element, any>(".arc.fill");
         const plottableColors = new Plottable.Scales.Color().range();

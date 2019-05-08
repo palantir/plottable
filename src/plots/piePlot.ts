@@ -88,12 +88,14 @@ export class Pie extends Plot {
       return this;
     }
     this._updatePieAngles();
+
+    super._addDataset(dataset);
+
     const strokeDrawer = new ArcOutlineSVGDrawer();
     if (this._isSetup) {
       strokeDrawer.attachTo(this._renderArea);
     }
     this._strokeDrawers.set(dataset, strokeDrawer);
-    super._addDataset(dataset);
     return this;
   }
 
@@ -109,6 +111,7 @@ export class Pie extends Plot {
 
   protected _removeDataset(dataset: Dataset) {
     super._removeDataset(dataset);
+    this._strokeDrawers.delete(dataset);
     this._startAngles = [];
     this._endAngles = [];
     return this;
