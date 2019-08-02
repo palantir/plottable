@@ -480,10 +480,10 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     const scaledBaseline = lengthScale.scale(this.baselineValue());
 
     const baselineAttr: any = {
-      "x1": this._isVertical ? 0 : scaledBaseline,
-      "y1": this._isVertical ? scaledBaseline : 0,
-      "x2": this._isVertical ? this.width() : scaledBaseline,
-      "y2": this._isVertical ? scaledBaseline : this.height(),
+      x1: this._isVertical ? 0 : scaledBaseline,
+      y1: this._isVertical ? scaledBaseline : 0,
+      x2: this._isVertical ? this.width() : scaledBaseline,
+      y2: this._isVertical ? scaledBaseline : this.height(),
     };
 
     this._getAnimator("baseline").animate(this._baseline, baselineAttr);

@@ -247,19 +247,19 @@ export class DragBoxLayer extends SelectionBoxLayer {
       const r = bounds.bottomRight.x;
 
       this._detectionEdgeT.attrs({
-        "x1": l, "y1": t, "x2": r, "y2": t,
+        x1: l, y1: t, x2: r, y2: t,
         "stroke-width": this._detectionRadius * 2,
       });
       this._detectionEdgeB.attrs({
-        "x1": l, "y1": b, "x2": r, "y2": b,
+        x1: l, y1: b, x2: r, y2: b,
         "stroke-width": this._detectionRadius * 2,
       });
       this._detectionEdgeL.attrs({
-        "x1": l, "y1": t, "x2": l, "y2": b,
+        x1: l, y1: t, x2: l, y2: b,
         "stroke-width": this._detectionRadius * 2,
       });
       this._detectionEdgeR.attrs({
-        "x1": r, "y1": t, "x2": r, "y2": b,
+        x1: r, y1: t, x2: r, y2: b,
         "stroke-width": this._detectionRadius * 2,
       });
 

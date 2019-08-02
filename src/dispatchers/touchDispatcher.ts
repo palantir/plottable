@@ -169,7 +169,7 @@ export class Touch extends Dispatcher {
         touchIdentifiers.push(touchID);
       }
     }
-    ;
+
     if (touchIdentifiers.length > 0) {
       this._callCallbacksForEvent(eventName, touchIdentifiers, touchPositions, event);
     }

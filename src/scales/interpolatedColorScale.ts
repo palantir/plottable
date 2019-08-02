@@ -108,7 +108,7 @@ export class InterpolatedColor extends Scale<number, string> {
     if (colors.length < 2) {
       throw new Error("Color scale arrays must have at least two elements.");
     }
-    ;
+
     return (a: number, b: number) => {
       return (t: number) => {
         // Clamp t parameter to [0,1]
@@ -149,8 +149,8 @@ export class InterpolatedColor extends Scale<number, string> {
     return this._backingScaleDomain();
   }
 
-  protected _backingScaleDomain(): number[]
-  protected _backingScaleDomain(values: number[]): this
+  protected _backingScaleDomain(): number[];
+  protected _backingScaleDomain(values: number[]): this;
   protected _backingScaleDomain(values?: number[]): any {
     if (values == null) {
       return this._d3Scale.domain();

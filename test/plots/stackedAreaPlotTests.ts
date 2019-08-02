@@ -414,7 +414,7 @@ describe("Plots", () => {
         const area0 = areas.filter((d) => d === datas[0]);
         const area1 = areas.filter((d) => d === datas[1]);
         const areaYs0 = TestMethods.areaVertices(area0).map((areaVertex) => areaVertex.y);
-        const areaYs1 = TestMethods.areaVertices(area1).map((areaVertex) => areaVertex.y);;
+        const areaYs1 = TestMethods.areaVertices(area1).map((areaVertex) => areaVertex.y);
 
         // note that higher y value means toward bottom of screen
         assert.operator(areaYs0[0], "<", areaYs1[0], "first series atop second");

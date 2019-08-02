@@ -57,8 +57,8 @@ export class Linear extends QuantitativeScale<number> {
     return this._backingScaleDomain();
   }
 
-  protected _backingScaleDomain(): number[]
-  protected _backingScaleDomain(values: number[]): this
+  protected _backingScaleDomain(): number[];
+  protected _backingScaleDomain(values: number[]): this;
   protected _backingScaleDomain(values?: number[]): any {
     if (values == null) {
       return this._d3Scale.domain();

@@ -251,8 +251,8 @@ export class Category extends Scale<string, number> implements ITransformableSca
     return this._backingScaleDomain();
   }
 
-  protected _backingScaleDomain(): string[]
-  protected _backingScaleDomain(values: string[]): this
+  protected _backingScaleDomain(): string[];
+  protected _backingScaleDomain(values: string[]): this;
   protected _backingScaleDomain(values?: string[]): any {
     if (values == null) {
       return this._d3Scale.domain();

@@ -404,10 +404,10 @@ export class Axis<D> extends Component {
     const isHorizontal = this.isHorizontal();
     bindElements(this._annotationContainer.select(".annotation-line-container"), "line", Axis.ANNOTATION_LINE_CLASS)
       .attrs({
-        "x1": isHorizontal ? positionF : secondaryPosition,
-        "x2": isHorizontal ? positionF : offsetF,
-        "y1": isHorizontal ? secondaryPosition : positionF,
-        "y2": isHorizontal ? offsetF : positionF,
+        x1: isHorizontal ? positionF : secondaryPosition,
+        x2: isHorizontal ? positionF : offsetF,
+        y1: isHorizontal ? secondaryPosition : positionF,
+        y2: isHorizontal ? offsetF : positionF,
         visibility: visibilityF,
       });
 
@@ -525,10 +525,10 @@ export class Axis<D> extends Component {
 
   protected _generateBaselineAttrHash() {
     const baselineAttrHash: { [key: string]: number } = {
-      "x1": 0,
-      "y1": 0,
-      "x2": 0,
-      "y2": 0,
+      x1: 0,
+      y1: 0,
+      x2: 0,
+      y2: 0,
     };
 
     switch (this._orientation) {
@@ -558,10 +558,10 @@ export class Axis<D> extends Component {
 
   protected _generateTickMarkAttrHash(isEndTickMark = false) {
     const tickMarkAttrHash: { [key: string]: number | ((d: any) => number) } = {
-      "x1": 0,
-      "y1": 0,
-      "x2": 0,
-      "y2": 0,
+      x1: 0,
+      y1: 0,
+      x2: 0,
+      y2: 0,
     };
 
     const scalingFunction = (d: any) => this._scale.scale(d);

@@ -95,7 +95,7 @@ export function assertBBoxNonIntersection(firstEl: SimpleSelection<void>, second
 export function assertPointsClose(actual: Plottable.Point, expected: Plottable.Point, epsilon: number, message: String) {
   assert.closeTo(actual.x, expected.x, epsilon, message + " (x)");
   assert.closeTo(actual.y, expected.y, epsilon, message + " (y)");
-};
+}
 
 export function assertWidthHeight(el: SimpleSelection<void>, widthExpected: number, heightExpected: number, message: string) {
   const width = el.attr("width");
@@ -271,7 +271,6 @@ export enum InteractionMode {
   Mouse,
   Touch,
 }
-;
 
 export enum InteractionType {
   Start,

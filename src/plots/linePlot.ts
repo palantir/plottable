@@ -500,7 +500,7 @@ export class Line<X> extends XYPlot<X, number> {
       .y((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
       .curve(this._getCurveFactory())
       .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset));
-  };
+  }
 
   protected _getCurveFactory(): d3.CurveFactory | d3.CurveFactoryLineOnly {
     const curve = this.curve();

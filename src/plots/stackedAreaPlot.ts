@@ -184,10 +184,10 @@ export class StackedArea<X> extends Area<X> {
   protected _additionalPaint() {
     const scaledBaseline = this.y().scale.scale(this._baselineValue);
     const baselineAttr: any = {
-      "x1": 0,
-      "y1": scaledBaseline,
-      "x2": this.width(),
-      "y2": scaledBaseline,
+      x1: 0,
+      y1: scaledBaseline,
+      x2: this.width(),
+      y2: scaledBaseline,
     };
 
     this._getAnimator("baseline").animate(this._baseline, baselineAttr);

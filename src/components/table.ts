@@ -101,7 +101,7 @@ export class Table extends ComponentContainer {
       return null;
     }
     return this._rows[rowIndex][columnIndex];
-  };
+  }
 
   /**
    * Adds a Component in the specified row and column position.

@@ -93,8 +93,8 @@ export class Time extends QuantitativeScale<Date> {
     return this._backingScaleDomain();
   }
 
-  protected _backingScaleDomain(): Date[]
-  protected _backingScaleDomain(values: Date[]): this
+  protected _backingScaleDomain(): Date[];
+  protected _backingScaleDomain(values: Date[]): this;
   protected _backingScaleDomain(values?: Date[]): any {
     if (values == null) {
       return this._d3Scale.domain();

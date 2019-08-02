@@ -66,13 +66,13 @@ export function memoize<F extends Function>(compute: F): MemoizedFunction<F> {
         if (lastSignature === undefined
             || lastSignature.isDifferent(inputSignature)) {
             if (logPerformance) {
-                console.log("cache miss! computing");
+                console.warn("cache miss! computing");
             }
             lastSignature = inputSignature;
             lastValue = compute.apply(this, args);
         } else {
             if (logPerformance) {
-                console.log("cache hit!");
+                console.warn("cache hit!");
             }
         }
         return lastValue;
