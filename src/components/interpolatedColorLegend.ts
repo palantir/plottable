@@ -308,7 +308,7 @@ export class InterpolatedColorLegend extends Component {
 
     const ticks = this._generateTicks(numSwatches);
     const swatchesUpdate = this._swatchContainer.selectAll("rect.swatch").data(ticks);
-    const rects = swatchesUpdate.enter().append("rect").classed("swatch", true);;
+    const rects = swatchesUpdate.enter().append("rect").classed("swatch", true);
     const swatches = swatchesUpdate.merge(rects);
     swatchesUpdate.exit().remove();
     swatches.attrs({

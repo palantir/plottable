@@ -32,7 +32,7 @@ export {
   Interactions,
   Plots,
   Scales,
-  Utils
+  Utils,
 };
 
 export * from "./animators/animator";

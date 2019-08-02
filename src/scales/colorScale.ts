@@ -159,8 +159,8 @@ export class Color extends Scale<string, string> {
     return this._backingScaleDomain();
   }
 
-  protected _backingScaleDomain(): string[]
-  protected _backingScaleDomain(values: string[]): this
+  protected _backingScaleDomain(): string[];
+  protected _backingScaleDomain(values: string[]): this;
   protected _backingScaleDomain(values?: string[]): any {
     if (values == null) {
       return this._d3Scale.domain();

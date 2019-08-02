@@ -154,8 +154,8 @@ export class Scale<D, R> {
     }
   }
 
-  protected _backingScaleDomain(): D[]
-  protected _backingScaleDomain(values: D[]): this
+  protected _backingScaleDomain(): D[];
+  protected _backingScaleDomain(values: D[]): this;
   protected _backingScaleDomain(values?: D[]): any {
     throw new Error("Subclasses should override _backingDomain");
   }

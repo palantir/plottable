@@ -22,8 +22,8 @@ describe("Scales", () => {
         return this._backingScaleDomain();
       }
 
-      protected _backingScaleDomain(): D[]
-      protected _backingScaleDomain(values: D[]): this
+      protected _backingScaleDomain(): D[];
+      protected _backingScaleDomain(values: D[]): this;
       protected _backingScaleDomain(values?: D[]): any {
         if (values == null) {
           return this._domain;
