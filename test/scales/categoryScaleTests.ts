@@ -85,7 +85,7 @@ describe("Scales", () => {
         const values = [1, 3, 2, 1];
         const computedExtent = scale.extentOfValues(<any>values);
 
-        assert.deepEqual(computedExtent, [1, 3, 2], "the extent is made of all the unique values in the domain");
+        assert.deepEqual(computedExtent, ["1", "3", "2"], "the extent is made of all the unique values in the domain");
       });
     });
 

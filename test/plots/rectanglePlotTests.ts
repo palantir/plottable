@@ -186,9 +186,9 @@ describe("Plots", () => {
         xScale.padProportion(0);
 
         const plot = new Plottable.Plots.Rectangle();
-        plot.x((d) => d.x, xScale);
-        plot.x2((d) => d.x2);
-        plot.y((d) => d.y, yScale);
+        plot.x((d: any) => d.x, xScale);
+        plot.x2((d: any) => d.x2);
+        plot.y((d: any) => d.y, yScale);
         plot.addDataset(new Plottable.Dataset(data));
         plot.autorangeMode("x");
         plot.renderTo(div);
@@ -214,9 +214,9 @@ describe("Plots", () => {
         yScale.padProportion(0);
 
         const plot = new Plottable.Plots.Rectangle();
-        plot.x((d) => d.x, xScale);
-        plot.y((d) => d.y, yScale);
-        plot.y2((d) => d.y2);
+        plot.x((d: any) => d.x, xScale);
+        plot.y((d: any) => d.y, yScale);
+        plot.y2((d: any) => d.y2);
         plot.addDataset(new Plottable.Dataset(data));
         plot.autorangeMode("y");
         plot.renderTo(div);
