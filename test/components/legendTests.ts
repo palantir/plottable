@@ -202,7 +202,7 @@ describe("Legend", () => {
     });
 
     it("wraps entries onto extra rows if necessary for horizontal legends", () => {
-      color.domain(["George Waaaaaashington", "John Adaaaams", "Thomaaaaas Jefferson"]);
+      color.domain(["George Waaaaaaaaaaaaashington", "John Adaaaaaaaaaaaaaams", "Thomaaaaaaaaas Jefferson"]);
       legend.maxEntriesPerRow(Infinity);
 
       legend.renderTo(div);
