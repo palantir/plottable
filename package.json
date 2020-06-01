@@ -61,6 +61,7 @@
   },
   "dependencies": {
     "@types/d3": "^4.13.0",
+    "@types/d3-shape": "^1.2.5",
     "@types/is-plain-object": "^0.0.2",
     "@types/lodash": "^4.14.109",
     "d3": "^4.13.0",
