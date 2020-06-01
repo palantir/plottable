@@ -201,8 +201,9 @@ describe("Legend", () => {
       div.remove();
     });
 
+    // Left this test in, but text lengths can vary based on OS causing inconsistent results.
     it("wraps entries onto extra rows if necessary for horizontal legends", () => {
-      color.domain(["George Waaaaaashington", "John Adaaaams", "Thomaaaaas Jefferson"]);
+      color.domain(["George Waaaaaaaaashington", "John Adaaaaaaaaaams", "Thomaaaaaaas Jefferson"]);
       legend.maxEntriesPerRow(Infinity);
 
       legend.renderTo(div);
