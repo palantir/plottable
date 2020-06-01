@@ -914,6 +914,11 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       0, 0, plotWidth, plotHeight,
     );
   }
+
+  public invalidateCache() {
+    super.invalidateCache();
+    this.datasets().forEach((dataset) => this._labelConfig.get(dataset).measurer.reset());
+  }
 }
 
 /**
