@@ -452,12 +452,12 @@ describe("Scales", () => {
 
         const plot1 = new Plottable.Plots.Line();
         plot1.addDataset(dataset1);
-        plot1.x((d) => d.x, xScale);
+        plot1.x((d: any) => d.x, xScale);
         plot1.y((d) => d.y, yScale);
 
         const plot2 = new Plottable.Plots.Line();
         plot2.addDataset(dataset2);
-        plot2.x((d) => d.x, xScale);
+        plot2.x((d: any) => d.x, xScale);
         plot2.y((d) => d.y, yScale);
 
         const group = new Plottable.Components.Group([plot1, plot2]);

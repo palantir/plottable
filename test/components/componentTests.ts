@@ -750,8 +750,8 @@ describe("Component", () => {
       colorScale.autoDomain();
       const barPlot = new Plottable.Plots.Bar();
       barPlot.addDataset(new Plottable.Dataset([{x: 1, y: 1}]));
-      barPlot.x((d) => d.x, xScale);
-      barPlot.y((d) => d.y, yScale);
+      barPlot.x((d: any) => d.x, xScale);
+      barPlot.y((d: any) => d.y, yScale);
       // hook up the colorScale to look at data from the bar plot
       barPlot.attr("fill", (d) => d.x, colorScale);
       // set up a legend to based on the colorScale. Legend will trigger an internal redraw() no the Table
