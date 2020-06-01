@@ -693,6 +693,7 @@ export class Legend extends Component {
   }
 
   public invalidateCache() {
+    super.invalidateCache();
     this._measurer.reset();
   }
 }
