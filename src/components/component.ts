@@ -9,6 +9,7 @@ import { Bounds, Point, SimpleSelection, SpaceRequest } from "../core/interfaces
 import * as RenderController from "../core/renderController";
 import * as Utils from "../utils";
 
+import { isElement } from "lodash";
 import { coerceExternalD3 } from "../utils/coerceD3";
 import { makeEnum } from "../utils/makeEnum";
 import { ComponentContainer } from "./componentContainer";
@@ -364,10 +365,10 @@ export class Component {
       let selection: d3.Selection<HTMLElement, any, any, any>;
       if (typeof(element) === "string") {
         selection = d3.select<HTMLElement, any>(element);
-      } else if (element instanceof Element) {
-        selection = d3.select<HTMLElement, any>(element);
+      } else if (isElement(element)) {
+        selection = d3.select<HTMLElement, any>(element as HTMLElement);
       } else {
-        selection = coerceExternalD3(element);
+        selection = coerceExternalD3(element as d3.Selection<HTMLElement, any, any, any>);
       }
       if (!selection.node() || selection.node().nodeName == null) {
         throw new Error("Plottable requires a valid Element to renderTo");
