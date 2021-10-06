@@ -21,27 +21,21 @@ function run(svg, data, Plottable) {
 
   var dataset = new Plottable.Dataset(data);
   var dataset1 = new Plottable.Dataset(data);
-  var verticalBarPlot = new Plottable.Plots.Bar("vertical")
-                              .addDataset(dataset)
-                              .x(function(d) { return d.x; }, xScale)
-                              .y(function(d) { return d.y; }, yScale)
-                              .labelsEnabled(true)
-                              .attr("opacity", 0.75)
-
-  var verticalStackedBarPlot = new Plottable.Plots.StackedBar("vertical")
-                              .addDataset(dataset)
-                              .addDataset(dataset1)
-                              .x(function(d) { return d.x; }, xScale)
-                              .y(function(d) { return d.y; }, yScale)
-                              .labelsEnabled(true, "middle")
-                              .attr("opacity", 0.75)
 
   var horizontalBarPlot = new Plottable.Plots.Bar("horizontal")
                               .addDataset(dataset)
                               .x(function(d) { return d.x; }, xScale)
                               .y(function(d) { return d.y; }, yScale)
                               .labelsEnabled(true)
-                              .attr("opacity", 0.75)
+                              .attr("opacity", 0.75);
+
+  var horizontalBarPlotLargeLabels = new Plottable.Plots.Bar("horizontal")
+                              .addDataset(dataset)
+                              .x(function(d) { return d.x; }, xScale)
+                              .y(function(d) { return d.y; }, yScale)
+                              .labelsEnabled(true)
+                              .labelFontSize(24)
+                              .attr("opacity", 0.75);
 
   var horizontalStackedBarPlot = new Plottable.Plots.StackedBar("horizontal")
                               .addDataset(dataset)
@@ -49,17 +43,26 @@ function run(svg, data, Plottable) {
                               .x(function(d) { return d.x; }, xScale)
                               .y(function(d) { return d.y; }, yScale)
                               .labelsEnabled(true, "middle")
-                              .attr("opacity", 0.75)
+                              .attr("opacity", 0.75);
+
+  var horizontalStackedBarPlotLargeLabels = new Plottable.Plots.StackedBar("horizontal")
+                              .addDataset(dataset)
+                              .addDataset(dataset1)
+                              .x(function(d) { return d.x; }, xScale)
+                              .y(function(d) { return d.y; }, yScale)
+                              .labelsEnabled(true, "middle")
+                              .labelFontSize(20)
+                              .attr("opacity", 0.75);
 
   var chart = new Plottable.Components.Table([
-    [verticalBarPlot, verticalStackedBarPlot],
-    [horizontalBarPlot, horizontalStackedBarPlot]
+    [horizontalBarPlot, horizontalBarPlotLargeLabels],
+    [horizontalStackedBarPlot, horizontalStackedBarPlotLargeLabels]
   ]);
 
   chart.renderTo(svg);
 
-  new Plottable.Interactions.PanZoom(xScale, yScale).attachTo(verticalBarPlot);
-  new Plottable.Interactions.PanZoom(xScale, yScale).attachTo(verticalStackedBarPlot);
   new Plottable.Interactions.PanZoom(xScale, yScale).attachTo(horizontalBarPlot);
+  new Plottable.Interactions.PanZoom(xScale, yScale).attachTo(horizontalBarPlotLargeLabels);
   new Plottable.Interactions.PanZoom(xScale, yScale).attachTo(horizontalStackedBarPlot);
+  new Plottable.Interactions.PanZoom(xScale, yScale).attachTo(horizontalStackedBarPlotLargeLabels);
 }

@@ -106,9 +106,35 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
     }
   }
 
+  /**
+   * Get the label font size in px.
+   */
+   public labelFontSize(): number;
+   /**
+    * Set the label font size.
+    *
+    * @param {fontSize} number The label font size in px. Must be an integer between 12 and 24,
+    * inclusive. Values will be coerced to this range.
+    */
+   public labelFontSize(fontSize: number): this;
+   public labelFontSize(fontSize?: number): number | this {
+     if (fontSize == null) {
+       return super.labelFontSize();
+     } else {
+       super.labelFontSize(fontSize);
+       if (this._labelArea != null) {
+         this._labelArea.classed(`label-${this._labelsFontSize}`, true);
+       }
+       return this;
+     }
+   }
+
   protected _setup() {
     super._setup();
-    this._labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
+    this._labelArea = this._renderArea
+      .append("g")
+      .classed(Bar._LABEL_AREA_CLASS, true)
+      .classed(`label-${this._labelsFontSize}`, true);
     const context = new Typesettable.SvgContext(this._labelArea.node() as SVGElement);
     this._measurer = new Typesettable.CacheMeasurer(context);
     this._writer = new Typesettable.Writer(this._measurer, context);

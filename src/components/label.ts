@@ -10,6 +10,8 @@ import { SimpleSelection, SpaceRequest } from "../core/interfaces";
 import { Component } from "./component";
 
 export class Label extends Component {
+  public static _DEFAULT_FONT_SIZE_PX = 12;
+
   protected _textContainer: SimpleSelection<void>;
   protected _text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
   protected _angle: number;
