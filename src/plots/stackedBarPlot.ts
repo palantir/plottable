@@ -121,10 +121,10 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
      if (fontSize == null) {
        return super.labelFontSize();
      } else {
-       super.labelFontSize(fontSize);
        if (this._labelArea != null) {
          this._labelArea.classed(`label-${this._labelsFontSize}`, true);
        }
+       super.labelFontSize(fontSize);
        return this;
      }
    }

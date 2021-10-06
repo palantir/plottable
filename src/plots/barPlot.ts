@@ -402,6 +402,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
         labelArea.classed(`label-${this._labelsFontSize}`, true);
       });
 
+      this._clearAttrToProjectorCache();
+      this.render();
       return this;
     }
   }
