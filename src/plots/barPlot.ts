@@ -7,6 +7,7 @@ import * as d3 from "d3";
 import * as Typesettable from "typesettable";
 
 import * as Animators from "../animators";
+import { Label } from "../components/label";
 import { Dataset } from "../core/dataset";
 import * as Formatters from "../core/formatters";
 import { DatumFormatter } from "../core/formatters";
@@ -31,7 +32,6 @@ import * as Plots from "./";
 import { IPlotEntity } from "./";
 import { Plot } from "./plot";
 import { XYPlot } from "./xyPlot";
-import { Label } from "../components/label";
 
 type LabelConfig = {
   labelArea: SimpleSelection<void>;
