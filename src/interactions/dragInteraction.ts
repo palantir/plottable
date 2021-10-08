@@ -84,7 +84,6 @@ export class Drag extends Interaction {
     }
     const translatedP = this._translateToComponentSpace(point);
     if (this._isInsideComponent(translatedP)) {
-      event.preventDefault();
       this._dragging = true;
       this._dragOrigin = translatedP;
       this._dragStartCallbacks.callCallbacks(this._dragOrigin);
