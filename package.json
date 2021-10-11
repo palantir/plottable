@@ -1,11 +1,11 @@
 {
   "name": "@frigoveneta_team/plottable",
   "description": "A modular charting library built on D3",
-  "version": "3.9.2",
+  "version": "3.9.5",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/palantir/plottable.git"
+    "url": "https://github.com/7eXx/plottable.git"
   },
   "author": "Palantir Technologies",
   "main": "build/src/index.js",
