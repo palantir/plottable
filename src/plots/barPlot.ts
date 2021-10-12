@@ -388,9 +388,6 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   public labelFontSize(): LabelFontSizePx;
   /**
    * Set the label font size.
-   *
-   * @param {fontSize} number The label font size in px. Must be an integer between 12 and 24,
-   * inclusive. Values will be coerced to this range.
    */
   public labelFontSize(fontSize: LabelFontSizePx): this;
   public labelFontSize(fontSize?: LabelFontSizePx): number | this {
