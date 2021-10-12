@@ -123,7 +123,10 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
        return super.labelFontSize();
      } else {
        if (this._labelArea != null) {
-         this._labelArea.classed(`label-${this._labelFontSize}`, true);
+        // clearing to remove outdated font-size classes
+         this._labelArea.attr("class", null)
+          .classed(Bar._LABEL_AREA_CLASS, true)
+          .classed(`label-${this._labelFontSize}`, true)
        }
        super.labelFontSize(fontSize);
        return this;
@@ -326,6 +329,8 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
 
   public invalidateCache() {
     super.invalidateCache();
-    this._measurer.reset();
+    if (this._measurer != null) {
+      this._measurer.reset();
+    }
   }
 }

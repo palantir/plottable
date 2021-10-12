@@ -400,6 +400,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       this.invalidateCache();
       this._labelFontSize = fontSize;
       this._labelConfig.forEach(({ labelArea }) => {
+        // clearing to remove outdated font-size classes
         labelArea.attr("class", null)
           .classed(Bar._LABEL_AREA_CLASS, true)
           .classed(`label-${this._labelFontSize}`, true);
