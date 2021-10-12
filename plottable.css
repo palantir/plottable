@@ -112,12 +112,6 @@
   fill: #32313F;
 }
 
-/* maybe delete me */
-.plottable .bar-label-text-area text,
-.plottable .scatter-label-text-area text {
-  font-size: 12px;
-}
-
 .plottable .tick-label-container.label-12 text,
 .plottable .bar-label-text-area.label-12 text,
 .plottable .scatter-label-text-area.label-12 text {
