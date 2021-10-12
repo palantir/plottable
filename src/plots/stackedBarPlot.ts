@@ -126,7 +126,7 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
         // clearing to remove outdated font-size classes
          this._labelArea.attr("class", null)
           .classed(Bar._LABEL_AREA_CLASS, true)
-          .classed(`label-${this._labelFontSize}`, true)
+          .classed(`label-${this._labelFontSize}`, true);
        }
        super.labelFontSize(fontSize);
        return this;
