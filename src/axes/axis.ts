@@ -7,6 +7,7 @@ import * as d3 from "d3";
 import * as Typesettable from "typesettable";
 
 import { Component } from "../components/component";
+import { Label } from "../components/label";
 import * as Formatters from "../core/formatters";
 import { Formatter } from "../core/formatters";
 import { Point, SimpleSelection, SpaceRequest } from "../core/interfaces";
@@ -49,6 +50,8 @@ export class Axis<D> extends Component {
   private static _ANNOTATION_LABEL_PADDING = 4;
   protected _tickMarkContainer: SimpleSelection<void>;
   protected _tickLabelContainer: SimpleSelection<void>;
+  /** protected instead of private to accommodate time axes which draw their own label containers */
+  protected _tickLabelFontSize: number = Label._DEFAULT_FONT_SIZE_PX;
   protected _baseline: SimpleSelection<void>;
   protected _scale: Scale<D, number>;
   private _formatter: Formatter;
@@ -124,6 +127,29 @@ export class Axis<D> extends Component {
     }
 
     return element === undefined ? undefined : d3.select(element).datum();
+  }
+
+  /**
+   * Get the label font size in px.
+   */
+  public tickLabelFontSize(): number;
+  /**
+   * Set the label font size.
+   *
+   * @param {fontSize} number The label font size in px. Must be an integer between 12 and 24,
+   * inclusive. Values will be coerced to this range.
+   */
+  public tickLabelFontSize(fontSize: number): this;
+  public tickLabelFontSize(fontSize?: number): number | this {
+    if (fontSize == null) {
+      return this._tickLabelFontSize;
+    } else {
+      this._tickLabelFontSize = Utils.Math.coerceToRange(fontSize, [Label._MIN_FONT_SIZE_PX, Label._MAX_FONT_SIZE_PX]);
+      if (this._tickLabelContainer != null) {
+        this._configureTickLabelContainer();
+      }
+      return this.render();
+    }
   }
 
   protected _computeWidth() {
@@ -204,8 +230,7 @@ export class Axis<D> extends Component {
     super._setup();
     this._tickMarkContainer = this.content().append("g")
       .classed(Axis.TICK_MARK_CLASS + "-container", true);
-    this._tickLabelContainer = this.content().append("g")
-      .classed(Axis.TICK_LABEL_CLASS + "-container", true);
+    this._configureTickLabelContainer();
     this._baseline = this.content().append("line").classed("baseline", true);
     this._annotationContainer = this.content().append("g")
       .classed("annotation-container", true);
@@ -216,6 +241,21 @@ export class Axis<D> extends Component {
     const typesetterContext = new Typesettable.SvgContext(annotationLabelContainer.node() as SVGElement);
     this._annotationMeasurer = new Typesettable.CacheMeasurer(typesetterContext);
     this._annotationWriter = new Typesettable.Writer(this._annotationMeasurer, typesetterContext);
+  }
+
+  private _configureTickLabelContainer() {
+    if (this._tickLabelContainer != null) {
+      this._tickLabelContainer
+        // clearing to remove outdated font-size classes
+        .attr("class", null)
+        .classed(`${Axis.TICK_LABEL_CLASS}-container`, true)
+        .classed(`label-${this._tickLabelFontSize}`, true);
+    } else {
+      this._tickLabelContainer = this.content()
+        .append("g")
+        .classed(`${Axis.TICK_LABEL_CLASS}-container`, true)
+        .classed(`label-${this._tickLabelFontSize}`, true);
+    }
   }
 
   /*
@@ -871,6 +911,8 @@ export class Axis<D> extends Component {
 
   public invalidateCache() {
     super.invalidateCache();
-    (this._annotationMeasurer as Typesettable.CacheMeasurer).reset();
+    if (this._annotationMeasurer != null) {
+      (this._annotationMeasurer as Typesettable.CacheMeasurer).reset();
+    }
   }
 }

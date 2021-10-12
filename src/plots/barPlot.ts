@@ -28,6 +28,7 @@ import { QuantitativeScale } from "../scales/quantitativeScale";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
 import { makeEnum } from "../utils/makeEnum";
+import { coerceToRange } from "../utils/mathUtils";
 import * as Plots from "./";
 import { IPlotEntity } from "./";
 import { Plot } from "./plot";
@@ -74,7 +75,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   private _labelFormatter: DatumFormatter = Formatters.identity();
   private _labelsEnabled = false;
   private _labelsPosition = LabelsPosition.end;
-  protected _labelsFontSize: number = Label._DEFAULT_FONT_SIZE_PX;
+  protected _labelFontSize: number = Label._DEFAULT_FONT_SIZE_PX;
   private _hideBarsIfAnyAreTooWide = true;
   private _labelConfig: Utils.Map<Dataset, LabelConfig>;
   private _baselineValueProvider: () => (X|Y)[];
@@ -395,25 +396,24 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   public labelFontSize(fontSize: number): this;
   public labelFontSize(fontSize?: number): number | this {
     if (fontSize == null) {
-      return this._labelsFontSize;
+      return this._labelFontSize;
     } else {
-      this._labelsFontSize = Math.min(24, Math.max(12, fontSize));
+      this.invalidateCache();
+      this._labelFontSize = Utils.Math.coerceToRange(fontSize, [Label._MIN_FONT_SIZE_PX, Label._MAX_FONT_SIZE_PX]);
       this._labelConfig.forEach(({ labelArea }) => {
-        labelArea.classed(`label-${this._labelsFontSize}`, true);
+        labelArea.attr("class", null)
+          .classed(Bar._LABEL_AREA_CLASS, true)
+          .classed(`label-${this._labelFontSize}`, true);
       });
-
-      this._clearAttrToProjectorCache();
-      this.render();
-      return this;
+      return this.render();
     }
   }
 
   protected _createNodesForDataset(dataset: Dataset): ProxyDrawer {
     const drawer = super._createNodesForDataset(dataset);
-    const labelArea = this._renderArea
-      .append("g")
+    const labelArea = this._renderArea .append("g")
       .classed(Bar._LABEL_AREA_CLASS, true)
-      .classed(`label-${this._labelsFontSize}`, true);
+      .classed(`label-${this._labelFontSize}`, true);
     const context = new Typesettable.SvgContext(labelArea.node() as SVGElement);
     const measurer = new Typesettable.CacheMeasurer(context);
     const writer = new Typesettable.Writer(measurer, context);
@@ -948,7 +948,12 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
 
   public invalidateCache() {
     super.invalidateCache();
-    this.datasets().forEach((dataset) => this._labelConfig.get(dataset).measurer.reset());
+    this.datasets().forEach((dataset) => {
+      const labelConfig = this._labelConfig.get(dataset);
+      if (labelConfig != null) {
+        labelConfig.measurer.reset();
+      }
+    });
   }
 }
 

@@ -317,6 +317,17 @@ export class Category extends Axis<string> {
     });
   }
 
+  public tickLabelFontSize(): number;
+  public tickLabelFontSize(fontSize: number): this;
+  public tickLabelFontSize(fontSize?: number): number | this {
+    if (fontSize == null) {
+      return super.tickLabelFontSize();
+    }
+    // Resets the measurer to measure distances using the latest font size
+    this.invalidateCache();
+    return super.tickLabelFontSize(fontSize);
+  }
+
   /**
    * Measures the size of the tick labels without making any (permanent) DOM changes.
    *
@@ -439,6 +450,8 @@ export class Category extends Axis<string> {
 
   public invalidateCache() {
     super.invalidateCache();
-    this._measurer.reset();
+    if (this._measurer != null) {
+      this._measurer.reset();
+    }
   }
 }

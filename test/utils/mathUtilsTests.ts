@@ -85,6 +85,21 @@ describe("Utils.Methods", () => {
     });
   });
 
+  describe("coerceToRange()", () => {
+    it("identity if value within range", () => {
+      assert.equal(Plottable.Utils.Math.coerceToRange(2, [-5, 15]), 2);
+      assert.equal(Plottable.Utils.Math.coerceToRange(15, [-5, 15]), 15);
+    });
+
+    it("returns range max if larger than range", () => {
+      assert.equal(Plottable.Utils.Math.coerceToRange(16, [-5, 15]), 15);
+    });
+
+    it("returns range min if smaller than range", () => {
+      assert.equal(Plottable.Utils.Math.coerceToRange(-10, [-5, 15]), -5);
+    });
+  });
+
   it("isNaN()", () => {
     const isNaN = Plottable.Utils.Math.isNaN;
 

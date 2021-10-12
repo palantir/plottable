@@ -122,7 +122,7 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
        return super.labelFontSize();
      } else {
        if (this._labelArea != null) {
-         this._labelArea.classed(`label-${this._labelsFontSize}`, true);
+         this._labelArea.classed(`label-${this._labelFontSize}`, true);
        }
        super.labelFontSize(fontSize);
        return this;
@@ -134,7 +134,7 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
     this._labelArea = this._renderArea
       .append("g")
       .classed(Bar._LABEL_AREA_CLASS, true)
-      .classed(`label-${this._labelsFontSize}`, true);
+      .classed(`label-${this._labelFontSize}`, true);
     const context = new Typesettable.SvgContext(this._labelArea.node() as SVGElement);
     this._measurer = new Typesettable.CacheMeasurer(context);
     this._writer = new Typesettable.Writer(this._measurer, context);

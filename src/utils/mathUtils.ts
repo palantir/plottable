@@ -275,3 +275,13 @@ export function applyTransform(a: ICssTransformMatrix, p: Point): Point {
     y: a[1] * p.x + a[3] * p.y + a[5],
   };
 }
+
+/**
+ * Returns the value of the given number after coercing it to the given range. The range is
+ * inclusive.
+ */
+export function coerceToRange(num: number, range: [number, number]): number {
+  const rangeCopy = range.slice().sort();
+  const [min, max] = range;
+  return Math.min(max, Math.max(min, num));
+}
