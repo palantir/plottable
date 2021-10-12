@@ -7,7 +7,7 @@ import * as d3 from "d3";
 import * as Typesettable from "typesettable";
 
 import * as Animators from "../animators";
-import { Label } from "../components/label";
+import { Label, LabelFontSizePx } from "../components/label";
 import { Dataset } from "../core/dataset";
 import * as Formatters from "../core/formatters";
 import { DatumFormatter } from "../core/formatters";
@@ -28,7 +28,6 @@ import { QuantitativeScale } from "../scales/quantitativeScale";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
 import { makeEnum } from "../utils/makeEnum";
-import { coerceToRange } from "../utils/mathUtils";
 import * as Plots from "./";
 import { IPlotEntity } from "./";
 import { Plot } from "./plot";
@@ -75,7 +74,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   private _labelFormatter: DatumFormatter = Formatters.identity();
   private _labelsEnabled = false;
   private _labelsPosition = LabelsPosition.end;
-  protected _labelFontSize: number = Label._DEFAULT_FONT_SIZE_PX;
+  protected _labelFontSize = Label._DEFAULT_FONT_SIZE_PX;
   private _hideBarsIfAnyAreTooWide = true;
   private _labelConfig: Utils.Map<Dataset, LabelConfig>;
   private _baselineValueProvider: () => (X|Y)[];
@@ -386,20 +385,20 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   /**
    * Get the label font size in px.
    */
-  public labelFontSize(): number;
+  public labelFontSize(): LabelFontSizePx;
   /**
    * Set the label font size.
    *
    * @param {fontSize} number The label font size in px. Must be an integer between 12 and 24,
    * inclusive. Values will be coerced to this range.
    */
-  public labelFontSize(fontSize: number): this;
-  public labelFontSize(fontSize?: number): number | this {
+  public labelFontSize(fontSize: LabelFontSizePx): this;
+  public labelFontSize(fontSize?: LabelFontSizePx): number | this {
     if (fontSize == null) {
       return this._labelFontSize;
     } else {
       this.invalidateCache();
-      this._labelFontSize = Utils.Math.coerceToRange(fontSize, [Label._MIN_FONT_SIZE_PX, Label._MAX_FONT_SIZE_PX]);
+      this._labelFontSize = fontSize;
       this._labelConfig.forEach(({ labelArea }) => {
         labelArea.attr("class", null)
           .classed(Bar._LABEL_AREA_CLASS, true)

@@ -15,7 +15,7 @@ import { makeSymbolCanvasDrawStep, SymbolSVGDrawer } from "../drawers/symbolDraw
 import { Scale } from "../scales/scale";
 
 import * as Animators from "../animators";
-import { Label } from "../components/label";
+import { Label, LabelFontSizePx } from "../components/label";
 import * as Drawers from "../drawers";
 import * as Scales from "../scales";
 import * as Utils from "../utils";
@@ -43,7 +43,7 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
   protected static _LABEL_AREA_CLASS = "scatter-label-text-area";
   private _labelConfig: Utils.Map<Dataset, LabelConfig>;
   private _labelFormatter: Formatters.DatumFormatter = Formatters.identity();
-  private _labelFontSize: number = Label._DEFAULT_FONT_SIZE_PX;
+  private _labelFontSize = Label._DEFAULT_FONT_SIZE_PX;
 
   protected static _LABEL_MARGIN_FROM_BUBBLE = 15;
   private _labelsEnabled = false;
@@ -252,20 +252,20 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
   /**
    * Get the label font size in px.
    */
-  public labelFontSize(): number;
+  public labelFontSize(): LabelFontSizePx;
   /**
    * Set the label font size.
    *
    * @param {fontSize} number The label font size in px. Must be an integer between 12 and 24,
    * inclusive. Values will be coerced to this range.
    */
-  public labelFontSize(fontSize: number): this;
-  public labelFontSize(fontSize?: number): number | this {
+  public labelFontSize(fontSize: LabelFontSizePx): this;
+  public labelFontSize(fontSize?: LabelFontSizePx): LabelFontSizePx | this {
     if (fontSize == null) {
       return this._labelFontSize;
     } else {
       this.invalidateCache();
-      this._labelFontSize = Utils.Math.coerceToRange(fontSize, [Label._MIN_FONT_SIZE_PX, Label._MAX_FONT_SIZE_PX]);
+      this._labelFontSize = fontSize;
       this._labelConfig.forEach(({ labelArea }) => {
         labelArea.attr("class", null)
           .classed(Scatter._LABEL_AREA_CLASS, true)

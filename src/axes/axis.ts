@@ -7,7 +7,7 @@ import * as d3 from "d3";
 import * as Typesettable from "typesettable";
 
 import { Component } from "../components/component";
-import { Label } from "../components/label";
+import { Label, LabelFontSizePx } from "../components/label";
 import * as Formatters from "../core/formatters";
 import { Formatter } from "../core/formatters";
 import { Point, SimpleSelection, SpaceRequest } from "../core/interfaces";
@@ -50,8 +50,11 @@ export class Axis<D> extends Component {
   private static _ANNOTATION_LABEL_PADDING = 4;
   protected _tickMarkContainer: SimpleSelection<void>;
   protected _tickLabelContainer: SimpleSelection<void>;
-  /** protected instead of private to accommodate time axes which draw their own label containers */
-  protected _tickLabelFontSize: number = Label._DEFAULT_FONT_SIZE_PX;
+  /**
+   * `protected` instead of `private` to accommodate time axes which draw their own label containers
+   * and need access to this value.
+   */
+  protected _tickLabelFontSize = Label._DEFAULT_FONT_SIZE_PX;
   protected _baseline: SimpleSelection<void>;
   protected _scale: Scale<D, number>;
   private _formatter: Formatter;
@@ -132,19 +135,16 @@ export class Axis<D> extends Component {
   /**
    * Get the label font size in px.
    */
-  public tickLabelFontSize(): number;
+  public tickLabelFontSize(): LabelFontSizePx;
   /**
    * Set the label font size.
-   *
-   * @param {fontSize} number The label font size in px. Must be an integer between 12 and 24,
-   * inclusive. Values will be coerced to this range.
    */
-  public tickLabelFontSize(fontSize: number): this;
-  public tickLabelFontSize(fontSize?: number): number | this {
+  public tickLabelFontSize(fontSize: LabelFontSizePx): this;
+  public tickLabelFontSize(fontSize?: LabelFontSizePx): LabelFontSizePx | this {
     if (fontSize == null) {
       return this._tickLabelFontSize;
     } else {
-      this._tickLabelFontSize = Utils.Math.coerceToRange(fontSize, [Label._MIN_FONT_SIZE_PX, Label._MAX_FONT_SIZE_PX]);
+      this._tickLabelFontSize = fontSize;
       if (this._tickLabelContainer != null) {
         this._configureTickLabelContainer();
       }

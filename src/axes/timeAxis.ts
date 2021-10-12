@@ -11,6 +11,7 @@ import * as Formatters from "../core/formatters";
 import * as Scales from "../scales";
 import * as Utils from "../utils";
 
+import { LabelFontSizePx } from "../components/label";
 import { SimpleSelection } from "../core/interfaces";
 import { makeEnum } from "../utils/makeEnum";
 import { Axis } from "./axis";
@@ -230,9 +231,9 @@ export class Time extends Axis<Date> {
     this.annotationFormatter(Formatters.time("%a %b %d, %Y", this._useUTC));
   }
 
-  public tickLabelFontSize(): number;
-  public tickLabelFontSize(fontSize: number): this;
-  public tickLabelFontSize(fontSize?: number): number | this {
+  public tickLabelFontSize(): LabelFontSizePx;
+  public tickLabelFontSize(fontSize: LabelFontSizePx): this;
+  public tickLabelFontSize(fontSize?: LabelFontSizePx): LabelFontSizePx | this {
     if (fontSize == null) {
       return super.tickLabelFontSize();
     }

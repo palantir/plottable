@@ -7,6 +7,7 @@ import * as d3 from "d3";
 import * as Typesettable from "typesettable";
 
 import { Component } from "../components/component";
+import { LabelFontSizePx } from "../components/label";
 import { Point, SimpleSelection, SpaceRequest } from "../core/interfaces";
 import * as Scales from "../scales";
 import * as Utils from "../utils";
@@ -317,9 +318,9 @@ export class Category extends Axis<string> {
     });
   }
 
-  public tickLabelFontSize(): number;
-  public tickLabelFontSize(fontSize: number): this;
-  public tickLabelFontSize(fontSize?: number): number | this {
+  public tickLabelFontSize(): LabelFontSizePx;
+  public tickLabelFontSize(fontSize: LabelFontSizePx): this;
+  public tickLabelFontSize(fontSize?: LabelFontSizePx): number | this {
     if (fontSize == null) {
       return super.tickLabelFontSize();
     }

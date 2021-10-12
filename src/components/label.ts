@@ -9,10 +9,12 @@ import { SimpleSelection, SpaceRequest } from "../core/interfaces";
 
 import { Component } from "./component";
 
+export type LabelFontSizePx = 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24;
+
 export class Label extends Component {
-  public static _MIN_FONT_SIZE_PX = 12;
-  public static _MAX_FONT_SIZE_PX = 24;
-  public static _DEFAULT_FONT_SIZE_PX = 12;
+  public static _MIN_FONT_SIZE_PX: LabelFontSizePx = 12;
+  public static _MAX_FONT_SIZE_PX: LabelFontSizePx = 24;
+  public static _DEFAULT_FONT_SIZE_PX: LabelFontSizePx = 12;
 
   protected _textContainer: SimpleSelection<void>;
   protected _text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
