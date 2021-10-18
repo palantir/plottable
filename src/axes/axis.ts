@@ -244,18 +244,13 @@ export class Axis<D> extends Component {
   }
 
   private _configureTickLabelContainer() {
-    if (this._tickLabelContainer != null) {
-      this._tickLabelContainer
-        // clearing to remove outdated font-size classes
-        .attr("class", null)
-        .classed(`${Axis.TICK_LABEL_CLASS}-container`, true)
-        .classed(`label-${this._tickLabelFontSize}`, true);
-    } else {
-      this._tickLabelContainer = this.content()
-        .append("g")
-        .classed(`${Axis.TICK_LABEL_CLASS}-container`, true)
-        .classed(`label-${this._tickLabelFontSize}`, true);
+    if (this._tickLabelContainer == null) {
+      this._tickLabelContainer = this.content().append("g");
     }
+    // clearing to remove outdated font-size classes
+    this._tickLabelContainer.attr("class", null)
+      .classed(`${Axis.TICK_LABEL_CLASS}-container`, true)
+      .classed(`label-${this._tickLabelFontSize}`, true);
   }
 
   /*

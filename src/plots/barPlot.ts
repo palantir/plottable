@@ -408,7 +408,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
 
   protected _createNodesForDataset(dataset: Dataset): ProxyDrawer {
     const drawer = super._createNodesForDataset(dataset);
-    const labelArea = this._renderArea .append("g")
+    const labelArea = this._renderArea.append("g")
       .classed(Bar._LABEL_AREA_CLASS, true)
       .classed(`label-${this._labelFontSize}`, true);
     const context = new Typesettable.SvgContext(labelArea.node() as SVGElement);
