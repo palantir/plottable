@@ -11,6 +11,7 @@ import * as Formatters from "../core/formatters";
 import * as Scales from "../scales";
 import * as Utils from "../utils";
 
+import { LabelFontSizePx } from "../components/label";
 import { SimpleSelection } from "../core/interfaces";
 import { makeEnum } from "../utils/makeEnum";
 import { Axis } from "./axis";
@@ -230,6 +231,25 @@ export class Time extends Axis<Date> {
     this.annotationFormatter(Formatters.time("%a %b %d, %Y", this._useUTC));
   }
 
+  public tickLabelFontSize(): LabelFontSizePx;
+  public tickLabelFontSize(fontSize: LabelFontSizePx): this;
+  public tickLabelFontSize(fontSize?: LabelFontSizePx): LabelFontSizePx | this {
+    if (fontSize == null) {
+      return super.tickLabelFontSize();
+    }
+    if (this._tierLabelContainers != null) {
+      this.invalidateCache();
+      this._computeHeight();
+      this._tierLabelContainers.forEach((container) => {
+        // clearing to remove outdated font-size classes
+        container.attr("class", null)
+          .classed(`${Axis.TICK_LABEL_CLASS}-container`, true)
+          .classed(`label-${this._tickLabelFontSize}`, true);
+      });
+    }
+    return super.tickLabelFontSize(fontSize);
+  }
+
   /**
    * Gets the label positions for each tier.
    */
@@ -432,7 +452,11 @@ export class Time extends Axis<Date> {
 
     for (let i = 0; i < this._numTiers; ++i) {
       const tierContainer = this.content().append("g").classed(Time.TIME_AXIS_TIER_CLASS, true);
-      this._tierLabelContainers.push(tierContainer.append("g").classed(Axis.TICK_LABEL_CLASS + "-container", true));
+      this._tierLabelContainers.push(
+        tierContainer.append("g")
+          .classed(`${Axis.TICK_LABEL_CLASS}-container`, true)
+          .classed(`label-${this._tickLabelFontSize}`, true),
+        );
       this._tierMarkContainers.push(tierContainer.append("g").classed(Axis.TICK_MARK_CLASS + "-container", true));
       this._tierBaselines.push(tierContainer.append("line").classed("baseline", true));
     }
@@ -488,6 +512,7 @@ export class Time extends Axis<Date> {
     }
 
     const tickLabelsUpdate = container.selectAll("." + Axis.TICK_LABEL_CLASS).data(labelPos, (d) => String(d.valueOf()));
+    tickLabelsUpdate.remove();
     const tickLabelsEnter =
       tickLabelsUpdate
         .enter()
@@ -688,6 +713,8 @@ export class Time extends Axis<Date> {
 
   public invalidateCache() {
     super.invalidateCache();
-    (this._measurer as Typesettable.CacheMeasurer).reset();
+    if (this._measurer != null) {
+      (this._measurer as Typesettable.CacheMeasurer).reset();
+    }
   }
 }

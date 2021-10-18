@@ -15,6 +15,7 @@ import { makeSymbolCanvasDrawStep, SymbolSVGDrawer } from "../drawers/symbolDraw
 import { Scale } from "../scales/scale";
 
 import * as Animators from "../animators";
+import { Label, LabelFontSizePx } from "../components/label";
 import * as Drawers from "../drawers";
 import * as Scales from "../scales";
 import * as Utils from "../utils";
@@ -42,6 +43,7 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
   protected static _LABEL_AREA_CLASS = "scatter-label-text-area";
   private _labelConfig: Utils.Map<Dataset, LabelConfig>;
   private _labelFormatter: Formatters.DatumFormatter = Formatters.identity();
+  private _labelFontSize = Label._DEFAULT_FONT_SIZE_PX;
 
   protected static _LABEL_MARGIN_FROM_BUBBLE = 15;
   private _labelsEnabled = false;
@@ -247,9 +249,44 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
     }
   }
 
+  /**
+   * Get the label font size in px.
+   */
+  public labelFontSize(): LabelFontSizePx;
+  /**
+   * Set the label font size.
+   */
+  public labelFontSize(fontSize: LabelFontSizePx): this;
+  public labelFontSize(fontSize?: LabelFontSizePx): LabelFontSizePx | this {
+    if (fontSize == null) {
+      return this._labelFontSize;
+    } else {
+      this.invalidateCache();
+      this._labelFontSize = fontSize;
+      this._labelConfig.forEach(({ labelArea }) => {
+        labelArea.attr("class", null)
+          .classed(Scatter._LABEL_AREA_CLASS, true)
+          .classed(`label-${this._labelFontSize}`, true);
+      });
+      return this.render();
+    }
+  }
+
+  public invalidateCache() {
+    super.invalidateCache();
+    this.datasets().forEach((dataset) => {
+      const labelConfig = this._labelConfig.get(dataset);
+      if (labelConfig != null) {
+        labelConfig.measurer.reset();
+      }
+    });
+  }
+
   protected _createNodesForDataset(dataset: Dataset): ProxyDrawer {
     const drawer = super._createNodesForDataset(dataset);
-    const labelArea = this._renderArea.append("g").classed(Scatter._LABEL_AREA_CLASS, true);
+    const labelArea = this._renderArea.append("g")
+      .classed(Scatter._LABEL_AREA_CLASS, true)
+      .classed(`label-${this._labelFontSize}`, true);
     const context = new Typesettable.SvgContext(labelArea.node() as SVGElement);
     const measurer = new Typesettable.CacheMeasurer(context);
     const writer = new Typesettable.Writer(measurer, context);
