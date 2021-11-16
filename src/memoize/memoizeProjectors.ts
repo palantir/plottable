@@ -1,9 +1,8 @@
-
+import { MapCache } from "lodash";
 import { memoize } from "lodash-es";
 
 import { Dataset } from "../core/dataset";
 import { AttributeToProjector, Projector } from "../core/interfaces";
-import { Map } from '../utils';
 
 interface IIndexMapRecord {
     [key: number]: any;
@@ -44,7 +43,7 @@ class IndexMap<T> {
  * A Map that utilizes a [number, number] key to create a fast-lookup 2D index. This is much faster
  * than stringifying the key.
  */
-class DatasetIndexCache extends Map<any, any> {
+class DatasetIndexCache implements MapCache {
     public static resolver = (d: any, i: number, dataset: Dataset) => [dataset.updateId(), i];
 
     private map: IndexMap<IndexMap<any>> = new IndexMap<IndexMap<any>>();
