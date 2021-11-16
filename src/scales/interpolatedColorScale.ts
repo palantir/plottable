@@ -96,8 +96,8 @@ export class InterpolatedColor extends Scale<number, string> {
   /**
    * Generates the converted QuantitativeScale.
    */
-  private _d3InterpolatedScale() {
-    return this._colorScale.range([0, 1]).interpolate(this._interpolateColors());
+  private _d3InterpolatedScale(): supportedScale {
+    return (this._colorScale.range([0, 1]) as supportedScale).interpolate(this._interpolateColors()) as supportedScale;
   }
 
   /**
