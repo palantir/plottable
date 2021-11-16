@@ -33,7 +33,7 @@ export function elementBBox(element: SimpleSelection<any>) {
   try {
     bbox = (<any> element.node()).getBBox();
   } catch (err) {
-    bbox = { x: 0, y: 0, width: 0, height: 0 };
+    bbox = { x: 0, y: 0, width: 0, height: 0 } as SVGRect;
   }
   return bbox;
 }
@@ -186,7 +186,7 @@ export function expandRect(rect: ClientRect, amount: number) {
     bottom: rect.bottom + amount,
     width: rect.width + amount * 2,
     height: rect.height + amount * 2,
-  };
+  } as ClientRect;
 }
 
 /**

@@ -276,7 +276,7 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
       y: attrToProjector["y"](datum, index, dataset),
       width: attrToProjector["width"](datum, index, dataset),
       height: attrToProjector["height"](datum, index, dataset),
-    };
+    } as SVGRect;
   }
 
   /**

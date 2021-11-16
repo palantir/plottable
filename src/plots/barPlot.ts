@@ -73,7 +73,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   protected _isVertical: boolean;
   private _labelFormatter: DatumFormatter = Formatters.identity();
   private _labelsEnabled = false;
-  private _labelsPosition = LabelsPosition.end;
+  private _labelsPosition: LabelsPosition = LabelsPosition.end;
   protected _labelFontSize = Label._DEFAULT_FONT_SIZE_PX;
   private _hideBarsIfAnyAreTooWide = true;
   private _labelConfig: Utils.Map<Dataset, LabelConfig>;
@@ -869,7 +869,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       y: attrToProjector["y"](datum, index, dataset),
       width: attrToProjector["width"](datum, index, dataset),
       height: attrToProjector["height"](datum, index, dataset),
-    };
+    } as DOMRect;
   }
 
   /**

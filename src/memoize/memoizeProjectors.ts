@@ -1,8 +1,9 @@
 
-import { MapCache, memoize as lodashMemoize } from "lodash";
+import { memoize } from "lodash-es";
 
 import { Dataset } from "../core/dataset";
 import { AttributeToProjector, Projector } from "../core/interfaces";
+import { Map } from '../utils';
 
 interface IIndexMapRecord {
     [key: number]: any;
@@ -40,10 +41,10 @@ class IndexMap<T> {
 }
 
 /**
- * A lodash-style `MapCache` that utilizes a [number, number] key to create a
- * fast-lookup 2D index. This is much faster than stringifying the key.
+ * A Map that utilizes a [number, number] key to create a fast-lookup 2D index. This is much faster
+ * than stringifying the key.
  */
-class DatasetIndexCache implements MapCache {
+class DatasetIndexCache extends Map<any, any> {
     public static resolver = (d: any, i: number, dataset: Dataset) => [dataset.updateId(), i];
 
     private map: IndexMap<IndexMap<any>> = new IndexMap<IndexMap<any>>();
@@ -76,7 +77,7 @@ class DatasetIndexCache implements MapCache {
 }
 
 export function memoizeProjector(projector: Projector): Projector {
-    const memo = lodashMemoize(projector, DatasetIndexCache.resolver);
+    const memo = memoize(projector, DatasetIndexCache.resolver);
     (memo as any).cache = new DatasetIndexCache();
     return memo;
 }

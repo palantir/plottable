@@ -194,7 +194,7 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
       y: entity.position.y - entity.diameter / 2,
       width: entity.diameter,
       height: entity.diameter,
-    };
+    } as DOMRect;
   }
 
   protected _entityVisibleOnPlot(entity: ILightweightScatterPlotEntity, bounds: Bounds) {

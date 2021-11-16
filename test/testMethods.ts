@@ -223,7 +223,7 @@ export function triggerFakeWheelEvent(type: string, target: SimpleSelection<void
   let event: WheelEvent;
   if (isIE()) {
     event = document.createEvent("WheelEvent");
-    event.initWheelEvent("wheel", true, true, window, 1, xPos, yPos, xPos, yPos, 0, null, null, 0, deltaY, 0, 0);
+    (event as any).initWheelEvent("wheel", true, true, window, 1, xPos, yPos, xPos, yPos, 0, null, null, 0, deltaY, 0, 0);
   } else {
     // HACKHACK anycasting constructor to allow for the dictionary argument
     // https://github.com/Microsoft/TypeScript/issues/2416
