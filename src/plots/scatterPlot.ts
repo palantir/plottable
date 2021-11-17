@@ -188,13 +188,13 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
     };
   }
 
-  protected _entityBounds(entity: ILightweightScatterPlotEntity) {
+  protected _entityBounds(entity: ILightweightScatterPlotEntity): Pick<DOMRect, "x" | "y"| "width" | "height"> {
     return {
       x: entity.position.x - entity.diameter / 2,
       y: entity.position.y - entity.diameter / 2,
       width: entity.diameter,
       height: entity.diameter,
-    } as DOMRect;
+    };
   }
 
   protected _entityVisibleOnPlot(entity: ILightweightScatterPlotEntity, bounds: Bounds) {

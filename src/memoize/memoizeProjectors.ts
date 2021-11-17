@@ -1,4 +1,4 @@
-import { MapCache } from "lodash";
+import type { MapCache } from "lodash";
 import { memoize } from "lodash-es";
 
 import { Dataset } from "../core/dataset";
@@ -40,9 +40,9 @@ class IndexMap<T> {
 }
 
 /**
- * A Map that utilizes a [number, number] key to create a fast-lookup 2D index. This is much faster
- * than stringifying the key.
- */
+  * A lodash-style `MapCache` that utilizes a [number, number] key to create a
+  * fast-lookup 2D index. This is much faster than stringifying the key.
+  */
 class DatasetIndexCache implements MapCache {
     public static resolver = (d: any, i: number, dataset: Dataset) => [dataset.updateId(), i];
 

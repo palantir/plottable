@@ -862,7 +862,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
    * same as the "pixel point" because they are always at the top/left of the
    * bar.
    */
-  protected _pixelBounds(datum: any, index: number, dataset: Dataset) {
+  protected _pixelBounds(datum: any, index: number, dataset: Dataset): Pick<DOMRect, "x" | "y" | "width" | "height"> {
     const attrToProjector = this._getAttrToProjector();
     return {
       x: attrToProjector["x"](datum, index, dataset),
