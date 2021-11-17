@@ -160,7 +160,7 @@ export class Category extends Axis<string> {
   public getDownsampleInfo(scale: Scales.Category = <Scales.Category> this._scale, domain = scale.invertRange()): IDownsampleInfo {
     // account for how shearing tightens the space between vertically oriented ticks
     const shearFactor = this._tickLabelAngle === 0 ? 1 : 1 / Math.cos(this._tickLabelShearAngle / 180 * Math.PI);
-    const shearedMinimumWidth = Category._MINIMUM_WIDTH_PER_LABEL_PX * shearFactor;// + 2 * (this.tickLabelFontSize() - Label._MIN_FONT_SIZE_PX);
+    const shearedMinimumWidth = Category._MINIMUM_WIDTH_PER_LABEL_PX * shearFactor + 2 * (this.tickLabelFontSize() - Label._MIN_FONT_SIZE_PX);
     const downsampleRatio = Math.ceil(shearedMinimumWidth / scale.stepWidth());
     return {
       domain: domain.filter((d, i) => i % downsampleRatio === 0),
