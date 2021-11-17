@@ -73,7 +73,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   protected _isVertical: boolean;
   private _labelFormatter: DatumFormatter = Formatters.identity();
   private _labelsEnabled = false;
-  private _labelsPosition = LabelsPosition.end;
+  private _labelsPosition: LabelsPosition = LabelsPosition.end;
   protected _labelFontSize = Label._DEFAULT_FONT_SIZE_PX;
   private _hideBarsIfAnyAreTooWide = true;
   private _labelConfig: Utils.Map<Dataset, LabelConfig>;
@@ -862,7 +862,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
    * same as the "pixel point" because they are always at the top/left of the
    * bar.
    */
-  protected _pixelBounds(datum: any, index: number, dataset: Dataset) {
+  protected _pixelBounds(datum: any, index: number, dataset: Dataset): Pick<DOMRect, "x" | "y" | "width" | "height"> {
     const attrToProjector = this._getAttrToProjector();
     return {
       x: attrToProjector["x"](datum, index, dataset),

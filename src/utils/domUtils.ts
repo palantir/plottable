@@ -27,8 +27,8 @@ export function contains(parent: Element, child: Element): boolean {
  * @param {d3.Selection} element
  * @returns {SVGRed} The bounding box.
  */
-export function elementBBox(element: SimpleSelection<any>) {
-  let bbox: SVGRect;
+export function elementBBox(element: SimpleSelection<any>): Pick<SVGRect, "x" | "y" | "width" | "height"> {
+  let bbox: Pick<SVGRect, "x" | "y" | "width" | "height">;
   // HACKHACK: Firefox won't correctly measure nodes with style "display: none" or their descendents (FF Bug 612118).
   try {
     bbox = (<any> element.node()).getBBox();
@@ -186,7 +186,7 @@ export function expandRect(rect: ClientRect, amount: number) {
     bottom: rect.bottom + amount,
     width: rect.width + amount * 2,
     height: rect.height + amount * 2,
-  };
+  } as ClientRect;
 }
 
 /**
@@ -219,7 +219,7 @@ export function clientRectInside(innerClientRect: ClientRect, outerClientRect: C
  */
 export function intersectsBBox(xValOrRange: number | Range,
                                yValOrRange: number | Range,
-                               bbox: SVGRect,
+                               bbox: Pick<SVGRect, "x" | "y" | "width" | "height">,
                                tolerance = 0.5) {
   const xRange = _parseRange(xValOrRange);
   const yRange = _parseRange(yValOrRange);

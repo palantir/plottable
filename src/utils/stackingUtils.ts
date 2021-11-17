@@ -8,7 +8,8 @@ import * as d3 from "d3";
 import { Dataset } from "../core/dataset";
 import { IAccessor } from "../core/interfaces";
 
-import { memoize, MemoizedFunction } from "lodash";
+import type { MemoizedFunction } from "lodash";
+import { memoize } from "lodash-es";
 import * as Utils from "./";
 import { makeEnum } from "./makeEnum";
 

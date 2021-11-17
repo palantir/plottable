@@ -56,7 +56,7 @@ export function makeSymbolCanvasDrawStep(
 
             // check attributes and symbol type
             const attrsSame = isAttributeValuesEqual(prevAttrs, attrs, ContextStyleAttrs);
-            const symbolGenerator = symbolAccessor(datum, index, this._dataset);
+            const symbolGenerator = symbolAccessor(datum, index, dataset);
             if (attrsSame && prevSymbolSize == symbolSize && prevSymbolGenerator == symbolGenerator) {
                 // no-op;
             } else {

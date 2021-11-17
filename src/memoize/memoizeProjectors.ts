@@ -1,5 +1,5 @@
-
-import { MapCache, memoize as lodashMemoize } from "lodash";
+import type { MapCache } from "lodash";
+import { memoize } from "lodash-es";
 
 import { Dataset } from "../core/dataset";
 import { AttributeToProjector, Projector } from "../core/interfaces";
@@ -76,7 +76,7 @@ class DatasetIndexCache implements MapCache {
 }
 
 export function memoizeProjector(projector: Projector): Projector {
-    const memo = lodashMemoize(projector, DatasetIndexCache.resolver);
+    const memo = memoize(projector, DatasetIndexCache.resolver);
     (memo as any).cache = new DatasetIndexCache();
     return memo;
 }
