@@ -1,5 +1,5 @@
 import type { MapCache } from "lodash";
-import { memoize } from "lodash-es";
+import memoize from "lodash.memoize";
 
 import { Dataset } from "../core/dataset";
 import { AttributeToProjector, Projector } from "../core/interfaces";

@@ -4,12 +4,12 @@
  */
 
 import * as d3 from "d3";
+import isElement from "lodash.iselement";
 
 import { Bounds, Point, SimpleSelection, SpaceRequest } from "../core/interfaces";
 import * as RenderController from "../core/renderController";
 import * as Utils from "../utils";
 
-import { isElement } from "lodash-es";
 import { coerceExternalD3 } from "../utils/coerceD3";
 import { makeEnum } from "../utils/makeEnum";
 import { ComponentContainer } from "./componentContainer";
