@@ -13,7 +13,7 @@
  * We must hand-write a signature for each custom class we wish to support.
  */
 
-import * as isPlainObject from "is-plain-object";
+import isPlainObject from "is-plain-object";
 
 import { Dataset } from "../core/dataset";
 import { Scale } from "../scales/scale";
