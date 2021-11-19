@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
+      "allowSyntheticDefaultImports": true,
       "declaration": true,
-      "esModuleInterop": true,
       "forceConsistentCasingInFileNames": true,
       "importHelpers": true,
       "module": "commonjs",
