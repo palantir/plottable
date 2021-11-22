@@ -9,7 +9,7 @@ import { Dataset } from "../core/dataset";
 import { IAccessor } from "../core/interfaces";
 
 import type { MemoizedFunction } from "lodash";
-import { memoize } from "lodash-es";
+import memoize from "lodash-es/memoize";
 import * as Utils from "./";
 import { makeEnum } from "./makeEnum";
 
