@@ -95,4 +95,45 @@ describe("Utils.DOM", () => {
       child.remove();
     });
   });
+
+  describe("elementWidth(), elementHeight() for display none element", () => {
+    it("can get a display none element's size", () => {
+      const parent = TestMethods.getElementParent();
+      parent.style("display", "none");
+      parent.style("width", "600px");
+      parent.style("height", "400px");
+      const parentElem = <Element> parent.node();
+
+      const width = Plottable.Utils.DOM.elementWidth(parentElem);
+      assert.strictEqual(width, 600, "measured width matches set width");
+      const height = Plottable.Utils.DOM.elementHeight(parentElem);
+      assert.strictEqual(height, 400, "measured height matches set height");
+    });
+
+    it("can get a div display none element's size", () => {
+      const div = TestMethods.generateDiv(300, 200);
+      div.style("display", "none");
+      const divElement = <Element> div.node();
+
+      const width = Plottable.Utils.DOM.elementWidth(divElement);
+      assert.strictEqual(width, 300, "measured width matches set width");
+      const height = Plottable.Utils.DOM.elementHeight(divElement);
+      assert.strictEqual(height, 200, "measured height matches set height");
+      div.remove();
+    });
+
+    it("can get a div display element's size inside parent display none", () => {
+      const parent = TestMethods.getElementParent();
+      parent.attr("display", "none");
+
+      const div = TestMethods.generateDiv(300, 200);
+      const divElement = <Element> div.node();
+
+      const width = Plottable.Utils.DOM.elementWidth(divElement);
+      assert.strictEqual(width, 300, "measured width matches set width");
+      const height = Plottable.Utils.DOM.elementHeight(divElement);
+      assert.strictEqual(height, 200, "measured height matches set height");
+      div.remove();
+    });
+  });
 });
