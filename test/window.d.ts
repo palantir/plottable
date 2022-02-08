@@ -4,4 +4,4 @@ declare interface Window {
   Pixel_CloseTo_Requirement: number;
 }
 
-declare var window: Window;
+declare var window: Window & typeof globalThis;

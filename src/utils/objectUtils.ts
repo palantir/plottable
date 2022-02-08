@@ -7,11 +7,11 @@
  * Polyfill for Object.assign
  */
 export function assign<T extends Record<any, any>>(...objs: Partial<T>[]): T {
-    const result = {} as Partial<T>;
+    const result: Partial<T> = {};
     for(const obj of objs) {
         const keys = Object.keys(obj);
         for (const key of keys) {
-            result[key] = obj[key];
+            result[key as keyof T] = obj[key];
         }
     }
     return result as T;
