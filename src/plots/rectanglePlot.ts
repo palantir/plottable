@@ -270,7 +270,7 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
     return this._entityBBox(datum, index, dataset, this._getAttrToProjector());
   }
 
-  private _entityBBox(datum: any, index: number, dataset: Dataset, attrToProjector: AttributeToProjector): SVGRect {
+  private _entityBBox(datum: any, index: number, dataset: Dataset, attrToProjector: AttributeToProjector): Pick<SVGRect, "x" | "y" | "width" | "height"> {
     return {
       x: attrToProjector["x"](datum, index, dataset),
       y: attrToProjector["y"](datum, index, dataset),

@@ -9,7 +9,7 @@ import * as Utils from "../utils";
 
 import { Scale } from "./scale";
 
-type supportedScale = d3.ScaleLinear<number, string> | d3.ScaleLogarithmic<number, string> | d3.ScalePower<number, string>;
+type SupportedScale = d3.ScaleLinear<number, string> | d3.ScaleLogarithmic<number, string> | d3.ScalePower<number, string>;
 
 export class InterpolatedColor extends Scale<number, string> {
   public static REDS = [
@@ -54,8 +54,8 @@ export class InterpolatedColor extends Scale<number, string> {
     "#B10026", // red
   ];
   private _colorRange: string[];
-  private _colorScale: supportedScale;
-  private _d3Scale: supportedScale;
+  private _colorScale: SupportedScale;
+  private _d3Scale: SupportedScale;
 
   /**
    * An InterpolatedColor Scale maps numbers to color hex values, expressed as strings.
@@ -96,8 +96,8 @@ export class InterpolatedColor extends Scale<number, string> {
   /**
    * Generates the converted QuantitativeScale.
    */
-  private _d3InterpolatedScale() {
-    return this._colorScale.range([0, 1]).interpolate(this._interpolateColors());
+  private _d3InterpolatedScale(): SupportedScale {
+    return (this._colorScale.range([0, 1]) as SupportedScale).interpolate(this._interpolateColors()) as SupportedScale;
   }
 
   /**

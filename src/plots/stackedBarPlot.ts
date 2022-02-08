@@ -12,6 +12,7 @@ import { memThunk, Thunk } from "../memoize";
 import * as Utils from "../utils";
 import { StackExtent } from "../utils/stackingUtils";
 
+import { Label, LabelFontSizePx } from "../components/label";
 import { Bar, BarOrientation } from "./barPlot";
 import { Plot } from "./plot";
 
@@ -106,9 +107,29 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
     }
   }
 
+   public labelFontSize(): LabelFontSizePx;
+   public labelFontSize(fontSize: LabelFontSizePx): this;
+   public labelFontSize(fontSize?: LabelFontSizePx): LabelFontSizePx | this {
+     if (fontSize == null) {
+       return super.labelFontSize();
+     } else {
+       if (this._labelArea != null) {
+        // clearing to remove outdated font-size classes
+         this._labelArea.attr("class", null)
+          .classed(Bar._LABEL_AREA_CLASS, true)
+          .classed(`label-${this._labelFontSize}`, true);
+       }
+       super.labelFontSize(fontSize);
+       return this;
+     }
+   }
+
   protected _setup() {
     super._setup();
-    this._labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
+    this._labelArea = this._renderArea
+      .append("g")
+      .classed(Bar._LABEL_AREA_CLASS, true)
+      .classed(`label-${this._labelFontSize}`, true);
     const context = new Typesettable.SvgContext(this._labelArea.node() as SVGElement);
     this._measurer = new Typesettable.CacheMeasurer(context);
     this._writer = new Typesettable.Writer(this._measurer, context);
@@ -299,6 +320,8 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
 
   public invalidateCache() {
     super.invalidateCache();
-    this._measurer.reset();
+    if (this._measurer != null) {
+      this._measurer.reset();
+    }
   }
 }

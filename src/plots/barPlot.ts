@@ -7,6 +7,7 @@ import * as d3 from "d3";
 import * as Typesettable from "typesettable";
 
 import * as Animators from "../animators";
+import { Label, LabelFontSizePx } from "../components/label";
 import { Dataset } from "../core/dataset";
 import * as Formatters from "../core/formatters";
 import { DatumFormatter } from "../core/formatters";
@@ -72,7 +73,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   protected _isVertical: boolean;
   private _labelFormatter: DatumFormatter = Formatters.identity();
   private _labelsEnabled = false;
-  private _labelsPosition = LabelsPosition.end;
+  private _labelsPosition: LabelsPosition = LabelsPosition.end;
+  protected _labelFontSize = Label._DEFAULT_FONT_SIZE_PX;
   private _hideBarsIfAnyAreTooWide = true;
   private _labelConfig: Utils.Map<Dataset, LabelConfig>;
   private _baselineValueProvider: () => (X|Y)[];
@@ -380,9 +382,35 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     }
   }
 
+  /**
+   * Get the label font size in px.
+   */
+  public labelFontSize(): LabelFontSizePx;
+  /**
+   * Set the label font size.
+   */
+  public labelFontSize(fontSize: LabelFontSizePx): this;
+  public labelFontSize(fontSize?: LabelFontSizePx): number | this {
+    if (fontSize == null) {
+      return this._labelFontSize;
+    } else {
+      this.invalidateCache();
+      this._labelFontSize = fontSize;
+      this._labelConfig.forEach(({ labelArea }) => {
+        // clearing to remove outdated font-size classes
+        labelArea.attr("class", null)
+          .classed(Bar._LABEL_AREA_CLASS, true)
+          .classed(`label-${this._labelFontSize}`, true);
+      });
+      return this.render();
+    }
+  }
+
   protected _createNodesForDataset(dataset: Dataset): ProxyDrawer {
     const drawer = super._createNodesForDataset(dataset);
-    const labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
+    const labelArea = this._renderArea.append("g")
+      .classed(Bar._LABEL_AREA_CLASS, true)
+      .classed(`label-${this._labelFontSize}`, true);
     const context = new Typesettable.SvgContext(labelArea.node() as SVGElement);
     const measurer = new Typesettable.CacheMeasurer(context);
     const writer = new Typesettable.Writer(measurer, context);
@@ -834,7 +862,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
    * same as the "pixel point" because they are always at the top/left of the
    * bar.
    */
-  protected _pixelBounds(datum: any, index: number, dataset: Dataset) {
+  protected _pixelBounds(datum: any, index: number, dataset: Dataset): Pick<DOMRect, "x" | "y" | "width" | "height"> {
     const attrToProjector = this._getAttrToProjector();
     return {
       x: attrToProjector["x"](datum, index, dataset),
@@ -917,7 +945,12 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
 
   public invalidateCache() {
     super.invalidateCache();
-    this.datasets().forEach((dataset) => this._labelConfig.get(dataset).measurer.reset());
+    this.datasets().forEach((dataset) => {
+      const labelConfig = this._labelConfig.get(dataset);
+      if (labelConfig != null) {
+        labelConfig.measurer.reset();
+      }
+    });
   }
 }
 

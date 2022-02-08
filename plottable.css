@@ -112,9 +112,82 @@
   fill: #32313F;
 }
 
-.plottable .bar-label-text-area text,
-.plottable .scatter-label-text-area text {
+.plottable .tick-label-container.label-12 text,
+.plottable .bar-label-text-area.label-12 text,
+.plottable .scatter-label-text-area.label-12 text {
   font-size: 12px;
+}
+
+.plottable .tick-label-container.label-13 text,
+.plottable .bar-label-text-area.label-13 text,
+.plottable .scatter-label-text-area.label-13 text {
+  font-size: 13px;
+}
+
+.plottable .tick-label-container.label-14 text,
+.plottable .bar-label-text-area.label-14 text,
+.plottable .scatter-label-text-area.label-14 text {
+  font-size: 14px;
+}
+
+.plottable .tick-label-container.label-15 text,
+.plottable .bar-label-text-area.label-15 text,
+.plottable .scatter-label-text-area.label-15 text {
+  font-size: 15px;
+}
+
+.plottable .tick-label-container.label-16 text,
+.plottable .bar-label-text-area.label-16 text,
+.plottable .scatter-label-text-area.label-16 text {
+  font-size: 16px;
+}
+
+.plottable .tick-label-container.label-17 text,
+.plottable .bar-label-text-area.label-17 text,
+.plottable .scatter-label-text-area.label-17 text {
+  font-size: 17px;
+}
+
+.plottable .tick-label-container.label-18 text,
+.plottable .bar-label-text-area.label-18 text,
+.plottable .scatter-label-text-area.label-18 text {
+  font-size: 18px;
+}
+
+.plottable .tick-label-container.label-19 text,
+.plottable .bar-label-text-area.label-19 text,
+.plottable .scatter-label-text-area.label-19 text {
+  font-size: 19px;
+}
+
+.plottable .tick-label-container.label-20 text,
+.plottable .bar-label-text-area.label-20 text,
+.plottable .scatter-label-text-area.label-20 text {
+  font-size: 20px;
+}
+
+.plottable .tick-label-container.label-21 text,
+.plottable .bar-label-text-area.label-21 text,
+.plottable .scatter-label-text-area.label-21 text {
+  font-size: 21px;
+}
+
+.plottable .tick-label-container.label-22 text,
+.plottable .bar-label-text-area.label-22 text,
+.plottable .scatter-label-text-area.label-22 text {
+  font-size: 22px;
+}
+
+.plottable .tick-label-container.label-23 text,
+.plottable .bar-label-text-area.label-23 text,
+.plottable .scatter-label-text-area.label-23 text {
+  font-size: 23px;
+}
+
+.plottable .tick-label-container.label-24 text,
+.plottable .bar-label-text-area.label-24 text,
+.plottable .scatter-label-text-area.label-24 text {
+  font-size: 24px;
 }
 
 .plottable .label-area text {
