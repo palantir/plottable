@@ -1,5 +1,5 @@
 {
-  "name": "@frigoveneta_team/plottable",
+  "name": "@texx/plottable",
   "description": "A modular charting library built on D3",
   "version": "3.13.0",
   "license": "MIT",
