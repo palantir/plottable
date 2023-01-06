@@ -158,46 +158,11 @@ describe("Legend", () => {
       div.remove();
     });
 
-    // Disable this test for now since it flakes all the time on Saucelabs Safari 10
-    xit("can set maximum number of lines per entry", () => {
-      color.domain(["this is a very very very very very very very long"]);
-      legend.renderTo(div);
-      legend.maxWidth(100);
-      legend.maxLinesPerEntry(2);
-      assert.strictEqual(2, legend.content().selectAll<Element, any>(`${ROW_SELECTOR} ${TEXT_LINE_SELECTOR}`).size());
-      legend.maxLinesPerEntry(4);
-      assert.strictEqual(4, legend.content().selectAll<Element, any>(`${ROW_SELECTOR} ${TEXT_LINE_SELECTOR}`).size());
-      div.remove();
-    });
-
     it("can set maximum width of legend", () => {
       color.domain(["this is a very very very very very very very long"]);
       legend.renderTo(div);
       legend.maxWidth(100);
       assert.isTrue((legend.content().node() as SVGElement).getBoundingClientRect().width <= 100);
-      div.remove();
-    });
-
-    // Disable this test for now since it flakes all the time on Saucelabs Safari 10
-    xit("can set maximum number of entries per row", () => {
-      color.domain(["AA", "BB", "CC", "DD", "EE", "FF"]);
-      legend.renderTo(div);
-
-      function verifyMaxEntriesInRow (n: number) {
-        legend.maxEntriesPerRow(n);
-        const rows = legend.content().selectAll<Element, any>(ROW_SELECTOR);
-        assert.strictEqual(rows.size(), (6 / n), "number of rows is correct");
-        rows.each(function(d: any) {
-          const entries = d3.select(this).selectAll<Element, any>(ENTRY_SELECTOR);
-          assert.strictEqual(entries.size(), n, "number of entries in row is correct");
-        });
-      }
-
-      verifyMaxEntriesInRow(1);
-      verifyMaxEntriesInRow(2);
-      verifyMaxEntriesInRow(3);
-      verifyMaxEntriesInRow(6);
-
       div.remove();
     });
 
