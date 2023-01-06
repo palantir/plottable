@@ -58,33 +58,6 @@ module.exports = function(grunt) {
     }
   };
 
-  var saucelabsMochaConfig = {
-    all: {
-      options: {
-        urls: ["http://127.0.0.1:9999/test/tests.html"],
-        testname: "Plottable Sauce Unit Tests",
-        pollInterval: 5000,
-        statusCheckAttempts: 60,
-        maxRetries: 1,
-        browsers: [{
-          browserName: "firefox",
-          platform: "linux"
-        }, {
-          browserName: "chrome",
-          platform: "linux"
-        }, {
-          browserName: "internet explorer",
-          version: "11",
-          platform: "WIN7"
-        }, {
-          browserName: "safari",
-          platform: "OS X 10.11",
-          version: "10.0",
-        }]
-      }
-    }
-  };
-
   grunt.initConfig({
     pkg: grunt.file.readJSON("package.json"),
     jscs: jscsConfig,
@@ -93,7 +66,6 @@ module.exports = function(grunt) {
     watch: watchConfig,
     "blanket_mocha": blanketMochaConfig,
     connect: connectConfig,
-    "saucelabs-mocha": saucelabsMochaConfig
   });
 
   // Loads the tasks specified in package.json
@@ -109,7 +81,6 @@ module.exports = function(grunt) {
 
   grunt.registerTask("test", ["dev-compile", "test-local"]);
   grunt.registerTask("test-local", ["blanket_mocha"]);
-  grunt.registerTask("test-sauce", ["connect", "saucelabs-mocha"]);
 
   grunt.registerTask("watch-quicktests", function() {
     // Surpresses the "Running 'foo' task" messages
@@ -119,13 +90,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask("lint", ["exec:yarn:lint", "jscs", "eslint"]);
 
-  // Disable saucelabs on dev environments by checking if SAUCE_USERNAME is an environment variable
-  // DISABLE SAUCE TEST ENTIRELY since it is a major cause of instability in circleci testing
-  if (process.env.SAUCE_USERNAME && false) {
-    grunt.registerTask("test-ci", ["dev-compile", "lint", "test-local", "test-sauce"]);
-  } else {
-    grunt.registerTask("test-ci", ["dev-compile", "lint", "test-local"]);
-  }
+  grunt.registerTask("test-ci", ["dev-compile", "lint", "test-local"]);
 
   grunt.registerTask("update-quicktests", function() {
     var qtJSON = [];

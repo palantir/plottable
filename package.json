@@ -48,7 +48,6 @@
     "grunt-eslint": "17.3.1",
     "grunt-exec": "1.0.1",
     "grunt-jscs": "2.6.0",
-    "grunt-saucelabs": "8.6.2",
     "jquery": "^3.3.1",
     "load-grunt-tasks": "3.4.0",
     "mocha": "2.2.5",
