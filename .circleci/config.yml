@@ -60,7 +60,7 @@ jobs:
           at: '.'
       - restore_cache: *restore_cache
       - run: yarn start:update-quicktests
-      - run: ./scripts/demo.js || true
+      - run: ./scripts/submit-comment-with-artifact-links.js || true
       - store_artifacts:
           path: plottable.css
       - store_artifacts:
