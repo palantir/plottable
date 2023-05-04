@@ -20,21 +20,21 @@ approval_rules:
       allow_contributor: false
     requires:
       count: 1
-      admins: true
+      permissions: ["admin", "maintain"]
 
   - name: two admins have approved
     options:
       allow_contributor: true
     requires:
       count: 2
-      admins: true
+      permissions: ["admin", "maintain"]
 
   - name: changelog only and contributor approval
     options:
       allow_contributor: true
     requires:
       count: 1
-      admins: true
+      permissions: ["admin", "maintain"]
     if:
       only_changed_files:
         paths:
@@ -45,7 +45,7 @@ approval_rules:
       allow_contributor: true
     requires:
       count: 1
-      admins: true
+      permissions: ["admin", "maintain"]
     if:
       has_author_in:
         users: [ "svc-excavator-bot" ]
