@@ -1,11 +1,11 @@
 {
-  "name": "plottable",
+  "name": "@texx/plottable",
   "description": "A modular charting library built on D3",
-  "version": "3.13.0",
+  "version": "3.14.0",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/palantir/plottable.git"
+    "url": "https://github.com/7eXx/plottable.git"
   },
   "author": "Palantir Technologies",
   "main": "build/src/index.js",
