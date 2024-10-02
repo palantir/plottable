@@ -39,7 +39,7 @@
     "awesome-typescript-loader": "^3.4.1",
     "chai": "2.0.0",
     "circle-github-bot": "^2.1.0",
-    "grunt": "~0.4.5",
+    "grunt": "~1.5.3",
     "grunt-blanket-mocha": "^1.0.0",
     "grunt-bump": "0.7.0",
     "grunt-cli": "0.1.13",
