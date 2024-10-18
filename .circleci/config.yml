@@ -108,6 +108,13 @@ jobs:
       - run: ./scripts/authenticateNpm.sh
       - run: ./scripts/publishSnapshot.sh
       - persist_to_workspace: *persist_to_workspace
+  circle-all:
+    docker:
+    - image: busybox:1.34.1
+    resource_class: small
+    steps:
+    - run:
+        command: echo "All required jobs finished successfully"
 
 workflows:
   version: 2
@@ -135,3 +142,12 @@ workflows:
           filters:
             branches:
               only: develop
+      - circle-all:
+          requires:
+          - test
+          - install
+          - dist
+          - demo
+          filters:
+            tags:
+              only: /.*/
