@@ -319,6 +319,10 @@
   stroke-width: 1px;
 }
 
+.plottable .guide-line-layer.hide line.guide-line{
+  display: none;
+}
+
 .plottable .drag-line-layer.enabled.vertical line.drag-edge {
   cursor: ew-resize;
 }
