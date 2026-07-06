@@ -66,6 +66,20 @@
   position: absolute;
 }
 
+/* bootstrap 5 fix table class due to different behavior */
+.plottable .table {
+  color: inherit;
+  width: auto;
+  margin: 0;
+  border-color: transparent;
+}
+.plottable .table > :not(caption) > * > * {
+  background-color: transparent;
+  box-shadow: none;
+  padding: 0;
+  border: 0;
+}
+
 .plottable .background-container,
 .plottable .content,
 .plottable .foreground-container {
@@ -317,6 +331,10 @@
 .plottable .guide-line-layer line.guide-line {
   stroke: #CCC;
   stroke-width: 1px;
+}
+
+.plottable .guide-line-layer.hide line.guide-line{
+  display: none;
 }
 
 .plottable .drag-line-layer.enabled.vertical line.drag-edge {
