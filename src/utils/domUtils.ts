@@ -279,13 +279,32 @@ export function getHtmlElementAncestors(elem: Element): HTMLElement[] {
  * style. Returns `null` if there is no transform on the element.
  */
 export function getElementTransform(elem: Element): ICssTransformMatrix | null {
-  const style = window.getComputedStyle(elem, null);
+  return getStyleTransform(window.getComputedStyle(elem, null));
+}
+
+/**
+ * Returns the `ICssTransformMatrix` of an already-computed style, if it defines
+ * one. Returns `null` if there is no transform.
+ *
+ * Callers that already hold a computed style should prefer this over
+ * `getElementTransform` - `getComputedStyle` is called on every ancestor on
+ * every pointer event, so it is worth reading each one only once.
+ */
+export function getStyleTransform(style: CSSStyleDeclaration): ICssTransformMatrix | null {
   const transform = style.getPropertyValue("-webkit-transform") ||
     style.getPropertyValue("-moz-transform") ||
     style.getPropertyValue("-ms-transform") ||
     style.getPropertyValue("-o-transform") ||
     style.getPropertyValue("transform");
   return parseTransformMatrix(transform);
+}
+
+/**
+ * Returns whether a computed style positions its element relative to the
+ * viewport rather than to an ancestor.
+ */
+export function isFixedPositionStyle(style: CSSStyleDeclaration): boolean {
+  return style.getPropertyValue("position") === "fixed";
 }
 
 const _MATRIX_REGEX = /^matrix\(([^)]+)\)$/;
