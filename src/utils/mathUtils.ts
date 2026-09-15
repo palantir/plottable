@@ -6,7 +6,7 @@
 import * as d3 from "d3";
 
 import { Bounds, Point } from "../core/interfaces";
-import { getElementTransform, getHtmlElementAncestors } from "./domUtils";
+import { getHtmlElementAncestors, getStyleTransform, isFixedPositionStyle } from "./domUtils";
 
 const nativeMath: Math = (<any>window).Math;
 
@@ -176,8 +176,12 @@ export function getCumulativeTransform(element: Element): ICssTransformMatrix {
   let transform = _IDENTITY_TRANSFORM;
   let offsetParent: Element = null;
   for (const elem of elems) {
+    // read the computed style once - this runs for every ancestor on every
+    // pointer event, and `getComputedStyle` is the expensive part
+    const style = window.getComputedStyle(elem, null);
+
     // apply css transform from any ancestor element
-    const elementTransform = getElementTransform(elem);
+    const elementTransform = getStyleTransform(style);
     if (elementTransform != null) {
       const midX = elem.clientWidth / 2;
       const midY = elem.clientHeight / 2;
@@ -197,6 +201,17 @@ export function getCumulativeTransform(element: Element): ICssTransformMatrix {
       offsetParent = elem.offsetParent;
     }
     transform = multiplyTranslate(transform, [offsetX, offsetY]);
+
+    // A fixed element is laid out against the viewport, so its offsetLeft and
+    // offsetTop are already the client coordinates of its border box and
+    // nothing above it can move it. Stop here: walking on would subtract the
+    // offsets of ancestors it is not positioned against, and - because
+    // `offsetParent` is null for a fixed element, which restarts the
+    // offsetParent chain - would also add the document's scroll offset, so the
+    // error grew as the page was scrolled.
+    if (isFixedPositionStyle(style)) {
+      break;
+    }
   }
   return transform;
 }
