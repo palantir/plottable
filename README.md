@@ -11,6 +11,13 @@ Plottable is used and developed at [Palantir Technologies](http://palantir.com/)
 
 ## Quick Start
 
+Plottable requires D3 7 (`d3@^7.9.0`) and a browser with ES2015 support.
+When loading D3 with a script tag or RequireJS, use `d3/dist/d3.min.js`.
+CommonJS consumers need Node.js 22.12 or later to load D3's ES modules;
+browser applications can use a bundler with ES module support.
+TypeScript consumers need TypeScript 5 or later for the D3 type definitions.
+The `Category20`, `Category20b`, and `Category20c` color scales retain their original palettes.
+
 - Get Plottable:
   - npm: `npm install --save plottable`
   - yarn: `yarn add plottable`
@@ -38,8 +45,8 @@ If you run into any problems using Plottable, please let us know. We want Plotta
 ## Development
 
 - Clone the repo
-- Install local dependencies `yarn install`
-- Run `yarn build` to build the dependencies
+- Use the Node.js version in `.nvmrc`, then run `yarn install` and `yarn build`
+- Run `yarn playwright install chromium` to install the browser used by `yarn test`
 - Run `yarn start` and it will spin up a server (pointed at http://localhost:9999) and begin compiling the typescript code
 - Navigate to `http://localhost:9999/quicktests/` and choose a directory to view visual tests
 
