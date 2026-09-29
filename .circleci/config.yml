@@ -3,10 +3,10 @@ version: 2
 references:
   setup_env: &setup_env
     docker:
-      - image: circleci/node:8.10.0
+      - image: cimg/node:22.14.0
   setup_env_browser: &setup_env_browser
     docker:
-      - image: circleci/node:8.10.0-browsers
+      - image: cimg/node:22.14.0-browsers
         environment:
             CHROME_BIN: "/usr/bin/google-chrome"
   save_cache: &save_cache
@@ -49,6 +49,7 @@ jobs:
       - attach_workspace:
           at: '.'
       - restore_cache: *restore_cache
+      - run: yarn playwright install --with-deps chromium
       - run: yarn test:ci
       - persist_to_workspace: *persist_to_workspace
 
