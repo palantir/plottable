@@ -255,7 +255,7 @@ function evalAndRunTest(name, error, text, firstQTBranch, secondQTBranch) {
 //filter all quicktests by category from list_of_quicktests.json & also load sidebar
 function filterQuickTests(category, urlList){
   //filter list of quicktests to list of quicktest names to pass to doSomething
-  d3.json("list_of_quicktests.json", function (data){
+  d3.json("list_of_quicktests.json").then(function (data){
     var paths = data.map(function(quickTestObj) {return quickTestObj.path; });
     if (category !== "all"){
       var pathsInCategory = paths.filter(function(path) {return path.indexOf("tests/" + category) !== -1; });

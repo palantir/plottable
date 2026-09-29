@@ -34,7 +34,7 @@ const PATH_SPLIT_REGEX = /(^.*?)\/([^\/]*$)/;
 const ROUTER = new Router()
 
 function loadTests() {
-  d3.json("../overlaying/list_of_quicktests.json", (data) => {
+  d3.json("../overlaying/list_of_quicktests.json").then((data) => {
     const routes = data.map((test) => test.path.replace(PATH_PREFIX, "").replace(/.js$/, ""));
 
     routes.forEach((path) => {
