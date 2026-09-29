@@ -168,6 +168,20 @@ describe("Scales", () => {
 
         assert.deepEqual(scale.range(), category20Colors, "The correct D3 Category 20 Scale colors are in range");
       });
+
+      it("preserves Category20b and Category20c palettes and aliases", () => {
+        [
+          { name: "20b", first: "#393b79", last: "#de9ed6" },
+          { name: "20c", first: "#3182bd", last: "#d9d9d9" },
+        ].forEach(({ name, first, last }) => {
+          const range = new Plottable.Scales.Color(name).range();
+          assert.lengthOf(range, 20);
+          assert.strictEqual(range[0], first);
+          assert.strictEqual(range[19], last);
+          assert.deepEqual(new Plottable.Scales.Color("Category" + name).range(), range);
+          assert.deepEqual(new Plottable.Scales.Color("category" + name).range(), range);
+        });
+      });
     });
 
   });

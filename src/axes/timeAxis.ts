@@ -545,7 +545,7 @@ export class Time extends Axis<Date> {
   }
 
   private _renderTickMarks(tickValues: Date[], index: number) {
-    const tickMarksUpdate = this._tierMarkContainers[index].selectAll("." + Axis.TICK_MARK_CLASS).data(tickValues);
+    const tickMarksUpdate = this._tierMarkContainers[index].selectAll<SVGLineElement, Date>("." + Axis.TICK_MARK_CLASS).data(tickValues);
     const tickMarks =
       tickMarksUpdate
         .enter()
@@ -583,7 +583,7 @@ export class Time extends Axis<Date> {
   }
 
   private _renderLabellessTickMarks(tickValues: Date[]) {
-    const tickMarksUpdate = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickValues);
+    const tickMarksUpdate = this._tickMarkContainer.selectAll<SVGLineElement, Date>("." + Axis.TICK_MARK_CLASS).data(tickValues);
     const tickMarks =
       tickMarksUpdate
         .enter()

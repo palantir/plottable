@@ -3,8 +3,6 @@
  * @license MIT
  */
 
-import * as d3 from "d3";
-
 const nativeArray = (<any>window).Array;
 
 /**
@@ -29,7 +27,7 @@ export function add(aList: number[], bList: number[]): number[] {
  * @return {T[]} The unique values
  */
 export function uniq<T>(arr: T[]): T[] {
-  const seen: d3.Set = d3.set();
+  const seen = new Set<string>();
   const result: T[] = [];
   arr.forEach((x) => {
     if (!seen.has(String(x))) {

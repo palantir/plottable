@@ -20,7 +20,7 @@ describe("SymbolFactory", () => {
       const circleFactory = Plottable.SymbolFactories.circle();
       const actualSize = Math.PI * Math.pow(symbolSize / 2, 2);
       const d = circleFactory(symbolSize)(null);
-      const expectedD = d3.symbol().type(d3.symbolCircle).size(actualSize)(null);
+      const expectedD = d3.symbol().digits(null).type(d3.symbolCircle).size(actualSize)(null);
       assert.strictEqual(d, expectedD, "a circle of set size is generated");
       const path = svg.append("path").attr("d", d);
       const bbox = Plottable.Utils.DOM.elementBBox(path);
@@ -35,7 +35,7 @@ describe("SymbolFactory", () => {
       const squareFactory = Plottable.SymbolFactories.square();
       const actualSize = Math.pow(symbolSize, 2);
       const d = squareFactory(symbolSize)(null);
-      const expectedD = d3.symbol().type(d3.symbolSquare).size(actualSize)(null);
+      const expectedD = d3.symbol().digits(null).type(d3.symbolSquare).size(actualSize)(null);
       assert.strictEqual(d, expectedD, "a square of set size is generated");
       const path = svg.append("path").attr("d", d);
       const bbox = Plottable.Utils.DOM.elementBBox(path);
@@ -50,7 +50,7 @@ describe("SymbolFactory", () => {
       const crossFactory = Plottable.SymbolFactories.cross();
       const actualSize = (5 / 9) * Math.pow(symbolSize, 2);
       const d = crossFactory(symbolSize)(null);
-      const expectedD = d3.symbol().type(d3.symbolCross).size(actualSize)(null);
+      const expectedD = d3.symbol().digits(null).type(d3.symbolCross).size(actualSize)(null);
       assert.strictEqual(d, expectedD, "a cross of set size is generated");
       const path = svg.append("path").attr("d", d);
       const bbox = Plottable.Utils.DOM.elementBBox(path);
@@ -65,7 +65,7 @@ describe("SymbolFactory", () => {
       const diamondFactory = Plottable.SymbolFactories.diamond();
       const actualSize = Math.tan(Math.PI / 6) * Math.pow(symbolSize, 2) / 2;
       const d = diamondFactory(symbolSize)(null);
-      const expectedD = d3.symbol().type(d3.symbolDiamond).size(actualSize)(null);
+      const expectedD = d3.symbol().digits(null).type(d3.symbolDiamond).size(actualSize)(null);
       assert.strictEqual(d, expectedD, "a diamond of set size is generated");
       const path = svg.append("path").attr("d", d);
       const bbox = Plottable.Utils.DOM.elementBBox(path);
@@ -80,7 +80,7 @@ describe("SymbolFactory", () => {
       const triangleFactory = Plottable.SymbolFactories.triangle();
       const actualSize = Math.sqrt(3) * Math.pow(symbolSize / 2, 2);
       const d = triangleFactory(symbolSize)(null);
-      const expectedD = d3.symbol().type(d3.symbolTriangle).size(actualSize)(null);
+      const expectedD = d3.symbol().digits(null).type(d3.symbolTriangle).size(actualSize)(null);
       assert.strictEqual(d, expectedD, "a up triangle of set size is generated");
       const path = svg.append("path").attr("d", d);
       const bbox = Plottable.Utils.DOM.elementBBox(path);
@@ -95,7 +95,7 @@ describe("SymbolFactory", () => {
       const a = ((1 / Math.sqrt(12)) / 2 + 1) * 3;
       const actualSize = a * Math.pow(symbolSize / 2.4, 2);
       const d = wyeFactory(symbolSize)(null);
-      const expectedD = d3.symbol().type(d3.symbolWye).size(actualSize)(null);
+      const expectedD = d3.symbol().digits(null).type(d3.symbolWye).size(actualSize)(null);
       assert.strictEqual(d, expectedD, "a wye of set size is generated");
       const path = svg.append("path").attr("d", d);
       const bbox = Plottable.Utils.DOM.elementBBox(path);

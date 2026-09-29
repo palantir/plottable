@@ -274,7 +274,7 @@ export class Area<X> extends Line<X> {
   ) {
       // just runtime error if user passes curveBundle to area plot
       const curveFactory = this._getCurveFactory() as d3.CurveFactory;
-      const areaGenerator = d3.area()
+      const areaGenerator = d3.area().digits(null)
         .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
         .y1((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
         .y0((innerDatum, innerIndex) => y0Projector(innerDatum, innerIndex, dataset))
@@ -290,7 +290,7 @@ export class Area<X> extends Line<X> {
     dataset: Dataset,
   ) {
       const curveFactory = this._getCurveFactory() as d3.CurveFactory;
-      const areaGenerator = d3.line()
+      const areaGenerator = d3.line().digits(null)
         .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
         .y((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
         .curve(curveFactory)

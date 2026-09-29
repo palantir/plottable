@@ -134,7 +134,7 @@ export function percentage(precision = 0) {
  */
 export function siSuffix(numberOfSignificantFigures = 3) {
   verifyPrecision(numberOfSignificantFigures);
-  return (d: any) => d3.format("." + numberOfSignificantFigures + "s")(d);
+  return (d: any) => d3.format("." + numberOfSignificantFigures + "s")(d).replace(/\u2212/g, "-");
 }
 
 /**
@@ -155,8 +155,11 @@ export function siSuffix(numberOfSignificantFigures = 3) {
 export function shortScale(precision = 3) {
   verifyPrecision(precision);
   const suffixes = "KMBTQ";
-  const exponentFormatter = d3.format("." + precision + "e");
-  const fixedFormatter = d3.format("." + precision + "f");
+  const formatExponent = d3.format("." + precision + "e");
+  const formatFixed = d3.format("." + precision + "f");
+  // Preserve Plottable's ASCII minus sign without changing D3's global locale.
+  const exponentFormatter = (value: number) => formatExponent(value).replace(/\u2212/g, "-");
+  const fixedFormatter = (value: number) => formatFixed(value).replace(/\u2212/g, "-");
   const max = Math.pow(10, (3 * (suffixes.length + 1)));
   const min = Math.pow(10, -precision);
   return (num: number) => {

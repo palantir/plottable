@@ -46,8 +46,8 @@ describe("Scales", () => {
         assert.strictEqual(scale.scale(10), 500, "first value in flipped domain maps to first value in range");
         assert.strictEqual(scale.scale(20), 400, "last value in flipped domain maps to last value in range");
 
-        assert.strictEqual(scale.invert(400), 20, "first value in range maps to first value in flipped domain");
-        assert.strictEqual(scale.invert(500), 10, "last value in range maps to last value in flipped domain");
+        assert.closeTo(scale.invert(400), 20, epsilon, "first value in range maps to first value in flipped domain");
+        assert.closeTo(scale.invert(500), 10, epsilon, "last value in range maps to last value in flipped domain");
       });
 
     });
@@ -70,7 +70,7 @@ describe("Scales", () => {
         assert.strictEqual(scale.scale(16), 1, "scales maximum value");
         assert.strictEqual(scale.scale(256), 2, "scales values outside the domain");
 
-        assert.strictEqual(scale.invert(1), 16, "inverts maximum value");
+        assert.closeTo(scale.invert(1), 16, 0.00001, "inverts maximum value");
       });
     });
 

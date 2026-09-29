@@ -12,7 +12,7 @@ import { QuantitativeScale } from "./quantitativeScale";
 
 export class ModifiedLog extends QuantitativeScale<number> {
   private _base: number;
-  private _d3Scale: d3.ScaleLinear<number, number>;
+  private _d3Scale: d3.ScaleLinear<number, number, number>;
   private _pivot: number;
   private _untransformedDomain: number[];
 
@@ -46,7 +46,7 @@ export class ModifiedLog extends QuantitativeScale<number> {
    */
   constructor(base = 10) {
     super();
-    this._d3Scale = d3.scaleLinear();
+    this._d3Scale = d3.scaleLinear().unknown(NaN);
     this._base = base;
     this._pivot = this._base;
     this._setDomain(this._defaultExtent());

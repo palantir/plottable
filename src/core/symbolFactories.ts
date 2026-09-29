@@ -4,41 +4,40 @@
  */
 
 import * as d3 from "d3";
-import * as d3Shape from "d3-shape";
 
 /**
  * A SymbolFactory is a function that takes in a symbolSize which is the edge length of the render area
  * and returns a d3 symbol generator.
  */
-export type SymbolFactory = (symbolSize: number) => d3Shape.Symbol<any, any>;
+export type SymbolFactory = (symbolSize: number) => d3.Symbol<any, any>;
 
 export function circle(): SymbolFactory {
   return (symbolSize: number) => {
-    return d3.symbol().type(d3.symbolCircle).size(Math.PI * Math.pow(symbolSize / 2, 2));
+    return d3.symbol().digits(null).type(d3.symbolCircle).size(Math.PI * Math.pow(symbolSize / 2, 2));
   };
 }
 
 export function square(): SymbolFactory {
   return (symbolSize: number) => {
-    return d3.symbol().type(d3.symbolSquare).size(Math.pow(symbolSize, 2));
+    return d3.symbol().digits(null).type(d3.symbolSquare).size(Math.pow(symbolSize, 2));
   };
 }
 
 export function cross(): SymbolFactory {
   return (symbolSize: number) => {
-    return d3.symbol().type(d3.symbolCross).size((5 / 9) * Math.pow(symbolSize, 2));
+    return d3.symbol().digits(null).type(d3.symbolCross).size((5 / 9) * Math.pow(symbolSize, 2));
   };
 }
 
 export function diamond(): SymbolFactory {
   return (symbolSize: number) => {
-    return d3.symbol().type(d3.symbolDiamond).size(Math.tan(Math.PI / 6) * Math.pow(symbolSize, 2) / 2);
+    return d3.symbol().digits(null).type(d3.symbolDiamond).size(Math.tan(Math.PI / 6) * Math.pow(symbolSize, 2) / 2);
   };
 }
 
 export function triangle(): SymbolFactory {
   return (symbolSize: number) => {
-    return d3.symbol().type(d3.symbolTriangle).size(Math.sqrt(3) * Math.pow(symbolSize / 2, 2));
+    return d3.symbol().digits(null).type(d3.symbolTriangle).size(Math.sqrt(3) * Math.pow(symbolSize / 2, 2));
   };
 }
 
@@ -46,7 +45,7 @@ export function triangle(): SymbolFactory {
 const ka = 0.89081309152928522810;
 export function star(): SymbolFactory {
   return (symbolSize: number) => {
-    return d3.symbol().type(d3.symbolStar).size(ka * Math.pow(symbolSize / 2, 2));
+    return d3.symbol().digits(null).type(d3.symbolStar).size(ka * Math.pow(symbolSize / 2, 2));
   };
 }
 
@@ -54,6 +53,6 @@ export function star(): SymbolFactory {
 const a = ((1 / Math.sqrt(12)) / 2 + 1) * 3;
 export function wye(): SymbolFactory {
   return (symbolSize: number) => {
-    return d3.symbol().type(d3.symbolWye).size(a * Math.pow(symbolSize / 2.4, 2));
+    return d3.symbol().digits(null).type(d3.symbolWye).size(a * Math.pow(symbolSize / 2.4, 2));
   };
 }

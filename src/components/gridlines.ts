@@ -173,7 +173,7 @@ export class Gridlines extends Component {
     if (this._xScale) {
       const between = this.betweenX();
       const xTicks = this._xScale.ticks().slice(between ? 1 : 0);
-      const xLinesUpdate = this._xLinesContainer.selectAll("line").data(xTicks);
+      const xLinesUpdate = this._xLinesContainer.selectAll<SVGLineElement, number>("line").data(xTicks);
       const xLines = xLinesUpdate.enter().append("line").merge(xLinesUpdate);
       xLines.attr("x1", gridPositionFactory(this._xScale, between, this._xScale.ticks()))
         .attr("y1", 0)
@@ -189,7 +189,7 @@ export class Gridlines extends Component {
     if (this._yScale) {
       const between = this.betweenY();
       const yTicks = this._yScale.ticks().slice(between ? 1 : 0);
-      const yLinesUpdate = this._yLinesContainer.selectAll("line").data(yTicks);
+      const yLinesUpdate = this._yLinesContainer.selectAll<SVGLineElement, number>("line").data(yTicks);
       const yLines = yLinesUpdate.enter().append("line").merge(yLinesUpdate);
       yLines.attr("x1", 0)
         .attr("y1", gridPositionFactory(this._yScale, between, this._yScale.ticks()))

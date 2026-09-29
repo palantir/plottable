@@ -356,7 +356,7 @@ export class Pie extends Plot {
     const innerRadiusAccessor = Plot._scaledAccessor(this.innerRadius());
     const outerRadiusAccessor = Plot._scaledAccessor(this.outerRadius());
     attrToProjector["d"] = (datum: any, index: number, ds: Dataset) => {
-      return d3.arc().innerRadius(innerRadiusAccessor(datum, index, ds))
+      return d3.arc().digits(null).innerRadius(innerRadiusAccessor(datum, index, ds))
         .outerRadius(outerRadiusAccessor(datum, index, ds))
         .startAngle(this._startAngles[index])
         .endAngle(this._endAngles[index])(datum, index);
