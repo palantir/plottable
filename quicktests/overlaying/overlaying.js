@@ -127,16 +127,13 @@ function populateTotalSidebarList(paths){
   });
   // hash = hash of quicktest categories and quicktests
 
-  var allQuickTests = d3.entries(hash);
-
-  allQuickTests.forEach(function(object){
-    var categoryName = object.key;
+  Object.keys(hash).forEach(function(categoryName){
     var startOlString = "<ol class=\"sidebar-quicktest-category\" id=" + categoryName + "> <input class=\"category-checkbox\" type=\"checkbox\">";
     var endOlString = "</ol>";
     var categoryStringHTML = startOlString + categoryName + endOlString;
       $(".sidebar").append(categoryStringHTML);
 
-    object.value.forEach(function(quicktest){
+    hash[categoryName].forEach(function(quicktest){
       var singleQuicktestName = quicktest;
       var startLiString = "<li class=\"sidebar-quicktest\"> <input class=\"quicktest-checkbox\" type=\"checkbox\">";
       var endLiString = "</li>";
@@ -149,9 +146,8 @@ function populateTotalSidebarList(paths){
   $(":checkbox").attr("checked", true);
 }
 
-function populateSidebarList(paths, testsInCategory, category){
+function populateSidebarList(testsInCategory, category){
 
-  var allQuickTests = d3.entries(testsInCategory);
   var categoryName = category;
   var startOlString = "<ol class=\"sidebar-quicktest-category\" id=" + categoryName + "> <input class=\"category-checkbox\" type=\"checkbox\">";
   var endOlString = "</ol>";
@@ -159,8 +155,8 @@ function populateSidebarList(paths, testsInCategory, category){
   var categoryStringHTML = startOlString + categoryName + endOlString;
     $(".sidebar").append(categoryStringHTML);
 
-    allQuickTests.forEach(function(quicktest){
-      var singleQuicktestName = quicktest.value;
+    testsInCategory.forEach(function(quicktest){
+      var singleQuicktestName = quicktest;
       var startLiString = "<li class=\"sidebar-quicktest\"> <input class=\"quicktest-checkbox\" type=\"checkbox\">";
       var endLiString = "</li>";
       var quicktestStringHTML = startLiString + singleQuicktestName + endLiString;
@@ -217,8 +213,8 @@ function loadAllQuickTests(quicktestsPaths, firstQTBranch, secondQTBranch){
   quicktestsPaths.forEach(function(path) { //for each quicktest
     var name = path.replace(/\w*\/|\.js/g, "");
     var relativePath = path.replace(/^quicktests\/overlaying\//, "");
-    d3.text(relativePath, function(error, text) {
-      evalAndRunTest(name, error, text, firstQTBranch, secondQTBranch);
+    d3.text(relativePath).then(function(text) {
+      evalAndRunTest(name, text, firstQTBranch, secondQTBranch);
     });
   });
 }
@@ -226,16 +222,13 @@ function loadAllQuickTests(quicktestsPaths, firstQTBranch, secondQTBranch){
 function loadQuickTestsInCategory(quickTestNames, category, firstQTBranch, secondQTBranch){
   quickTestNames.forEach(function(q) { //for each quicktest
     var name = q;
-    d3.text("/quicktests/overlaying/tests/" + category + "/" + name + ".js", function(error, text) {
-      evalAndRunTest(name, error, text, firstQTBranch, secondQTBranch);
+    d3.text("/quicktests/overlaying/tests/" + category + "/" + name + ".js").then(function(text) {
+      evalAndRunTest(name, text, firstQTBranch, secondQTBranch);
     });
   });
 }
 
-function evalAndRunTest(name, error, text, firstQTBranch, secondQTBranch) {
-  if (error !== null) {
-    throw new Error("Tried to load nonexistant quicktest.");
-  }
+function evalAndRunTest(name, text, firstQTBranch, secondQTBranch) {
   text = "(function(){" + text +
     "\nreturn {makeData: makeData, run: run};" +
     "})();" +
@@ -261,7 +254,7 @@ function filterQuickTests(category, urlList){
       var pathsInCategory = paths.filter(function(path) {return path.indexOf("tests/" + category) !== -1; });
       var testsInCategory = pathsInCategory.map(function(path) {return path.replace(/.*\/|\.js/g, ""); });
       loadQuickTestsInCategory(testsInCategory, category, urlList[0], urlList[1]);
-      populateSidebarList(paths, testsInCategory, category);
+      populateSidebarList(testsInCategory, category);
     }
     else{
       loadAllQuickTests(paths, urlList[0], urlList[1]);

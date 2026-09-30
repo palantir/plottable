@@ -78,11 +78,7 @@ function loadQuickTest(path){
     // clear app
     d3.select("#app").html("");
 
-    d3.text(`../../${PATH_PREFIX}${path}.js`, (error, text) => {
-        if (error !== null) {
-            throw new Error("Error loading test: " + error);
-        }
-
+    d3.text(`../../${PATH_PREFIX}${path}.js`).then((text) => {
         const name = path.replace(PATH_SPLIT_REGEX, "$2");
 
         const closure = eval(`

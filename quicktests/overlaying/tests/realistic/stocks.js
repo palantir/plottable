@@ -12,14 +12,14 @@ function run(svg, data, Plottable) {
   }
 
   // load GOOG
-  d3.csv("data/GOOG_20140401_20140901.csv")
-    .get(function(error, rows) {
+  return d3.csv("../overlaying/data/GOOG_20140401_20140901.csv")
+    .then(function(rows) {
       var goog = rows.reverse();
       goog.forEach(processDatum);
 
       // load AAPL
-      d3.csv("data/AAPL_20140401_20140901.csv")
-        .get(function(aaplError, aaplRows) {
+      return d3.csv("../overlaying/data/AAPL_20140401_20140901.csv")
+        .then(function(aaplRows) {
           var aapl = aaplRows.reverse();
           aapl.forEach(processDatum);
 
