@@ -3,10 +3,10 @@ version: 2
 references:
   setup_env: &setup_env
     docker:
-      - image: cimg/node:22.14.0
+      - image: cimg/node:22.12.0
   setup_env_browser: &setup_env_browser
     docker:
-      - image: cimg/node:22.14.0-browsers
+      - image: cimg/node:22.12.0-browsers
         environment:
             CHROME_BIN: "/usr/bin/google-chrome"
   save_cache: &save_cache
