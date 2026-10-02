@@ -72,6 +72,31 @@ describe("Plots", () => {
         assert.strictEqual(pathString, expectedPathString, "path string is initialized with the correct symbol and a size of 0");
       });
 
+      it("keeps entities aligned with drawn symbols when pixel positions are invalid", () => {
+        const data = [
+          { x: 0, y: 0 },
+          { x: undefined, y: 10 },
+          { x: 10, y: undefined },
+          { x: NaN, y: 10 },
+          { x: 10, y: NaN },
+          { x: null, y: 10 },
+          { x: 10, y: null },
+          { x: Infinity, y: 10 },
+          { x: 10, y: -Infinity },
+          { x: 100, y: 100 },
+        ];
+        plot.x((d) => d.x).y((d) => d.y);
+        plot.addDataset(new Plottable.Dataset(data)).renderTo(div);
+
+        const entities = plot.entities();
+        assert.strictEqual(plot.selections().size(), 2, "only valid positions are drawn");
+        assert.deepEqual(entities.map((entity) => entity.index), [0, 9], "only drawn data has entities");
+        entities.forEach((entity) => {
+          assert.strictEqual(entity.selection.datum(), entity.datum, "each entity selects its own symbol");
+        });
+        assert.strictEqual(plot.entityNearest({ x: 100, y: 100 }).datum, data[9], "hit testing finds the valid symbol");
+      });
+
       it.skip("correctly handles NaN, undefined, Infinity, and non-number x and y values", () => {
         const data = [
           { x: 0.0, y: 0.0 },

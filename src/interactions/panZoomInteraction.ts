@@ -3,8 +3,6 @@
  * @license MIT
  */
 
-import * as d3 from "d3";
-
 import {Component} from "../components/component";
 import {Point} from "../core/interfaces";
 import * as Dispatchers from "../dispatchers";
@@ -35,7 +33,7 @@ export class PanZoom extends Interaction {
   private _touchDispatcher: Dispatchers.Touch;
   private _wheelFilter: WheelFilter = (e: WheelEvent) => true;
 
-  private _touchIds: d3.Map<Point>;
+  private _touchIds: Map<string, Point>;
 
   private _wheelCallback = (p: Point, e: WheelEvent) => this._handleWheelEvent(p, e);
   private _touchStartCallback = (ids: number[], idToPoint: Point[], e: TouchEvent) => this._handleTouchStart(ids, idToPoint, e);
@@ -67,7 +65,7 @@ export class PanZoom extends Interaction {
     this._yScales = new Utils.Set<TransformableScale<any, number>>();
     this._dragInteraction = new Interactions.Drag();
     this._setupDragInteraction();
-    this._touchIds = d3.map<Point>();
+    this._touchIds = new Map<string, Point>();
     this._minDomainExtents = new Utils.Map<TransformableScale<any, number>, number>();
     this._maxDomainExtents = new Utils.Map<TransformableScale<any, number>, number>();
     this._minDomainValues = new Utils.Map<TransformableScale<any, number>, any>();
@@ -206,18 +204,18 @@ export class PanZoom extends Interaction {
   }
 
   private _handleTouchStart(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {
-    for (let i = 0; i < ids.length && this._touchIds.size() < 2; i++) {
+    for (let i = 0; i < ids.length && this._touchIds.size < 2; i++) {
       const id = ids[i];
       this._touchIds.set(id.toString(), this._translateToComponentSpace(idToPoint[id]));
     }
   }
 
   private _handlePinch(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {
-    if (this._touchIds.size() < 2) {
+    if (this._touchIds.size < 2) {
       return;
     }
 
-    const oldPoints = this._touchIds.values();
+    const oldPoints = Array.from(this._touchIds.values());
 
     if (!this._isInsideComponent(this._translateToComponentSpace(oldPoints[0])) || !this._isInsideComponent(this._translateToComponentSpace(oldPoints[1]))) {
       return;
@@ -235,7 +233,7 @@ export class PanZoom extends Interaction {
       }
     });
 
-    const points = this._touchIds.values();
+    const points = Array.from(this._touchIds.values());
     const newCornerDistance = PanZoom._pointDistance(points[0], points[1]);
 
     if (newCornerDistance === 0) {
@@ -291,10 +289,10 @@ export class PanZoom extends Interaction {
 
   private _handleTouchEnd(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {
     ids.forEach((id) => {
-      this._touchIds.remove(id.toString());
+      this._touchIds.delete(id.toString());
     });
 
-    if (this._touchIds.size() > 0) {
+    if (this._touchIds.size > 0) {
       this._zoomEndCallbacks.callCallbacks();
     }
   }
@@ -339,7 +337,7 @@ export class PanZoom extends Interaction {
     let lastDragPoint: Point;
     this._dragInteraction.onDragStart(() => lastDragPoint = null);
     this._dragInteraction.onDrag((startPoint, endPoint) => {
-      if (this._touchIds.size() >= 2) {
+      if (this._touchIds.size >= 2) {
         return;
       }
 

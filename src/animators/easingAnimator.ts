@@ -4,7 +4,7 @@
  */
 
 import * as d3 from "d3";
-import * as d3Ease from "d3-ease";
+import * as d3Ease from "d3";
 
 import { AttributeToAppliedProjector, SimpleSelection } from "../core/interfaces";
 import { coerceExternalD3 } from "../utils/coerceD3";

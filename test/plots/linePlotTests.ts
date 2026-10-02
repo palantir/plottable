@@ -75,6 +75,17 @@ describe("Plots", () => {
         div.remove();
       });
 
+      it("preserves fractional coordinates in SVG paths", () => {
+        const fractionalData = [{ x: 1 / 3, y: 2 / 3 }, { x: 4 / 3, y: 5 / 3 }];
+        linePlot.x((d) => d.x).y((d) => d.y);
+        linePlot.addDataset(new Plottable.Dataset(fractionalData)).renderTo(div);
+
+        const linePath = linePlot.content().select(".line");
+        assert.strictEqual(linePath.attr("d"), `M${1 / 3},${2 / 3}L${4 / 3},${5 / 3}`,
+          "coordinates retain their full precision");
+        div.remove();
+      });
+
       it("can set attributes and render accordingly", () => {
         linePlot.addDataset(dataset);
         linePlot.renderTo(div);

@@ -227,7 +227,7 @@ export class StackedArea<X> extends Area<X> {
     const keyAccessor = this.x().accessor;
 
     const keySets = datasets.map((dataset) => {
-      return d3.set(dataset.data().map((datum, i) => Utils.Stacking.normalizeKey(keyAccessor(datum, i, dataset)))).values();
+      return Utils.Array.uniq(dataset.data().map((datum, i) => Utils.Stacking.normalizeKey(keyAccessor(datum, i, dataset))));
     });
     const domainKeys = StackedArea._domainKeys(datasets, keyAccessor);
 
@@ -246,17 +246,17 @@ export class StackedArea<X> extends Area<X> {
    * @return {string[]} An array of stringified keys
    */
   private static _domainKeys(datasets: Dataset[], keyAccessor: IAccessor<any>) {
-    const domainKeys = d3.set();
+    const domainKeys = new Set<string>();
     datasets.forEach((dataset) => {
       const data = dataset.data();
       const dataLen = data.length;
       for (let index = 0; index < dataLen; index++) {
         const datum = data[index];
-        domainKeys.add(keyAccessor(datum, index, dataset));
+        domainKeys.add(String(keyAccessor(datum, index, dataset)));
       }
     });
 
-    return domainKeys.values();
+    return Array.from(domainKeys);
   }
 
   protected _coordinateProjectors(): [Projector, Projector, Projector] {

@@ -975,11 +975,11 @@ function computeBarPixelThickness(
   } else {
     const positionAccessor = positionBinding.accessor;
 
-    const numberBarAccessorData = d3.set(Utils.Array.flatten(datasets.map((dataset) => {
+    const numberBarAccessorData = Utils.Array.uniq(Utils.Array.flatten(datasets.map((dataset) => {
       return dataset.data().map((d, i) => positionAccessor(d, i, dataset))
           .filter((d) => d != null)
           .map((d) => d.valueOf());
-    }))).values().map((value) => +value);
+    }))).map((value) => +value);
 
     numberBarAccessorData.sort((a, b) => a - b);
 

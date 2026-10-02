@@ -379,13 +379,11 @@ export class Category extends Axis<string> {
     });
 
     // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
-    const widthFn = (this.isHorizontal() && this._tickLabelAngle === 0) ? d3.sum : Utils.Math.max;
-    const heightFn = (this.isHorizontal() && this._tickLabelAngle === 0) ? Utils.Math.max : d3.sum;
-
-    let usedWidth = widthFn<Typesettable.IWrappingResult, number>(wrappingResults,
-      (t: Typesettable.IWrappingResult) => this._measurer.measure(t.wrappedText).width, 0);
-    let usedHeight = heightFn<Typesettable.IWrappingResult, number>(wrappingResults,
-      (t: Typesettable.IWrappingResult) => this._measurer.measure(t.wrappedText).height, 0);
+    const widths = wrappingResults.map((result) => this._measurer.measure(result.wrappedText).width);
+    const heights = wrappingResults.map((result) => this._measurer.measure(result.wrappedText).height);
+    const horizontal = this.isHorizontal() && this._tickLabelAngle === 0;
+    let usedWidth = horizontal ? d3.sum(widths) : Utils.Math.max(widths, 0);
+    let usedHeight = horizontal ? Utils.Math.max(heights, 0) : d3.sum(heights);
 
     // If the tick labels are rotated, reverse usedWidth and usedHeight
     // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25

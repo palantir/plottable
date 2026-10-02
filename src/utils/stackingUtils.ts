@@ -3,8 +3,6 @@
  * @license MIT
  */
 
-import * as d3 from "d3";
-
 import { Dataset } from "../core/dataset";
 import { IAccessor } from "../core/interfaces";
 
@@ -68,8 +66,8 @@ export function stack(
   valueAccessor: IAccessor<number>,
   stackingOrder: IStackingOrder = "bottomup",
 ): StackingResult {
-  const positiveOffsets = d3.map<number>();
-  const negativeOffsets = d3.map<number>();
+  const positiveOffsets = new Map<string, number>();
+  const negativeOffsets = new Map<string, number>();
   const datasetToKeyToStackedDatum = new Utils.Map<Dataset, Utils.Map<string, StackedDatum>>();
 
   if (stackingOrder === "topdown") {

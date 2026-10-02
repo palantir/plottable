@@ -8,14 +8,14 @@ import * as d3 from "d3";
 import { QuantitativeScale } from "./quantitativeScale";
 
 export class Linear extends QuantitativeScale<number> {
-  private _d3Scale: d3.ScaleLinear<number, number>;
+  private _d3Scale: d3.ScaleLinear<number, number, number>;
 
   /**
    * @constructor
    */
   constructor() {
     super();
-    this._d3Scale = d3.scaleLinear();
+    this._d3Scale = d3.scaleLinear().unknown(NaN);
   }
 
   protected _defaultExtent(): number[] {
@@ -30,7 +30,7 @@ export class Linear extends QuantitativeScale<number> {
   }
 
   public scale(value: number) {
-    return this._d3Scale(value);
+    return this._d3Scale(+value);
   }
 
   public scaleTransformation(value: number) {

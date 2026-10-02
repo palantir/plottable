@@ -4,6 +4,7 @@
       "forceConsistentCasingInFileNames": true,
       "importHelpers": true,
       "module": "commonjs",
+      "lib": ["dom", "es2015"],
       "noFallthroughCasesInSwitch": true,
       "noImplicitReturns": true,
       "outDir": "build",

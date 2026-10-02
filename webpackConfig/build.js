@@ -17,7 +17,7 @@ Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)`;
  *
  * User adds two script tags to their html page:
  *
- *   <script src="https://cdn.jsdelivr.net/npm/d3@4.5.0/build/d3.min.js"></script>
+ *   <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
  *   <script src="https://cdn.jsdelivr.net/npm/plottable/plottable.min.js"></script>
  *
  * And then references Plottable globally.
@@ -28,7 +28,7 @@ Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)`;
  *
  * require.config( {
  *   paths: {
- *     d3: "https://cdn.jsdelivr.net/npm/d3@4.5.0/build/d3.min.js",
+ *     d3: "https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js",
  *     plottable: "//cdn.jsdelivr.net/npm/plottable/plottable.min.js"
  *   },
  *   shim: {

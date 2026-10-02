@@ -142,7 +142,7 @@ export class InterpolatedColor extends Scale<number, string> {
   }
 
   public scale(value: number) {
-    return this._d3Scale(value);
+    return this._d3Scale(+value);
   }
 
   protected _getDomain() {

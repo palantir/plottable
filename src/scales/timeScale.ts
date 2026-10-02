@@ -10,7 +10,7 @@ import { TimeInterval } from "../axes/timeAxis";
 import { QuantitativeScale } from "./quantitativeScale";
 
 export class Time extends QuantitativeScale<Date> {
-  private _d3Scale: d3.ScaleTime<number, number>;
+  private _d3Scale: d3.ScaleTime<number, number, number>;
 
   /**
    * A Time Scale maps Date objects to numbers.
@@ -19,7 +19,7 @@ export class Time extends QuantitativeScale<Date> {
    */
   constructor() {
     super();
-    this._d3Scale = d3.scaleTime();
+    this._d3Scale = d3.scaleTime().unknown(NaN);
     this.autoDomain();
   }
 
@@ -32,7 +32,7 @@ export class Time extends QuantitativeScale<Date> {
    */
   public tickInterval(interval: string, step: number = 1, useUTC: boolean = false): Date[] {
     // temporarily creats a time scale from our linear scale into a time scale so we can get access to its api
-    const tempScale = d3.scaleTime();
+    const tempScale = d3.scaleTime().unknown(NaN);
     const d3Interval = Time.timeIntervalToD3Time(interval, useUTC).every(step);
     tempScale.domain(this.domain());
     tempScale.range(this.range());
@@ -64,7 +64,7 @@ export class Time extends QuantitativeScale<Date> {
   }
 
   public scale(value: Date): number {
-    return this._d3Scale(value);
+    return this._d3Scale(+value);
   }
 
   public scaleTransformation(value: number) {

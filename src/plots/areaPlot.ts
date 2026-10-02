@@ -10,6 +10,7 @@ import { AttributeToProjector, IAccessor, Projector, SimpleSelection } from "../
 import * as Scales from "../scales";
 import { QuantitativeScale } from "../scales/quantitativeScale";
 import * as Utils from "../utils";
+import { withFullPrecision } from "../utils/d3ShapeUtils";
 
 import * as Drawers from "../drawers";
 import { AreaSVGDrawer, makeAreaCanvasDrawStep } from "../drawers/areaDrawer";
@@ -274,7 +275,7 @@ export class Area<X> extends Line<X> {
   ) {
       // just runtime error if user passes curveBundle to area plot
       const curveFactory = this._getCurveFactory() as d3.CurveFactory;
-      const areaGenerator = d3.area()
+      const areaGenerator = withFullPrecision(d3.area())
         .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
         .y1((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
         .y0((innerDatum, innerIndex) => y0Projector(innerDatum, innerIndex, dataset))
@@ -290,7 +291,7 @@ export class Area<X> extends Line<X> {
     dataset: Dataset,
   ) {
       const curveFactory = this._getCurveFactory() as d3.CurveFactory;
-      const areaGenerator = d3.line()
+      const areaGenerator = withFullPrecision(d3.line())
         .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
         .y((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
         .curve(curveFactory)
