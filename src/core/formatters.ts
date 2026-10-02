@@ -157,7 +157,8 @@ export function shortScale(precision = 3) {
   const suffixes = "KMBTQ";
   const formatExponent = d3.format("." + precision + "e");
   const formatFixed = d3.format("." + precision + "f");
-  // Preserve Plottable's ASCII minus sign without changing D3's global locale.
+  // D3 6 (d3-format 2.0.0) changed the default minus sign from ASCII "-" to Unicode "−" (U+2212).
+  // Convert it back to preserve Plottable's output without changing D3's global locale.
   const exponentFormatter = (value: number) => formatExponent(value).replace(/\u2212/g, "-");
   const fixedFormatter = (value: number) => formatFixed(value).replace(/\u2212/g, "-");
   const max = Math.pow(10, (3 * (suffixes.length + 1)));
