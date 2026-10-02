@@ -718,7 +718,7 @@ export class Plot extends Component {
       for (let datumIndex = 0; datumIndex < dataLen; datumIndex++) {
         const datum = data[datumIndex];
         const position = this._pixelPoint(datum, datumIndex, dataset);
-        if (Utils.Math.isNaN(position.x) || Utils.Math.isNaN(position.y)) {
+        if (!Utils.Math.isValidNumber(position.x) || !Utils.Math.isValidNumber(position.y)) {
           continue;
         }
 
