@@ -18,6 +18,7 @@ import * as Utils from "../utils";
 import { ArcSVGDrawer } from "../drawers/arcDrawer";
 import { ArcOutlineSVGDrawer } from "../drawers/arcOutlineDrawer";
 import { ProxyDrawer } from "../drawers/drawer";
+import { withFullPrecision } from "../utils/d3ShapeUtils";
 import { warn } from "../utils/windowUtils";
 import { IAccessorScaleBinding, IPlotEntity } from "./";
 import { Plot } from "./plot";
@@ -356,7 +357,7 @@ export class Pie extends Plot {
     const innerRadiusAccessor = Plot._scaledAccessor(this.innerRadius());
     const outerRadiusAccessor = Plot._scaledAccessor(this.outerRadius());
     attrToProjector["d"] = (datum: any, index: number, ds: Dataset) => {
-      return d3.arc().digits(null).innerRadius(innerRadiusAccessor(datum, index, ds))
+      return withFullPrecision(d3.arc()).innerRadius(innerRadiusAccessor(datum, index, ds))
         .outerRadius(outerRadiusAccessor(datum, index, ds))
         .startAngle(this._startAngles[index])
         .endAngle(this._endAngles[index])(datum, index);

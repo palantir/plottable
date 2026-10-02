@@ -15,6 +15,7 @@ import * as Scales from "../scales";
 import { QuantitativeScale } from "../scales/quantitativeScale";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
+import { withFullPrecision } from "../utils/d3ShapeUtils";
 import { makeEnum } from "../utils/makeEnum";
 import * as Plots from "./";
 import { IPlotEntity } from "./";
@@ -494,7 +495,7 @@ export class Line<X> extends XYPlot<X, number> {
       return Utils.Math.isValidNumber(positionX) && Utils.Math.isValidNumber(positionY);
     };
 
-    return d3.line().digits(null)
+    return withFullPrecision(d3.line())
       .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
       .y((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
       .curve(this._getCurveFactory())
