@@ -261,3 +261,124 @@ describe("Utils Matrix", () => {
     assert.throws(() => invertMatrix(m));
   });
 });
+
+describe("Utils.Math.getCumulativeTransform", () => {
+  const ROOT_WIDTH = 120;
+  const ROOT_HEIGHT = 80;
+
+  let created: HTMLElement[];
+
+  beforeEach(() => {
+    created = [];
+  });
+
+  afterEach(() => {
+    created.forEach((element) => element.parentNode && element.parentNode.removeChild(element));
+    window.scrollTo(0, 0);
+  });
+
+  /**
+   * Nests a chain of `<div>`s in the body, outermost style first, and returns
+   * the innermost one to stand in for a Component's root element.
+   */
+  function buildChain(...styles: { [key: string]: string }[]) {
+    let parent: HTMLElement = document.body;
+    styles.forEach((style) => {
+      const wrapper = document.createElement("div");
+      Object.keys(style).forEach((key) => (<any> wrapper.style)[key] = style[key]);
+      parent.appendChild(wrapper);
+      if (parent === document.body) {
+        created.push(wrapper);
+      }
+      parent = wrapper;
+    });
+    const root = document.createElement("div");
+    root.style.width = `${ROOT_WIDTH}px`;
+    root.style.height = `${ROOT_HEIGHT}px`;
+    parent.appendChild(root);
+    if (parent === document.body) {
+      created.push(root);
+    }
+    return root;
+  }
+
+  /**
+   * Maps a client point that is `dx`/`dy` inside the root's top left corner
+   * through the cumulative transform. A correct transform gives back exactly
+   * `dx`/`dy`, whatever the ancestors are doing.
+   */
+  function locate(root: HTMLElement, dx: number, dy: number) {
+    const bounds = root.getBoundingClientRect();
+    const transform = Plottable.Utils.Math.getCumulativeTransform(root);
+    return Plottable.Utils.Math.applyTransform(transform, { x: bounds.left + dx, y: bounds.top + dy });
+  }
+
+  it("locates points inside a plainly positioned element", () => {
+    const root = buildChain({ padding: "17px 23px" });
+    TestMethods.assertPointsClose(locate(root, 31, 19), { x: 31, y: 19 }, 0.5,
+      "a static ancestor does not shift the result");
+  });
+
+  it("locates points inside a relatively positioned ancestor", () => {
+    const root = buildChain({ position: "relative", top: "13px", left: "29px", border: "4px solid #999" });
+    TestMethods.assertPointsClose(locate(root, 31, 19), { x: 31, y: 19 }, 0.5,
+      "a positioned ancestor does not shift the result");
+  });
+
+  it("accounts for the scroll offset of an ancestor", () => {
+    const root = buildChain({ overflow: "auto", width: "60px", height: "40px" });
+    const scroller = root.parentElement;
+    const filler = document.createElement("div");
+    filler.style.width = `${ROOT_WIDTH * 3}px`;
+    filler.style.height = `${ROOT_HEIGHT * 3}px`;
+    scroller.appendChild(filler);
+    scroller.scrollLeft = 25;
+    scroller.scrollTop = 35;
+    assert.isAbove(scroller.scrollTop, 0, "the ancestor really did scroll");
+
+    TestMethods.assertPointsClose(locate(root, 31, 19), { x: 31, y: 19 }, 0.5,
+      "the ancestor's scroll offset is accounted for");
+  });
+
+  // https://github.com/palantir/plottable/issues/3437
+  describe("with a position: fixed ancestor", () => {
+    it("does not apply the offsets of ancestors above it", () => {
+      // A margin on <body> is the simplest ancestor offset that must not be
+      // applied: a fixed element is laid out against the viewport, not the body.
+      const originalMargin = document.body.style.margin;
+      document.body.style.margin = "37px 53px";
+      try {
+        const root = buildChain({ position: "fixed", top: "60px", left: "90px" });
+        TestMethods.assertPointsClose(locate(root, 31, 19), { x: 31, y: 19 }, 0.5,
+          "the body's offset is not subtracted from a viewport-positioned element");
+      } finally {
+        document.body.style.margin = originalMargin;
+      }
+    });
+
+    it("does not apply the document scroll offset", () => {
+      const spacer = document.createElement("div");
+      spacer.style.height = `${window.innerHeight + 1500}px`;
+      document.body.appendChild(spacer);
+      created.push(spacer);
+
+      const root = buildChain({ position: "fixed", top: "60px", left: "90px" });
+
+      window.scrollTo(0, 500);
+      assert.isAbove(window.pageYOffset, 0, "the document really did scroll");
+
+      TestMethods.assertPointsClose(locate(root, 31, 19), { x: 31, y: 19 }, 0.5,
+        "the document scroll offset is not added to a viewport-positioned element");
+    });
+
+    it("still accounts for static and positioned wrappers inside it", () => {
+      const root = buildChain(
+        { position: "fixed", top: "60px", left: "90px" },
+        { padding: "21px 13px", border: "3px solid #999" },
+        { position: "relative", top: "7px", left: "11px" },
+      );
+      TestMethods.assertPointsClose(locate(root, 31, 19), { x: 31, y: 19 }, 0.5,
+        "wrappers between the fixed element and the root are still applied");
+    });
+  });
+});
