@@ -98,6 +98,7 @@ jobs:
       - run:
           name: Publish release using CircleCI OIDC
           command: |
+            # From https://docs.npmjs.com/trusted-publishers#circleci-configuration
             NPM_ID_TOKEN="$(circleci run oidc get --claims '{"aud": "npm:registry.npmjs.org"}')"
             export NPM_ID_TOKEN
             npm publish
@@ -113,6 +114,7 @@ jobs:
       - run:
           name: Publish snapshot using CircleCI OIDC
           command: |
+            # From https://docs.npmjs.com/trusted-publishers#circleci-configuration
             NPM_ID_TOKEN="$(circleci run oidc get --claims '{"aud": "npm:registry.npmjs.org"}')"
             export NPM_ID_TOKEN
             ./scripts/publishSnapshot.sh
