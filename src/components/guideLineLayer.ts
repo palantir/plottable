@@ -3,18 +3,26 @@
  * @license MIT
  */
 
+import * as Typesettable from "typesettable";
+
 import { Point, SimpleSelection } from "../core/interfaces";
 import { QuantitativeScale } from "../scales/quantitativeScale";
 import { IScaleCallback } from "../scales/scale";
 import * as Utils from "../utils";
 
-import { Component } from "./component";
+import { Component, XAlignment, YAlignment } from "./component";
 
 enum PropertyMode { VALUE, PIXEL }
 
 export class GuideLineLayer<D> extends Component {
   public static ORIENTATION_VERTICAL = "vertical";
   public static ORIENTATION_HORIZONTAL = "horizontal";
+
+  /**
+   * Distance in pixels between the guide line and its label, and between the
+   * label and the edge of the layer it is aligned against.
+   */
+  private static _DEFAULT_LABEL_PADDING_PX = 5;
 
   private _orientation: string;
   private _value: D;
@@ -23,6 +31,14 @@ export class GuideLineLayer<D> extends Component {
   private _scaleUpdateCallback: IScaleCallback<QuantitativeScale<D>>;
   private _guideLine: SimpleSelection<void>;
   private _mode = PropertyMode.VALUE;
+
+  private _label: string = null;
+  private _labelPadding = GuideLineLayer._DEFAULT_LABEL_PADDING_PX;
+  private _labelXAlignment: XAlignment = "right";
+  private _labelYAlignment: YAlignment = "top";
+  private _labelContainer: SimpleSelection<void>;
+  private _measurer: Typesettable.CacheMeasurer;
+  private _writer: Typesettable.Writer;
 
   constructor(orientation: string) {
     super();
@@ -46,6 +62,10 @@ export class GuideLineLayer<D> extends Component {
   protected _setup() {
     super._setup();
     this._guideLine = this.content().append("line").classed("guide-line", true);
+    this._labelContainer = this.content().append("g").classed("guide-line-label", true);
+    const context = new Typesettable.SvgContext(this._labelContainer.node() as SVGElement);
+    this._measurer = new Typesettable.CacheMeasurer(context);
+    this._writer = new Typesettable.Writer(this._measurer, context);
   }
 
   protected _sizeFromOffer(availableWidth: number, availableHeight: number) {
@@ -88,7 +108,73 @@ export class GuideLineLayer<D> extends Component {
       x2: this._isVertical() ? this.pixelPosition() : this.width(),
       y2: this._isVertical() ? this.height() : this.pixelPosition(),
     });
+    this._renderLabel();
     return this;
+  }
+
+  public invalidateCache() {
+    super.invalidateCache();
+    if (this._measurer != null) {
+      this._measurer.reset();
+    }
+  }
+
+  /**
+   * Draws label() next to the guide line, positioned according to
+   * labelXAlignment() and labelYAlignment().
+   */
+  private _renderLabel() {
+    // HACKHACK Typesettable cannot remove its own content - #21 on Typesettable.
+    this._labelContainer.selectAll("g").remove();
+    if (this._label == null || this._label === "") {
+      return;
+    }
+    if (!Utils.Math.isValidNumber(this.pixelPosition())) {
+      // the guide line itself has nowhere to be drawn yet, so neither has its label
+      return;
+    }
+    const { width: textWidth, height: textHeight } = this._measurer.measure(this._label);
+    const { x, y } = this._labelOrigin(textWidth, textHeight);
+    this._labelContainer.attr("transform", `translate(${x},${y})`);
+    this._writer.write(this._label, textWidth, textHeight, { xAlign: "left", yAlign: "top" });
+  }
+
+  /**
+   * Computes the top-left corner of the label's bounding box in the layer's
+   * pixel space.
+   *
+   * Along the axis the guide line runs on, the alignment positions the label
+   * within the bounds of the layer. Across that axis, it picks which side of
+   * the guide line the label sits on.
+   */
+  private _labelOrigin(textWidth: number, textHeight: number): Point {
+    const position = this.pixelPosition();
+    const padding = this._labelPadding;
+
+    const acrossVertical = { // vertical guide line: x picks a side of the line
+      center: position - textWidth / 2,
+      left: position - padding - textWidth,
+      right: position + padding,
+    };
+    const alongHorizontal = { // vertical guide line: y slides along the line
+      bottom: this.height() - padding - textHeight,
+      center: (this.height() - textHeight) / 2,
+      top: padding,
+    };
+    const alongVertical = { // horizontal guide line: x slides along the line
+      center: (this.width() - textWidth) / 2,
+      left: padding,
+      right: this.width() - padding - textWidth,
+    };
+    const acrossHorizontal = { // horizontal guide line: y picks a side of the line
+      bottom: position + padding,
+      center: position - textHeight / 2,
+      top: position - padding - textHeight,
+    };
+
+    return this._isVertical()
+      ? { x: acrossVertical[this._labelXAlignment], y: alongHorizontal[this._labelYAlignment] }
+      : { x: alongVertical[this._labelXAlignment], y: acrossHorizontal[this._labelYAlignment] };
   }
 
   // sets pixelPosition() or value() based on the other, depending on which was the last one set
@@ -190,6 +276,132 @@ export class GuideLineLayer<D> extends Component {
     this._pixelPosition = pixelPosition;
     this._mode = PropertyMode.PIXEL;
     this._syncPixelPositionAndValue();
+    this.render();
+    return this;
+  }
+
+  /**
+   * Gets the text drawn next to the guide line.
+   *
+   * @return {string} The label text, or null if the GuideLineLayer has no label.
+   */
+  public label(): string;
+  /**
+   * Sets the text drawn next to the guide line.
+   *
+   * Pass null or "" to remove the label. Use labelXAlignment() and
+   * labelYAlignment() to position it.
+   *
+   * @param {string} label
+   * @return {GuideLineLayer<D>} The calling GuideLineLayer.
+   */
+  public label(label: string): this;
+  public label(label?: string): any {
+    // unlike other properties, null is a meaningful value here (it clears the
+    // label), so only `undefined` selects the getter
+    if (label === undefined) {
+      return this._label;
+    }
+    if (label !== null && typeof label !== "string") {
+      throw new Error("label must be a string or null");
+    }
+    this._label = label;
+    this.render();
+    return this;
+  }
+
+  /**
+   * Gets the space in pixels between the label and the guide line.
+   *
+   * @return {number}
+   */
+  public labelPadding(): number;
+  /**
+   * Sets the space in pixels between the label and the guide line, and between
+   * the label and the edge of the layer it is aligned against.
+   *
+   * @param {number} labelPadding
+   * @return {GuideLineLayer<D>} The calling GuideLineLayer.
+   */
+  public labelPadding(labelPadding: number): this;
+  public labelPadding(labelPadding?: number): any {
+    if (labelPadding == null) {
+      return this._labelPadding;
+    }
+    if (!Utils.Math.isValidNumber(labelPadding) || labelPadding < 0) {
+      throw new Error("labelPadding must be a finite non-negative number");
+    }
+    this._labelPadding = labelPadding;
+    this.render();
+    return this;
+  }
+
+  /**
+   * Gets the horizontal placement of the label.
+   *
+   * @return {string} One of "left"/"center"/"right".
+   */
+  public labelXAlignment(): XAlignment;
+  /**
+   * Sets the horizontal placement of the label.
+   *
+   * On a vertical GuideLineLayer this picks the side of the guide line the
+   * label sits on: "left" puts it before the line, "right" after it, and
+   * "center" straddles it. On a horizontal GuideLineLayer it slides the label
+   * along the line, between the left and right edges of the layer.
+   *
+   * This is independent of xAlignment(), which positions the GuideLineLayer
+   * itself within its parent and has no effect on a layer that always fills
+   * the space offered to it.
+   *
+   * @param {string} labelXAlignment One of "left"/"center"/"right".
+   * @return {GuideLineLayer<D>} The calling GuideLineLayer.
+   */
+  public labelXAlignment(labelXAlignment: XAlignment): this;
+  public labelXAlignment(labelXAlignment?: XAlignment): any {
+    if (labelXAlignment == null) {
+      return this._labelXAlignment;
+    }
+    const alignment = labelXAlignment.toLowerCase() as XAlignment;
+    if (XAlignment[alignment] !== alignment) {
+      throw new Error("Unsupported alignment: " + labelXAlignment);
+    }
+    this._labelXAlignment = alignment;
+    this.render();
+    return this;
+  }
+
+  /**
+   * Gets the vertical placement of the label.
+   *
+   * @return {string} One of "top"/"center"/"bottom".
+   */
+  public labelYAlignment(): YAlignment;
+  /**
+   * Sets the vertical placement of the label.
+   *
+   * On a horizontal GuideLineLayer this picks the side of the guide line the
+   * label sits on: "top" puts it above the line, "bottom" below it, and
+   * "center" straddles it. On a vertical GuideLineLayer it slides the label
+   * along the line, between the top and bottom edges of the layer.
+   *
+   * This is independent of yAlignment(), which positions the GuideLineLayer
+   * itself within its parent and has no effect on a layer that always fills
+   * the space offered to it.
+   *
+   * @param {string} labelYAlignment One of "top"/"center"/"bottom".
+   * @return {GuideLineLayer<D>} The calling GuideLineLayer.
+   */
+  public labelYAlignment(labelYAlignment: YAlignment): this;
+  public labelYAlignment(labelYAlignment?: YAlignment): any {
+    if (labelYAlignment == null) {
+      return this._labelYAlignment;
+    }
+    const alignment = labelYAlignment.toLowerCase() as YAlignment;
+    if (YAlignment[alignment] !== alignment) {
+      throw new Error("Unsupported alignment: " + labelYAlignment);
+    }
+    this._labelYAlignment = alignment;
     this.render();
     return this;
   }

@@ -1,6 +1,7 @@
 import * as d3 from "d3";
 
 import { assert } from "chai";
+import * as Typesettable from "typesettable";
 
 import * as Plottable from "../../src";
 
@@ -63,6 +64,58 @@ describe("GuideLineLayer", () => {
       assert.doesNotThrow(() => new Plottable.Components.GuideLineLayer<number>("horizontal"), Error, "accepts \"horizontal\"");
       (<any> assert).throws(() => new Plottable.Components.GuideLineLayer<number>("blargh"), Error,
         "blargh is not a valid orientation for GuideLineLayer", "throws error on invalid orientation");
+    });
+
+    it("can get and set the label property", () => {
+      const gll = new Plottable.Components.GuideLineLayer<void>("vertical");
+      assert.isNull(gll.label(), "there is no label by default");
+      assert.strictEqual(gll.label("Moon landing"), gll, "setter returns the calling GuideLineLayer");
+      assert.strictEqual(gll.label(), "Moon landing", "getter returns the set label");
+      gll.label(null);
+      assert.isNull(gll.label(), "the label can be cleared with null");
+      // HACKHACK #2614: chai-assert.d.ts has the wrong signature
+      (<any> assert).throws(() => gll.label(<any> 5), Error,
+        "label must be a string or null", "rejects non-string labels");
+    });
+
+    it("can get and set the labelPadding property", () => {
+      const gll = new Plottable.Components.GuideLineLayer<void>("vertical");
+      assert.strictEqual(gll.labelPadding(), 5, "labelPadding defaults to 5px");
+      assert.strictEqual(gll.labelPadding(12), gll, "setter returns the calling GuideLineLayer");
+      assert.strictEqual(gll.labelPadding(), 12, "getter returns the set padding");
+      assert.doesNotThrow(() => gll.labelPadding(0), Error, "accepts zero padding");
+      (<any> assert).throws(() => gll.labelPadding(-1), Error,
+        "labelPadding must be a finite non-negative number", "rejects negative padding");
+      (<any> assert).throws(() => gll.labelPadding(NaN), Error,
+        "labelPadding must be a finite non-negative number", "rejects NaN");
+      (<any> assert).throws(() => gll.labelPadding(Infinity), Error,
+        "labelPadding must be a finite non-negative number", "rejects Infinity");
+    });
+
+    it("can get and set the labelXAlignment property", () => {
+      const gll = new Plottable.Components.GuideLineLayer<void>("vertical");
+      assert.strictEqual(gll.labelXAlignment(), "right", "labelXAlignment defaults to \"right\"");
+      assert.strictEqual(gll.labelXAlignment("left"), gll, "setter returns the calling GuideLineLayer");
+      assert.strictEqual(gll.labelXAlignment(), "left", "getter returns the set alignment");
+      gll.labelXAlignment(<any> "CENTER");
+      assert.strictEqual(gll.labelXAlignment(), "center", "alignments are case-insensitive");
+      (<any> assert).throws(() => gll.labelXAlignment(<any> "top"), Error,
+        "Unsupported alignment: top", "rejects y-alignments");
+      (<any> assert).throws(() => gll.labelXAlignment(<any> "constructor"), Error,
+        "Unsupported alignment: constructor", "rejects inherited Object properties");
+    });
+
+    it("can get and set the labelYAlignment property", () => {
+      const gll = new Plottable.Components.GuideLineLayer<void>("horizontal");
+      assert.strictEqual(gll.labelYAlignment(), "top", "labelYAlignment defaults to \"top\"");
+      assert.strictEqual(gll.labelYAlignment("bottom"), gll, "setter returns the calling GuideLineLayer");
+      assert.strictEqual(gll.labelYAlignment(), "bottom", "getter returns the set alignment");
+      gll.labelYAlignment(<any> "Center");
+      assert.strictEqual(gll.labelYAlignment(), "center", "alignments are case-insensitive");
+      (<any> assert).throws(() => gll.labelYAlignment(<any> "left"), Error,
+        "Unsupported alignment: left", "rejects x-alignments");
+      (<any> assert).throws(() => gll.labelYAlignment(<any> "constructor"), Error,
+        "Unsupported alignment: constructor", "rejects inherited Object properties");
     });
   });
 
@@ -297,6 +350,196 @@ describe("GuideLineLayer", () => {
 
         div.remove();
       });
+    });
+  });
+
+  describe("Rendering the label", () => {
+    const DIV_WIDTH = 400;
+    const DIV_HEIGHT = 300;
+    const LABEL_CONTAINER_CLASS = ".guide-line-label";
+    const LABEL_TEXT = "First Man on the Moon";
+    const POSITION = 200;
+    const EPSILON = 0.001;
+
+    let div: d3.Selection<HTMLDivElement, any, any, any>;
+
+    beforeEach(() => {
+      div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
+    });
+
+    afterEach(() => {
+      div.remove();
+    });
+
+    function renderGuideLine(orientation: string) {
+      const gll = new Plottable.Components.GuideLineLayer<number>(orientation);
+      gll.pixelPosition(POSITION).label(LABEL_TEXT);
+      gll.renderTo(div);
+      return gll;
+    }
+
+    function labelOrigin(gll: Plottable.Components.GuideLineLayer<number>): Plottable.Point {
+      const [x, y] = TestMethods.getTranslate(gll.content().select(LABEL_CONTAINER_CLASS));
+      return { x, y };
+    }
+
+    function labelTextCount(gll: Plottable.Components.GuideLineLayer<number>) {
+      return gll.content().selectAll<Element, any>(`${LABEL_CONTAINER_CLASS} text`).size();
+    }
+
+    /**
+     * Measures LABEL_TEXT in a throwaway element carrying the same classes as the
+     * real label container, so the font metrics match what the layer measured.
+     */
+    function measureLabel(gll: Plottable.Components.GuideLineLayer<number>) {
+      const scratch = gll.content().append("g").classed("guide-line-label", true);
+      const context = new Typesettable.SvgContext(scratch.node() as SVGElement);
+      const measurement = new Typesettable.CacheMeasurer(context).measure(LABEL_TEXT);
+      scratch.remove();
+      return measurement;
+    }
+
+    it("draws nothing until a label is set", () => {
+      const gll = new Plottable.Components.GuideLineLayer<number>("vertical");
+      gll.pixelPosition(POSITION);
+      gll.renderTo(div);
+      assert.strictEqual(labelTextCount(gll), 0, "no text is drawn when there is no label");
+
+      gll.label(LABEL_TEXT);
+      assert.strictEqual(labelTextCount(gll), 1, "the label is drawn once it is set");
+      assert.strictEqual(gll.content().select(LABEL_CONTAINER_CLASS).text(), LABEL_TEXT,
+        "the drawn text is the label that was set");
+    });
+
+    it("draws no label until the guide line has a position", () => {
+      const gll = new Plottable.Components.GuideLineLayer<number>("vertical");
+      gll.label(LABEL_TEXT);
+      gll.renderTo(div);
+      assert.strictEqual(labelTextCount(gll), 0, "nothing is drawn while the guide line has no position");
+
+      gll.pixelPosition(POSITION);
+      assert.strictEqual(labelTextCount(gll), 1, "the label appears once the guide line is positioned");
+    });
+
+    it("removes the label when it is cleared", () => {
+      const gll = renderGuideLine("vertical");
+      assert.strictEqual(labelTextCount(gll), 1, "the label is drawn to begin with");
+
+      gll.label(null);
+      assert.strictEqual(labelTextCount(gll), 0, "null removes the label");
+
+      gll.label(LABEL_TEXT);
+      gll.label("");
+      assert.strictEqual(labelTextCount(gll), 0, "the empty string removes the label");
+    });
+
+    it("does not stack up text when re-rendered", () => {
+      const gll = renderGuideLine("vertical");
+      gll.label("Sputnik 1");
+      gll.pixelPosition(POSITION + 20);
+      gll.redraw();
+      assert.strictEqual(labelTextCount(gll), 1, "exactly one label is drawn after several renders");
+      assert.strictEqual(gll.content().select(LABEL_CONTAINER_CLASS).text(), "Sputnik 1",
+        "the label shows the most recently set text");
+    });
+
+    it("labelXAlignment picks which side of a vertical guide line the label sits on", () => {
+      const gll = renderGuideLine("vertical");
+      const padding = gll.labelPadding();
+      const { width } = measureLabel(gll);
+
+      assert.closeTo(labelOrigin(gll.labelXAlignment("right")).x, POSITION + padding, EPSILON,
+        "\"right\" starts one padding to the right of the guide line");
+      assert.closeTo(labelOrigin(gll.labelXAlignment("left")).x, POSITION - padding - width, EPSILON,
+        "\"left\" ends one padding to the left of the guide line");
+      assert.closeTo(labelOrigin(gll.labelXAlignment("center")).x, POSITION - width / 2, EPSILON,
+        "\"center\" straddles the guide line");
+    });
+
+    it("labelYAlignment slides the label along a vertical guide line", () => {
+      const gll = renderGuideLine("vertical");
+      const padding = gll.labelPadding();
+      const { height } = measureLabel(gll);
+
+      assert.closeTo(labelOrigin(gll.labelYAlignment("top")).y, padding, EPSILON,
+        "\"top\" sits one padding below the top edge");
+      assert.closeTo(labelOrigin(gll.labelYAlignment("bottom")).y, DIV_HEIGHT - padding - height, EPSILON,
+        "\"bottom\" sits one padding above the bottom edge");
+      assert.closeTo(labelOrigin(gll.labelYAlignment("center")).y, (DIV_HEIGHT - height) / 2, EPSILON,
+        "\"center\" is centered between the top and bottom edges");
+    });
+
+    it("labelYAlignment picks which side of a horizontal guide line the label sits on", () => {
+      const gll = renderGuideLine("horizontal");
+      const padding = gll.labelPadding();
+      const { height } = measureLabel(gll);
+
+      assert.closeTo(labelOrigin(gll.labelYAlignment("bottom")).y, POSITION + padding, EPSILON,
+        "\"bottom\" starts one padding below the guide line");
+      assert.closeTo(labelOrigin(gll.labelYAlignment("top")).y, POSITION - padding - height, EPSILON,
+        "\"top\" ends one padding above the guide line");
+      assert.closeTo(labelOrigin(gll.labelYAlignment("center")).y, POSITION - height / 2, EPSILON,
+        "\"center\" straddles the guide line");
+    });
+
+    it("labelXAlignment slides the label along a horizontal guide line", () => {
+      const gll = renderGuideLine("horizontal");
+      const padding = gll.labelPadding();
+      const { width } = measureLabel(gll);
+
+      assert.closeTo(labelOrigin(gll.labelXAlignment("left")).x, padding, EPSILON,
+        "\"left\" sits one padding right of the left edge");
+      assert.closeTo(labelOrigin(gll.labelXAlignment("right")).x, DIV_WIDTH - padding - width, EPSILON,
+        "\"right\" sits one padding left of the right edge");
+      assert.closeTo(labelOrigin(gll.labelXAlignment("center")).x, (DIV_WIDTH - width) / 2, EPSILON,
+        "\"center\" is centered between the left and right edges");
+    });
+
+    it("labelPadding controls the gap between the label and the guide line", () => {
+      const gll = renderGuideLine("vertical").labelXAlignment("right");
+      gll.labelPadding(0);
+      assert.closeTo(labelOrigin(gll).x, POSITION, EPSILON, "zero padding puts the label flush against the line");
+      gll.labelPadding(25);
+      assert.closeTo(labelOrigin(gll).x, POSITION + 25, EPSILON, "the label moves out with the padding");
+    });
+
+    it("moves the label when the guide line moves", () => {
+      const gll = renderGuideLine("vertical").labelXAlignment("right");
+      const padding = gll.labelPadding();
+      assert.closeTo(labelOrigin(gll).x, POSITION + padding, EPSILON, "the label follows the initial position");
+
+      gll.pixelPosition(POSITION + 50);
+      assert.closeTo(labelOrigin(gll).x, POSITION + 50 + padding, EPSILON, "the label follows the new pixel position");
+
+      const scale = new Plottable.Scales.Linear();
+      scale.domain([0, DIV_WIDTH]);
+      gll.scale(scale).value(100);
+      assert.closeTo(labelOrigin(gll).x, scale.scale(100) + padding, EPSILON, "the label follows a scaled value");
+    });
+
+    it("positions the label independently of xAlignment() and yAlignment()", () => {
+      // xAlignment()/yAlignment() place the Component within its parent; because a
+      // GuideLineLayer always fills the space offered to it they cannot move the
+      // label. See https://github.com/palantir/plottable/issues/3526.
+      const gll = renderGuideLine("vertical").labelXAlignment("right").labelYAlignment("top");
+      const before = labelOrigin(gll);
+
+      gll.xAlignment("center").yAlignment("bottom");
+      gll.redraw();
+
+      TestMethods.assertPointsClose(labelOrigin(gll), before, EPSILON,
+        "only labelXAlignment()/labelYAlignment() move the label");
+    });
+
+    it("is inherited by DragLineLayer", () => {
+      const dll = new Plottable.Components.DragLineLayer<number>("vertical");
+      dll.pixelPosition(POSITION).label(LABEL_TEXT).labelXAlignment("right");
+      dll.renderTo(div);
+
+      assert.strictEqual(dll.content().selectAll<Element, any>(`${LABEL_CONTAINER_CLASS} text`).size(), 1,
+        "the drag line draws its label");
+      const [x] = TestMethods.getTranslate(dll.content().select(LABEL_CONTAINER_CLASS));
+      assert.closeTo(x, POSITION + dll.labelPadding(), EPSILON, "the label is placed relative to the drag line");
     });
   });
 });

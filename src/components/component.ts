@@ -395,6 +395,11 @@ export class Component {
   /**
    * Sets the x alignment of the Component.
    *
+   * This positions the Component within the horizontal space its parent offers
+   * it. It has no effect on a Component that accepts all the width it is
+   * offered, and it never moves the Component's own contents; a Component that
+   * needs to place something inside itself exposes its own accessors for that.
+   *
    * @param {string} xAlignment The x alignment of the Component ("left"/"center"/"right").
    * @returns {Component} The calling Component.
    */
@@ -419,6 +424,11 @@ export class Component {
   public yAlignment(): YAlignment;
   /**
    * Sets the y alignment of the Component.
+   *
+   * This positions the Component within the vertical space its parent offers
+   * it. It has no effect on a Component that accepts all the height it is
+   * offered, and it never moves the Component's own contents; a Component that
+   * needs to place something inside itself exposes its own accessors for that.
    *
    * @param {string} yAlignment The y alignment of the Component ("top"/"center"/"bottom").
    * @returns {Component} The calling Component.

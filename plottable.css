@@ -319,6 +319,11 @@
   stroke-width: 1px;
 }
 
+.plottable .guide-line-layer .guide-line-label text {
+  fill: #32313F;
+  font-size: 12px;
+}
+
 .plottable .drag-line-layer.enabled.vertical line.drag-edge {
   cursor: ew-resize;
 }
