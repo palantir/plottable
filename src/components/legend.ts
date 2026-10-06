@@ -563,7 +563,7 @@ export class Legend extends Component {
 
     // clear content from previous renders
     this.content().selectAll("*").remove();
-    const rowsUpdate = this.content().selectAll("g." + Legend.LEGEND_ROW_CLASS).data(table.rows);
+    const rowsUpdate = this.content().selectAll<SVGGElement, LegendRow>("g." + Legend.LEGEND_ROW_CLASS).data(table.rows);
     const rows =
       rowsUpdate
         .enter()
@@ -585,7 +585,7 @@ export class Legend extends Component {
         symbolEntryPairs.push([row.columns[i], row.columns[i + 1]]);
       }
 
-      const entriesUpdate = d3.select(this).selectAll(`g.${Legend.LEGEND_ENTRY_CLASS}`).data(symbolEntryPairs);
+      const entriesUpdate = d3.select(this).selectAll<SVGGElement, SymbolEntryPair>(`g.${Legend.LEGEND_ENTRY_CLASS}`).data(symbolEntryPairs);
       const entriesEnter =
         entriesUpdate
           .enter()

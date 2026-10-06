@@ -88,7 +88,7 @@ export class Plot extends Component {
   /**
    * Mapping from attribute names to the AccessorScale that defines that attribute.
    */
-  private _attrBindings: d3.Map<Plots.IAccessorScaleBinding<any, any>>;
+  private _attrBindings: Map<string, Plots.IAccessorScaleBinding<any, any>>;
   /**
    * Mapping from attribute names to the extents ([min, max]) values that that attribute takes on.
    */
@@ -140,7 +140,7 @@ export class Plot extends Component {
    * registered by the user. By default, only attrs are passed to the
    * _generateDrawStep's attrToProjector; properties are not.
    */
-  protected _propertyBindings: d3.Map<Plots.IAccessorScaleBinding<any, any>>;
+  protected _propertyBindings: Map<string, Plots.IAccessorScaleBinding<any, any>>;
   /**
    * Mapping from property names to the extents ([min, max]) values that that
    * property takes on.
@@ -167,13 +167,13 @@ export class Plot extends Component {
     this._overflowHidden = true;
     this.addClass("plot");
     this._datasetToDrawer = new Utils.Map<Dataset, ProxyDrawer>();
-    this._attrBindings = d3.map<Plots.IAccessorScaleBinding<any, any>>();
+    this._attrBindings = new Map<string, Plots.IAccessorScaleBinding<any, any>>();
     this._includedValuesProvider = (scale: Scale<any, any>, ignoreAnchorState: boolean) => {
       return this._includedValuesForScale(scale, ignoreAnchorState);
     };
     this._renderCallback = () => this.render();
     this._onDatasetUpdateCallback = () => this._onDatasetUpdate();
-    this._propertyBindings = d3.map<Plots.IAccessorScaleBinding<any, any>>();
+    this._propertyBindings = new Map<string, Plots.IAccessorScaleBinding<any, any>>();
     const mainAnimator = new Animators.Easing().maxTotalDuration(Plot._ANIMATION_MAX_DURATION);
     this.animator(Plots.Animator.MAIN, mainAnimator);
     this.animator(Plots.Animator.RESET, new Animators.Null());
@@ -417,7 +417,7 @@ export class Plot extends Component {
   protected _generateAttrToProjector(): AttributeToProjector {
     const h: AttributeToProjector = {};
 
-    this._attrBindings.each((binding, attr) => {
+    this._attrBindings.forEach((binding, attr) => {
       h[attr] = Plot._scaledAccessor(binding);
     });
 
@@ -474,13 +474,13 @@ export class Plot extends Component {
    */
   private _scales() {
     const scales: Scale<any, any>[] = [];
-    this._attrBindings.each((binding, attr) => {
+    this._attrBindings.forEach((binding, attr) => {
       const scale = binding.scale;
       if (scale != null && scales.indexOf(scale) === -1) {
         scales.push(scale);
       }
     });
-    this._propertyBindings.each((binding, property) => {
+    this._propertyBindings.forEach((binding, property) => {
       const scale = binding.scale;
       if (scale != null && scales.indexOf(scale) === -1) {
         scales.push(scale);
@@ -545,7 +545,7 @@ export class Plot extends Component {
     }
 
     let includedValues: D[] = [];
-    this._attrBindings.each((binding, attr) => {
+    this._attrBindings.forEach((binding, attr) => {
       if (binding.scale === scale) {
         const extents = this.getExtentsForAttr(attr);
         if (extents != null) {
@@ -554,7 +554,7 @@ export class Plot extends Component {
       }
     });
 
-    this._propertyBindings.each((binding, property) => {
+    this._propertyBindings.forEach((binding, property) => {
       if (binding.scale === scale) {
         const extents = this.getExtentsForProperty(property);
         if (extents != null) {
@@ -718,7 +718,7 @@ export class Plot extends Component {
       for (let datumIndex = 0; datumIndex < dataLen; datumIndex++) {
         const datum = data[datumIndex];
         const position = this._pixelPoint(datum, datumIndex, dataset);
-        if (Utils.Math.isNaN(position.x) || Utils.Math.isNaN(position.y)) {
+        if (!Utils.Math.isValidNumber(position.x) || !Utils.Math.isValidNumber(position.y)) {
           continue;
         }
 

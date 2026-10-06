@@ -185,7 +185,7 @@ export class Numeric extends Axis<number> {
     }
 
     const tickLabelValues = this._getTickValues();
-    const tickLabelsUpdate = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS).data(tickLabelValues);
+    const tickLabelsUpdate = this._tickLabelContainer.selectAll<SVGTextElement, number>("." + Axis.TICK_LABEL_CLASS).data(tickLabelValues);
     tickLabelsUpdate.exit().remove();
 
     const tickLabels =

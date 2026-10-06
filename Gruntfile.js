@@ -38,15 +38,6 @@ module.exports = function(grunt) {
     }
   };
 
-  var blanketMochaConfig = {
-    all: ["test/coverage.html"],
-    options: {
-      // disable coverage for the time being since we intend to replace grunt-blanket-mocha
-      threshold: 0,
-      reporter: "spec"
-    }
-  };
-
   var connectConfig = {
     server: {
       options: {
@@ -64,7 +55,6 @@ module.exports = function(grunt) {
     eslint: eslintConfig,
     exec: execConfig,
     watch: watchConfig,
-    "blanket_mocha": blanketMochaConfig,
     connect: connectConfig,
   });
 
@@ -80,7 +70,7 @@ module.exports = function(grunt) {
   grunt.registerTask("default", ["exec:yarn:start"]);
 
   grunt.registerTask("test", ["dev-compile", "test-local"]);
-  grunt.registerTask("test-local", ["blanket_mocha"]);
+  grunt.registerTask("test-local", ["exec:yarn:test:browser"]);
 
   grunt.registerTask("watch-quicktests", function() {
     // Surpresses the "Running 'foo' task" messages

@@ -29,7 +29,7 @@ export class Category extends Scale<string, number> implements ITransformableSca
    * *Transformation Space* and transformed to screen space in methods like
    * `rangeBand()` and `stepWidth()`.
    */
-  private _d3TransformationScale: d3.ScaleLinear<number, number>;
+  private _d3TransformationScale: d3.ScaleLinear<number, number, number>;
 
   private _d3Scale: d3.ScaleBand<string>;
   private _range = [0, 1];
@@ -47,7 +47,7 @@ export class Category extends Scale<string, number> implements ITransformableSca
     this._d3Scale = d3.scaleBand<string>();
     this._d3Scale.range(TRANSFORMATION_SPACE);
 
-    this._d3TransformationScale = d3.scaleLinear<number, number>();
+    this._d3TransformationScale = d3.scaleLinear<number, number>().unknown(NaN);
     this._d3TransformationScale.domain(TRANSFORMATION_SPACE);
 
     const d3InnerPadding = 0.3;

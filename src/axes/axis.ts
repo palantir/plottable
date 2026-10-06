@@ -267,7 +267,7 @@ export class Axis<D> extends Component {
    */
   public renderImmediately() {
     const tickMarkValues = this._getTickValues();
-    const tickMarksUpdate = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickMarkValues);
+    const tickMarksUpdate = this._tickMarkContainer.selectAll<SVGLineElement, D>("." + Axis.TICK_MARK_CLASS).data(tickMarkValues);
     const tickMarks =
       tickMarksUpdate
         .enter()

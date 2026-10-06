@@ -4,7 +4,6 @@
  */
 
 import * as d3 from "d3";
-import * as d3Shape from "d3-shape";
 
 import * as Animators from "../animators";
 import { Dataset } from "../core/dataset";
@@ -16,6 +15,7 @@ import * as Scales from "../scales";
 import { QuantitativeScale } from "../scales/quantitativeScale";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
+import { withFullPrecision } from "../utils/d3ShapeUtils";
 import { makeEnum } from "../utils/makeEnum";
 import * as Plots from "./";
 import { IPlotEntity } from "./";
@@ -488,14 +488,14 @@ export class Line<X> extends XYPlot<X, number> {
   protected _d3LineFactory(
     dataset: Dataset,
     xProjector = Plot._scaledAccessor(this.x()),
-    yProjector = Plot._scaledAccessor(this.y())): d3Shape.Line<any> {
+    yProjector = Plot._scaledAccessor(this.y())): d3.Line<any> {
     const definedProjector = (d: any, i: number, dataset: Dataset) => {
       const positionX = xProjector(d, i, dataset);
       const positionY = yProjector(d, i, dataset);
       return Utils.Math.isValidNumber(positionX) && Utils.Math.isValidNumber(positionY);
     };
 
-    return d3.line()
+    return withFullPrecision(d3.line())
       .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
       .y((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
       .curve(this._getCurveFactory())

@@ -8,14 +8,14 @@ import * as d3 from "d3";
 import { QuantitativeScale } from "./quantitativeScale";
 
 export class Log extends QuantitativeScale<number> {
-  private _d3Scale: d3.ScaleLogarithmic<number, number>;
+  private _d3Scale: d3.ScaleLogarithmic<number, number, number>;
 
   /**
    * @constructor
    */
   constructor(base = 10) {
     super();
-    this._d3Scale = d3.scaleLog().base(base);
+    this._d3Scale = d3.scaleLog().base(base).unknown(NaN);
     this._setDomain(this._defaultExtent());
   }
 
@@ -32,7 +32,7 @@ export class Log extends QuantitativeScale<number> {
   }
 
   public scale(value: number) {
-    return this._d3Scale(value);
+    return this._d3Scale(+value);
   }
 
   public scaleTransformation(value: number) {

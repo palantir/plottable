@@ -353,9 +353,9 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
       return (<Scales.Category> scale).rangeBand();
     } else {
       const accessor = scale === this.x().scale ? this.x().accessor : this.y().accessor;
-      const accessorData = d3.set(Utils.Array.flatten(this.datasets().map((dataset) => {
+      const accessorData = Utils.Array.uniq(Utils.Array.flatten(this.datasets().map((dataset) => {
         return dataset.data().map((d, i) => accessor(d, i, dataset).valueOf());
-      }))).values().map((value) => +value);
+      }))).map((value) => +value);
       // Get the absolute difference between min and max
       const min = Utils.Math.min(accessorData, 0);
       const max = Utils.Math.max(accessorData, 0);

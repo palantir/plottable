@@ -43,6 +43,28 @@ class ImplicitSeriesTracker {
   }
 }
 
+// Preserve the public D3 4 palette names removed in D3 5.
+const CATEGORY20 = [
+  "#1f77b4", "#aec7e8", "#ff7f0e", "#ffbb78", "#2ca02c",
+  "#98df8a", "#d62728", "#ff9896", "#9467bd", "#c5b0d5",
+  "#8c564b", "#c49c94", "#e377c2", "#f7b6d2", "#7f7f7f",
+  "#c7c7c7", "#bcbd22", "#dbdb8d", "#17becf", "#9edae5",
+];
+
+const CATEGORY20B = [
+  "#393b79", "#5254a3", "#6b6ecf", "#9c9ede", "#637939",
+  "#8ca252", "#b5cf6b", "#cedb9c", "#8c6d31", "#bd9e39",
+  "#e7ba52", "#e7cb94", "#843c39", "#ad494a", "#d6616b",
+  "#e7969c", "#7b4173", "#a55194", "#ce6dbd", "#de9ed6",
+];
+
+const CATEGORY20C = [
+  "#3182bd", "#6baed6", "#9ecae1", "#c6dbef", "#e6550d",
+  "#fd8d3c", "#fdae6b", "#fdd0a2", "#31a354", "#74c476",
+  "#a1d99b", "#c7e9c0", "#756bb1", "#9e9ac8", "#bcbddc",
+  "#dadaeb", "#636363", "#969696", "#bdbdbd", "#d9d9d9",
+];
+
 export class Color extends Scale<string, string> {
 
   private static _LOOP_LIGHTEN_FACTOR = 1.6;
@@ -83,17 +105,17 @@ export class Color extends Scale<string, string> {
       case "Category20":
       case "category20":
       case "20":
-        scale = d3.scaleOrdinal(d3.schemeCategory20);
+        scale = d3.scaleOrdinal(CATEGORY20);
         break;
       case "Category20b":
       case "category20b":
       case "20b":
-        scale = d3.scaleOrdinal(d3.schemeCategory20b);
+        scale = d3.scaleOrdinal(CATEGORY20B);
         break;
       case "Category20c":
       case "category20c":
       case "20c":
-        scale = d3.scaleOrdinal(d3.schemeCategory20c);
+        scale = d3.scaleOrdinal(CATEGORY20C);
         break;
       default:
         throw new Error("Unsupported ColorScale type");

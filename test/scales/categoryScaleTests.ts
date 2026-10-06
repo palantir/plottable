@@ -14,6 +14,15 @@ describe("Scales", () => {
         scale = new Plottable.Scales.Category();
       });
 
+      it("returns NaN for categories outside the domain and invalid transformed values", () => {
+        scale.domain(["known"]).range([0, 100]);
+        assert.isTrue(Plottable.Utils.Math.isNaN(scale.scale("missing")), "unknown categories remain invalid numeric positions");
+        assert.isTrue(Plottable.Utils.Math.isNaN(scale.scaleTransformation(NaN)), "invalid transformed positions remain NaN");
+        assert.isTrue(Plottable.Utils.Math.isNaN(scale.cloneWithoutProviders().scale("missing")),
+          "cloned scales preserve unknown-value behavior");
+        assert.strictEqual(scale.scale("known"), 50, "known categories still scale normally");
+      });
+
       it("updates rangeBand when domain changes", () => {
         scale.range([0, 2679]);
 
