@@ -3,20 +3,20 @@ version: 2.1
 references:
   setup_env: &setup_env
     docker:
-      - image: cimg/node:22.12.0
+      - image: cimg/node:24.21.0
   setup_env_browser: &setup_env_browser
     docker:
-      - image: cimg/node:22.12.0-browsers
+      - image: cimg/node:24.21.0-browsers
         environment:
             CHROME_BIN: "/usr/bin/google-chrome"
   save_cache: &save_cache
-    key: v1-dependency-cache-{{ checksum "yarn.lock" }}
+    key: v2-dependency-cache-{{ checksum "yarn.lock" }}
     paths:
       - node_modules
   restore_cache: &restore_cache
     keys:
-      - v1-dependency-cache-{{ checksum "yarn.lock" }}
-      - v1-dependency-cache-
+      - v2-dependency-cache-{{ checksum "yarn.lock" }}
+      - v2-dependency-cache-
   persist_to_workspace: &persist_to_workspace
     root: '.'
     paths:
@@ -95,8 +95,12 @@ jobs:
       - restore_cache: *restore_cache
       - run: git diff HEAD..origin/develop --quiet || (echo "dist not built"; exit 1)
       - run: npm run -s check_version || (echo "package.json version not updated"; exit 1)
-      - run: ./scripts/authenticateNpm.sh
-      - run: npm publish
+      - run:
+          name: Publish release using CircleCI OIDC
+          command: |
+            NPM_ID_TOKEN="$(circleci run oidc get --claims '{"aud": "npm:registry.npmjs.org"}')"
+            export NPM_ID_TOKEN
+            npm publish
       - persist_to_workspace: *persist_to_workspace
 
   publish-snapshot:
@@ -106,8 +110,12 @@ jobs:
       - attach_workspace:
           at: '.'
       - restore_cache: *restore_cache
-      - run: ./scripts/authenticateNpm.sh
-      - run: ./scripts/publishSnapshot.sh
+      - run:
+          name: Publish snapshot using CircleCI OIDC
+          command: |
+            NPM_ID_TOKEN="$(circleci run oidc get --claims '{"aud": "npm:registry.npmjs.org"}')"
+            export NPM_ID_TOKEN
+            ./scripts/publishSnapshot.sh
       - persist_to_workspace: *persist_to_workspace
 
 workflows:
