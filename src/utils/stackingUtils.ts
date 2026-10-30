@@ -6,7 +6,7 @@
 import { Dataset } from "../core/dataset";
 import { IAccessor } from "../core/interfaces";
 
-import type { MemoizedFunction } from "lodash";
+import type { MapCache, MemoizedFunction } from "lodash";
 import memoize from "lodash-es/memoize";
 import * as Utils from "./";
 import { makeEnum } from "./makeEnum";
@@ -176,6 +176,43 @@ export function stackedExtent(stackingResult: StackingResult, keyAccessor: IAcce
 }
 
 /**
+ * A lodash `MapCache` backed by a `WeakMap`, so each cached string is
+ * released once its key object (such as a `Date`) is garbage collected.
+ * Primitive keys are never cached: a `WeakMap` cannot hold them, and
+ * `String()` on a primitive costs no more than a cache lookup.
+ */
+class WeakKeyCache implements MapCache {
+  private map: WeakMap<object, string> = new WeakMap<object, string>();
+
+  public get(key: any): any {
+    return this.isObjectKey(key) ? this.map.get(key) : undefined;
+  }
+
+  public has(key: any): boolean {
+    return this.isObjectKey(key) && this.map.has(key);
+  }
+
+  public set(key: any, value: any) {
+    if (this.isObjectKey(key)) {
+      this.map.set(key, value);
+    }
+    return this;
+  }
+
+  public delete(key: any): boolean {
+    return this.isObjectKey(key) && this.map.delete(key);
+  }
+
+  public clear(): void {
+    this.map = new WeakMap<object, string>();
+  }
+
+  private isObjectKey(key: any): key is object {
+    return typeof key === "object" && key !== null;
+  }
+}
+
+/**
  * Normalizes a key used for stacking
  *
  * @param {any} key The key to be normalized
@@ -184,3 +221,4 @@ export function stackedExtent(stackingResult: StackingResult, keyAccessor: IAcce
 export const normalizeKey = memoize((key: any) => {
   return String(key);
 }) as ((key: any) => string) & MemoizedFunction;
+normalizeKey.cache = new WeakKeyCache();

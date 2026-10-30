@@ -1,4 +1,5 @@
 import { assert } from "chai";
+import * as sinon from "sinon";
 
 import * as Plottable from "../../src";
 
@@ -164,6 +165,28 @@ describe("Utils", () => {
 
       assert.deepEqual(stackExtents[0], expectedStackExtents[0], "Fred has the smallest minimum stack");
       assert.deepEqual(stackExtents[1], expectedStackExtents[1], "Fred has the largest maximum stack");
+    });
+
+    it("stack() works with null and undefined keys", () => {
+      const data1: {key: string, value: number}[] = [{key: null, value: 1}, {key: undefined, value: 2}];
+      const data2: {key: string, value: number}[] = [{key: null, value: 3}, {key: undefined, value: 4}];
+
+      const datasets = createDatasets([data1, data2]);
+      const stackingResult = Plottable.Utils.Stacking.stack(datasets, keyAccessor, valueAccessor);
+
+      assert.strictEqual(stackingResult.get(datasets[1]).get("null").offset, 1, "null keys stack together");
+      assert.strictEqual(stackingResult.get(datasets[1]).get("undefined").offset, 2, "undefined keys stack together");
+    });
+
+    it("normalizeKey() stringifies a Date key only once", () => {
+      const date = new Date(0);
+      const toStringSpy = sinon.spy(date, "toString");
+
+      const firstKey = Plottable.Utils.Stacking.normalizeKey(date);
+      const secondKey = Plottable.Utils.Stacking.normalizeKey(date);
+
+      assert.strictEqual(secondKey, firstKey, "repeated calls return the same key");
+      assert.strictEqual(toStringSpy.callCount, 1, "the Date is stringified only once");
     });
   });
 });
