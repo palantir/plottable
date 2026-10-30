@@ -226,6 +226,26 @@ describe("Plots", () => {
 
         div.remove();
       });
+
+      it("autodomains against the new ranges after a zero-size layout", () => {
+        const xScale = new Plottable.Scales.Linear();
+        const yScale = new Plottable.Scales.Linear();
+        const plot = new Plottable.XYPlot<number, number>();
+        plot.addDataset(new Plottable.Dataset(TestMethods.makeLinearSeries(5)));
+        plot.x((d) => d.x, xScale).y((d) => d.y, yScale);
+        plot.anchor(div);
+        plot.computeLayout();
+        const xDomain = xScale.domain();
+        const yDomain = yScale.domain();
+
+        plot.computeLayout({ x: 0, y: 0 }, 0, 0);
+        plot.computeLayout();
+
+        assert.deepEqual(xScale.domain(), xDomain, "x domain is restored");
+        assert.deepEqual(yScale.domain(), yDomain, "y domain is restored");
+
+        div.remove();
+      });
     });
 
     describe("managing the x property", () => {
