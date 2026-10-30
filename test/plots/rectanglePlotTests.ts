@@ -156,6 +156,18 @@ describe("Plots", () => {
         div.remove();
       });
 
+      it("retrieves the entity's own rectangle after an invalid datum", () => {
+        const data = createNonIntersectingRectangleData(3);
+        data[1].x = NaN;
+        plot.addDataset(new Plottable.Dataset(data));
+        plot.renderTo(div);
+
+        const entities = plot.entities();
+        assert.lengthOf(entities, 2, "no entity for the invalid datum");
+        assert.strictEqual(entities[1].selection.node(), plot.selections().nodes()[1], "entity selects the rectangle at index 2");
+        div.remove();
+      });
+
       it("retrieves undefined from entityNearest when no entities are rendered", () => {
         plot.addDataset(new Plottable.Dataset([]));
         plot.renderTo(div);

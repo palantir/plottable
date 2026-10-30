@@ -618,6 +618,13 @@ describe("Plots", () => {
           };
         }
 
+        it("returns the Entity's own bar after an invalid datum", () => {
+          dataset.data([data[0], { base: 0, value: NaN }, data[2]]);
+          const entities = barPlot.entities();
+          assert.lengthOf(entities, 2, "no Entity for the invalid datum");
+          TestMethods.assertPlotEntitiesEqual(entities[1], expectedEntityForIndex(2, 1), "Entity corresponds to bar 2");
+        });
+
         describe("retrieving the nearest Entity", () => {
           function testEntityNearest() {
             data.forEach((datum, index) => {
