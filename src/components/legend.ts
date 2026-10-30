@@ -272,11 +272,18 @@ export class Legend extends Component {
 
   protected _setup() {
     super._setup();
-    const fakeLegendRow = this.content().append("g").classed(Legend.LEGEND_ROW_CLASS, true);
+    // Keep the row out of content() except while measuring, since renderImmediately() clears content()
+    const fakeLegendRow = d3.create("svg:g").classed(Legend.LEGEND_ROW_CLASS, true);
     const fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
     fakeLegendEntry.append("text");
     const context = new Typesettable.SvgContext(fakeLegendRow.node() as SVGElement, null, Configs.ADD_TITLE_ELEMENTS);
-    this._measurer = new Typesettable.CacheMeasurer(context);
+    const ruler = context.createRuler();
+    this._measurer = new Typesettable.CacheMeasurer((text: string) => {
+      this.content().append(() => fakeLegendRow.node());
+      const dimensions = ruler(text);
+      fakeLegendRow.remove();
+      return dimensions;
+    });
     this._wrapper = new Typesettable.Wrapper().maxLines(this.maxLinesPerEntry());
     this._writer = new Typesettable.Writer(this._measurer, context, this._wrapper);
   }
