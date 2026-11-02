@@ -249,8 +249,7 @@ describe("Legend", () => {
       div.remove();
     });
 
-    // Failed after upgrade to typescript 2.7
-    xit("scales icon sizes properly with font size", () => {
+    it("scales icon sizes properly with font size", () => {
       color.domain(["foo"]);
       legend.renderTo(div);
       const style = div.append("style");
