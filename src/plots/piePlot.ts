@@ -75,6 +75,7 @@ export class Pie extends Plot {
     if (this.outerRadius().scale != null) {
       this.outerRadius().scale.range([0, radiusLimit]);
     }
+    this._updateExtents();
     return this;
   }
 

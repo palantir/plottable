@@ -295,6 +295,7 @@ export class XYPlot<X, Y> extends Plot {
         yScale.range([this.height(), 0]);
       }
     }
+    this._updateExtents();
     return this;
   }
 

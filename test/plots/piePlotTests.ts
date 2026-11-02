@@ -165,6 +165,20 @@ describe("Plots", () => {
         div.remove();
       });
 
+      it("autodomains the outerRadius() scale against the new range after a zero-size layout", () => {
+        const radiusScale = new Plottable.Scales.Linear();
+        piePlot.outerRadius((d) => d.value, radiusScale);
+        piePlot.computeLayout();
+        const radiusDomain = radiusScale.domain();
+
+        piePlot.computeLayout({ x: 0, y: 0 }, 0, 0);
+        piePlot.computeLayout();
+
+        assert.deepEqual(radiusScale.domain(), radiusDomain, "radius domain is restored");
+
+        div.remove();
+      });
+
       it("can set startAngle()", () => {
         const expectedStartAngle = Math.PI;
         assert.strictEqual(piePlot.startAngle(expectedStartAngle), piePlot, "setter returns the calling pie plot");
