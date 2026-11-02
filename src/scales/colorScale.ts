@@ -24,14 +24,14 @@ import { Scale } from "./scale";
  */
 class ImplicitSeriesTracker {
   public count = 0;
-  private tracker: Record<string, number> = {};
+  private tracker = new Map<string, number>();
 
   public getIndex(value: string) {
-    if (this.tracker[value] != null) {
-      return this.tracker[value];
+    if (this.tracker.has(value)) {
+      return this.tracker.get(value);
     } else{
       const idx = this.count;
-      this.tracker[value] = idx;
+      this.tracker.set(value, idx);
       this.count += 1;
       return idx;
     }
@@ -39,7 +39,7 @@ class ImplicitSeriesTracker {
 
   public clear() {
     this.count = 0;
-    this.tracker = {};
+    this.tracker.clear();
   }
 }
 

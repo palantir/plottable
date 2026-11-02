@@ -51,6 +51,14 @@ describe("Scales", () => {
         assert.deepEqual(d3.color(scale.scale("no")), d3.color(defaultColors[1]), "second color used for second option");
         assert.deepEqual(d3.color(scale.scale("maybe")), d3.color(defaultColors[2]), "third color used for third option");
       });
+
+      it("maps values named like Object.prototype properties to range colors", () => {
+        const domain = ["constructor", "toString", "__proto__", "hasOwnProperty"];
+        scale.domain(domain);
+        domain.forEach((value, i) => {
+          assert.deepEqual(d3.color(scale.scale(value)), d3.color(defaultColors[i]), `${value} uses color ${i}`);
+        });
+      });
     });
 
     describe("CSS integration", () => {
