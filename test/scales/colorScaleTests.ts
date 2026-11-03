@@ -12,6 +12,7 @@ describe("Scales", () => {
         "#5279c7", "#fd373e", "#63c261", "#fad419", "#2c2b6f",
         "#ff7939", "#db2e65", "#99ce50", "#962565", "#06cccc",
       ];
+      const colorRange = ["#5279c7", "#fd373e"];
 
       let scale: Plottable.Scales.Color;
 
@@ -24,7 +25,6 @@ describe("Scales", () => {
       });
 
       it("uses altered colors if size of domain exceeds size of range", () => {
-        const colorRange = ["#5279c7", "#fd373e"];
         scale.range(colorRange);
         scale.domain(["a", "b", "c"]);
         assert.deepEqual(d3.color(scale.scale("a")), d3.color(colorRange[0]), "first color is used");
@@ -35,6 +35,23 @@ describe("Scales", () => {
         assert.operator(alteredColor1.r, ">", color1.r, "The resulting color should be lighter in the red component");
         assert.operator(alteredColor1.g, ">", color1.g, "The resulting color should be lighter in the green component");
         assert.operator(alteredColor1.b, ">", color1.b, "The resulting color should be lighter in the blue component");
+      });
+
+      it("lightens repeated colors by domain position regardless of call order", () => {
+        const domain = ["a", "b", "c"];
+        scale.range(colorRange).domain(domain);
+        const colorsInDomainOrder = domain.map((value) => scale.scale(value));
+        scale.domain(domain);
+        const colorsInReverseOrder = domain.slice().reverse().map((value) => scale.scale(value)).reverse();
+        assert.deepEqual(colorsInReverseOrder, colorsInDomainOrder, "colors do not depend on the order of scale() calls");
+      });
+
+      it("matches values to the domain by string", () => {
+        scale.domain(["1", "2"]);
+        assert.strictEqual(scale.scale(<any> 1), scale.scale("1"), "1 and \"1\" share a color");
+        scale.scale(<any> 3);
+        scale.scale("3");
+        assert.deepEqual(scale.domain(), ["1", "2", 3], "the domain grows once per string value and keeps the first value");
       });
 
       it("interprets named color values correctly", () => {

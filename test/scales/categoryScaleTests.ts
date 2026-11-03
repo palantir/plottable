@@ -23,6 +23,18 @@ describe("Scales", () => {
         assert.strictEqual(scale.scale("known"), 50, "known categories still scale normally");
       });
 
+      it("matches values to the domain by string", () => {
+        scale.domain(["1", "2"]).range([0, 100]);
+        assert.strictEqual(scale.scale(<any> 1), scale.scale("1"), "1 and \"1\" are the same category");
+        assert.deepEqual(scale.domain(), ["1", "2"], "the domain keeps its original values");
+      });
+
+      it("dedupes the domain by string and keeps the first value", () => {
+        scale.domain(<any> [1, "1", 2]);
+        assert.deepEqual(scale.domain(), [1, 2], "the domain keeps the first of 1 and \"1\"");
+        assert.deepEqual(scale.invertRange(), [1, 2], "invertRange returns the original domain values");
+      });
+
       it("updates rangeBand when domain changes", () => {
         scale.range([0, 2679]);
 
