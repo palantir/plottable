@@ -9,7 +9,9 @@ import * as Utils from "../utils";
 
 import { Scale } from "./scale";
 
-type SupportedScale = d3.ScaleLinear<number, string> | d3.ScaleLogarithmic<number, string> | d3.ScalePower<number, string>;
+const UNKNOWN_COLOR = "rgb(0, 0, 0)";
+
+type SupportedScale = d3.ScaleLinear<number, string, string> | d3.ScaleLogarithmic<number, string, string> | d3.ScalePower<number, string, string>;
 
 export class InterpolatedColor extends Scale<number, string> {
   public static REDS = [
@@ -66,16 +68,16 @@ export class InterpolatedColor extends Scale<number, string> {
     super();
     switch (scaleType) {
       case "linear":
-        this._colorScale = d3.scaleLinear<number, string>();
+        this._colorScale = d3.scaleLinear<number, string>().unknown(UNKNOWN_COLOR);
         break;
       case "log":
-        this._colorScale = d3.scaleLog<number, string>();
+        this._colorScale = d3.scaleLog<number, string>().unknown(UNKNOWN_COLOR);
         break;
       case "sqrt":
-        this._colorScale = d3.scaleSqrt<number, string>();
+        this._colorScale = d3.scaleSqrt<number, string>().unknown(UNKNOWN_COLOR);
         break;
       case "pow":
-        this._colorScale = d3.scalePow<number, string>();
+        this._colorScale = d3.scalePow<number, string>().unknown(UNKNOWN_COLOR);
         break;
     }
     if (this._colorScale == null) {
