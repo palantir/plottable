@@ -449,6 +449,16 @@ describe("Plots", () => {
           assert.strictEqual(texts.size(), 0, "no labels drawn");
         });
 
+        it("lets stylesheets override the default label font size but not an explicit one", () => {
+          div.append("style").text(".plottable .bar-label-text-area text { font-size: 16px; }");
+          barPlot.labelsEnabled(true);
+          const renderedFontSize = () => barPlot.content().select(".bar-label-text-area text").style("font-size");
+
+          assert.strictEqual(renderedFontSize(), "16px", "stylesheet overrides the default size");
+          barPlot.labelFontSize(14);
+          assert.strictEqual(renderedFontSize(), "14px", "explicit size overrides the stylesheet");
+        });
+
         it("can apply a formatter to the labels", () => {
           barPlot.labelsEnabled(true);
           const formatter = (n: number) => `${n}%`;

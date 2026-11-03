@@ -699,4 +699,21 @@ describe("Axis", () => {
       assert.isUndefined(axis.tickLabelDataOnElement(null));
     });
   });
+
+  describe("tickLabelFontSize", () => {
+    it("lets stylesheets override the default size but not an explicit one", () => {
+      const div = TestMethods.generateDiv();
+      div.append("style").text(".plottable .axis text { font-size: 16px; }");
+      const axis = new Plottable.Axes.Numeric(new Plottable.Scales.Linear(), "left");
+      axis.renderTo(div);
+      const renderedFontSize = () => axis.content().select(`.${Plottable.Axis.TICK_LABEL_CLASS}`).style("font-size");
+
+      assert.strictEqual(renderedFontSize(), "16px", "stylesheet overrides the default size");
+      axis.tickLabelFontSize(14);
+      assert.strictEqual(renderedFontSize(), "14px", "explicit size overrides the stylesheet");
+
+      axis.destroy();
+      div.remove();
+    });
+  });
 });
