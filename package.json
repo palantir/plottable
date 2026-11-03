@@ -21,11 +21,12 @@
     "lint": "npm-run-all lint:tslint lint:eslint",
     "lint:eslint": "grunt eslint",
     "lint:tslint": "tslint --project tsconfig.json",
-    "start": "npm-run-all -p start:update-quicktests start:watch-tsc start:watch-quicktests start:webpack-dev-server",
+    "start": "npm-run-all -p start:update-quicktests start:watch-tsc start:watch-quicktests start:watch-webpack start:server",
+    "start:server": "grunt connect:server:keepalive",
     "start:update-quicktests": "grunt update-quicktests",
     "start:watch-quicktests": "grunt watch-quicktests",
     "start:watch-tsc": "tsc -w -p .",
-    "start:webpack-dev-server": "webpack-dev-server",
+    "start:watch-webpack": "webpack --watch",
     "test": "grunt test-local",
     "test:ci": "grunt test-ci",
     "test:browser": "node scripts/test-browser.js"
@@ -58,7 +59,6 @@
     "tslint": "5.18.0",
     "typescript": "~5.9.3",
     "webpack": "2.6.1",
-    "webpack-dev-server": "2.11.1",
     "webpack-merge": "^4.1.0"
   },
   "dependencies": {

@@ -12,11 +12,6 @@ const packageJson = require("../package.json");
  */
 module.exports = {
   devtool: "source-map",
-  devServer: {
-    compress: true,
-    port: 9999,
-    inline: false
-  },
   entry: "./test/index.ts",
   output: {
     filename: "test/tests.js"
