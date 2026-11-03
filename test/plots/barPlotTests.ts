@@ -648,6 +648,19 @@ describe("Plots", () => {
             testEntityNearest();
           });
 
+          it("returns the bar drawn last when bars overlap", () => {
+            // Six bars split the plot's R-tree, whose internal order then differs from drawing order
+            const overlappingDataset = new Plottable.Dataset(data);
+            barPlot.addDataset(overlappingDataset);
+            data.forEach((datum, index) => {
+              const barBasePosition = baseScale.scale(datum.base);
+              const halfwayValuePosition = valueScale.scale((barPlot.baselineValue() + datum.value) / 2);
+              const pointInsideBars = getPointFromBaseAndValuePositions(barBasePosition, halfwayValuePosition);
+              const nearestEntity = barPlot.entityNearest(pointInsideBars);
+              assert.strictEqual(nearestEntity.dataset, overlappingDataset, `retrieves the Entity drawn on top (index ${index})`);
+            });
+          });
+
           it("returns the closest visible bar", () => {
             const baseValuebetweenBars = (data[0].base + data[1].base) / 2;
             baseScale.domain([baseValuebetweenBars , DEFAULT_DOMAIN[1]]); // cuts off bar 0

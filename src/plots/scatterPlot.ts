@@ -225,6 +225,35 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
     });
   }
 
+  /**
+   * Returns the {Plots.PlotEntity} nearest to the query point,
+   * or undefined if no {Plots.PlotEntity} can be found.
+   *
+   * If the query point is inside several Entities' bounding boxes, returns the
+   * one whose position is nearest, then the one drawn last.
+   *
+   * @param {Point} queryPoint
+   * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no {Plots.PlotEntity} can be found.
+   */
+  public entityNearest(queryPoint: Point): IPlotEntity {
+    const containing = this._getEntityStore().entitiesInBounds({ x: queryPoint.x, y: queryPoint.y, width: 0, height: 0 });
+    if (containing.length === 0) {
+      return super.entityNearest(queryPoint);
+    }
+
+    containing.sort((a, b) => a.datasetIndex - b.datasetIndex || a.index - b.index);
+    let nearest: ILightweightPlotEntity;
+    let minDistSquared = Infinity;
+    containing.forEach((entity) => {
+      const distSquared = Utils.Math.distanceSquared(entity.position, queryPoint);
+      if (distSquared <= minDistSquared) {
+        nearest = entity;
+        minDistSquared = distSquared;
+      }
+    });
+    return this._lightweightPlotEntityToPlotEntity(nearest);
+  }
+
  /**
    * Get whether bar labels are enabled.
    *

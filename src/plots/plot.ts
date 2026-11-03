@@ -909,6 +909,8 @@ export class Plot extends Component {
    * Returns the {Plots.PlotEntity} nearest to the query point,
    * or undefined if no {Plots.PlotEntity} can be found.
    *
+   * If several Entities are equally near, returns the one drawn last (the last Dataset, then the last datum).
+   *
    * @param {Point} queryPoint
    * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no {Plots.PlotEntity} can be found.
    */

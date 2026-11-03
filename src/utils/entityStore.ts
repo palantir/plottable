@@ -32,7 +32,8 @@ export interface IEntityStore<T extends IPositionedEntity> {
   addAll(entities: T[], entityBoundsFactory: (entity: T) => IEntityBounds, bounds?: Bounds): void;
 
   /**
-   * Returns the entity closest to a given {Point}
+   * Returns the entity closest to a given {Point}. Ties are broken in favor of
+   * the entity added last.
    *
    * Note that if a {Bounds} was provided to the `addAll` method, entities
    * outside those bounds will not be returned by this method.
@@ -44,7 +45,8 @@ export interface IEntityStore<T extends IPositionedEntity> {
 
   /**
    * Returns the entity closest to a given {Point} in the x-dimension. Ties are
-   * broken with a sort in the y-dimension.
+   * broken with a sort in the y-dimension, then in favor of the entity added
+   * last.
    *
    * @param {Point} [point] Point around which to search for a closest entity
    * @returns {T} Will return the nearest entity or undefined if none are found
@@ -53,7 +55,8 @@ export interface IEntityStore<T extends IPositionedEntity> {
 
   /**
    * Returns the entity closest to a given {Point} in the y-dimension. Ties are
-   * broken with a sort in the x-dimension.
+   * broken with a sort in the x-dimension, then in favor of the entity added
+   * last.
    *
    * @param {Point} [point] Point around which to search for a closest entity
    * @returns {T} Will return the nearest entity or undefined if none are found

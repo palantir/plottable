@@ -166,6 +166,24 @@ describe("Plots", () => {
         assert.strictEqual(closest, undefined, "no datum has been retrieved");
         div.remove();
       });
+
+      it("retrieves the entity drawn last from entityNearest when rectangles overlap", () => {
+        // Ten rectangles split the plot's R-tree, whose internal order then differs from drawing order
+        const data = createNonIntersectingRectangleData(5);
+        plot.addDataset(new Plottable.Dataset(data));
+        const overlappingDataset = new Plottable.Dataset(data);
+        plot.addDataset(overlappingDataset);
+        plot.renderTo(div);
+
+        data.forEach((datum, index) => {
+          const closest = plot.entityNearest({
+            x: xScale.scale(datum.x + 0.5),
+            y: yScale.scale(datum.y + 0.5),
+          });
+          assert.strictEqual(closest.dataset, overlappingDataset, `retrieves the entity drawn on top (index ${index})`);
+        });
+        div.remove();
+      });
     });
 
     describe("autoranging the x and y scales", () => {
