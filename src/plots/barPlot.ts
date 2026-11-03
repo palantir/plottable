@@ -852,6 +852,18 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     return entities;
   }
 
+  /**
+   * Undrawn bars stay in `_getDataToDraw` as null placeholders, so the drawer
+   * indexes each bar's element by its dataset index
+   */
+  protected _buildLightweightPlotEntities(datasets: Dataset[]) {
+    const lightweightPlotEntities = super._buildLightweightPlotEntities(datasets);
+    lightweightPlotEntities.forEach((lightweightPlotEntity) => {
+      lightweightPlotEntity.validDatumIndex = lightweightPlotEntity.index;
+    });
+    return lightweightPlotEntities;
+  }
+
   protected _entityBounds(entity: Plots.IPlotEntity | Plots.ILightweightPlotEntity) {
     const { datum, index, dataset } = entity;
     return this._pixelBounds(datum, index, dataset);

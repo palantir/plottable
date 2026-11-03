@@ -265,6 +265,18 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
     });
   }
 
+  /**
+   * Undrawn rectangles stay in `_getDataToDraw` as null placeholders, so the
+   * drawer indexes each rectangle's element by its dataset index
+   */
+  protected _buildLightweightPlotEntities(datasets: Dataset[]) {
+    const lightweightPlotEntities = super._buildLightweightPlotEntities(datasets);
+    lightweightPlotEntities.forEach((lightweightPlotEntity) => {
+      lightweightPlotEntity.validDatumIndex = lightweightPlotEntity.index;
+    });
+    return lightweightPlotEntities;
+  }
+
   protected _entityBounds(entity: Plots.IPlotEntity | Plots.ILightweightPlotEntity) {
     const { datum, index, dataset } = entity;
     return this._entityBBox(datum, index, dataset, this._getAttrToProjector());
