@@ -77,7 +77,14 @@ export class Dispatcher {
   protected _callCallbacksForEvent(eventName: string, ...args: any[]) {
     const callbackSet = this._eventNameToCallbackSet[eventName];
     if (callbackSet != null) {
-      callbackSet.callCallbacks.apply(callbackSet, args);
+      // Interactions can resubscribe while handling an event, which Set.forEach would visit again
+      const callbacks: Function[] = [];
+      callbackSet.forEach((callback) => callbacks.push(callback));
+      callbacks.forEach((callback) => {
+        if (callbackSet.has(callback)) {
+          callback.apply(callbackSet, args);
+        }
+      });
     }
   }
 }
