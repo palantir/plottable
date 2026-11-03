@@ -83,10 +83,14 @@ export function createMinimizingNodePredicate<T>(point: Point, nearFn: IDistance
 
 /**
  * Create a `Array.sort` function from a query point and a distance function.
+ *
+ * Nodes are sorted from farthest to nearest. Ties are sorted from first
+ * inserted to last inserted.
  */
 export function createNodeSort<T>(point: Point, distanceFn: IDistanceFunction) {
     return (a: RTreeNode<T>, b: RTreeNode<T>) => {
-        return distanceFn(b.bounds, point) - distanceFn(a.bounds, point);
+        const distanceDifference = distanceFn(b.bounds, point) - distanceFn(a.bounds, point);
+        return distanceDifference !== 0 ? distanceDifference : a.insertionIndex - b.insertionIndex;
     };
 }
 
@@ -134,6 +138,7 @@ export class RTree<T> {
 
         // Insert new value node into leaf node
         const valueNode = RTreeNode.valueNode<T>(bounds, value);
+        valueNode.insertionIndex = this.size;
         node.insert(valueNode);
         this.size += 1;
 
@@ -157,6 +162,9 @@ export class RTree<T> {
      * Nearness is measured as the absolute distance from the query point to the
      * nearest edge of the node bounds. If the node bounds contains the query
      * point, the distance is 0.
+     *
+     * The results are equally near and sorted by insertion order, ending with
+     * the last inserted value.
      */
     public locateNearest(xy: Point) {
         const predicate = createMinimizingNodePredicate(
@@ -165,6 +173,7 @@ export class RTree<T> {
             RTreeBounds.distanceSquaredToFarEdge,
         );
         const nodes = this.queryNodes(predicate);
+        nodes.sort((a, b) => a.insertionIndex - b.insertionIndex);
         return nodes.map((node) => node.value);
     }
 
@@ -175,7 +184,8 @@ export class RTree<T> {
      * query's x point to the nearest edge of the node bounds. If the node
      * bounds contains the query point, the distance is 0.
      *
-     * The results are sorted by y-coordinate nearness.
+     * The results are sorted by y-coordinate nearness, then by insertion
+     * order, ending with the nearest, last inserted value.
      */
     public locateNearestX(xy: Point) {
         const predicate = createMinimizingNodePredicate(
@@ -195,7 +205,8 @@ export class RTree<T> {
      * query's y point to the nearest edge of the node bounds. If the node
      * bounds contains the query point, the distance is 0.
      *
-     * The results are sorted by x-coordinate nearness.
+     * The results are sorted by x-coordinate nearness, then by insertion
+     * order, ending with the nearest, last inserted value.
      */
     public locateNearestY(xy: Point) {
         const predicate = createMinimizingNodePredicate(
@@ -283,6 +294,7 @@ export class RTreeNode<T> {
     public entries: RTreeNode<T>[] = [];
     public parent: RTreeNode<T> = null;
     public value: T = null;
+    public insertionIndex: number = null;
 
     constructor(
         public leaf: boolean,

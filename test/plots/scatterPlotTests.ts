@@ -449,5 +449,43 @@ describe("Plots", () => {
         div.remove();
       });
     });
+
+    describe("entityNearest", () => {
+      const big = { x: 100, y: 100, size: 60 };
+      // Enough Entities to split the plot's R-tree, whose internal order then differs from drawing order
+      const otherData = [
+        { x: 300, y: 300, size: 6 },
+        { x: 310, y: 300, size: 6 },
+        { x: 320, y: 300, size: 6 },
+        { x: 330, y: 300, size: 6 },
+      ];
+      let div: d3.Selection<HTMLDivElement, any, any, any>;
+      let plot: Plottable.Plots.Scatter<number, number>;
+
+      beforeEach(() => {
+        div = TestMethods.generateDiv();
+        plot = new Plottable.Plots.Scatter<number, number>();
+        plot.x((d: any) => d.x).y((d: any) => d.y).size((d: any) => d.size);
+      });
+
+      afterEach(() => {
+        plot.destroy();
+        div.remove();
+      });
+
+      it("returns the Entity with the nearest position when the point is inside several Entities", () => {
+        const small = { x: 110, y: 110, size: 6 };
+        plot.addDataset(new Plottable.Dataset([small, big, ...otherData])).renderTo(div);
+
+        assert.strictEqual(plot.entityNearest(small).datum, small, "hovering the small symbol finds it inside the big one");
+      });
+
+      it("returns the Entity drawn last when the point is inside several Entities at the same position", () => {
+        const small = { x: big.x, y: big.y, size: 6 };
+        plot.addDataset(new Plottable.Dataset([big, small, ...otherData])).renderTo(div);
+
+        assert.strictEqual(plot.entityNearest(small).datum, small, "the symbol drawn on top is found");
+      });
+    });
   });
 });

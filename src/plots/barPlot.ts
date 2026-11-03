@@ -432,6 +432,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
    *   - If the query point is inside a bar, returns the PlotEntity for that bar.
    *   - Otherwise, gets the nearest PlotEntity by the positional direction (X for vertical, Y for horizontal),
    *     breaking ties with the secondary direction.
+   *   - Remaining ties, such as overlapping bars, go to the bar drawn last (the last Dataset, then the last datum).
    * Returns undefined if no PlotEntity can be found.
    *
    * @param {Point} queryPoint
