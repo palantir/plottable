@@ -55,6 +55,12 @@ describe("Scales", () => {
         assert.deepEqual(d3.color(scale.scale(100)), d3.color("#ffffff"), "values larger than the domain maximum clamp to white");
       });
 
+      it("maps values that are not numbers to black", () => {
+        scale.domain([0, 16]);
+        assert.deepEqual(d3.color(scale.scale(NaN)), d3.color("#000000"), "NaN maps to black");
+        assert.deepEqual(d3.color(scale.scale(undefined)), d3.color("#000000"), "undefined maps to black");
+      });
+
     });
   });
 });
