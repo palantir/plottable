@@ -32,6 +32,7 @@ export class Category extends Scale<string, number> implements ITransformableSca
   private _d3TransformationScale: d3.ScaleLinear<number, number, number>;
 
   private _d3Scale: d3.ScaleBand<string>;
+  private _domain: string[] = [];
   private _range = [0, 1];
 
   private _innerPadding: number;
@@ -98,7 +99,7 @@ export class Category extends Scale<string, number> implements ITransformableSca
     const normalizedDomain = domain.map((d) => this._d3Scale(d) + rangeBand / 2);
     const domainStart = d3.bisect(normalizedDomain, domainStartNormalized);
     const domainEnd = d3.bisect(normalizedDomain, domainEndNormalized);
-    return domain.slice(domainStart, domainEnd);
+    return this._domain.slice(domainStart, domainEnd);
   }
 
   public range(): [number, number];
@@ -204,8 +205,9 @@ export class Category extends Scale<string, number> implements ITransformableSca
   }
 
   public scale(value: string): number {
+    // Accessors read untyped data, so values can be numbers, and 1 and "1" must share a band
     // Determine the middle of the range band for the value
-    const untransformed = this._d3Scale(value) + this._d3Scale.bandwidth() / 2;
+    const untransformed = this._d3Scale(String(value)) + this._d3Scale.bandwidth() / 2;
     // Convert to screen space
     return this._d3TransformationScale(untransformed);
   }
@@ -255,9 +257,10 @@ export class Category extends Scale<string, number> implements ITransformableSca
   protected _backingScaleDomain(values: string[]): this;
   protected _backingScaleDomain(values?: string[]): any {
     if (values == null) {
-      return this._d3Scale.domain();
+      return this._domain.slice();
     } else {
-      this._d3Scale.domain(values);
+      this._domain = Utils.Array.uniq(values);
+      this._d3Scale.domain(this._domain.map(String));
       this._setBands();
       return this;
     }

@@ -9,40 +9,6 @@ import * as Utils from "../utils";
 
 import { Scale } from "./scale";
 
-/**
- * Workaround for bad d3 behavior.
- *
- * d3's color scales, which are oridinal scales, have side-effects when invoked.
- * When you call the `scale(value)` as a function, it will implicitly add new
- * values to the domain.
- *
- * These side-effects cause us to rely on looking up the current scale state
- * with the `.domain()` and `.range()` methods. However, these methods have poor
- * performance implications since they will always slice their internal values
- * before returning. Inside the inner render loop of color scatter plot points,
- * these slices add up.
- */
-class ImplicitSeriesTracker {
-  public count = 0;
-  private tracker = new Map<string, number>();
-
-  public getIndex(value: string) {
-    if (this.tracker.has(value)) {
-      return this.tracker.get(value);
-    } else{
-      const idx = this.count;
-      this.tracker.set(value, idx);
-      this.count += 1;
-      return idx;
-    }
-  }
-
-  public clear() {
-    this.count = 0;
-    this.tracker.clear();
-  }
-}
-
 // Preserve the public D3 4 palette names removed in D3 5.
 const CATEGORY20 = [
   "#1f77b4", "#aec7e8", "#ff7f0e", "#ffbb78", "#2ca02c",
@@ -73,10 +39,9 @@ export class Color extends Scale<string, string> {
 
   private static _plottableColorCache: string[];
 
-  private _d3Scale: d3.ScaleOrdinal<string, string>;
-  // Cache the number of range value to avoid calling `scale.range().length`
-  private _rangeLength = 1;
-  private _tracker = new ImplicitSeriesTracker();
+  private _domain: string[] = [];
+  private _domainIndices = new Map<string, number>();
+  private _range: string[];
 
   /**
    * A Color Scale maps string values to color hex values expressed as a string.
@@ -88,40 +53,39 @@ export class Color extends Scale<string, string> {
    */
   constructor(scaleType?: string) {
     super();
-    let scale: d3.ScaleOrdinal<string, string>;
+    let range: readonly string[];
     switch (scaleType) {
       case null:
       case undefined:
         if (Color._plottableColorCache == null) {
           Color._plottableColorCache = Color._getPlottableColors();
         }
-        scale = d3.scaleOrdinal<string, string>().range(Color._plottableColorCache);
+        range = Color._plottableColorCache;
         break;
       case "Category10":
       case "category10":
       case "10":
-        scale = d3.scaleOrdinal(d3.schemeCategory10);
+        range = d3.schemeCategory10;
         break;
       case "Category20":
       case "category20":
       case "20":
-        scale = d3.scaleOrdinal(CATEGORY20);
+        range = CATEGORY20;
         break;
       case "Category20b":
       case "category20b":
       case "20b":
-        scale = d3.scaleOrdinal(CATEGORY20B);
+        range = CATEGORY20B;
         break;
       case "Category20c":
       case "category20c":
       case "20c":
-        scale = d3.scaleOrdinal(CATEGORY20C);
+        range = CATEGORY20C;
         break;
       default:
         throw new Error("Unsupported ColorScale type");
     }
-    this._d3Scale = scale;
-    this._rangeLength = this._d3Scale.range().length;
+    this._range = range.slice();
   }
 
   public extentOfValues(values: string[]) {
@@ -167,14 +131,25 @@ export class Color extends Scale<string, string> {
    * @returns {string}
    */
   public scale(value: string): string {
-    const color = this._d3Scale(value);
-    const index = this._tracker.getIndex(value);
-    const numLooped = Math.floor(index / this._rangeLength);
+    const index = this._domainIndex(value);
+    const color = this._range[index % this._range.length];
+    const numLooped = Math.floor(index / this._range.length);
     if (numLooped === 0) {
       return color;
     }
     const modifyFactor = Math.log(numLooped * Color._LOOP_LIGHTEN_FACTOR + 1);
     return Utils.Color.lightenColor(color, modifyFactor);
+  }
+
+  private _domainIndex(value: string) {
+    // Accessors read untyped data, so values can be numbers, and 1 and "1" must share a color
+    const key = String(value);
+    let index = this._domainIndices.get(key);
+    if (index == null) {
+      index = this._domain.push(value) - 1;
+      this._domainIndices.set(key, index);
+    }
+    return index;
   }
 
   protected _getDomain() {
@@ -185,20 +160,20 @@ export class Color extends Scale<string, string> {
   protected _backingScaleDomain(values: string[]): this;
   protected _backingScaleDomain(values?: string[]): any {
     if (values == null) {
-      return this._d3Scale.domain();
+      return this._domain.slice();
     } else {
-      this._d3Scale.domain(values);
-      this._tracker.clear();
+      this._domain = [];
+      this._domainIndices.clear();
+      values.forEach((value) => this._domainIndex(value));
       return this;
     }
   }
 
   protected _getRange() {
-    return this._d3Scale.range();
+    return this._range.slice();
   }
 
   protected _setRange(values: string[]) {
-    this._d3Scale.range(values);
-    this._rangeLength = values.length;
+    this._range = values.slice();
   }
 }
