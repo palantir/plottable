@@ -7,7 +7,15 @@ import { Component } from "../components/component";
 import { Point } from "../core/interfaces";
 
 export class Interaction {
-  private _anchorCallback = (component: Component) => this._anchor(component);
+  private _anchorCallback = (component: Component) => {
+    this._detachCallback();
+    this._anchor(component);
+  }
+  private _detachCallback = () => {
+    if (this._isAnchored) {
+      this._unanchor();
+    }
+  }
   private _isAnchored: boolean;
   private _enabled = true;
 
@@ -107,6 +115,7 @@ export class Interaction {
   private _connect() {
     if (this.enabled() && this._componentAttachedTo != null && !this._isAnchored) {
       this._componentAttachedTo.onAnchor(this._anchorCallback);
+      this._componentAttachedTo.onDetach(this._detachCallback);
     }
   }
 
@@ -116,6 +125,7 @@ export class Interaction {
     }
     if (this._componentAttachedTo != null) {
       this._componentAttachedTo.offAnchor(this._anchorCallback);
+      this._componentAttachedTo.offDetach(this._detachCallback);
     }
   }
 }
