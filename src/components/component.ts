@@ -662,6 +662,13 @@ export class Component {
   }
 
   /**
+   * Checks if the Component is anchored to the DOM.
+   */
+  public isAnchored() {
+    return this._isAnchored;
+  }
+
+  /**
    * Gets the Selection containing the <g> in front of the visual elements of the Component.
    *
    * Will return undefined if the Component has not been anchored.

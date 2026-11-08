@@ -237,6 +237,14 @@ describe("Interactions", () => {
           assert.deepEqual(callback.lastStartPoint, startPoint, "start point is correct");
           assert.deepEqual(callback.lastEndPoint, tenFromEndPoint, "end point is last known location when cancelled");
         });
+
+        it("stops dragging when the Component is detached during a drag", () => {
+          triggerFakeDragStart(startPoint);
+          component.detach();
+          component.renderTo(div);
+          TestMethods.triggerFakeMouseEvent("mousemove", component.background(), endPoint.x, endPoint.y);
+          assert.isFalse(callback.called, "callback was not called after the Component was detached during a drag");
+        });
       });
 
       describe("for DragEnd", () => {

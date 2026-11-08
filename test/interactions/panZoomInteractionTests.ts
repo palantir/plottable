@@ -320,6 +320,22 @@ describe("Interactions", () => {
         div.remove();
       });
 
+      it("pinches after the Component is detached during a pinch", () => {
+        const startPoint = { x: DIV_WIDTH / 4, y: DIV_HEIGHT / 4 };
+        const startPoint2 = { x: DIV_WIDTH / 2, y: DIV_HEIGHT / 2 };
+        const endPoint = { x: DIV_WIDTH * 3 / 4, y: DIV_HEIGHT * 3 / 4 };
+        const expectedXDomain = domainAfterPinch(startPoint, startPoint2, startPoint, endPoint, xScale, true);
+
+        TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint, startPoint2], [0, 1] );
+        component.detach();
+        component.renderTo(div);
+        TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint, startPoint2], [2, 3] );
+        TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [3] );
+        TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [3] );
+        assert.deepEqual(xScale.domain(), expectedXDomain, "xScale transforms to the correct domain via pinch after detaching");
+        div.remove();
+      });
+
       it("can pinch inside one component and not affect another component", () => {
         const xScale2 = new Plottable.Scales.Linear();
         const initialDomain = [0, DIV_WIDTH / 2];
