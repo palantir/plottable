@@ -16,7 +16,7 @@ export class Interaction {
       this._unanchor();
     }
   }
-  private _isAnchored: boolean;
+  protected _isAnchored: boolean;
   private _enabled = true;
 
   protected _componentAttachedTo: Component;

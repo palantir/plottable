@@ -191,14 +191,11 @@ export class PanZoom extends Interaction {
 
   protected _unanchor() {
     super._unanchor();
-    const component = this._componentAttachedTo;
-    if (!component.isAnchored()) {
-      Promise.resolve().then(() => {
-        if (!component.isAnchored()) {
-          this._touchIds.clear();
-        }
-      });
-    }
+    Promise.resolve().then(() => {
+      if (!this._isAnchored) {
+        this._touchIds.clear();
+      }
+    });
     this._mouseDispatcher.offWheel(this._wheelCallback);
     this._mouseDispatcher = null;
 

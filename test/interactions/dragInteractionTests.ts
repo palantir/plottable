@@ -249,6 +249,17 @@ describe("Interactions", () => {
           }, 0);
         });
 
+        it("stops dragging when the Interaction is detached during a drag", (done) => {
+          triggerFakeDragStart(startPoint);
+          dragInteraction.detach();
+          setTimeout(() => {
+            dragInteraction.attachTo(component);
+            TestMethods.triggerFakeMouseEvent("mousemove", component.background(), endPoint.x, endPoint.y);
+            assert.isFalse(callback.called, "callback was not called after the Interaction was detached during a drag");
+            done();
+          }, 0);
+        });
+
         it("keeps dragging when the Component is rendered again during a drag", (done) => {
           triggerFakeDragStart(startPoint);
           component.renderTo(div);
