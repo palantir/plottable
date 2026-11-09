@@ -52,6 +52,12 @@ export class Click extends Interaction {
 
   protected _unanchor() {
     super._unanchor();
+    // Preserve a press through synchronous renderTo(), but discard it if its release can be missed.
+    Promise.resolve().then(() => {
+      if (!this._isAnchored) {
+        this._clickedDown = false;
+      }
+    });
     this._mouseDispatcher.offMouseDown(this._mouseDownCallback);
     this._mouseDispatcher.offMouseUp(this._mouseUpCallback);
     this._mouseDispatcher.offDblClick(this._dblClickCallback);

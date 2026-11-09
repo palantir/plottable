@@ -55,6 +55,11 @@ export class Drag extends Interaction {
 
   protected _unanchor() {
     super._unanchor();
+    Promise.resolve().then(() => {
+      if (!this._isAnchored) {
+        this._dragging = false;
+      }
+    });
     this._mouseDispatcher.offMouseDown(this._mouseDownCallback);
     this._mouseDispatcher.offMouseMove(this._mouseMoveCallback);
     this._mouseDispatcher.offMouseUp(this._mouseUpCallback);
