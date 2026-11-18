@@ -8,15 +8,13 @@ import { Point } from "../core/interfaces";
 
 export class Interaction {
   private _anchorCallback = (component: Component) => {
-    this._detachCallback();
-    this._anchor(component);
-  }
-  private _detachCallback = () => {
     if (this._isAnchored) {
       this._unanchor();
     }
+    this._anchor(component);
   }
-  protected _isAnchored: boolean;
+  private _detachCallback = () => this._unanchorAndReset();
+  private _isAnchored: boolean;
   private _enabled = true;
 
   protected _componentAttachedTo: Component;
@@ -29,8 +27,10 @@ export class Interaction {
    * @returns {Interaction} The calling Interaction.
    */
   public attachTo(component: Component) {
-    this._disconnect();
-    this._componentAttachedTo = component;
+    if (component !== this._componentAttachedTo) {
+      this._disconnect();
+      this._componentAttachedTo = component;
+    }
     this._connect();
     return this;
   }
@@ -87,6 +87,13 @@ export class Interaction {
   }
 
   /**
+   * Discards any gesture in progress. Called when the Interaction stops receiving events
+   * and could miss the event that ends the gesture.
+   */
+  protected _resetState() {
+  }
+
+  /**
    * Translates an <svg>-coordinate-space point to Component-space coordinates.
    *
    * @param {Point} p A Point in <svg>-space coordinates.
@@ -119,10 +126,15 @@ export class Interaction {
     }
   }
 
-  private _disconnect() {
+  private _unanchorAndReset() {
     if (this._isAnchored) {
       this._unanchor();
+      this._resetState();
     }
+  }
+
+  private _disconnect() {
+    this._unanchorAndReset();
     if (this._componentAttachedTo != null) {
       this._componentAttachedTo.offAnchor(this._anchorCallback);
       this._componentAttachedTo.offDetach(this._detachCallback);

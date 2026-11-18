@@ -33,17 +33,15 @@ export class Pointer extends Interaction {
 
   protected _unanchor() {
     super._unanchor();
-    // Preserve hover through synchronous renderTo(), but discard state if pointer events can be missed.
-    Promise.resolve().then(() => {
-      if (!this._isAnchored) {
-        this._overComponent = false;
-      }
-    });
     this._mouseDispatcher.offMouseMove(this._mouseMoveCallback);
     this._mouseDispatcher = null;
 
     this._touchDispatcher.offTouchStart(this._touchStartCallback);
     this._touchDispatcher = null;
+  }
+
+  protected _resetState() {
+    this._overComponent = false;
   }
 
   private _handleMouseEvent(p: Point, e: MouseEvent) {

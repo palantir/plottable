@@ -192,6 +192,20 @@ describe("SelectionBoxLayer", () => {
         div.remove();
       });
 
+      it("keeps dragging when a parent of dragBoxLayer is rendered again during a drag", () => {
+        const group = new Plottable.Components.Group([dbl]);
+        group.renderTo(div);
+        let onDragCallbackCalled = false;
+        dbl.onDrag(() => onDragCallbackCalled = true);
+
+        TestMethods.triggerFakeMouseEvent("mousedown", dbl.background(), quarterPoint.x, quarterPoint.y);
+        group.renderTo(div);
+        TestMethods.triggerFakeMouseEvent("mousemove", dbl.background(), halfPoint.x, halfPoint.y);
+        assert.isTrue(onDragCallbackCalled, "onDrag callback is called after a parent of dragBoxLayer was rendered again");
+        group.destroy();
+        div.remove();
+      });
+
       it("stops dragging when dragBoxLayer is detached during a drag", (done) => {
         const group = new Plottable.Components.Group([dbl]);
         group.renderTo(div);

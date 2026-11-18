@@ -191,11 +191,6 @@ export class PanZoom extends Interaction {
 
   protected _unanchor() {
     super._unanchor();
-    Promise.resolve().then(() => {
-      if (!this._isAnchored) {
-        this._touchIds.clear();
-      }
-    });
     this._mouseDispatcher.offWheel(this._wheelCallback);
     this._mouseDispatcher = null;
 
@@ -206,6 +201,10 @@ export class PanZoom extends Interaction {
     this._touchDispatcher = null;
 
     this._dragInteraction.detach();
+  }
+
+  protected _resetState() {
+    this._touchIds.clear();
   }
 
   private _handleTouchStart(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {

@@ -86,6 +86,24 @@ describe("Interactions", () => {
           assert.isFalse(callback.called, `callback not called after disconnecting (${MODE_NAME[mode]})`);
         });
 
+        it("does not call the onPointerEnter callback again when a parent is rendered again", () => {
+          const component = new Plottable.Component();
+          const group = new Plottable.Components.Group([component]);
+          group.renderTo(div);
+          const pointer = new Plottable.Interactions.Pointer();
+          pointer.attachTo(component);
+          pointer.onPointerEnter(callback);
+
+          triggerPointerEvent(HALF_POINT, mode, component.background());
+          assert.isTrue(callback.called, `callback called on entering Component (${MODE_NAME[mode]})`);
+
+          callback.reset();
+          group.renderTo(div);
+          triggerPointerEvent(QUARTER_POINT, mode, component.background());
+          assert.isFalse(callback.called, `callback not called again after the parent is rendered again (${MODE_NAME[mode]})`);
+          group.destroy();
+        });
+
         it("calls the onPointerMove callback", () => {
           pointerInteraction.onPointerMove(callback);
 
