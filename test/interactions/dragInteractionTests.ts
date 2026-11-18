@@ -260,6 +260,23 @@ describe("Interactions", () => {
           }, 0);
         });
 
+        it("keeps dragging when a parent of the Component is rendered again during a drag", () => {
+          const group = new Plottable.Components.Group([component]);
+          group.renderTo(div);
+          triggerFakeDragStart(startPoint);
+          group.renderTo(div);
+          TestMethods.triggerFakeMouseEvent("mousemove", component.background(), endPoint.x, endPoint.y);
+          assert.isTrue(callback.called, "callback was called after a parent of the Component was rendered again during a drag");
+          group.destroy();
+        });
+
+        it("keeps dragging when attached to the same Component again during a drag", () => {
+          triggerFakeDragStart(startPoint);
+          dragInteraction.attachTo(component);
+          TestMethods.triggerFakeMouseEvent("mousemove", component.background(), endPoint.x, endPoint.y);
+          assert.isTrue(callback.called, "callback was called after attaching to the same Component again during a drag");
+        });
+
         it("keeps dragging when the Component is rendered again during a drag", (done) => {
           triggerFakeDragStart(startPoint);
           component.renderTo(div);
@@ -268,6 +285,27 @@ describe("Interactions", () => {
             assert.isTrue(callback.called, "callback was called after the Component was rendered again during a drag");
             done();
           }, 0);
+        });
+
+        it("keeps dragging when a drag callback renders the Component again", () => {
+          let renders = 0;
+          dragInteraction.onDrag(() => {
+            if (renders++ === 0) {
+              component.renderTo(div);
+            }
+          });
+          triggerFakeDragMove(startPoint, endPoint);
+          callback.reset();
+          TestMethods.triggerFakeMouseEvent("mousemove", component.background(), startPoint.x, startPoint.y);
+          assert.isTrue(callback.called, "callback was called after a drag callback rendered the Component again");
+        });
+
+        it("stops dragging when renderTo() fails and leaves the Component detached", () => {
+          triggerFakeDragStart(startPoint);
+          assert.throws(() => component.renderTo("#not-an-element"), "valid Element");
+          component.renderTo(div);
+          TestMethods.triggerFakeMouseEvent("mousemove", component.background(), endPoint.x, endPoint.y);
+          assert.isFalse(callback.called, "callback was not called after a failed renderTo() left the Component detached");
         });
       });
 

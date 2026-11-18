@@ -38,18 +38,16 @@ export class Key extends Interaction {
 
   protected _unanchor() {
     super._unanchor();
-    // Preserve held keys through synchronous renderTo(), but discard them if keyup can be missed.
-    Promise.resolve().then(() => {
-      if (!this._isAnchored) {
-        this._downedKeys = new Utils.Set();
-      }
-    });
     this._positionDispatcher.offMouseMove(this._mouseMoveCallback);
     this._positionDispatcher = null;
 
     this._keyDispatcher.offKeyDown(this._keyDownCallback);
     this._keyDispatcher.offKeyUp(this._keyUpCallback);
     this._keyDispatcher = null;
+  }
+
+  protected _resetState() {
+    this._downedKeys = new Utils.Set();
   }
 
   private _handleKeyDownEvent(keyCode: number, event: KeyboardEvent) {

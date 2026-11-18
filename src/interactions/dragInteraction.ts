@@ -55,11 +55,6 @@ export class Drag extends Interaction {
 
   protected _unanchor() {
     super._unanchor();
-    Promise.resolve().then(() => {
-      if (!this._isAnchored) {
-        this._dragging = false;
-      }
-    });
     this._mouseDispatcher.offMouseDown(this._mouseDownCallback);
     this._mouseDispatcher.offMouseMove(this._mouseMoveCallback);
     this._mouseDispatcher.offMouseUp(this._mouseUpCallback);
@@ -69,6 +64,10 @@ export class Drag extends Interaction {
     this._touchDispatcher.offTouchMove(this._touchMoveCallback);
     this._touchDispatcher.offTouchEnd(this._touchEndCallback);
     this._touchDispatcher = null;
+  }
+
+  protected _resetState() {
+    this._dragging = false;
   }
 
   private _translateAndConstrain(p: Point) {
