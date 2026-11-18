@@ -158,6 +158,69 @@ describe("Interactions", () => {
       div2.remove();
     });
 
+    it("does not duplicate callbacks when the Component is anchored again", () => {
+      const div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
+      const component = new Plottable.Component();
+      const group = new Plottable.Components.Group([component]);
+
+      const pointerInteraction = new Plottable.Interactions.Pointer();
+      let callbackCount = 0;
+      pointerInteraction.onPointerMove(() => callbackCount++);
+      pointerInteraction.attachTo(component);
+
+      group.renderTo(div.node());
+      group.renderTo(div.node());
+      triggerMoveEvent(component);
+      assert.strictEqual(callbackCount, 1, "callback called once after the Component is anchored again");
+
+      group.destroy();
+      div.remove();
+    });
+
+    it("does not respond while the Component is detached", () => {
+      const div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
+      const component = new Plottable.Component();
+      component.renderTo(div);
+
+      const pointerInteraction = new Plottable.Interactions.Pointer();
+      let callbackCalled = false;
+      pointerInteraction.onPointerMove(() => callbackCalled = true);
+      pointerInteraction.attachTo(component);
+
+      component.detach();
+      TestMethods.triggerFakeMouseEvent("mousemove", div, DIV_WIDTH / 2, DIV_HEIGHT / 2);
+      assert.isFalse(callbackCalled, "callback not called while the Component is detached");
+
+      component.renderTo(div);
+      triggerMoveEvent(component);
+      assert.isTrue(callbackCalled, "callback called after the Component is rendered again");
+
+      component.destroy();
+      div.remove();
+    });
+
+    it("calls callbacks once when a callback renders the Component again", () => {
+      const div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
+      const component = new Plottable.Component();
+      component.renderTo(div);
+
+      const pointerInteraction = new Plottable.Interactions.Pointer();
+      let callbackCount = 0;
+      pointerInteraction.onPointerMove(() => {
+        callbackCount++;
+        if (callbackCount < 3) {
+          component.renderTo(div);
+        }
+      });
+      pointerInteraction.attachTo(component);
+
+      triggerMoveEvent(component);
+      assert.strictEqual(callbackCount, 1, "callback called once when it renders the Component again");
+
+      component.destroy();
+      div.remove();
+    });
+
     describe("enabled()", () => {
       it("setting and querying status", () => {
         const interaction = new Plottable.Interaction();
