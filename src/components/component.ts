@@ -13,6 +13,7 @@ import isElement from "lodash-es/isElement";
 import { coerceExternalD3 } from "../utils/coerceD3";
 import { makeEnum } from "../utils/makeEnum";
 import { ComponentContainer } from "./componentContainer";
+import { runRenderTo } from "./renderToScope";
 
 export type ComponentCallback = (component: Component) => void;
 
@@ -360,6 +361,10 @@ export class Component {
    * @returns {Component} The calling Component.
    */
   public renderTo(element: string | HTMLElement | d3.Selection<HTMLElement, any, any, any>): this {
+    return runRenderTo(() => this._renderTo(element));
+  }
+
+  private _renderTo(element: string | HTMLElement | d3.Selection<HTMLElement, any, any, any>): this {
     this.detach();
     if (element != null) {
       let selection: d3.Selection<HTMLElement, any, any, any>;

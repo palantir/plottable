@@ -4,6 +4,7 @@
  */
 
 import { Component } from "../components/component";
+import { afterRenderTo } from "../components/renderToScope";
 import { Point } from "../core/interfaces";
 
 export class Interaction {
@@ -13,7 +14,16 @@ export class Interaction {
     }
     this._anchor(component);
   }
-  private _detachCallback = () => this._unanchorAndReset();
+  private _detachCallback = () => {
+    if (this._isAnchored) {
+      this._unanchor();
+      afterRenderTo(() => {
+        if (!this._isAnchored) {
+          this._resetState();
+        }
+      });
+    }
+  }
   private _isAnchored: boolean;
   private _enabled = true;
 
