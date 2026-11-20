@@ -130,6 +130,9 @@ export class Component {
     }
 
     this._isAnchored = true;
+    if (this.isRoot()) {
+      watchFontLoading(this);
+    }
     this._onAnchorCallbacks.callCallbacks(this);
     return this;
   }
@@ -525,6 +528,7 @@ export class Component {
       this._element.remove();
     }
     this._isAnchored = false;
+    fontLoadingComponents.delete(this);
     this._onDetachCallbacks.callCallbacks(this);
 
     return this;
@@ -707,4 +711,36 @@ export class Component {
   public background(): SimpleSelection<void> {
     return this._backgroundContainer;
   }
+}
+
+const fontLoadingComponents = new Utils.Set<Component>();
+let isWatchingFontLoading = false;
+
+function watchFontLoading(component: Component) {
+  removeDisconnectedComponents();
+  fontLoadingComponents.add(component);
+  if (!isWatchingFontLoading && document.fonts != null) {
+    document.fonts.addEventListener("loadingdone", redrawAfterFontLoading);
+    isWatchingFontLoading = true;
+  }
+}
+
+function removeDisconnectedComponents() {
+  const disconnectedComponents: Component[] = [];
+  fontLoadingComponents.forEach((component) => {
+    if (!component.element().node().isConnected) {
+      disconnectedComponents.push(component);
+    }
+  });
+  disconnectedComponents.forEach((component) => fontLoadingComponents.delete(component));
+}
+
+function redrawAfterFontLoading() {
+  removeDisconnectedComponents();
+  fontLoadingComponents.forEach((component) => {
+    if (component.isRoot()) {
+      component.invalidateCache();
+      component.redraw();
+    }
+  });
 }

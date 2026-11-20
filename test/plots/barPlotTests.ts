@@ -449,6 +449,20 @@ describe("Plots", () => {
           assert.strictEqual(texts.size(), 0, "no labels drawn");
         });
 
+        it("measures the labels again when fonts finish loading", () => {
+          const style = div.append("style").text(".plottable .bar-label-text-area text { font-size: 200px; }");
+          barPlot.labelsEnabled(true);
+          const texts = () => barPlot.content().selectAll<Element, any>("text");
+          assert.strictEqual(texts().size(), 0, "labels too wide for the bars are hidden");
+
+          style.remove();
+          barPlot.redraw();
+          assert.strictEqual(texts().size(), 0, "labels stay hidden with the earlier measurements");
+
+          document.fonts.dispatchEvent(new Event("loadingdone"));
+          assert.strictEqual(texts().size(), data.length, "labels are drawn after fonts finish loading");
+        });
+
         it("lets stylesheets override the default label font size but not an explicit one", () => {
           div.append("style").text(".plottable .bar-label-text-area text { font-size: 16px; }");
           barPlot.labelsEnabled(true);
