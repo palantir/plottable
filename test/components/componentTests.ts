@@ -658,6 +658,68 @@ describe("Component", () => {
     });
   });
 
+  describe("loading fonts", () => {
+
+    let c: Plottable.Component;
+    let div: d3.Selection<HTMLDivElement, any, any, any>;
+
+    beforeEach(() => {
+      c = new Plottable.Component();
+      div = TestMethods.generateDiv(DIV_WIDTH, DIV_HEIGHT);
+    });
+
+    it("invalidates the cache and redraws from the root when fonts finish loading", () => {
+      const group = new Plottable.Components.Group([c]);
+      group.renderTo(div);
+      const invalidateCacheSpy = sinon.spy(c, "invalidateCache");
+      const computeLayoutSpy = sinon.spy(group, "computeLayout");
+
+      document.fonts.dispatchEvent(new Event("loadingdone"));
+      assert.isTrue(invalidateCacheSpy.calledOnce, "cache invalidated once");
+      assert.isTrue(computeLayoutSpy.calledOnce, "root layout recomputed once");
+
+      group.destroy();
+      div.remove();
+    });
+
+    it("does not redraw when fonts finish loading after detaching", () => {
+      c.renderTo(div);
+      c.detach();
+      const invalidateCacheSpy = sinon.spy(c, "invalidateCache");
+
+      document.fonts.dispatchEvent(new Event("loadingdone"));
+      assert.isFalse(invalidateCacheSpy.called, "cache not invalidated");
+
+      c.destroy();
+      div.remove();
+    });
+
+    it("does not redraw when fonts finish loading after its element is removed", () => {
+      c.renderTo(div);
+      div.remove();
+      const invalidateCacheSpy = sinon.spy(c, "invalidateCache");
+
+      document.fonts.dispatchEvent(new Event("loadingdone"));
+      assert.isFalse(invalidateCacheSpy.called, "cache not invalidated");
+
+      c.destroy();
+    });
+
+    it("redraws inside a shadow root when fonts finish loading", () => {
+      const shadowRoot = div.node().attachShadow({ mode: "open" });
+      const shadowDiv = document.createElement("div");
+      shadowRoot.appendChild(shadowDiv);
+      c.renderTo(shadowDiv);
+      const invalidateCacheSpy = sinon.spy(c, "invalidateCache");
+
+      document.fonts.dispatchEvent(new Event("loadingdone"));
+      assert.isTrue(invalidateCacheSpy.calledOnce, "cache invalidated once");
+
+      c.destroy();
+      div.remove();
+    });
+  });
+
   describe("rendering on the anchored div", () => {
 
     let c: Plottable.Component;
